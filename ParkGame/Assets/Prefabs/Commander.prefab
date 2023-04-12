@@ -10,10 +10,11 @@ GameObject:
   m_Component:
   - component: {fileID: 4485332556201745315}
   - component: {fileID: 4443134242904292131}
+  - component: {fileID: 4913421246284866641}
   - component: {fileID: -2561659011316829293}
   - component: {fileID: 4847180919347885991}
   - component: {fileID: 3127336112645494456}
-  - component: {fileID: 4913421246284866641}
+  - component: {fileID: 7324999011249965989}
   m_Layer: 0
   m_Name: Commander
   m_TagString: Untagged
@@ -34,7 +35,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &4443134242904292131
 MonoBehaviour:
@@ -52,6 +53,32 @@ MonoBehaviour:
   AlwaysReplicateAsRoot: 0
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
+--- !u!114 &4913421246284866641
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8693786845917539996}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73518536509d4eb4e89a6e488b9373ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SyncPositionX: 1
+  SyncPositionY: 1
+  SyncPositionZ: 0
+  SyncRotAngleX: 0
+  SyncRotAngleY: 0
+  SyncRotAngleZ: 0
+  SyncScaleX: 0
+  SyncScaleY: 0
+  SyncScaleZ: 0
+  PositionThreshold: 0.001
+  RotAngleThreshold: 0.01
+  ScaleThreshold: 0.01
+  InLocalSpace: 0
+  Interpolate: 1
 --- !u!114 &-2561659011316829293
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -137,7 +164,7 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
---- !u!114 &4913421246284866641
+--- !u!114 &7324999011249965989
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -146,20 +173,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 8693786845917539996}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 73518536509d4eb4e89a6e488b9373ff, type: 3}
+  m_Script: {fileID: 11500000, guid: 115a9a5bc3c16154594842d6f91a66ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SyncPositionX: 1
-  SyncPositionY: 1
-  SyncPositionZ: 0
-  SyncRotAngleX: 0
-  SyncRotAngleY: 0
-  SyncRotAngleZ: 0
-  SyncScaleX: 0
-  SyncScaleY: 0
-  SyncScaleZ: 0
-  PositionThreshold: 0.001
-  RotAngleThreshold: 0.01
-  ScaleThreshold: 0.01
-  InLocalSpace: 0
-  Interpolate: 1
+  TransitionStateInfoList: []
+  m_Animator: {fileID: 3127336112645494456}
