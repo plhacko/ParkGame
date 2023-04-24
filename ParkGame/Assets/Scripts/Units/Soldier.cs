@@ -18,6 +18,8 @@ public class Soldier : NetworkBehaviour
 
     private static readonly int MovementSpeed = Animator.StringToHash("MovementSpeed");
 
+    [SerializeField] float DistanceFromCommander = 2.0f;
+
     private void Initialize()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
@@ -45,7 +47,17 @@ public class Soldier : NetworkBehaviour
         NetworkObject no = NetworkManager?.LocalClient?.PlayerObject;
         if (no == null) { return; }
 
-        move(no.transform.position - transform.position);
+        Vector2 direction = no.transform.position - transform.position;
+        float distance = direction.magnitude;
+
+        if (distance > DistanceFromCommander)
+        {
+            move(direction);
+        }
+        else
+        {
+            animator.SetFloat(MovementSpeed, 0.0f);
+        }
     }
 
     private void move(Vector2 direction)
@@ -62,5 +74,10 @@ public class Soldier : NetworkBehaviour
         xSpriteFlip.Value = spriteRenderer.flipX;
 
         transform.Translate(movement * Time.deltaTime);
+    }
+
+    void OnMouseDown()
+    {
+        Debug.Log("Sprite Clicked");
     }
 }
