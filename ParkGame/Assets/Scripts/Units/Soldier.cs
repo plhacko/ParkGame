@@ -17,6 +17,7 @@ public class Soldier : NetworkBehaviour
         NetworkVariableWritePermission.Owner);
 
     private static readonly int MovementSpeed = Animator.StringToHash("MovementSpeed");
+    private bool following;
 
     [SerializeField] float DistanceFromCommander = 2.0f;
 
@@ -50,7 +51,7 @@ public class Soldier : NetworkBehaviour
         Vector2 direction = no.transform.position - transform.position;
         float distance = direction.magnitude;
 
-        if (distance > DistanceFromCommander)
+        if (distance > DistanceFromCommander && following)
         {
             move(direction);
         }
@@ -76,8 +77,16 @@ public class Soldier : NetworkBehaviour
         transform.Translate(movement * Time.deltaTime);
     }
 
+    // formation -> go there
+    public void MoveToPosition(Vector2 position) 
+    {
+
+    }
+
     void OnMouseDown()
     {
         Debug.Log("Sprite Clicked");
+        if (!IsOwner) { return; }
+        following = !following; // flip boolean
     }
 }
