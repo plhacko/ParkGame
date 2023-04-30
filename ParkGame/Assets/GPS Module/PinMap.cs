@@ -26,24 +26,6 @@ public class PinMap : MonoBehaviour
             return;
         }
 
-        var berlin = new Coordinate()
-        {
-            lon = 13.404954,
-            lat = 52.520008
-        };
-
-        var munchen = new Coordinate()
-        {
-            lon = 11.57549,
-            lat = 48.13743
-        };
-
-        var cheb = new Coordinate()
-        {
-            lon = 12.36837,
-            lat = 50.08375
-        };
-
         var tl = new Coordinate()
         {
             lon = 5.865010,
@@ -56,22 +38,49 @@ public class PinMap : MonoBehaviour
             lat = 47.269133
         };
 
+      
         var convertor = new CoordinateConverter();
 
-        var rect = GetComponent<SpriteRenderer>().sprite.rect;
-        int width = (int)rect.width;
-        int height = (int)rect.height;
+        var sprite = GetComponent<SpriteRenderer>().sprite;
+        
+        // Size of map in pixels
+        var rect = sprite.rect;
+        var mapXSize = (int)rect.width;
+        var mapYSize = (int)rect.height;
 
+        // Scale of map in unity units
+        var ppu = sprite.pixelsPerUnit;
+        var scale = transform.localScale;
+
+        var pixelXSize = 1 / ppu * scale.x;
+        var pixelYSize = 1 / ppu * scale.y;
+
+        // Size of map in Unity units
+        int width = (int)(rect.width * pixelXSize);
+        int height = (int)(rect.height * pixelYSize);
+
+
+        // Pin position in pixels
         var mapPosition = convertor.ConvertFrom3857ToPixelCoordinate(
             lon,
             lat,
             tl,
             br,
-            width,
-            height
+            mapXSize,
+            mapYSize
             );
 
-        pin.transform.position = new Vector3((float)mapPosition.lon, (float)mapPosition.lat, 0);
-        Debug.Log("Map position: " + mapPosition.lon + " " + mapPosition.lat);
+        // Offset it with the map
+        var offset = new Vector3(
+            transform.position.x - width / 2 + pixelXSize / 2,
+            transform.position.y - height / 2 + pixelYSize / 2,
+            transform.position.z
+        );
+    
+        var pinworldspacex = (float)mapPosition.lon * pixelXSize + offset.x;
+        var pinworldspacey = (float)mapPosition.lat * pixelYSize + offset.y;
+        var pinworldspacez = offset.z;
+
+        pin.transform.position = new Vector3(pinworldspacex, pinworldspacey, pinworldspacez);
     }
 }
