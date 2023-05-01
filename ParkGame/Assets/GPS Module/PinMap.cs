@@ -4,8 +4,23 @@ public class PinMap : MonoBehaviour
 {
     public GameObject pin;
 
-    public float lon = 13.404954f;
-    public float lat = 52.520008f;
+    public Coordinate pos = new Coordinate()
+    {
+        lon = 13.404954,
+        lat = 52.520008
+    };
+
+    public Coordinate tl = new Coordinate()
+    {
+        lon = 5.865010,
+        lat = 55.05772
+    };
+
+    public Coordinate br = new Coordinate()
+    {
+        lon = 15.043380,
+        lat = 47.269133
+    };
 
     // Start is called before the first frame update
     void Start()
@@ -25,19 +40,6 @@ public class PinMap : MonoBehaviour
             Debug.LogError("Pin Prefab is null");
             return;
         }
-
-        var tl = new Coordinate()
-        {
-            lon = 5.865010,
-            lat = 55.05772
-        };
-
-        var br = new Coordinate()
-        {
-            lon = 15.043380,
-            lat = 47.269133
-        };
-
       
         var convertor = new CoordinateConverter();
 
@@ -62,8 +64,8 @@ public class PinMap : MonoBehaviour
 
         // Pin position in pixels
         var mapPosition = convertor.ConvertFrom3857ToPixelCoordinate(
-            lon,
-            lat,
+            pos.lon,
+            pos.lat,
             tl,
             br,
             mapXSize,
@@ -72,8 +74,8 @@ public class PinMap : MonoBehaviour
 
         // Offset it with the map
         var offset = new Vector3(
-            transform.position.x - width / 2 + pixelXSize / 2,
-            transform.position.y - height / 2 + pixelYSize / 2,
+            transform.position.x - width / 2,
+            transform.position.y - height / 2,
             transform.position.z
         );
     

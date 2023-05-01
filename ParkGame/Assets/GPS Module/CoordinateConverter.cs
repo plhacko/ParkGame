@@ -2,6 +2,7 @@ using System;
 using ProjNet.CoordinateSystems;
 using ProjNet.CoordinateSystems.Transformations;
 
+[Serializable]
 public struct Coordinate
 {
     public double lon;
