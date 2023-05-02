@@ -9,7 +9,6 @@ public struct Coordinate
     public double lat;
 }
 
-
 public class CoordinateConverter
 { 
     public Coordinate ConvertFrom4326To3857Coordinate(double lon, double lat)
@@ -59,6 +58,40 @@ public class CoordinateConverter
         int height)
     {
         var mercatorP = ConvertFrom4326To3857Coordinate(lon, lat);
+        var mercatorTL = ConvertFrom4326To3857Coordinate(topLeft.lon, topLeft.lat);
+        var mercatorBR = ConvertFrom4326To3857Coordinate(bottomRight.lon, bottomRight.lat);
+
+        var latMin = Math.Min(mercatorTL.lat, mercatorBR.lat);
+        var latMax = Math.Max(mercatorTL.lat, mercatorBR.lat);
+        var lonMin = Math.Min(mercatorTL.lon, mercatorBR.lon);
+        var lonMax = Math.Max(mercatorTL.lon, mercatorBR.lon);
+
+        mercatorP.lon = Math.Clamp(mercatorP.lon, lonMin, lonMax);
+        mercatorP.lat = Math.Clamp(mercatorP.lat, latMin, latMax);
+
+        double xMin = 0;
+        double xMax = width - 1;
+        double yMin = 0;
+        double yMax = height - 1;
+
+        var x = (mercatorP.lon - lonMin) / (lonMax - lonMin) * (xMax - xMin);
+        var y = (mercatorP.lat - latMin) / (latMax - latMin) * (yMax - yMin);
+
+        return new Coordinate()
+        {
+            lon = x,
+            lat = y
+        };
+    }
+
+    public Coordinate ConvertFrom3857ToPixelCoordinate(
+       Coordinate position,
+       Coordinate topLeft,
+       Coordinate bottomRight,
+       int width,
+       int height)
+    {
+        var mercatorP = ConvertFrom4326To3857Coordinate(position.lon, position.lat);
         var mercatorTL = ConvertFrom4326To3857Coordinate(topLeft.lon, topLeft.lat);
         var mercatorBR = ConvertFrom4326To3857Coordinate(bottomRight.lon, bottomRight.lat);
 

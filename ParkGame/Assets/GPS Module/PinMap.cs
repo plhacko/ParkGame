@@ -1,10 +1,12 @@
+using System.Collections;
+using TMPro;
 using UnityEngine;
 
 public class PinMap : MonoBehaviour
 {
     public GameObject pin;
 
-    public Coordinate pos = new Coordinate()
+    public Coordinate pinPosition = new Coordinate()
     {
         lon = 13.404954,
         lat = 52.520008
@@ -22,14 +24,26 @@ public class PinMap : MonoBehaviour
         lat = 47.269133
     };
 
-    // Start is called before the first frame update
-    void Start()
-    {
-    }
+    public TextMeshProUGUI text;
+
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
+        // Check if GPS data is available
+        if (!GPSLocator.instance.IsLocationServiceEnabled())
+        {
+            text.text = "GPS not enabled";
+            // SetPin for debugging in Unity Editor
+            SetPin();
+            return;
+        }
+
+        pinPosition.lon = GPSLocator.instance.Longitude;
+        pinPosition.lat = GPSLocator.instance.Lattitude;
+
+        text.text = GPSLocator.instance.Lattitude.ToString() + " " + GPSLocator.instance.Longitude.ToString();
+
         SetPin();
     }
 
@@ -64,8 +78,7 @@ public class PinMap : MonoBehaviour
 
         // Pin position in pixels
         var mapPosition = convertor.ConvertFrom3857ToPixelCoordinate(
-            pos.lon,
-            pos.lat,
+            pinPosition,
             tl,
             br,
             mapXSize,
