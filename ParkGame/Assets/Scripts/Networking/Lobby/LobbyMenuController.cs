@@ -8,8 +8,16 @@ using UnityEngine.UI;
 
 public class LobbyMenuController : NetworkBehaviour
 {
+#if UNITY_EDITOR
     [SerializeField] private UnityEditor.SceneAsset gameScene;
     [SerializeField] private UnityEditor.SceneAsset joinMenuScene;
+    string gameSceneName { get => gameScene.name; }
+    string joinMenuSceneName { get => joinMenuScene.name; }
+#else
+    // TODO: check if the cenes have right names
+    string gameSceneName { get => "SampleGame"; }
+    string joinMenuSceneName { get => "SampleGame"; }
+#endif
 
     [SerializeField] private Button goBackButton;
     [SerializeField] private Button readyButton;
@@ -51,7 +59,7 @@ public class LobbyMenuController : NetworkBehaviour
 
     private void startGame()
     {
-        NetworkManager.Singleton.SceneManager.LoadScene(gameScene.name, LoadSceneMode.Single);
+        NetworkManager.Singleton.SceneManager.LoadScene(gameSceneName, LoadSceneMode.Single);
     }
 
     public override void OnNetworkSpawn()
@@ -162,6 +170,6 @@ public class LobbyMenuController : NetworkBehaviour
     {
         NetworkManager.Singleton.Shutdown();
         Destroy(NetworkManager.Singleton.gameObject);
-        SceneManager.LoadScene(joinMenuScene.name);
+        SceneManager.LoadScene(joinMenuSceneName);
     }
 }

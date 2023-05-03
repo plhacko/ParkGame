@@ -15,8 +15,13 @@ namespace Networking
 {
     public class JoinMenuController : MonoBehaviour
     {
+#if UNITY_EDITOR
         [SerializeField] private UnityEditor.SceneAsset lobbyMenuScene;
-        
+        string lobbyMenuSceneName { get => lobbyMenuScene.name; }
+#else
+        // TODO: check if the cenes have right names
+        string lobbyMenuSceneName { get => "LobbyMenu"; }
+#endif
         [SerializeField] private Button joinButton;
         [SerializeField] private Button hostButton;
         [SerializeField] private TMP_InputField joinCodeInputField;
@@ -65,7 +70,7 @@ namespace Networking
                     allocation.ConnectionData);
 
                 NetworkManager.Singleton.StartHost();
-                NetworkManager.Singleton.SceneManager.LoadScene(lobbyMenuScene.name, LoadSceneMode.Single);
+                NetworkManager.Singleton.SceneManager.LoadScene(lobbyMenuSceneName, LoadSceneMode.Single);
             }
             catch (RelayServiceException e)
             {
