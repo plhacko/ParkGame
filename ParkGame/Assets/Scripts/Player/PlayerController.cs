@@ -11,6 +11,7 @@ namespace Player
         private SpriteRenderer spriteRenderer;
         private Animator animator;
         private NetworkAnimator networkanimator;
+        private Formation formation;
 
         private NetworkVariable<bool> xSpriteFlip = new (false,
             NetworkVariableReadPermission.Everyone,
@@ -22,6 +23,7 @@ namespace Player
         {
             spriteRenderer = GetComponent<SpriteRenderer>();
             animator = GetComponent<Animator>();
+            formation = GetComponent<Formation>();
 
             if (!IsOwner)
             {
@@ -56,6 +58,12 @@ namespace Player
         
             Vector2 movement = input * movementSpeed;
             
+            if (movement == Vector2.zero) 
+            {
+                formation.ListFormationPositions();
+            } 
+
+
             animator.SetFloat(MovementSpeed, movement.magnitude);
 
             if (input.magnitude < Mathf.Epsilon) return;
