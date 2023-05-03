@@ -18,7 +18,7 @@ namespace Player
         
         private static readonly int MovementSpeed = Animator.StringToHash("MovementSpeed");
 
-        private void Initialize()
+        private void initialize()
         {
             spriteRenderer = GetComponent<SpriteRenderer>();
             animator = GetComponent<Animator>();
@@ -37,7 +37,7 @@ namespace Player
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
-            Initialize();
+            initialize();
         }
 
         private void Update()

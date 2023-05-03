@@ -202,7 +202,6 @@ GameObject:
   - component: {fileID: 410426473}
   - component: {fileID: 410426475}
   - component: {fileID: 410426476}
-  - component: {fileID: 410426477}
   m_Layer: 5
   m_Name: NetworkingHelperUI
   m_TagString: Untagged
@@ -274,22 +273,6 @@ MonoBehaviour:
   joinButton: {fileID: 1812615310}
   hostButton: {fileID: 650524174}
   joinCodeInputField: {fileID: 2029562324}
---- !u!114 &410426477
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 410426472}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 404458447
-  AlwaysReplicateAsRoot: 0
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
 --- !u!1 &536152028
 GameObject:
   m_ObjectHideFlags: 0
@@ -718,7 +701,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Join Code
+  m_text: Room Code
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -1024,7 +1007,7 @@ MonoBehaviour:
   NetworkConfig:
     ProtocolVersion: 0
     NetworkTransport: {fileID: 1487475478}
-    PlayerPrefab: {fileID: 8693786845917539996, guid: 6792bdcabd42fb04987eb19d3912546f, type: 3}
+    PlayerPrefab: {fileID: 0}
     Prefabs:
       NetworkPrefabsLists:
       - {fileID: 11400000, guid: f36479150aa54b740b3e094d8fbc8263, type: 2}

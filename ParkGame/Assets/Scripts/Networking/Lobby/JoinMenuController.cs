@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using TMPro;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
@@ -8,12 +9,11 @@ using Unity.Services.Relay;
 using Unity.Services.Relay.Models;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace Networking
 {
-    public class JoinMenuController : NetworkBehaviour
+    public class JoinMenuController : MonoBehaviour
     {
         [SerializeField] private UnityEditor.SceneAsset lobbyMenuScene;
         
@@ -23,6 +23,8 @@ namespace Networking
         
         private const int numPlayers = 1;
 
+        public static string RoomCode;
+        
         private async void Start()
         {
             enableButtons(false);
@@ -52,8 +54,8 @@ namespace Networking
             {
                 Allocation allocation = await RelayService.Instance.CreateAllocationAsync(numPlayers);
                 string joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
-                
-                Debug.Log(joinCode);
+
+                RoomCode = joinCode;
                 
                 NetworkManager.Singleton.GetComponent<UnityTransport>().SetHostRelayData(
                     allocation.RelayServer.IpV4,
@@ -63,12 +65,7 @@ namespace Networking
                     allocation.ConnectionData);
 
                 NetworkManager.Singleton.StartHost();
-                
-                var status = NetworkManager.SceneManager.LoadScene(lobbyMenuScene.name, LoadSceneMode.Single);
-                if (status != SceneEventProgressStatus.Started)
-                {
-                    Debug.LogWarning($"Failed to load {lobbyMenuScene.name}");
-                }
+                NetworkManager.Singleton.SceneManager.LoadScene(lobbyMenuScene.name, LoadSceneMode.Single);
             }
             catch (RelayServiceException e)
             {
@@ -79,7 +76,14 @@ namespace Networking
         public async void JoinGame()
         {
             enableButtons(false);
-            await JoinGame(joinCodeInputField.text);
+            
+            RoomCode = joinCodeInputField.text.ToUpper();
+            
+            bool joined = await JoinGame(joinCodeInputField.text);
+            if (!joined)
+            {
+                enableButtons(true);
+            }
             
             joinCodeInputField.text = "";
         }
@@ -91,7 +95,7 @@ namespace Networking
             joinCodeInputField.interactable = isInteractable;
         }
 
-        private static async Task JoinGame(string joinCode)
+        private static async Task<bool> JoinGame(string joinCode)
         {
             try
             {
@@ -106,10 +110,12 @@ namespace Networking
                     joinAllocation.HostConnectionData);
 
                 NetworkManager.Singleton.StartClient();
+                return true;
             }
-            catch (RelayServiceException e)
+            catch (Exception e)
             {
                 Debug.LogWarning(e);
+                return false;
             }
         }
     }
