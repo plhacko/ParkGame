@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using FreeDraw;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 using UnityEngine.Windows;
@@ -54,6 +53,7 @@ public class CreateMapWithOverlay : MonoBehaviour
     /// </summary>
     public void SaveMap()
     {
+#if UNITY_EDITOR
         var pngData = drawableTexture.EncodeToPNG();
         if (pngData == null)
         {
@@ -62,5 +62,8 @@ public class CreateMapWithOverlay : MonoBehaviour
         }
         File.WriteAllBytes(path, pngData);
         Debug.Log("Map saved");
+#else
+        Debug.Log("Currently the map can be saved only in the editor");
+#endif 
     }
 }
