@@ -22,7 +22,7 @@ public class Soldier : NetworkBehaviour
     private bool inPosition;
     private Vector3 positionInFormation;
 
-    [SerializeField] float DistanceFromCommander = 2.0f;
+    [SerializeField] float DistanceFromCommander = 1.0f;//2.0f;
 
     private void Initialize()
     {

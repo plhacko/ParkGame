@@ -50,7 +50,7 @@ public class Formation : MonoBehaviour
     public void ListFormationPositions() 
     {
         soldierPositions.Clear();
-        float radius = 2f;
+        float radius = 1f;// 2f; // radius from commander
         float alpha = 2 * Mathf.PI / followingSoldiers;
         
         for (int i = 0; i < followingSoldiers; i++) 
