@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using Unity.Netcode.Components;
-using UnityEngine.AI;
 
 public class Soldier : NetworkBehaviour
 {
@@ -12,8 +11,6 @@ public class Soldier : NetworkBehaviour
     private SpriteRenderer spriteRenderer;
     private Animator animator;
     private NetworkAnimator networkanimator;
-    private NavMeshAgent agent;
-    public GameObject target;
 
     private NetworkVariable<bool> xSpriteFlip = new(false,
         NetworkVariableReadPermission.Everyone,
@@ -28,8 +25,6 @@ public class Soldier : NetworkBehaviour
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
-        agent = gameObject.GetComponentInParent<NavMeshAgent>();
-        Debug.Log("agent " + agent);
 
         if (!IsOwner)
         {
@@ -57,9 +52,8 @@ public class Soldier : NetworkBehaviour
         float distance = direction.magnitude;
 
         if (distance > DistanceFromCommander && following)
-        {   
-            agent.SetDestination(target.transform.position);
-            //move(direction);
+        {
+            move(direction);
         }
         else
         {

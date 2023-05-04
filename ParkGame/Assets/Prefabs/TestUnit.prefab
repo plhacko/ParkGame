@@ -181,7 +181,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   movementSpeed: 1
-  target: {fileID: 0}
   DistanceFromCommander: 2
 --- !u!50 &4202592828477963968
 Rigidbody2D:
