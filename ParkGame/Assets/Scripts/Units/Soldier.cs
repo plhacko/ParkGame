@@ -18,6 +18,9 @@ public class Soldier : NetworkBehaviour
 
     private static readonly int MovementSpeed = Animator.StringToHash("MovementSpeed");
     private bool following;
+    private bool gotPosition;
+    private bool inPosition;
+    private Vector3 positionInFormation;
 
     [SerializeField] float DistanceFromCommander = 2.0f;
 
@@ -54,6 +57,18 @@ public class Soldier : NetworkBehaviour
         if (distance > DistanceFromCommander && following)
         {
             move(direction);
+            gotPosition = false;
+        } 
+        else if (following && !gotPosition) 
+        {
+            positionInFormation = no.GetComponent<Formation>().GetPositionInFormation();
+            inPosition = false;
+            gotPosition = true;
+        } 
+        else if (following && gotPosition && !inPosition) 
+        {
+            Vector2 dirToPos = positionInFormation - transform.position;
+            move(dirToPos);
         }
         else
         {
@@ -63,30 +78,48 @@ public class Soldier : NetworkBehaviour
 
     private void move(Vector2 direction)
     {
+        
+        if (direction.magnitude < 0.01f) {
+            animator.SetFloat(MovementSpeed, 0.0f);
+
+            Debug.Log("direction magnitude " + direction.magnitude);
+    
+            return;
+        }
+
         direction = direction.normalized;
 
         Vector2 movement = direction * movementSpeed;
 
         animator.SetFloat(MovementSpeed, movement.magnitude);
 
-        if (direction.magnitude < Mathf.Epsilon) return;
-
+        if (direction.magnitude < Mathf.Epsilon)
+        {
+            return;
+        }
+        Debug.Log("MOVEMENT " + movement);
         spriteRenderer.flipX = movement.x < 0;
         xSpriteFlip.Value = spriteRenderer.flipX;
 
         transform.Translate(movement * Time.deltaTime);
     }
 
-    // formation -> go there
-    public void MoveToPosition(Vector2 position) 
-    {
-
-    }
-
     void OnMouseDown()
     {
         Debug.Log("Sprite Clicked");
         if (!IsOwner) { return; }
+
         following = !following; // flip boolean
+        NetworkObject commander = NetworkManager?.LocalClient?.PlayerObject;
+        var formation = commander.GetComponent<Formation>();
+        if (following) 
+        {
+            // increase commander's counter - Formation
+            formation.addFollower();
+        } else 
+        {
+            // decrease commander's counter - Formation
+            formation.removeFollower();
+        }
     }
 }
