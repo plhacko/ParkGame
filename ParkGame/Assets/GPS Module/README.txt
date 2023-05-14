@@ -6,3 +6,5 @@ The access token then needs to submitted from the top Unity editor panel Mapbox 
 
 For the script MapDisplayer.cs to function Mapbox access token needs to be inserted into its public member variable 
 'Access Token' from the Inspector or within code. 
+
+For Android Build Android version should be at least 24.
