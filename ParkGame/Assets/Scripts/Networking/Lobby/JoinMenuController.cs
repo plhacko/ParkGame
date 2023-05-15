@@ -15,18 +15,11 @@ namespace Networking
 {
     public class JoinMenuController : MonoBehaviour
     {
-#if UNITY_EDITOR
-        [SerializeField] private UnityEditor.SceneAsset lobbyMenuScene;
-        string lobbyMenuSceneName { get => lobbyMenuScene.name; }
-#else
-        // TODO: check if the cenes have right names
-        string lobbyMenuSceneName { get => "LobbyMenu"; }
-#endif
+        [SerializeField] private string lobbyMenuSceneName;
+        [SerializeField] private string hostMenuSceneName;
         [SerializeField] private Button joinButton;
         [SerializeField] private Button hostButton;
         [SerializeField] private TMP_InputField joinCodeInputField;
-        
-        private const int numPlayers = 1;
 
         public static string RoomCode;
         
@@ -37,12 +30,7 @@ namespace Networking
             hostButton.onClick.AddListener(HostGame);
             
             await UnityServices.InitializeAsync();
-
-            AuthenticationService.Instance.SignedIn += () =>
-            {
-                Debug.Log("Signed in " + AuthenticationService.Instance.PlayerId);
-            };
-
+            
             if (!AuthenticationService.Instance.IsSignedIn)
             {
                 await AuthenticationService.Instance.SignInAnonymouslyAsync();   
@@ -51,31 +39,10 @@ namespace Networking
             enableButtons(true);
         }
 
-        private async void HostGame()
+        private void HostGame()
         {
             enableButtons(false);
-            
-            try
-            {
-                Allocation allocation = await RelayService.Instance.CreateAllocationAsync(numPlayers);
-                string joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
-
-                RoomCode = joinCode;
-                
-                NetworkManager.Singleton.GetComponent<UnityTransport>().SetHostRelayData(
-                    allocation.RelayServer.IpV4,
-                    (ushort)allocation.RelayServer.Port,
-                    allocation.AllocationIdBytes,
-                    allocation.Key,
-                    allocation.ConnectionData);
-
-                NetworkManager.Singleton.StartHost();
-                NetworkManager.Singleton.SceneManager.LoadScene(lobbyMenuSceneName, LoadSceneMode.Single);
-            }
-            catch (RelayServiceException e)
-            {
-                Debug.LogWarning(e);
-            }
+            SceneManager.LoadScene(hostMenuSceneName, LoadSceneMode.Single);
         }
 
         public async void JoinGame()
