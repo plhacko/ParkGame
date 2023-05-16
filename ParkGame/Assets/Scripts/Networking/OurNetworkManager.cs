@@ -8,5 +8,20 @@ namespace Networking
 
         public string RoomCode;
 
+        private void Awake()
+        {
+            OnClientConnectedCallback += OnClientConnected;
+            OnClientDisconnectCallback += OnClientDisconnected;
+        }
+
+        private void OnClientDisconnected(ulong obj)
+        {
+            // throw new System.NotImplementedException();
+        }
+
+        private void OnClientConnected(ulong obj)
+        {
+            // throw new System.NotImplementedException();
+        }
     }
 }

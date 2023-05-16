@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using TMPro;
-using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
@@ -15,19 +14,16 @@ namespace Networking
 {
     public class JoinMenuController : MonoBehaviour
     {
-        [SerializeField] private string lobbyMenuSceneName;
         [SerializeField] private string hostMenuSceneName;
         [SerializeField] private Button joinButton;
         [SerializeField] private Button hostButton;
         [SerializeField] private TMP_InputField joinCodeInputField;
 
-        public static string RoomCode;
-        
         private async void Start()
         {
             enableButtons(false);
-            joinButton.onClick.AddListener(JoinGame);
-            hostButton.onClick.AddListener(HostGame);
+            joinButton.onClick.AddListener(joinGame);
+            hostButton.onClick.AddListener(hostGame);
             
             await UnityServices.InitializeAsync();
             
@@ -39,25 +35,25 @@ namespace Networking
             enableButtons(true);
         }
 
-        private void HostGame()
+        private void hostGame()
         {
             enableButtons(false);
             SceneManager.LoadScene(hostMenuSceneName, LoadSceneMode.Single);
         }
 
-        public async void JoinGame()
+        private async void joinGame()
         {
             enableButtons(false);
             
-            RoomCode = joinCodeInputField.text.ToUpper();
+            OurNetworkManager.Singleton.RoomCode = joinCodeInputField.text.ToUpper();
             
-            bool joined = await JoinGame(joinCodeInputField.text);
+            bool joined = await joinGame(joinCodeInputField.text);
             if (!joined)
             {
                 enableButtons(true);
+                OurNetworkManager.Singleton.RoomCode = "";
+                joinCodeInputField.text = "";
             }
-            
-            joinCodeInputField.text = "";
         }
 
         private void enableButtons(bool isInteractable)
@@ -67,13 +63,13 @@ namespace Networking
             joinCodeInputField.interactable = isInteractable;
         }
 
-        private static async Task<bool> JoinGame(string joinCode)
+        private static async Task<bool> joinGame(string joinCode)
         {
             try
             {
                 JoinAllocation joinAllocation = await RelayService.Instance.JoinAllocationAsync(joinCode);
                 
-                NetworkManager.Singleton.GetComponent<UnityTransport>().SetClientRelayData(
+                OurNetworkManager.Singleton.GetComponent<UnityTransport>().SetClientRelayData(
                     joinAllocation.RelayServer.IpV4,
                     (ushort)joinAllocation.RelayServer.Port,
                     joinAllocation.AllocationIdBytes,
@@ -81,7 +77,7 @@ namespace Networking
                     joinAllocation.ConnectionData,
                     joinAllocation.HostConnectionData);
 
-                NetworkManager.Singleton.StartClient();
+                OurNetworkManager.Singleton.StartClient();
                 return true;
             }
             catch (Exception e)

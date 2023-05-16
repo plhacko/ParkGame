@@ -13,7 +13,6 @@ public class PrepareGameMenuController : MonoBehaviour
     [SerializeField] private string joinGameSceneName;
     [SerializeField] private Button backButton;
     [SerializeField] private Button createButton;
-    [SerializeField] private NumberPicker numberPicker;
 
     void Awake()
     {
@@ -34,7 +33,7 @@ public class PrepareGameMenuController : MonoBehaviour
         setInteractable(false);
         try
         {
-            Allocation allocation = await RelayService.Instance.CreateAllocationAsync(numberPicker.Number);
+            Allocation allocation = await RelayService.Instance.CreateAllocationAsync(1);
             string joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
             
             OurNetworkManager.Singleton.RoomCode = joinCode;
@@ -60,6 +59,5 @@ public class PrepareGameMenuController : MonoBehaviour
     {
         backButton.interactable = interactable;
         createButton.interactable = interactable;
-        numberPicker.SetInteractable(interactable);
     }
 }
