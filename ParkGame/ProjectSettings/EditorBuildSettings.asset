@@ -11,6 +11,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/SampleMultiplayerScene.unity
     guid: 74c43dccafad75644ae217038456d828
+  - enabled: 1
+    path: Assets/Scenes/TestingCombatScene.unity
+    guid: 3fd0b38ed656c18469c156bd1c1afcd1
   m_configObjects:
     com.unity.adaptiveperformance.loader_settings: {fileID: 11400000, guid: 3ad410e226113ae45a953aa6554aea9c, type: 2}
     com.unity.adaptiveperformance.simulator.provider_settings: {fileID: 11400000, guid: 439bd770a0624a141bf5dfc5e420bfcc, type: 2}
