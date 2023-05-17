@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using Unity.Netcode.Components;
+using UnityEngine.AI;
 
 public class Soldier : NetworkBehaviour
 {
@@ -22,10 +23,14 @@ public class Soldier : NetworkBehaviour
     private bool inPosition;
     private Vector3 positionInFormation;
 
+    NavMeshAgent navMeshAgent;
+
+
     [SerializeField] float DistanceFromCommander = 1.0f;//2.0f;
 
     private void Initialize()
     {
+        navMeshAgent = GetComponent<NavMeshAgent>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
 
@@ -67,8 +72,9 @@ public class Soldier : NetworkBehaviour
         } 
         else if (following && gotPosition && !inPosition) 
         {
-            Vector2 dirToPos = positionInFormation - transform.position;
-            move(dirToPos);
+            navMeshAgent.SetDestination(positionInFormation);
+            //Vector2 dirToPos = positionInFormation - transform.position;
+            //move(dirToPos);
         }
         else
         {
