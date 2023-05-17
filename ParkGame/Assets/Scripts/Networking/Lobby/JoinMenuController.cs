@@ -77,6 +77,7 @@ namespace Networking
                     joinAllocation.ConnectionData,
                     joinAllocation.HostConnectionData);
 
+                OurNetworkManager.Singleton.NetworkConfig.ConnectionData = SessionManager.Singleton.LocalPlayerId.ToByteArray();
                 OurNetworkManager.Singleton.StartClient();
                 return true;
             }

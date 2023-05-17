@@ -1281,7 +1281,35 @@ MonoBehaviour:
   joinGameSceneName: JoinGameMenu
   backButton: {fileID: 1473583322}
   createButton: {fileID: 1560430782}
-  numberPicker: {fileID: 0}
+  maps:
+  - Name: Park 1
+    Teams:
+    - PlayerCountRange:
+        Min: 1
+        Max: 2
+      TeamNumber: 0
+    - PlayerCountRange:
+        Min: 1
+        Max: 2
+      TeamNumber: 0
+  - Name: Park 2
+    Teams:
+    - PlayerCountRange:
+        Min: 1
+        Max: 2
+      TeamNumber: 0
+    - PlayerCountRange:
+        Min: 1
+        Max: 2
+      TeamNumber: 0
+    - PlayerCountRange:
+        Min: 1
+        Max: 2
+      TeamNumber: 0
+    - PlayerCountRange:
+        Min: 1
+        Max: 2
+      TeamNumber: 0
 --- !u!1 &1926720176
 GameObject:
   m_ObjectHideFlags: 0
