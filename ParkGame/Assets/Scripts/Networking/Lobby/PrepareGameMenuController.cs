@@ -37,7 +37,6 @@ namespace Networking.Lobby
         {
             setInteractable(false);
             OurNetworkManager.Singleton.Shutdown();
-            Destroy(OurNetworkManager.Singleton.gameObject);
             SceneManager.LoadScene(joinGameSceneName, LoadSceneMode.Single);
         }
 

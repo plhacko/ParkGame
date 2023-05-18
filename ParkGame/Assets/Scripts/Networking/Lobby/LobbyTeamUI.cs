@@ -11,29 +11,38 @@ namespace Networking
         [SerializeField] private Button joinButton;
         [SerializeField] private RectTransform teamParent;
         
-        private LobbyMenuController2 lobbyMenuController2;
+        private LobbyMenuController lobbyMenuController;
         private int teamNumber;
 
         private readonly Dictionary<Guid, LobbyPlayerUI> playerUIs = new();
 
         private void Awake()
         {
+            Debug.Log("created for team " + teamNumber);
+            playerUIs.Clear();
             joinButton.onClick.AddListener(onJoinButtonClicked);
+        }
+
+        private void Update()
+        {
+            // Debug.Log(playerUIs.Count);
         }
 
         private void onJoinButtonClicked()
         {
-            lobbyMenuController2.JoinTeam(teamNumber);
+            lobbyMenuController.JoinTeam(teamNumber);
         }
 
-        public void Initialize(LobbyMenuController2 lobbyMenuController2, int teamNumber)
+        public void Initialize(LobbyMenuController lobbyMenuController, int teamNumber)
         {
-            this.lobbyMenuController2 = lobbyMenuController2;
+            Debug.Log("created for team ---- " + teamNumber);
+            this.lobbyMenuController = lobbyMenuController;
             this.teamNumber = teamNumber;
         }
 
         public void AddPlayer(PlayerData playerData, bool isLocalPlayer)
         {
+            Debug.Log(playerUIs.Count + " " + playerData.ID);
             LobbyPlayerUI playerUI = Instantiate(lobbyPlayerUIPrefab, teamParent);
             playerUI.Initialize(this, playerData, isLocalPlayer);
             playerUIs.Add(playerData.ID, playerUI);
@@ -41,7 +50,7 @@ namespace Networking
         
         public void RemovePlayer(PlayerData playerData)
         {
-            lobbyMenuController2.RemoveFromTeam(playerData);
+            lobbyMenuController.RemoveFromTeam(playerData);
         }
 
         public bool CanJoin()

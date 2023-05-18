@@ -9,7 +9,7 @@ using UnityEngine.UI;
 
 namespace Networking
 {
-    public class LobbyMenuController2 : NetworkBehaviour
+    public class LobbyMenuController : NetworkBehaviour
     {
         [SerializeField] private string gameSceneName;
         [SerializeField] private string joinMenuSceneName;
@@ -20,13 +20,15 @@ namespace Networking
         [SerializeField] private LobbyTeamUI lobbyTeamUIPrefab;
 
         [SerializeField] private RectTransform teamsParent;
-        [SerializeField] private List<LobbyTeamUI> teamUIs = new();
         
+        private List<LobbyTeamUI> teamUIs = new();
         private MapData mapData;
 
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
+            Debug.Log("----------------------------------");
+            Debug.Log(teamUIs.Count);
             initialize();
         }
         
@@ -55,6 +57,24 @@ namespace Networking
             {
                 SessionManager.Singleton.OnMapReceived += initializeTeamUI;
             }
+            
+            OurNetworkManager.Singleton.OnClientDisconnectCallback += onClientDisconnect;
+        }
+
+        private void onClientDisconnect(ulong clientId)
+        {
+            if (IsHost)
+            {
+                var playerData = SessionManager.Singleton.GetPlayerData(clientId);
+                if (playerData.HasValue)
+                {
+                    RemoveFromTeam(playerData.Value);   
+                }
+            }
+            else if (clientId == 0)
+            {
+                goBack();   
+            }
         }
 
         private void onSetPlayerData(PlayerData playerData)
@@ -82,7 +102,20 @@ namespace Networking
 
         private void goBack()
         {
-            throw new System.NotImplementedException();
+            if (IsHost)
+            {
+                var copyOfKeys = new List<ulong>(OurNetworkManager.Singleton.ConnectedClients.Keys);
+                
+                foreach (var clientId in copyOfKeys)
+                {
+                    if(clientId == OurNetworkManager.Singleton.LocalClientId) continue;
+                    OurNetworkManager.Singleton.DisconnectClient(clientId);
+                }
+            }
+            
+            OurNetworkManager.Singleton.Shutdown();
+            SessionManager.Singleton.ClearData(true);
+            SceneManager.LoadScene(joinMenuSceneName, LoadSceneMode.Single);   
         }
 
         private void startGame()
@@ -206,26 +239,5 @@ namespace Networking
             if(teamNumber == -1) return;
             teamUIs[teamNumber].RemovePlayerUI(playerId);
         }
-        
-        // public void RemoveFromTeam(PlayerData data, int oldTeamNumber)
-        // {
-        //     if(data.Team == -1) return;
-        //     
-        //     teamUIs[data.Team].RemovePlayerUI(data.ID);
-        //     data.Team = -1;
-        //     SessionManager.Singleton.SetPlayerData(data);
-        // }
-
-        // [ServerRpc]
-        // private void RemoveFromTeamUIServerRpc(Guid playerData, int teamNumber, ServerRpcParams clientRpcParams = default)
-        // {
-        //     throw new NotImplementedException();
-        // }
-        //
-        // [ClientRpc]
-        // private void RemoveFromTeamUIClientRpc(Guid playerData, int teamNumber, ClientRpcParams clientRpcParams = default)
-        // {
-        //     throw new NotImplementedException();
-        // }
     }
 }

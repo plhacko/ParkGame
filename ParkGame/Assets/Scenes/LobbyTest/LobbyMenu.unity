@@ -598,13 +598,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameSceneName: 
-  joinMenuSceneName: 
+  joinMenuSceneName: JoinGameMenu
   goBackButton: {fileID: 1136283629}
   startGameButton: {fileID: 2080904514}
   roomCodeLabel: {fileID: 1214342303}
   lobbyTeamUIPrefab: {fileID: 5719480191540753893, guid: 05e620151527e2440979015ea4e64daa, type: 3}
   teamsParent: {fileID: 1843917588}
-  teamUIs: []
 --- !u!1 &1136283627
 GameObject:
   m_ObjectHideFlags: 0

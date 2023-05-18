@@ -132,7 +132,6 @@ namespace Networking
             PlayerData? playerData = SessionManager.Singleton.GetPlayerData(clientId);
             if(playerData.HasValue)
             {
-                Debug.Log($"Sending player data to {clientId} {playerData.Value.Name}");
                 SessionManager.Singleton.SetPlayerDataClientRpc(clientId, playerData.Value, OneClientRpcParams(clientId));
                 
                 foreach (var idPair in SessionManager.Singleton.ClientIdToPlayerId)
@@ -141,7 +140,6 @@ namespace Networking
                     
                     if(SessionManager.Singleton.ClientData.TryGetValue(idPair.Value, out var otherPlayerData))
                     {
-                        Debug.Log($"Sending player data to {clientId} {otherPlayerData.Name}");
                         SessionManager.Singleton.SetPlayerDataClientRpc(idPair.Key, otherPlayerData, OneClientRpcParams(clientId));   
                     }
                 }

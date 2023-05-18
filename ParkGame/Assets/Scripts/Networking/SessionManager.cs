@@ -12,7 +12,7 @@ namespace Networking
     public class SessionManager : NetworkBehaviour
     {
         public static int MaxNumTeams = 4;
-        
+
         public static SessionManager Singleton
         {
             get
@@ -20,13 +20,7 @@ namespace Networking
                 if (instance != null) return instance;
                 
                 instance = FindObjectOfType<SessionManager>();
-
-                if (instance != null) return instance;
-                    
-                GameObject singletonObject = new GameObject();
-                instance = singletonObject.AddComponent<SessionManager>();
-                DontDestroyOnLoad(singletonObject);
-
+                
                 return instance;
             }
         }
@@ -172,13 +166,11 @@ namespace Networking
         {
             if (IsHost) return;
             
-            if(OnMapReceived == null) return;
             OnMapReceived.Invoke(mapData);
         }
 
         public void InitializeHost()
         {
-            Debug.Log("--------- " + LocalPlayerName);
             Guid clientGuid = Guid.NewGuid();
             SetPlayerId(OwnerClientId, clientGuid);
             UpdatePlayerData(new PlayerData
@@ -187,6 +179,16 @@ namespace Networking
                 Name = new ForceNetworkSerializeByMemcpy<FixedString64Bytes>(LocalPlayerName),
                 Team = -1
             });
+        }
+        
+        public void ClearData(bool clearId)
+        {
+            OnMapReceived = null;
+            OnSetPlayerData = null;
+            ClientIdToPlayerId.Clear();
+            ClientData.Clear();
+            if(clearId)
+                localPlayerId = Guid.Empty;
         }
     }
 }
