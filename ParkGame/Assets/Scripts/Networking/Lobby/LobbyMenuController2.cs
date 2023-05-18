@@ -134,8 +134,26 @@ namespace Networking
             }
             else
             {
-                // RemoveFromTeamServerRpc(OurNetworkManager.Singleton.LocalClientId);
+                RemoveFromTeamServerRpc(OurNetworkManager.Singleton.LocalClientId);
             }
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        private void RemoveFromTeamServerRpc(ulong clientId, ServerRpcParams clientRpcParams = default)
+        {
+            var playerData = SessionManager.Singleton.GetPlayerData(clientId);
+            if(!playerData.HasValue) return;
+            
+            if(playerData.Value.Team == -1) return;
+            
+            var data = playerData.Value;
+            RemoveFromTeamClientRpc(data);
+            
+            int oldTeam = data.Team;
+            data.Team = -1;
+            
+            removeFromTeamUI(data.ID, oldTeam);
+            SessionManager.Singleton.UpdatePlayerData(data);
         }
 
         [ClientRpc]
