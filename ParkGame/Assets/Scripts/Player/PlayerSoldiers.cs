@@ -16,8 +16,10 @@ public class PlayerSoldiers : MonoBehaviour
         Debug.Log("found #" + s.Length.ToString() + " soldiers");
         for (int i = 0; i < s.Length; i++) {
             GameObject sgo = s[i].gameObject;
-            s[i].Follow(true);
-            soldiers.Add(sgo);
+            if (!s[i].IsFollowing()) {
+                s[i].Follow(true);
+                soldiers.Add(sgo);
+            }
         }
     }
 

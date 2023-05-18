@@ -139,7 +139,9 @@ public class Soldier : NetworkBehaviour
 
         transform.Translate(movement * Time.deltaTime);
     }
-
+    public bool IsFollowing() {
+        return following;
+    }
     public void Follow(bool follow) {
         following = follow;
         NetworkObject commander = NetworkManager?.LocalClient?.PlayerObject;
