@@ -13,6 +13,8 @@ namespace Player
         private NetworkAnimator networkanimator;
         private Formation formation;
 
+        private PlayerSoldiers soldiers;
+
         private NetworkVariable<bool> xSpriteFlip = new (false,
             NetworkVariableReadPermission.Everyone,
             NetworkVariableWritePermission.Owner);
@@ -24,6 +26,7 @@ namespace Player
             spriteRenderer = GetComponent<SpriteRenderer>();
             animator = GetComponent<Animator>();
             formation = GetComponent<Formation>();
+            soldiers = GetComponent<PlayerSoldiers>();
 
             if (!IsOwner)
             {
@@ -42,10 +45,19 @@ namespace Player
             Initialize();
         }
 
+        void FollowedByAllSwitch() {
+            soldiers.SwitchMassSelect();
+        }
+
         private void Update()
         {
             if (!IsOwner) return;
-            
+
+            if (Input.GetKeyDown(KeyCode.F)) {
+                FollowedByAllSwitch();
+                
+            }
+
             if (Application.isFocused)
             {
                 move();   

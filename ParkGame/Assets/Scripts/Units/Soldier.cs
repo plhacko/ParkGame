@@ -53,33 +53,40 @@ public class Soldier : NetworkBehaviour
 
     void Update()
     {
-        NetworkObject no = NetworkManager?.LocalClient?.PlayerObject;
-        if (no == null) { return; }
+        NetworkObject commander = NetworkManager?.LocalClient?.PlayerObject;
+        if (commander == null) { return; }
 
-        Vector2 direction = no.transform.position - transform.position;
+        Vector2 direction = commander.transform.position - transform.position;
         float distance = direction.magnitude;
 
-        if (distance > DistanceFromCommander && following)
-        {
+        if (following) {
+            positionInFormation = commander.GetComponent<Formation>().GetPositionInFormation();
+
+            navMeshAgent.SetDestination(positionInFormation);
+        } else {
+            //jitter/wander
+        }
+        
+
+        /*
+        if (distance > DistanceFromCommander && following) {
             move(direction);
             gotPosition = false;
-        } 
-        else if (following && !gotPosition) 
-        {
+        } else if (following && !gotPosition) {
             positionInFormation = no.GetComponent<Formation>().GetPositionInFormation();
             inPosition = false;
             gotPosition = true;
-        } 
-        else if (following && gotPosition && !inPosition) 
-        {
+        } else if (following && gotPosition && !inPosition) {
             navMeshAgent.SetDestination(positionInFormation);
+
             //Vector2 dirToPos = positionInFormation - transform.position;
             //move(dirToPos);
-        }
-        else
-        {
+
+        } else {
             animator.SetFloat(MovementSpeed, 0.0f);
         }
+        */
+
     }
 
     private void move(Vector2 direction)
@@ -110,22 +117,31 @@ public class Soldier : NetworkBehaviour
         transform.Translate(movement * Time.deltaTime);
     }
 
+    public void Follow(bool follow) {
+        following = follow;
+        NetworkObject commander = NetworkManager?.LocalClient?.PlayerObject;
+        var formation = commander.GetComponent<Formation>();
+        if (follow) {
+            formation.addFollower();
+        } else {
+            formation.removeFollower();
+        }
+    }
+
     void OnMouseDown()
     {
         Debug.Log("Sprite Clicked");
         if (!IsOwner) { return; }
 
         following = !following; // flip boolean
-        NetworkObject commander = NetworkManager?.LocalClient?.PlayerObject;
-        var formation = commander.GetComponent<Formation>();
         if (following) 
         {
             // increase commander's counter - Formation
-            formation.addFollower();
+            Follow(true);
         } else 
         {
             // decrease commander's counter - Formation
-            formation.removeFollower();
+            Follow(false);
         }
     }
 }
