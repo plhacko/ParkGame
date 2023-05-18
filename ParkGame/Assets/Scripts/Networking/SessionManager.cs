@@ -113,8 +113,6 @@ namespace Networking
         public void SetPlayerDataClientRpc(ulong clientId, PlayerData playerData, ClientRpcParams clientRpcParams = default)
         {
             if(IsHost) return;
-
-            Debug.Log(clientId + " " + playerData.Team + " " + playerData.Name.Value);
             
             SetPlayerId(clientId, playerData.ID);
             UpdatePlayerData(playerData);

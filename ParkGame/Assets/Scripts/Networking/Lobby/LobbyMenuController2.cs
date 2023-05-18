@@ -21,6 +21,8 @@ namespace Networking
 
         [SerializeField] private RectTransform teamsParent;
         [SerializeField] private List<LobbyTeamUI> teamUIs = new();
+        
+        private MapData mapData;
 
         public override void OnNetworkSpawn()
         {
@@ -63,6 +65,7 @@ namespace Networking
         
         private void initializeTeamUI(MapData mapData)
         {
+            this.mapData = mapData;
             for (int teamNumber = 0; teamNumber < mapData.NumTeams; teamNumber++)
             {
                 LobbyTeamUI teamUI = createTeamUI(teamNumber);
@@ -115,10 +118,26 @@ namespace Networking
             }
             else
             {
-                // PlayerData data = playerData.Value;
-                // data.Team = teamNumber;
-                // data.Name = nameInputField.text;
+                JoinTeamServerRpc(OurNetworkManager.Singleton.LocalClientId, teamNumber);
             }
+        }
+        
+        [ServerRpc(RequireOwnership = false)]
+        private void JoinTeamServerRpc(ulong clientId, int newTeam, ServerRpcParams clientRpcParams = default)
+        {
+            var playerData = SessionManager.Singleton.GetPlayerData(clientId);
+            if(!playerData.HasValue) return;
+            
+            if(newTeam < 0 || newTeam >= mapData.NumTeams) return;
+
+            var data = playerData.Value;
+            int oldTeam = data.Team;
+            data.Team = newTeam;
+            
+            removeFromTeamUI(data.ID, oldTeam);
+            addPlayerToTeamUI(data);
+            SessionManager.Singleton.UpdatePlayerData(data);
+            JoinTeamClientRpc(data, oldTeam);
         }
 
         [ClientRpc]
@@ -140,6 +159,8 @@ namespace Networking
         private void removeFromTeamUI(Guid playerId, int teamNumber)
         {
             if(teamNumber == -1) return;
+            
+            Debug.Log(teamNumber + " " + playerId);
             
             teamUIs[teamNumber].RemovePlayerUI(playerId);
         }
