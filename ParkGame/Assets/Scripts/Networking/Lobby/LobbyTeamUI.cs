@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Networking.Lobby;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -13,7 +12,7 @@ namespace Networking
         [SerializeField] private RectTransform teamParent;
         
         private LobbyMenuController2 lobbyMenuController2;
-        private TeamAllocationData teamAllocationData;
+        private int teamNumber;
 
         private readonly Dictionary<Guid, LobbyPlayerUI> playerUIs = new();
 
@@ -24,13 +23,13 @@ namespace Networking
 
         private void onJoinButtonClicked()
         {
-            lobbyMenuController2.JoinTeam(teamAllocationData.TeamNumber);
+            lobbyMenuController2.JoinTeam(teamNumber);
         }
 
-        public void Initialize(LobbyMenuController2 lobbyMenuController2, TeamAllocationData teamAllocationData)
+        public void Initialize(LobbyMenuController2 lobbyMenuController2, int teamNumber)
         {
             this.lobbyMenuController2 = lobbyMenuController2;
-            this.teamAllocationData = teamAllocationData;
+            this.teamNumber = teamNumber;
         }
 
         public void AddPlayer(PlayerData playerData)
@@ -40,9 +39,26 @@ namespace Networking
             playerUIs.Add(playerData.ID, playerUI);
         }
         
-        public void RemovePlayer(Guid playerData)
+        public void RemovePlayer(PlayerData playerData)
         {
-            lobbyMenuController2.RemoveFromTeamUI(playerData, teamAllocationData.TeamNumber);
+            // lobbyMenuController2.RemoveFromTeam(playerData);
+        }
+
+        public bool CanJoin()
+        {
+            var teams = SessionManager.Singleton.GetTeams();
+            return teams[teamNumber].Count <= 4;
+        }
+        
+        public void TryEnableJoinButton(bool interactable)
+        {
+            joinButton.interactable = interactable && CanJoin();
+        }
+
+        public void RemovePlayerUI(Guid playerId)
+        {
+            Destroy(playerUIs[playerId].gameObject);
+            playerUIs.Remove(playerId);
         }
     }
 }

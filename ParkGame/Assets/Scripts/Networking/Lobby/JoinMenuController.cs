@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using TMPro;
 using Unity.Netcode.Transports.UTP;
@@ -76,8 +77,12 @@ namespace Networking
                     joinAllocation.Key,
                     joinAllocation.ConnectionData,
                     joinAllocation.HostConnectionData);
-
-                OurNetworkManager.Singleton.NetworkConfig.ConnectionData = SessionManager.Singleton.LocalPlayerId.ToByteArray();
+                
+                var name = System.Text.Encoding.ASCII.GetBytes(SessionManager.Singleton.LocalPlayerName);
+                var localPlayerId = SessionManager.Singleton.LocalPlayerId.ToByteArray();
+                var payload = localPlayerId.Concat(name).ToArray();
+                
+                OurNetworkManager.Singleton.NetworkConfig.ConnectionData = payload;
                 OurNetworkManager.Singleton.StartClient();
                 return true;
             }

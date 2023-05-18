@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Networking.Lobby;
+using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -9,6 +11,8 @@ namespace Networking
 
     public class SessionManager : NetworkBehaviour
     {
+        public static int MaxNumTeams = 4;
+        
         public static SessionManager Singleton
         {
             get
@@ -28,13 +32,35 @@ namespace Networking
         }
 
         public Guid LocalPlayerId => localPlayerId;
-        
-        private static SessionManager instance;
+        public string LocalPlayerName => localPlayerName;
 
-        private readonly Dictionary<ulong, Guid> clientIdToPlayerId = new();
-        private readonly Dictionary<Guid, PlayerData> clientData = new();
+        public Dictionary<int, List<Guid>> GetTeams()
+        {
+            Dictionary<int, List<Guid>> teams = new();
+            for (int i = 0; i < MaxNumTeams; i++)
+            {
+                teams.Add(i, new List<Guid>());
+            }
+            
+            foreach (var (key, value) in ClientData)
+            {
+                if(value.Team == -1) continue;
+                teams[value.Team].Add(key);
+            }
+            
+            return teams;  
+        } 
+
+        private static SessionManager instance;
+        
+        public readonly Dictionary<ulong, Guid> ClientIdToPlayerId = new();
+        public readonly Dictionary<Guid, PlayerData> ClientData = new();
+        
+        public event Action<PlayerData> OnSetPlayerData = null;
+        public event Action<MapData> OnMapReceived = null;
         
         private Guid localPlayerId;
+        private string localPlayerName;
         
         private void Awake()
         {
@@ -52,12 +78,11 @@ namespace Networking
         
         public Guid? GetPlayerId(ulong clientId)
         {
-            if (clientIdToPlayerId.TryGetValue(clientId, out Guid playerId))
+            if (ClientIdToPlayerId.TryGetValue(clientId, out Guid playerId))
             {
                 return playerId;
             }
 
-            Debug.Log($"No client player ID found mapped to the given client ID: {clientId}");
             return null;
         }
 
@@ -71,31 +96,40 @@ namespace Networking
                 return GetPlayerData(playerId.Value);
             }
             
-            Debug.Log($"No client player ID found mapped to the given client ID: {clientId}");
             return null;
         }
 
         public PlayerData? GetPlayerData(Guid playerId)
         {
-            if (clientData.TryGetValue(playerId, out PlayerData data))
+            if (ClientData.TryGetValue(playerId, out PlayerData data))
             {
                 return data;
             }
             
-            Debug.Log($"No PlayerData of matching player ID found: {playerId}");
             return null;
         }
         
         [ClientRpc]
         public void SetPlayerDataClientRpc(ulong clientId, PlayerData playerData, ClientRpcParams clientRpcParams = default)
         {
+            if(IsHost) return;
+
+            Debug.Log(clientId + " " + playerData.Team + " " + playerData.Name.Value);
+            
             SetPlayerId(clientId, playerData.ID);
-            SetPlayerData(playerData);
+            UpdatePlayerData(playerData);
+            
+            OnSetPlayerData.Invoke(playerData);
         }
         
-        public void SetPlayerData(PlayerData playerData)
+        public void UpdatePlayerData(PlayerData playerData)
         {
-            clientData[playerData.ID] = playerData;
+            ClientData[playerData.ID] = playerData;
+        }
+        
+        public void SetName(string name)
+        {
+            localPlayerName = name;
         }
 
         public void SetPlayerId(ulong clientId, Guid playerId)
@@ -103,29 +137,58 @@ namespace Networking
             if(OurNetworkManager.Singleton.LocalClientId == clientId)
                 localPlayerId = playerId;
             
-            if (clientIdToPlayerId.ContainsKey(clientId))
+            if (ClientIdToPlayerId.ContainsKey(clientId))
             {
-                clientIdToPlayerId[clientId] = playerId;
+                ClientIdToPlayerId[clientId] = playerId;
                 return;
             }
             
-            clientIdToPlayerId.Add(clientId, playerId);
+            ClientIdToPlayerId.Add(clientId, playerId);
         }
 
         public bool IsConnected(Guid playerId)
         {
-            ulong clientId = ulong.MaxValue;
-            
-            foreach (var id in clientIdToPlayerId)
+            foreach (var id in ClientIdToPlayerId)
             {
                 if (id.Value == playerId)
                 {
-                    clientId = id.Key;
-                    break;
+                    return OurNetworkManager.Singleton.ConnectedClientsIds.Contains(id.Key);
                 }
             }
+
+            return false;
+        }
+
+        public void SetPlayerTeam(Guid playerId, int team)
+        {
+            if (ClientData.TryGetValue(playerId, out PlayerData data))
+            {
+                data.Team = team;
+                ClientData[playerId] = data;
+            }
+        }
+
+        
+        [ClientRpc]
+        public void SendMapDataClientRpc(MapData mapData, ClientRpcParams clientRpcParams)
+        {
+            if (IsHost) return;
             
-            return clientId != ulong.MaxValue && OurNetworkManager.Singleton.ConnectedClientsIds.Contains(clientId);
+            if(OnMapReceived == null) return;
+            OnMapReceived.Invoke(mapData);
+        }
+
+        public void InitializeHost()
+        {
+            Debug.Log("--------- " + LocalPlayerName);
+            Guid clientGuid = Guid.NewGuid();
+            SetPlayerId(OwnerClientId, clientGuid);
+            UpdatePlayerData(new PlayerData
+            {
+                ID = clientGuid,
+                Name = new ForceNetworkSerializeByMemcpy<FixedString64Bytes>(LocalPlayerName),
+                Team = -1
+            });
         }
     }
 }

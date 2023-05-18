@@ -1,18 +1,36 @@
 ﻿using System;
-using System.Collections.Generic;
 using Networking.Lobby;
+using Unity.Collections;
 using Unity.Netcode;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Networking
 {
     
-    public struct PlayerData : INetworkSerializeByMemcpy
+    public struct PlayerData : INetworkSerializable
     {
-         public string Name;
-         public Guid ID;
+         public ForceNetworkSerializeByMemcpy<FixedString64Bytes> Name;
          public int Team;
+         public Guid ID;
+         
+         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+         {
+             serializer.SerializeValue(ref Name);
+             serializer.SerializeValue(ref Team);
+
+             if (serializer.IsWriter)
+             {
+                 byte[] idBytes = ID.ToByteArray();
+                 serializer.SerializeValue(ref idBytes);
+             }
+
+             if (serializer.IsReader)
+             {
+                 byte[] idBytes = new byte[16];
+                 serializer.SerializeValue(ref idBytes);
+                 ID = new Guid(idBytes);
+             }
+         }
     }
     
     public enum ServerState
@@ -30,6 +48,7 @@ namespace Networking
         
         private ServerState serverState;
         
+        
         private void Awake()
         {
             OnClientConnectedCallback += OnClientConnected;
@@ -38,20 +57,6 @@ namespace Networking
             
             serverState = ServerState.Lobby;
         }
-
-        // private void OnServerStartedHandler()
-        // {
-        //     serverState = ServerState.Lobby;
-        //     
-        //     Guid clientGuid = Guid.NewGuid();
-        //     SessionManager.Singleton.SetPlayerId(LocalClientId, clientGuid);
-        //     SessionManager.Singleton.SetPlayerData(new PlayerData
-        //     {
-        //         ID = clientGuid,
-        //         Name = "",
-        //         Team = 7
-        //     });
-        // }
 
         private void OnConnectionApproval(ConnectionApprovalRequest request, ConnectionApprovalResponse response)
         {
@@ -62,20 +67,18 @@ namespace Networking
             // host started hosting            
             if(clientId == LocalClientId)
             {
-                Guid clientGuid = Guid.NewGuid();
-                SessionManager.Singleton.SetPlayerId(clientId, clientGuid);
-                SessionManager.Singleton.SetPlayerData(new PlayerData
-                {
-                    ID = clientGuid,
-                    Name = "",
-                    Team = 7
-                });
-                
+                SessionManager.Singleton.InitializeHost();
                 response.Approved = true;
                 return;
             }
-
-            Guid playerId = new Guid(request.Payload);
+            
+            byte[] guidBytes = new byte[16];
+            byte[] nameBytes = new byte[request.Payload.Length - 16];
+            
+            Array.Copy(request.Payload, 0, guidBytes, 0, 16);
+            Array.Copy(request.Payload, 16, nameBytes, 0, request.Payload.Length - 16);
+            
+            Guid playerId = new Guid(guidBytes);
             if (SessionManager.Singleton.IsConnected(playerId))
             {
                 response.Approved = false;
@@ -96,12 +99,14 @@ namespace Networking
             if(serverState == ServerState.Lobby)
             {
                 Guid clientGuid = Guid.NewGuid();
+                string playerName = System.Text.Encoding.ASCII.GetString(nameBytes);
+                
                 SessionManager.Singleton.SetPlayerId(clientId, clientGuid);
-                SessionManager.Singleton.SetPlayerData(new PlayerData
+                SessionManager.Singleton.UpdatePlayerData(new PlayerData
                 {
                     ID = clientGuid,
-                    Name = "",
-                    Team = 7
+                    Name = new ForceNetworkSerializeByMemcpy<FixedString64Bytes>(playerName),
+                    Team = -1
                 });
                 
                 response.Approved = true;
@@ -119,11 +124,27 @@ namespace Networking
         private void OnClientConnected(ulong clientId)
         {
             if (!IsHost) return;
+            
+            if (clientId == LocalClientId) return;
+            
+            SessionManager.Singleton.SendMapDataClientRpc(MapData, OneClientRpcParams(clientId));
 
             PlayerData? playerData = SessionManager.Singleton.GetPlayerData(clientId);
             if(playerData.HasValue)
             {
-                SessionManager.Singleton.SetPlayerDataClientRpc(clientId, playerData.Value);
+                Debug.Log($"Sending player data to {clientId} {playerData.Value.Name}");
+                SessionManager.Singleton.SetPlayerDataClientRpc(clientId, playerData.Value, OneClientRpcParams(clientId));
+                
+                foreach (var idPair in SessionManager.Singleton.ClientIdToPlayerId)
+                {
+                    if(clientId == idPair.Key) continue;
+                    
+                    if(SessionManager.Singleton.ClientData.TryGetValue(idPair.Value, out var otherPlayerData))
+                    {
+                        Debug.Log($"Sending player data to {clientId} {otherPlayerData.Name}");
+                        SessionManager.Singleton.SetPlayerDataClientRpc(idPair.Key, otherPlayerData, OneClientRpcParams(clientId));   
+                    }
+                }
             }
             else
             {
@@ -162,6 +183,14 @@ namespace Networking
             // {
             //     // todo reconnect
             // }
+        }
+
+        public static ClientRpcParams OneClientRpcParams(ulong clientId)
+        {
+            return new ClientRpcParams
+            {
+                Send = new ClientRpcSendParams { TargetClientIds = new [] { clientId } }
+            };
         }
     }
 }

@@ -16,7 +16,6 @@ namespace Networking
 
         [SerializeField] private Button goBackButton;
         [SerializeField] private Button startGameButton;
-        [SerializeField] private TMP_InputField nameInputField;
         [SerializeField] private TextMeshProUGUI roomCodeLabel;
         [SerializeField] private LobbyTeamUI lobbyTeamUIPrefab;
 
@@ -40,57 +39,41 @@ namespace Networking
                 startGameButton.gameObject.SetActive(false);
             }
 
-            OurNetworkManager.Singleton.OnClientConnectedCallback += onClientConnected;
+            SessionManager.Singleton.OnSetPlayerData += onSetPlayerData;
             
             roomCodeLabel.text += OurNetworkManager.Singleton.RoomCode;
         
             goBackButton.onClick.AddListener(goBack);
 
-            if (!IsHost) return;
-            
-            initializeTeamUI(OurNetworkManager.Singleton.MapData);
-        }
-        
-        [ClientRpc]
-        private void sendMapDataClientRpc(MapData mapData, ClientRpcParams clientRpcParams)
-        {
-            initializeTeamUI(mapData);
-        }
-
-        private void onClientConnected(ulong clientId)
-        {
             if (IsHost)
             {
-                if (clientId == OurNetworkManager.Singleton.LocalClientId) return;
-                
-                ClientRpcParams clientRpcParams = new ClientRpcParams
-                {
-                    Send = new ClientRpcSendParams
-                    {
-                        TargetClientIds = new ulong[]{ clientId }
-                    }
-                };
-
-                sendMapDataClientRpc(OurNetworkManager.Singleton.MapData, clientRpcParams);
+                initializeTeamUI(OurNetworkManager.Singleton.MapData);   
             }
-            
+            else
+            {
+                SessionManager.Singleton.OnMapReceived += initializeTeamUI;
+            }
         }
 
+        private void onSetPlayerData(PlayerData playerData)
+        {
+            if(playerData.Team == -1) return;
+            addPlayerToTeamUI(playerData);
+        }
+        
         private void initializeTeamUI(MapData mapData)
         {
-            foreach (var team in mapData.Teams)
+            for (int teamNumber = 0; teamNumber < mapData.NumTeams; teamNumber++)
             {
-                if (team.PlayerCountRange.Max <= 0) continue;
-                
-                LobbyTeamUI teamUI = createTeamUI(team);
+                LobbyTeamUI teamUI = createTeamUI(teamNumber);
                 teamUIs.Add(teamUI);
             }
         }
 
-        private LobbyTeamUI createTeamUI(TeamAllocationData teamAllocationData)
+        private LobbyTeamUI createTeamUI(int teamNumber)
         {
             var teamUI = Instantiate(lobbyTeamUIPrefab, teamsParent);
-            teamUI.Initialize(this, teamAllocationData);
+            teamUI.Initialize(this, teamNumber);
             return teamUI;
         }
 
@@ -107,47 +90,68 @@ namespace Networking
         public void JoinTeam(int teamNumber)
         {
             PlayerData? playerData = SessionManager.Singleton.GetLocalPlayerData();
-            if(!playerData.HasValue) return;
+            
+            if (!playerData.HasValue) return;
+            if (!teamUIs[teamNumber].CanJoin()) return;
+            
+            foreach (var teamUI in teamUIs)
+            {
+                teamUI.TryEnableJoinButton(true);    
+            }
+            teamUIs[teamNumber].TryEnableJoinButton(false);
             
             if (IsHost)
             {
+                
                 PlayerData data = playerData.Value;
+                int oldTeam = playerData.Value.Team;
+
                 data.Team = teamNumber;
-                data.Name = nameInputField.text;
+                SessionManager.Singleton.UpdatePlayerData(data);
+                
+                removeFromTeamUI(data.ID, oldTeam);
                 addPlayerToTeamUI(data);
-                JoinTeamClientRpc(OurNetworkManager.Singleton.LocalClientId, data);
+                JoinTeamClientRpc(data, oldTeam);
             }
             else
             {
-                
+                // PlayerData data = playerData.Value;
+                // data.Team = teamNumber;
+                // data.Name = nameInputField.text;
             }
         }
 
         [ClientRpc]
-        private void JoinTeamClientRpc(ulong clientId, PlayerData playerData, ClientRpcParams clientRpcParams = default)
+        private void JoinTeamClientRpc(PlayerData playerData, int oldTeamNumber, ClientRpcParams clientRpcParams = default)
         {
             if(IsHost) return;
             
+            removeFromTeamUI(playerData.ID, oldTeamNumber);
             addPlayerToTeamUI(playerData);
+            
+            SessionManager.Singleton.UpdatePlayerData(playerData);
         }
         
         private void addPlayerToTeamUI(PlayerData playerData)
         {
-            SessionManager.Singleton.SetPlayerData(playerData);
             teamUIs[playerData.Team].AddPlayer(playerData);
         }
 
-        public void RemoveFromTeamUI(Guid playerData, int teamNumber)
+        private void removeFromTeamUI(Guid playerId, int teamNumber)
         {
-            if (IsHost)
-            {
-                // RemoveFromTeamUIClientRpc(playerData, teamNumber);   
-            }
-            else
-            {
-                // RemoveFromTeamUIServerRpc(playerData, teamNumber);
-            }
+            if(teamNumber == -1) return;
+            
+            teamUIs[teamNumber].RemovePlayerUI(playerId);
         }
+        
+        // public void RemoveFromTeam(PlayerData data, int oldTeamNumber)
+        // {
+        //     if(data.Team == -1) return;
+        //     
+        //     teamUIs[data.Team].RemovePlayerUI(data.ID);
+        //     data.Team = -1;
+        //     SessionManager.Singleton.SetPlayerData(data);
+        // }
 
         // [ServerRpc]
         // private void RemoveFromTeamUIServerRpc(Guid playerData, int teamNumber, ServerRpcParams clientRpcParams = default)

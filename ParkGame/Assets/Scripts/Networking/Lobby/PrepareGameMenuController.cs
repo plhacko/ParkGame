@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using Unity.Collections;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using Unity.Services.Relay;
@@ -12,59 +12,10 @@ using UnityEngine.UI;
 namespace Networking.Lobby
 {
     [Serializable]
-    public struct MapData : INetworkSerializable
+    public struct MapData : INetworkSerializeByMemcpy
     {
-        public string Name;
-        public TeamAllocationData[] Teams;
-        public int GetMaxNumPlayers() => Teams.Sum(team => team.PlayerCountRange.Max);
-
-        public void InitTeams()
-        {
-            for (int i = 0; i < Teams.Length; i++)
-            {
-                var team = Teams[i];
-                team.TeamNumber = i;
-                Teams[i] = team;
-            }
-        }
-
-        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
-        {
-            serializer.SerializeValue(ref Name);
-            
-            int length = 0;
-            if (!serializer.IsReader)
-            {
-                length = Teams.Length;
-            }
-
-            serializer.SerializeValue(ref length);
-
-            // Array
-            if (serializer.IsReader)
-            {
-                Teams = new TeamAllocationData[length];
-            }
-
-            for (int i = 0; i < length; ++i)
-            {
-                serializer.SerializeValue(ref Teams[i]);
-            }
-        }
-    }
-    
-    [Serializable]
-    public struct Range : INetworkSerializeByMemcpy
-    {
-        public int Min;
-        public int Max;
-    }
-    
-    [Serializable]
-    public struct TeamAllocationData : INetworkSerializeByMemcpy
-    {
-        public Range PlayerCountRange;
-        [HideInInspector] public int TeamNumber;
+        public FixedString64Bytes Name;
+        public int NumTeams;
     }
 
     public class PrepareGameMenuController : MonoBehaviour
@@ -78,11 +29,6 @@ namespace Networking.Lobby
     
         void Awake()
         {
-            for (int i = 0; i < maps.Count; i++)
-            {
-                maps[i].InitTeams();
-            }
-        
             createButton.onClick.AddListener(createGame);
             backButton.onClick.AddListener(backJoinGameScene);
         }
@@ -102,7 +48,7 @@ namespace Networking.Lobby
             {
                 MapData mapData = maps[0];
                 
-                Allocation allocation = await RelayService.Instance.CreateAllocationAsync(mapData.GetMaxNumPlayers());
+                Allocation allocation = await RelayService.Instance.CreateAllocationAsync(mapData.NumTeams * 4);
                 string joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
             
                 OurNetworkManager.Singleton.RoomCode = joinCode;

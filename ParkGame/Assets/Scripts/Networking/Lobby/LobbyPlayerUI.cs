@@ -1,5 +1,4 @@
-﻿using System;
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,10 +13,10 @@ namespace Networking
         {
             playerUnReadyButton.onClick.AddListener(() =>
             {
-                lobbyTeamUI.RemovePlayer(playerData.ID);
+                lobbyTeamUI.RemovePlayer(playerData);
             });
-            
-            playerNameLabel.text = playerData.Name;
+
+            playerNameLabel.text = playerData.Name.Value.Value;
         }
     }
 }
