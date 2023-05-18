@@ -22,6 +22,8 @@ public class Soldier : NetworkBehaviour
     private bool gotPosition;
     private bool inPosition;
     private Vector3 positionInFormation;
+    private Vector3 randomIdlePosition;
+
 
     NavMeshAgent navMeshAgent;
 
@@ -33,6 +35,9 @@ public class Soldier : NetworkBehaviour
         navMeshAgent = GetComponent<NavMeshAgent>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
+        positionInFormation = Vector3.zero;
+        
+        GenerateIdlePosition();
 
         if (!IsOwner)
         {
@@ -51,6 +56,23 @@ public class Soldier : NetworkBehaviour
         Initialize();
     }
 
+    void GenerateIdlePosition() {
+        float rx = Random.Range(-0.4f, 0.4f);
+        float ry = Random.Range(-0.4f, 0.4f);
+        randomIdlePosition = new Vector3(transform.position.x + rx, transform.position.y + ry, 0);
+        Debug.Log("new idle position ");
+        Debug.Log(rx);
+        Debug.Log(ry);
+    }
+    void Wander() {
+        float dist = Vector3.Distance(transform.position, randomIdlePosition);
+        Debug.Log("wander");
+        if (dist >= 0f && dist <= 0.6f) {
+            GenerateIdlePosition();
+        }
+        navMeshAgent.SetDestination(randomIdlePosition);
+    }
+
     void Update()
     {
         NetworkObject commander = NetworkManager?.LocalClient?.PlayerObject;
@@ -60,10 +82,11 @@ public class Soldier : NetworkBehaviour
         float distance = direction.magnitude;
 
         if (following) {
-            positionInFormation = commander.GetComponent<Formation>().GetPositionInFormation();
+            positionInFormation = commander.GetComponent<Formation>().GetPositionInFormation(transform.position);
 
             navMeshAgent.SetDestination(positionInFormation);
         } else {
+            Wander();
             //jitter/wander
         }
         
@@ -124,6 +147,7 @@ public class Soldier : NetworkBehaviour
         if (follow) {
             formation.addFollower();
         } else {
+            GenerateIdlePosition();
             formation.removeFollower();
         }
     }
