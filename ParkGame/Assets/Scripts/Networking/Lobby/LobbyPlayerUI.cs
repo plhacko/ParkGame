@@ -9,14 +9,17 @@ namespace Networking
         [SerializeField] private TextMeshProUGUI playerNameLabel;
         [SerializeField] private Button playerUnReadyButton;
 
-        public void Initialize(LobbyTeamUI lobbyTeamUI, PlayerData playerData)
+        public void Initialize(LobbyTeamUI lobbyTeamUI, PlayerData playerData, bool isLocalPlayer)
         {
+            playerNameLabel.text = playerData.Name.Value.Value;
+            
+            if(!isLocalPlayer) return;
+            
+            playerUnReadyButton.gameObject.SetActive(true);
             playerUnReadyButton.onClick.AddListener(() =>
             {
                 lobbyTeamUI.RemovePlayer(playerData);
             });
-
-            playerNameLabel.text = playerData.Name.Value.Value;
         }
     }
 }

@@ -122,6 +122,32 @@ namespace Networking
             }
         }
         
+        public void RemoveFromTeam(PlayerData playerData)
+        {
+            if (IsHost)
+            {
+                removeFromTeamUI(playerData.ID, playerData.Team);
+                RemoveFromTeamClientRpc(playerData);
+                
+                playerData.Team = -1;
+                SessionManager.Singleton.UpdatePlayerData(playerData);
+            }
+            else
+            {
+                // RemoveFromTeamServerRpc(OurNetworkManager.Singleton.LocalClientId);
+            }
+        }
+
+        [ClientRpc]
+        private void RemoveFromTeamClientRpc(PlayerData playerData, ClientRpcParams clientRpcParams = default)
+        {
+            if(IsHost) return;
+            
+            removeFromTeamUI(playerData.ID, playerData.Team);
+            playerData.Team = -1;
+            SessionManager.Singleton.UpdatePlayerData(playerData);
+        }
+
         [ServerRpc(RequireOwnership = false)]
         private void JoinTeamServerRpc(ulong clientId, int newTeam, ServerRpcParams clientRpcParams = default)
         {
@@ -153,15 +179,13 @@ namespace Networking
         
         private void addPlayerToTeamUI(PlayerData playerData)
         {
-            teamUIs[playerData.Team].AddPlayer(playerData);
+            bool isLocalPlayer = playerData.ID == SessionManager.Singleton.LocalPlayerId;
+            teamUIs[playerData.Team].AddPlayer(playerData, isLocalPlayer);
         }
 
         private void removeFromTeamUI(Guid playerId, int teamNumber)
         {
             if(teamNumber == -1) return;
-            
-            Debug.Log(teamNumber + " " + playerId);
-            
             teamUIs[teamNumber].RemovePlayerUI(playerId);
         }
         

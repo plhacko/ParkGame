@@ -32,16 +32,16 @@ namespace Networking
             this.teamNumber = teamNumber;
         }
 
-        public void AddPlayer(PlayerData playerData)
+        public void AddPlayer(PlayerData playerData, bool isLocalPlayer)
         {
             LobbyPlayerUI playerUI = Instantiate(lobbyPlayerUIPrefab, teamParent);
-            playerUI.Initialize(this, playerData);
+            playerUI.Initialize(this, playerData, isLocalPlayer);
             playerUIs.Add(playerData.ID, playerUI);
         }
         
         public void RemovePlayer(PlayerData playerData)
         {
-            // lobbyMenuController2.RemoveFromTeam(playerData);
+            lobbyMenuController2.RemoveFromTeam(playerData);
         }
 
         public bool CanJoin()
@@ -59,6 +59,11 @@ namespace Networking
         {
             Destroy(playerUIs[playerId].gameObject);
             playerUIs.Remove(playerId);
+
+            if (SessionManager.Singleton.LocalPlayerId == playerId)
+            {
+                TryEnableJoinButton(true);   
+            }
         }
     }
 }
