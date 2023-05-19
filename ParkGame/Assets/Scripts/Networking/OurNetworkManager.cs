@@ -148,39 +148,6 @@ namespace Networking
             {
                 DisconnectClient(clientId);
             }
-
-            // if(clientIDToPlayerId.ContainsValue())
-            //
-            // Guid clientGuid = Guid.NewGuid();
-            //     
-            // if (!clientIDToPlayerId.ContainsKey(clientId))
-            // {
-            //     clientIDToPlayerId.Add(clientId, clientGuid);    
-            // }
-            // else
-            // {
-            //     clientIDToPlayerId[clientId] = clientGuid;
-            // }
-            //
-            // if(!clientData.TryGetValue(clientGuid, out var playerData))
-            // {
-            //     clientData.Add(clientGuid, new PlayerData()
-            //     {
-            //         ID = clientGuid,
-            //         Name = "",
-            //         Team = 7
-            //     });
-            //     SetPlayerDataClientRpc(clientId, playerData);
-            //
-            //     foreach (var client in clientIDToPlayerId)
-            //     {
-            //         SetPlayerDataClientRpc(client.Key, client.Value);   
-            //     }
-            // }
-            // else
-            // {
-            //     // todo reconnect
-            // }
         }
 
         public static ClientRpcParams OneClientRpcParams(ulong clientId)

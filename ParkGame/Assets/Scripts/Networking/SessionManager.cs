@@ -12,6 +12,7 @@ namespace Networking
     public class SessionManager : NetworkBehaviour
     {
         public static int MaxNumTeams = 4;
+        public static int MaxNumPlayersPerTeam = 3;
 
         public static SessionManager Singleton
         {
@@ -110,8 +111,8 @@ namespace Networking
             
             SetPlayerId(clientId, playerData.ID);
             UpdatePlayerData(playerData);
-            
-            OnSetPlayerData.Invoke(playerData);
+
+            OnSetPlayerData?.Invoke(playerData);
         }
         
         public void UpdatePlayerData(PlayerData playerData)
@@ -165,8 +166,8 @@ namespace Networking
         public void SendMapDataClientRpc(MapData mapData, ClientRpcParams clientRpcParams)
         {
             if (IsHost) return;
-            
-            OnMapReceived.Invoke(mapData);
+
+            OnMapReceived?.Invoke(mapData);
         }
 
         public void InitializeHost()
@@ -181,14 +182,10 @@ namespace Networking
             });
         }
         
-        public void ClearData(bool clearId)
+        public void ClearData()
         {
-            OnMapReceived = null;
-            OnSetPlayerData = null;
             ClientIdToPlayerId.Clear();
             ClientData.Clear();
-            if(clearId)
-                localPlayerId = Guid.Empty;
         }
     }
 }

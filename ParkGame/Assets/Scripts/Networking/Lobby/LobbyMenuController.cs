@@ -27,9 +27,15 @@ namespace Networking
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
-            Debug.Log("----------------------------------");
-            Debug.Log(teamUIs.Count);
             initialize();
+        }
+        
+        public override void OnNetworkDespawn()
+        {
+            base.OnNetworkDespawn();
+            SessionManager.Singleton.OnSetPlayerData -= onSetPlayerData;
+            SessionManager.Singleton.OnMapReceived -= initializeTeamUI;
+            OurNetworkManager.Singleton.OnClientDisconnectCallback -= onClientDisconnect;
         }
         
         void initialize()
@@ -114,7 +120,7 @@ namespace Networking
             }
             
             OurNetworkManager.Singleton.Shutdown();
-            SessionManager.Singleton.ClearData(true);
+            SessionManager.Singleton.ClearData();
             SceneManager.LoadScene(joinMenuSceneName, LoadSceneMode.Single);   
         }
 

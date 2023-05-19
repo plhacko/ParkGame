@@ -1,3 +1,5 @@
+using System;
+using Networking;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
@@ -10,7 +12,8 @@ namespace Player
 
         private SpriteRenderer spriteRenderer;
         private Animator animator;
-        private NetworkAnimator networkanimator;
+        private NetworkAnimator networkAnimator;
+        private Guid playerId;
 
         private NetworkVariable<bool> xSpriteFlip = new (false,
             NetworkVariableReadPermission.Everyone,
@@ -23,7 +26,7 @@ namespace Player
             spriteRenderer = GetComponent<SpriteRenderer>();
             animator = GetComponent<Animator>();
 
-            if (!IsOwner)
+            if (!isActualOwner())
             {
                 xSpriteFlip.OnValueChanged += OnXSpriteFlipChanged;   
             }
@@ -42,7 +45,7 @@ namespace Player
 
         private void Update()
         {
-            if (!IsOwner) return;
+            if (!isActualOwner()) return;
             
             if (Application.isFocused)
             {
@@ -64,6 +67,21 @@ namespace Player
             xSpriteFlip.Value = spriteRenderer.flipX;
             
             transform.Translate(movement * Time.deltaTime);
+        }
+        
+        private bool isActualOwner()
+        {
+            if (IsHost)
+            {
+                return SessionManager.Singleton.LocalPlayerId == playerId;
+            }
+
+            return IsOwner;
+        }
+
+        public void Initialize(Guid playerId)
+        {
+            this.playerId = playerId;
         }
     }
 }

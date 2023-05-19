@@ -23,11 +23,6 @@ namespace Networking
             joinButton.onClick.AddListener(onJoinButtonClicked);
         }
 
-        private void Update()
-        {
-            // Debug.Log(playerUIs.Count);
-        }
-
         private void onJoinButtonClicked()
         {
             lobbyMenuController.JoinTeam(teamNumber);
@@ -35,14 +30,12 @@ namespace Networking
 
         public void Initialize(LobbyMenuController lobbyMenuController, int teamNumber)
         {
-            Debug.Log("created for team ---- " + teamNumber);
             this.lobbyMenuController = lobbyMenuController;
             this.teamNumber = teamNumber;
         }
 
         public void AddPlayer(PlayerData playerData, bool isLocalPlayer)
         {
-            Debug.Log(playerUIs.Count + " " + playerData.ID);
             LobbyPlayerUI playerUI = Instantiate(lobbyPlayerUIPrefab, teamParent);
             playerUI.Initialize(this, playerData, isLocalPlayer);
             playerUIs.Add(playerData.ID, playerUI);
@@ -56,7 +49,7 @@ namespace Networking
         public bool CanJoin()
         {
             var teams = SessionManager.Singleton.GetTeams();
-            return teams[teamNumber].Count <= 4;
+            return teams[teamNumber].Count <= SessionManager.MaxNumPlayersPerTeam;
         }
         
         public void TryEnableJoinButton(bool interactable)
