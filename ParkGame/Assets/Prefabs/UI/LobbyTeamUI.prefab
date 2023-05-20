@@ -159,6 +159,7 @@ MonoBehaviour:
   lobbyPlayerUIPrefab: {fileID: 3079610046589916646, guid: eec4870150b4c274fa5cbb96bacf36ab, type: 3}
   joinButton: {fileID: 8184762145344601897}
   teamParent: {fileID: 8184762143482167450}
+  teamNameLabel: {fileID: 8184762145003467722}
 --- !u!1 &8184762144520980635
 GameObject:
   m_ObjectHideFlags: 0

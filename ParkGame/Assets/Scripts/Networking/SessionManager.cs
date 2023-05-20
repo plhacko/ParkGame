@@ -5,6 +5,7 @@ using Networking.Lobby;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Networking
 {
@@ -28,23 +29,6 @@ namespace Networking
 
         public Guid LocalPlayerId => localPlayerId;
         public string LocalPlayerName => localPlayerName;
-
-        public Dictionary<int, List<Guid>> GetTeams()
-        {
-            Dictionary<int, List<Guid>> teams = new();
-            for (int i = 0; i < MaxNumTeams; i++)
-            {
-                teams.Add(i, new List<Guid>());
-            }
-            
-            foreach (var (key, value) in ClientData)
-            {
-                if(value.Team == -1) continue;
-                teams[value.Team].Add(key);
-            }
-            
-            return teams;  
-        } 
 
         private static SessionManager instance;
         
@@ -104,6 +88,23 @@ namespace Networking
             return null;
         }
         
+        public Dictionary<int, List<Guid>> GetTeams()
+        {
+            Dictionary<int, List<Guid>> teams = new();
+            for (int i = 0; i < MaxNumTeams; i++)
+            {
+                teams.Add(i, new List<Guid>());
+            }
+            
+            foreach (var (key, value) in ClientData)
+            {
+                if(value.Team == -1) continue;
+                teams[value.Team].Add(key);
+            }
+            
+            return teams;  
+        } 
+        
         [ClientRpc]
         public void SetPlayerDataClientRpc(ulong clientId, PlayerData playerData, ClientRpcParams clientRpcParams = default)
         {
@@ -161,7 +162,6 @@ namespace Networking
             }
         }
 
-        
         [ClientRpc]
         public void SendMapDataClientRpc(MapData mapData, ClientRpcParams clientRpcParams)
         {
@@ -181,11 +181,36 @@ namespace Networking
                 Team = -1
             });
         }
-        
-        public void ClearData()
+
+        public void EndSessionAndGoToScene(string sceneName)
+        {
+            clearData();
+            OurNetworkManager.Singleton.Shutdown();
+            SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
+        }
+
+        private void clearData()
         {
             ClientIdToPlayerId.Clear();
             ClientData.Clear();
+        }
+
+        public void RemovePlayerData(Guid playerId)
+        {
+            ClientIdToPlayerId.Remove(ClientIdToPlayerId.First(x => x.Value == playerId).Key);
+            ClientData.Remove(playerId);
+        }
+
+        [ClientRpc]
+        public void RemovePlayerDataClientRpc(ulong clientId, ClientRpcParams clientRpcParams = default)
+        {
+            if (IsHost) return;
+
+            Guid? playerId = GetPlayerId(clientId);
+            if (playerId.HasValue)
+            {
+                RemovePlayerData(playerId.Value);
+            }
         }
     }
 }

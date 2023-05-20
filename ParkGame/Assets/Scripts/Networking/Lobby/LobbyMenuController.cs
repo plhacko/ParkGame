@@ -4,7 +4,6 @@ using Networking.Lobby;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace Networking
@@ -37,7 +36,19 @@ namespace Networking
             SessionManager.Singleton.OnMapReceived -= initializeTeamUI;
             OurNetworkManager.Singleton.OnClientDisconnectCallback -= onClientDisconnect;
         }
-        
+
+        private void Update()
+        {
+            if (IsHost)
+            {
+                PlayerData? playerData = SessionManager.Singleton.GetPlayerData(NetworkManager.Singleton.LocalClientId);
+                if (playerData.HasValue)
+                {
+                    startGameButton.interactable = playerData.Value.Team != -1;   
+                }
+            }
+        }
+
         void initialize()
         {
             if (IsHost)
@@ -50,9 +61,7 @@ namespace Networking
             }
 
             SessionManager.Singleton.OnSetPlayerData += onSetPlayerData;
-            
             roomCodeLabel.text += OurNetworkManager.Singleton.RoomCode;
-        
             goBackButton.onClick.AddListener(goBack);
 
             if (IsHost)
@@ -76,11 +85,9 @@ namespace Networking
                 {
                     RemoveFromTeam(playerData.Value);   
                 }
+                return;
             }
-            else if (clientId == 0)
-            {
-                goBack();   
-            }
+            goBack();
         }
 
         private void onSetPlayerData(PlayerData playerData)
@@ -118,15 +125,13 @@ namespace Networking
                     OurNetworkManager.Singleton.DisconnectClient(clientId);
                 }
             }
-            
-            OurNetworkManager.Singleton.Shutdown();
-            SessionManager.Singleton.ClearData();
-            SceneManager.LoadScene(joinMenuSceneName, LoadSceneMode.Single);   
+
+            SessionManager.Singleton.EndSessionAndGoToScene(joinMenuSceneName);
         }
 
         private void startGame()
         {
-            NetworkManager.Singleton.SceneManager.LoadScene(gameSceneName, LoadSceneMode.Single);
+            OurNetworkManager.Singleton.LoadGame(gameSceneName);
         }
 
         public void JoinTeam(int teamNumber)

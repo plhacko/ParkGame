@@ -1,8 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Networking.Lobby;
 using Unity.Collections;
 using Unity.Netcode;
+using Unity.Netcode.Transports.UTP;
+using Unity.Services.Relay;
+using Unity.Services.Relay.Models;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Networking
 {
@@ -43,19 +50,26 @@ namespace Networking
     {
         public new static OurNetworkManager Singleton => (OurNetworkManager)NetworkManager.Singleton;
 
+        public event Action<bool, ulong> OnClientDisconnect = null;
+        
         public string RoomCode;
         public MapData MapData;
         
         private ServerState serverState;
         
-        
         private void Awake()
         {
             OnClientConnectedCallback += OnClientConnected;
             OnClientDisconnectCallback += OnClientDisconnected;
+            OnServerStarted += () => serverState = ServerState.Lobby;
             ConnectionApprovalCallback = OnConnectionApproval;
             
             serverState = ServerState.Lobby;
+        }
+
+        private void OnClientDisconnected(ulong clientId)
+        {
+            OnClientDisconnect?.Invoke(IsHost, clientId);
         }
 
         private void OnConnectionApproval(ConnectionApprovalRequest request, ConnectionApprovalResponse response)
@@ -116,11 +130,6 @@ namespace Networking
             response.Approved = false;
         }
 
-        private void OnClientDisconnected(ulong clientId)
-        {
-            // throw new System.NotImplementedException();
-        }
-
         private void OnClientConnected(ulong clientId)
         {
             if (!IsHost) return;
@@ -156,6 +165,59 @@ namespace Networking
             {
                 Send = new ClientRpcSendParams { TargetClientIds = new [] { clientId } }
             };
+        }
+        
+        public void LoadGame(string gameSceneName)
+        {
+            this.serverState = ServerState.InGame;
+
+            var copyOfKeys = new List<ulong>(ConnectedClients.Keys);
+
+            foreach (var clientId in copyOfKeys)
+            {
+                PlayerData? playerData = SessionManager.Singleton.GetPlayerData(clientId);
+                if (!playerData.HasValue || playerData.Value.Team == -1)
+                {
+                    Guid? playerId = SessionManager.Singleton.GetPlayerId(clientId);
+                    if (playerId.HasValue)
+                    {
+                        SessionManager.Singleton.RemovePlayerDataClientRpc(clientId);
+                        SessionManager.Singleton.RemovePlayerData(playerId.Value);
+                    }
+                    DisconnectClient(clientId);
+                }
+            }
+            
+            SceneManager.LoadScene(gameSceneName, LoadSceneMode.Single);
+        }
+
+        public async Task<bool> JoinGame(string joinCode)
+        {
+            try
+            {
+                JoinAllocation joinAllocation = await RelayService.Instance.JoinAllocationAsync(joinCode);
+
+                GetComponent<UnityTransport>().SetClientRelayData(
+                    joinAllocation.RelayServer.IpV4,
+                    (ushort)joinAllocation.RelayServer.Port,
+                    joinAllocation.AllocationIdBytes,
+                    joinAllocation.Key,
+                    joinAllocation.ConnectionData,
+                    joinAllocation.HostConnectionData);
+
+                var name = System.Text.Encoding.ASCII.GetBytes(SessionManager.Singleton.LocalPlayerName);
+                var localPlayerId = SessionManager.Singleton.LocalPlayerId.ToByteArray();
+                var payload = localPlayerId.Concat(name).ToArray();
+                
+                NetworkConfig.ConnectionData = payload;
+                StartClient();
+                return true;
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning(e);
+                return false;
+            }
         }
     }
 }

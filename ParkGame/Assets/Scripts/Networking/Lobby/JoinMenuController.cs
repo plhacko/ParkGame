@@ -1,12 +1,6 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using TMPro;
-using Unity.Netcode.Transports.UTP;
+﻿using TMPro;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
-using Unity.Services.Relay;
-using Unity.Services.Relay.Models;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -33,6 +27,21 @@ namespace Networking
                 await AuthenticationService.Instance.SignInAnonymouslyAsync();   
             }
 
+            OurNetworkManager.Singleton.OnClientDisconnectCallback += onClientDisconnect;
+            
+            enableButtons(true);
+        }
+
+        private void OnDestroy()
+        {
+            if(OurNetworkManager.Singleton != null)
+                OurNetworkManager.Singleton.OnClientDisconnectCallback -= onClientDisconnect;
+        }
+
+        private void onClientDisconnect(ulong clientId)
+        {
+            OurNetworkManager.Singleton.RoomCode = "";
+            joinCodeInputField.text = "";
             enableButtons(true);
         }
 
@@ -48,7 +57,7 @@ namespace Networking
             
             OurNetworkManager.Singleton.RoomCode = joinCodeInputField.text.ToUpper();
             
-            bool joined = await joinGame(joinCodeInputField.text);
+            bool joined = await OurNetworkManager.Singleton.JoinGame(joinCodeInputField.text);
             if (!joined)
             {
                 enableButtons(true);
@@ -62,35 +71,6 @@ namespace Networking
             joinButton.interactable = isInteractable;
             hostButton.interactable = isInteractable;
             joinCodeInputField.interactable = isInteractable;
-        }
-
-        private static async Task<bool> joinGame(string joinCode)
-        {
-            try
-            {
-                JoinAllocation joinAllocation = await RelayService.Instance.JoinAllocationAsync(joinCode);
-                
-                OurNetworkManager.Singleton.GetComponent<UnityTransport>().SetClientRelayData(
-                    joinAllocation.RelayServer.IpV4,
-                    (ushort)joinAllocation.RelayServer.Port,
-                    joinAllocation.AllocationIdBytes,
-                    joinAllocation.Key,
-                    joinAllocation.ConnectionData,
-                    joinAllocation.HostConnectionData);
-                
-                var name = System.Text.Encoding.ASCII.GetBytes(SessionManager.Singleton.LocalPlayerName);
-                var localPlayerId = SessionManager.Singleton.LocalPlayerId.ToByteArray();
-                var payload = localPlayerId.Concat(name).ToArray();
-                
-                OurNetworkManager.Singleton.NetworkConfig.ConnectionData = payload;
-                OurNetworkManager.Singleton.StartClient();
-                return true;
-            }
-            catch (Exception e)
-            {
-                Debug.LogWarning(e);
-                return false;
-            }
         }
     }
 }

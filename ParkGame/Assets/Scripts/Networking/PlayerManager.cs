@@ -11,6 +11,8 @@ public class PlayerManager : NetworkBehaviour
 
     Dictionary<Guid, PlayerController> playerControllers = new();
     
+    public event Action OnClientReconnectedCallback;
+    
     private void initialize()
     {
         if (!IsHost) return;
@@ -37,6 +39,13 @@ public class PlayerManager : NetworkBehaviour
         if (!playerControllers.TryGetValue(clientData.Value.ID, out var playerController)) return;
         
         playerController.GetComponent<NetworkObject>().ChangeOwnership(clientId);
+        sendReconnectedSuccessClientRpc(OurNetworkManager.OneClientRpcParams(clientId));
+    }
+
+    [ClientRpc]
+    private void sendReconnectedSuccessClientRpc(ClientRpcParams clientRpcParams)
+    {
+        OnClientReconnectedCallback?.Invoke();
     }
 
     public override void OnNetworkSpawn()

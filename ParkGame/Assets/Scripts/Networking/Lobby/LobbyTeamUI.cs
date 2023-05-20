@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,6 +11,7 @@ namespace Networking
         [SerializeField] private LobbyPlayerUI lobbyPlayerUIPrefab;
         [SerializeField] private Button joinButton;
         [SerializeField] private RectTransform teamParent;
+        [SerializeField] private TextMeshProUGUI teamNameLabel;
         
         private LobbyMenuController lobbyMenuController;
         private int teamNumber;
@@ -18,7 +20,6 @@ namespace Networking
 
         private void Awake()
         {
-            Debug.Log("created for team " + teamNumber);
             playerUIs.Clear();
             joinButton.onClick.AddListener(onJoinButtonClicked);
         }
@@ -32,6 +33,7 @@ namespace Networking
         {
             this.lobbyMenuController = lobbyMenuController;
             this.teamNumber = teamNumber;
+            teamNameLabel.text = $"Team {teamNumber + 1}";
         }
 
         public void AddPlayer(PlayerData playerData, bool isLocalPlayer)
