@@ -221,7 +221,7 @@ CircleCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2149011059489662585}
-  m_Enabled: 0
+  m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
   m_IncludeLayers:
@@ -243,7 +243,7 @@ CircleCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: -0.028519511, y: -0.2957236}
@@ -485,7 +485,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9028078709961950859}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 1}
   m_LocalScale: {x: 0.6323733, y: 0.3173, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -566,4 +566,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b6cfc98fe1c0ff04c9d9dc5690a1ff2e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  soldiersInMyVicinity: []
+  enemySoldiersInMyVicinity: []
