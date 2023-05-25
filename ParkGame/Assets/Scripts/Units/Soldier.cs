@@ -24,8 +24,39 @@ public class Soldier : NetworkBehaviour
     private Vector3 positionInFormation;
     private Vector3 randomIdlePosition;
 
+    public int teamNumber;
 
     NavMeshAgent navMeshAgent;
+
+    /* soldier:
+     * Pridat unorlidness
+     * - zna svou affiliation, public metoda 
+     * 
+     * - trigger collider - vetsi collider, pri vstupu do nej si prida nepratelske vojaky, pri odchodu je odebere
+     * 
+     * - move - vybrany vojak nasleduje nejak commandera
+     *   - bez do formace: dostanou se k commanderovi, pak se postavi do formace
+     *   - jednou v +- formaci, neudrzuj ji, ale drz se blizko ke mne
+     *   - FORMACE ZELVA (z hlediska prirodniho): presny pocet vojaku -> objevi se tlacitko pro formaci zelvy
+     *   - formace: 
+     *      - do kruhu
+     *      - co nejbliz
+     *   - zmensovat vojakuv collider, kdyz je na pohybu
+     *       
+     * - command stahni se - jde ke commanderovi 
+     * 
+     * - attack behaviour: 
+     *   - utoc, nehlede na pozici commandera
+     *   - vi o svem okoli : vi, o tom, kdo je jeho nepritel
+     *   -> umet zautocit na nejblizsiho vojaka
+     * 
+     * ZATIM NIC
+     * - idle stav //= brani se, kdyz na nej nekdo zautoci
+     *   - stoji, ale je ve strehu
+     *   - stav v campu = "domecek, kolem ktereho se poflakujou"
+     * ---------  
+     * 
+     */
 
 
     [SerializeField] float DistanceFromCommander = 1.0f;//2.0f;
@@ -36,13 +67,18 @@ public class Soldier : NetworkBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
         positionInFormation = Vector3.zero;
-        
+        //teamNumber = AssignTeamAffiliation();
+
         GenerateIdlePosition();
 
         if (!IsOwner)
         {
             xSpriteFlip.OnValueChanged += OnXSpriteFlipChanged;
         }
+    }
+
+    public int GetAffiliation() {
+        return teamNumber;
     }
 
     private void OnXSpriteFlipChanged(bool previousValue, bool newValue)

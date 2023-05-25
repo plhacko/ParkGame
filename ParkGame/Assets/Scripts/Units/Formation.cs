@@ -47,6 +47,8 @@ public class Formation : MonoBehaviour
         //var position = soldierPositions[counter];
         //counter++;
         //Debug.Log("position " + position);
+
+        // asign closest position to current soldier
         Vector3 position = Vector3.zero;
         float distance = Mathf.Infinity;
         for (int i = 0; i < freeSoldierPositions.Count; i++) {
@@ -66,7 +68,7 @@ public class Formation : MonoBehaviour
     {
         soldierPositions.Clear();
         freeSoldierPositions.Clear();
-        float radius = 1 + followingSoldiers * 0.1f;//1f;// 2f; // radius from commander
+        float radius = followingSoldiers * 0.1f - 0.5f;//1f;// 2f; // radius from commander
         float alpha = 2 * Mathf.PI / followingSoldiers;
         
         for (int i = 0; i < followingSoldiers; i++) 
