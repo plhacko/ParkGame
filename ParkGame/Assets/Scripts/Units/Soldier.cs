@@ -17,10 +17,17 @@ public class Soldier : NetworkBehaviour
         NetworkVariableReadPermission.Everyone,
         NetworkVariableWritePermission.Owner);
 
+    [SerializeField] int startingTeam = 0; // TODO: rm DEBUG
+    private NetworkVariable<int> _team = new NetworkVariable<int>();
+    public int team { get => _team.Value; }
+
+    EnemyDetector enemyDetector;
+
     private static readonly int MovementSpeed = Animator.StringToHash("MovementSpeed");
     private bool following;
     private bool gotPosition;
     private bool inPosition;
+    private bool attacking = true; // DEBUG: redo
     private Vector3 positionInFormation;
     private Vector3 randomIdlePosition;
 
@@ -63,11 +70,11 @@ public class Soldier : NetworkBehaviour
 
     private void Initialize()
     {
+        enemyDetector = GetComponentInChildren<EnemyDetector>();
         navMeshAgent = GetComponent<NavMeshAgent>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
         positionInFormation = Vector3.zero;
-        //teamNumber = AssignTeamAffiliation();
 
         GenerateIdlePosition();
 
@@ -75,9 +82,12 @@ public class Soldier : NetworkBehaviour
         {
             xSpriteFlip.OnValueChanged += OnXSpriteFlipChanged;
         }
+
+        _team.Value = startingTeam;// TODO: rm debug
     }
 
-    public int GetAffiliation() {
+    public int GetAffiliation()
+    {
         return teamNumber;
     }
 
@@ -92,7 +102,8 @@ public class Soldier : NetworkBehaviour
         Initialize();
     }
 
-    void GenerateIdlePosition() {
+    void GenerateIdlePosition()
+    {
         float rx = Random.Range(-0.4f, 0.4f);
         float ry = Random.Range(-0.4f, 0.4f);
         randomIdlePosition = new Vector3(transform.position.x + rx, transform.position.y + ry, 0);
@@ -100,10 +111,12 @@ public class Soldier : NetworkBehaviour
         Debug.Log(rx);
         Debug.Log(ry);
     }
-    void Wander() {
+    void Wander()
+    {
         float dist = Vector3.Distance(transform.position, randomIdlePosition);
-        Debug.Log("wander");
-        if (dist >= 0f && dist <= 0.6f) {
+        // Debug.Log("wander");
+        if (dist >= 0f && dist <= 0.6f)
+        {
             GenerateIdlePosition();
         }
         navMeshAgent.SetDestination(randomIdlePosition);
@@ -114,18 +127,34 @@ public class Soldier : NetworkBehaviour
         NetworkObject commander = NetworkManager?.LocalClient?.PlayerObject;
         if (commander == null) { return; }
 
-        Vector2 direction = commander.transform.position - transform.position;
-        float distance = direction.magnitude;
+        // TODO: rm // float soldierCommanderdistance = (commander.transform.position - transform.position).magnitude;
 
-        if (following) {
+        if (attacking && enemyDetector.IsEnemyInSight())
+        {
+            Soldier closestEnemy = enemyDetector.GetClosesEnemy();
+            float closestEnemyDistance = Vector3.Distance(closestEnemy.transform.position, transform.position);
+            if (closestEnemyDistance < 0.5f) // TODO: dont have the number hard coded
+            {
+                // attack // TODO: redo to have a attack cooldown and eventually play animation
+                closestEnemy.TakeDamageServerRpc(1);
+            }
+            else
+            {
+                // get to the enemy
+                navMeshAgent.SetDestination(closestEnemy.transform.position);
+            }
+        }
+        else if (following)
+        {
             positionInFormation = commander.GetComponent<Formation>().GetPositionInFormation(transform.position);
-
             navMeshAgent.SetDestination(positionInFormation);
-        } else {
+        }
+        else
+        {
             Wander();
             //jitter/wander
         }
-        
+
 
         /*
         if (distance > DistanceFromCommander && following) {
@@ -150,12 +179,13 @@ public class Soldier : NetworkBehaviour
 
     private void move(Vector2 direction)
     {
-        
-        if (direction.magnitude < 0.01f) {
+
+        if (direction.magnitude < 0.01f)
+        {
             animator.SetFloat(MovementSpeed, 0.0f);
 
             Debug.Log("direction magnitude " + direction.magnitude);
-    
+
             return;
         }
 
@@ -166,25 +196,28 @@ public class Soldier : NetworkBehaviour
         animator.SetFloat(MovementSpeed, movement.magnitude);
 
         if (direction.magnitude < Mathf.Epsilon)
-        {
-            return;
-        }
+        { return; }
         Debug.Log("MOVEMENT " + movement);
         spriteRenderer.flipX = movement.x < 0;
         xSpriteFlip.Value = spriteRenderer.flipX;
 
         transform.Translate(movement * Time.deltaTime);
     }
-    public bool IsFollowing() {
+    public bool IsFollowing()
+    {
         return following;
     }
-    public void Follow(bool follow) {
+    public void Follow(bool follow)
+    {
         following = follow;
         NetworkObject commander = NetworkManager?.LocalClient?.PlayerObject;
         var formation = commander.GetComponent<Formation>();
-        if (follow) {
+        if (follow)
+        {
             formation.addFollower();
-        } else {
+        }
+        else
+        {
             GenerateIdlePosition();
             formation.removeFollower();
         }
@@ -196,14 +229,26 @@ public class Soldier : NetworkBehaviour
         if (!IsOwner) { return; }
 
         following = !following; // flip boolean
-        if (following) 
+        if (following)
         {
             // increase commander's counter - Formation
             Follow(true);
-        } else 
+        }
+        else
         {
             // decrease commander's counter - Formation
             Follow(false);
+        }
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void TakeDamageServerRpc(int damage)
+    {
+        // TODO: redo (tmp) (add hp and so on)
+        if (damage > 0)
+        {
+            this.NetworkObject.Despawn();
+            Destroy(this);
         }
     }
 }
