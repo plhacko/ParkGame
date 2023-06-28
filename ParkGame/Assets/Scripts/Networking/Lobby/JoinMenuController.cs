@@ -7,6 +7,11 @@ using UnityEngine.UI;
 
 namespace Networking
 {
+    
+    /*
+     * This class is responsible for the UI of the Join Game menu.
+     * Player can join a game here with a room code or start hosting a new game.
+     */ 
     public class JoinMenuController : MonoBehaviour
     {
         [SerializeField] private string hostMenuSceneName;
@@ -16,20 +21,25 @@ namespace Networking
 
         private async void Start()
         {
-            enableButtons(false);
             joinButton.onClick.AddListener(joinGame);
             hostButton.onClick.AddListener(hostGame);
             
+            // Disable buttons until the player is signed in
+            enableButtons(false);
+            
+            // todo maybe unnecessary?
+            // Initialize Unity Services and sign in anonymously
             await UnityServices.InitializeAsync();
             
             if (!AuthenticationService.Instance.IsSignedIn)
             {
                 await AuthenticationService.Instance.SignInAnonymouslyAsync();   
             }
-
-            OurNetworkManager.Singleton.OnClientDisconnectCallback += onClientDisconnect;
             
             enableButtons(true);
+            
+            OurNetworkManager.Singleton.OnClientDisconnectCallback += onClientDisconnect;
+            joinCodeInputField.text = OurNetworkManager.Singleton.RoomCode;
         }
 
         private void OnDestroy()
@@ -38,34 +48,40 @@ namespace Networking
                 OurNetworkManager.Singleton.OnClientDisconnectCallback -= onClientDisconnect;
         }
 
+        // todo when is this called?
         private void onClientDisconnect(ulong clientId)
         {
-            OurNetworkManager.Singleton.RoomCode = "";
+            // todo don't need?
+            // OurNetworkManager.Singleton.RoomCode = "";
             joinCodeInputField.text = "";
             enableButtons(true);
         }
 
+        // Go to scene where the player can host a new game
         private void hostGame()
         {
             enableButtons(false);
             SceneManager.LoadScene(hostMenuSceneName, LoadSceneMode.Single);
         }
 
+        // Join a game with the room code entered in the input field
         private async void joinGame()
         {
             enableButtons(false);
             
-            OurNetworkManager.Singleton.RoomCode = joinCodeInputField.text.ToUpper();
-            
             bool joined = await OurNetworkManager.Singleton.JoinGame(joinCodeInputField.text);
-            if (!joined)
+            if (joined)
             {
-                enableButtons(true);
-                OurNetworkManager.Singleton.RoomCode = "";
-                joinCodeInputField.text = "";
+                // Save the room code so the player can reconnect if they disconnect
+                OurNetworkManager.Singleton.RoomCode = joinCodeInputField.text.ToUpper();
+                return;
             }
+            
+            enableButtons(true);
+            joinCodeInputField.text = "";
         }
 
+        // Enable or disable all buttons
         private void enableButtons(bool isInteractable)
         {
             joinButton.interactable = isInteractable;

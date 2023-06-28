@@ -49,7 +49,7 @@ namespace Networking
     public class OurNetworkManager : NetworkManager
     {
         public new static OurNetworkManager Singleton => (OurNetworkManager)NetworkManager.Singleton;
-
+        
         public event Action<bool, ulong> OnClientDisconnect = null;
         
         public string RoomCode;
@@ -60,25 +60,23 @@ namespace Networking
         private void Awake()
         {
             OnClientConnectedCallback += OnClientConnected;
-            OnClientDisconnectCallback += OnClientDisconnected;
+            OnClientDisconnectCallback += clientId => OnClientDisconnect?.Invoke(IsHost, clientId);
             OnServerStarted += () => serverState = ServerState.Lobby;
             ConnectionApprovalCallback = OnConnectionApproval;
-            
             serverState = ServerState.Lobby;
         }
 
-        private void OnClientDisconnected(ulong clientId)
-        {
-            OnClientDisconnect?.Invoke(IsHost, clientId);
-        }
-
+        // Called when a client requests connection to the host
+        // The request is created when the client calls JoinGame()
+        // and it contains a player's name and a unique player ID if the player is reconnecting
         private void OnConnectionApproval(ConnectionApprovalRequest request, ConnectionApprovalResponse response)
         {
             var clientId = request.ClientNetworkId;
             
+            // We don't want to create a player object immediately 
             response.CreatePlayerObject = false;
             
-            // host started hosting            
+            // Host started hosting, initialize host and approve ourselves            
             if(clientId == LocalClientId)
             {
                 SessionManager.Singleton.InitializeHost();
@@ -89,9 +87,11 @@ namespace Networking
             byte[] guidBytes = new byte[16];
             byte[] nameBytes = new byte[request.Payload.Length - 16];
             
+            // Load name and ID from the request
             Array.Copy(request.Payload, 0, guidBytes, 0, 16);
             Array.Copy(request.Payload, 16, nameBytes, 0, request.Payload.Length - 16);
             
+            // Check if player is already connected, should not happen
             Guid playerId = new Guid(guidBytes);
             if (SessionManager.Singleton.IsConnected(playerId))
             {
@@ -99,9 +99,11 @@ namespace Networking
                 return;
             }
                 
+            // Try to get player data from the session manager
             PlayerData? playerData = SessionManager.Singleton.GetPlayerData(playerId);
 
-            // reconnect
+            // Reconnect if data exists, we can reconnect into lobby or game
+            // Approve the connection and associate the client's ID with the player's ID
             if (playerData.HasValue)
             {
                 SessionManager.Singleton.SetPlayerId(clientId, playerData.Value.ID);
@@ -109,70 +111,79 @@ namespace Networking
                 return;
             }
             
-            // register new player
-            if(serverState == ServerState.Lobby)
+            // If the player is trying to connect but we aren't in lobby reject
+            if (serverState != ServerState.Lobby)
             {
-                Guid clientGuid = Guid.NewGuid();
-                string playerName = System.Text.Encoding.ASCII.GetString(nameBytes);
-                
-                SessionManager.Singleton.SetPlayerId(clientId, clientGuid);
-                SessionManager.Singleton.UpdatePlayerData(new PlayerData
-                {
-                    ID = clientGuid,
-                    Name = new ForceNetworkSerializeByMemcpy<FixedString64Bytes>(playerName),
-                    Team = -1
-                });
-                
-                response.Approved = true;
+                response.Approved = false;
                 return;
             }
+
+            // Create new player data and approve the connection
+            Guid clientGuid = Guid.NewGuid();
+            string playerName = System.Text.Encoding.ASCII.GetString(nameBytes);
+            response.Approved = true;
             
-            response.Approved = false;
+            // Save the player's data on the host's session manager
+            // In OnClientConnected we will send the player data to the client
+            SessionManager.Singleton.SetPlayerId(clientId, clientGuid);
+            SessionManager.Singleton.UpdatePlayerData(new PlayerData
+            {
+                ID = clientGuid,
+                Name = new ForceNetworkSerializeByMemcpy<FixedString64Bytes>(playerName),
+                Team = -1
+            });
         }
 
+        // When a client connects to the host
+        // Send the map data and the player data to the client
+        // Send the player data of all other players to the client
         private void OnClientConnected(ulong clientId)
         {
             if (!IsHost) return;
-            
             if (clientId == LocalClientId) return;
             
+            // Send map data to the client
             SessionManager.Singleton.SendMapDataClientRpc(MapData, OneClientRpcParams(clientId));
 
+            // Try to get the player data of the client
             PlayerData? playerData = SessionManager.Singleton.GetPlayerData(clientId);
             if(playerData.HasValue)
             {
+                // Send the player his data
                 SessionManager.Singleton.SetPlayerDataClientRpc(clientId, playerData.Value, OneClientRpcParams(clientId));
                 
-                foreach (var idPair in SessionManager.Singleton.ClientIdToPlayerId)
+                // Send the player data of all other players to the client
+                foreach (var (currentClientId, currentPlayerId) in SessionManager.Singleton.ClientIdToPlayerId)
                 {
-                    if(clientId == idPair.Key) continue;
+                    // dont send the player his own data, we just sent it 
+                    if(clientId == currentClientId) continue;
                     
-                    if(SessionManager.Singleton.ClientData.TryGetValue(idPair.Value, out var otherPlayerData))
+                    if(SessionManager.Singleton.ClientData.TryGetValue(currentPlayerId, out var otherPlayerData))
                     {
-                        SessionManager.Singleton.SetPlayerDataClientRpc(idPair.Key, otherPlayerData, OneClientRpcParams(clientId));   
+                        // todo we aren't sending the data of newly connected to previously connected clients??
+                        
+                        // Sent client other player's data
+                        SessionManager.Singleton.SetPlayerDataClientRpc(currentClientId, otherPlayerData, OneClientRpcParams(clientId));   
                     }
                 }
             }
             else
             {
+                // Disconnect the client if we couldn't get his player data
                 DisconnectClient(clientId);
             }
         }
-
-        public static ClientRpcParams OneClientRpcParams(ulong clientId)
-        {
-            return new ClientRpcParams
-            {
-                Send = new ClientRpcSendParams { TargetClientIds = new [] { clientId } }
-            };
-        }
         
-        public void LoadGame(string gameSceneName)
+        // Load game scene and disconnect all clients that don't have a team assigned
+        public void LoadGameScene()
         {
+            if (!IsHost) return;
+            if (serverState != ServerState.Lobby) return;
+            
             this.serverState = ServerState.InGame;
 
+            // Kick all players that don't have a team assigned
             var copyOfKeys = new List<ulong>(ConnectedClients.Keys);
-
             foreach (var clientId in copyOfKeys)
             {
                 PlayerData? playerData = SessionManager.Singleton.GetPlayerData(clientId);
@@ -188,9 +199,13 @@ namespace Networking
                 }
             }
             
-            SceneManager.LoadScene(gameSceneName, LoadSceneMode.Single);
+            // Load game scene
+            SceneManager.LoadScene(SessionManager.Singleton.GameSceneName, LoadSceneMode.Single);
         }
 
+        // Join a game with a join code
+        // The join code is generated by the host when the host calls StartHosting()
+        // Clients can join into lobby or reconnect into a previously abandoned game
         public async Task<bool> JoinGame(string joinCode)
         {
             try
@@ -205,9 +220,12 @@ namespace Networking
                     joinAllocation.ConnectionData,
                     joinAllocation.HostConnectionData);
 
-                var name = System.Text.Encoding.ASCII.GetBytes(SessionManager.Singleton.LocalPlayerName);
+                var playerName = System.Text.Encoding.ASCII.GetBytes(SessionManager.Singleton.LocalPlayerName);
+                
+                // When we are joining the session for the first time we just send empty playerId
+                // Otherwise we sent our cached playerId to reconnect into the game
                 var localPlayerId = SessionManager.Singleton.LocalPlayerId.ToByteArray();
-                var payload = localPlayerId.Concat(name).ToArray();
+                var payload = localPlayerId.Concat(playerName).ToArray();
                 
                 NetworkConfig.ConnectionData = payload;
                 StartClient();
@@ -219,5 +237,12 @@ namespace Networking
                 return false;
             }
         }
+        
+        // Helper to create ClientRpcParams targeting a single client id
+        public static ClientRpcParams OneClientRpcParams(ulong clientId) => 
+            new()
+            {
+                Send = new ClientRpcSendParams { TargetClientIds = new [] { clientId } }
+            };
     }
 }

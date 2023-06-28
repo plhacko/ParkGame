@@ -6,6 +6,9 @@ using UnityEngine.UI;
 
 namespace Networking
 {
+    /*
+     * This class is responsible for the UI of a single team in the Lobby menu.
+     */
     public class LobbyTeamUI : MonoBehaviour
     {
         [SerializeField] private LobbyPlayerUI lobbyPlayerUIPrefab;
@@ -14,56 +17,53 @@ namespace Networking
         [SerializeField] private TextMeshProUGUI teamNameLabel;
         
         private LobbyMenuController lobbyMenuController;
-        private int teamNumber;
+        private int teamNumber; // team number is in 0 - 3 range
 
+        // player ID -> player UI
         private readonly Dictionary<Guid, LobbyPlayerUI> playerUIs = new();
-
-        private void Awake()
-        {
-            playerUIs.Clear();
-            joinButton.onClick.AddListener(onJoinButtonClicked);
-        }
-
-        private void onJoinButtonClicked()
-        {
-            lobbyMenuController.JoinTeam(teamNumber);
-        }
 
         public void Initialize(LobbyMenuController lobbyMenuController, int teamNumber)
         {
             this.lobbyMenuController = lobbyMenuController;
             this.teamNumber = teamNumber;
             teamNameLabel.text = $"Team {teamNumber + 1}";
+            
+            // todo maybe remove this?
+            // playerUIs.Clear();
+            joinButton.onClick.AddListener(() => lobbyMenuController.JoinTeam(teamNumber));
         }
 
+        // Add a player to the team UI
         public void AddPlayer(PlayerData playerData, bool isLocalPlayer)
         {
+            // Create new player UI, initialize it, and add it to the team UIs
             LobbyPlayerUI playerUI = Instantiate(lobbyPlayerUIPrefab, teamParent);
-            playerUI.Initialize(this, playerData, isLocalPlayer);
+            playerUI.Initialize(lobbyMenuController, playerData, isLocalPlayer);
             playerUIs.Add(playerData.ID, playerUI);
         }
         
-        public void RemovePlayer(PlayerData playerData)
-        {
-            lobbyMenuController.RemoveFromTeam(playerData);
-        }
-
+        // Can the team be joined?
         public bool CanJoin()
         {
-            var teams = SessionManager.Singleton.GetTeams();
-            return teams[teamNumber].Count <= SessionManager.MaxNumPlayersPerTeam;
+            var team = SessionManager.Singleton.GetTeam(teamNumber);
+            if (team == null) return false;
+            
+            return team.Count <= SessionManager.MaxNumPlayersPerTeam;
         }
         
+        // Try to enable the join team button
         public void TryEnableJoinButton(bool interactable)
         {
-            joinButton.interactable = interactable && CanJoin();
+            joinButton.interactable = CanJoin() && interactable;
         }
 
+        // Remove a player from the team UI
         public void RemovePlayerUI(Guid playerId)
         {
             Destroy(playerUIs[playerId].gameObject);
             playerUIs.Remove(playerId);
 
+            // Tru to enable the join team button if the player leaving the team was the local player
             if (SessionManager.Singleton.LocalPlayerId == playerId)
             {
                 TryEnableJoinButton(true);   

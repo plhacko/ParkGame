@@ -8,11 +8,16 @@ using UnityEngine.UI;
 
 namespace Networking
 {
+    
+    /*
+     * This class is responsible for the UI of the Lobby menu.
+     * Players can see the room code, their team, and the other players in the game.
+     * Host can start the game from here.
+     */
     public class LobbyMenuController : NetworkBehaviour
     {
-        [SerializeField] private string gameSceneName;
         [SerializeField] private string joinMenuSceneName;
-
+        
         [SerializeField] private Button goBackButton;
         [SerializeField] private Button startGameButton;
         [SerializeField] private TextMeshProUGUI roomCodeLabel;
@@ -36,6 +41,54 @@ namespace Networking
             SessionManager.Singleton.OnMapReceived -= initializeTeamUI;
             OurNetworkManager.Singleton.OnClientDisconnectCallback -= onClientDisconnect;
         }
+        
+        public void JoinTeam(int teamNumber)
+        {
+            PlayerData? playerData = SessionManager.Singleton.GetLocalPlayerData();
+            
+            if (!playerData.HasValue) return;
+            if (!teamUIs[teamNumber].CanJoin()) return;
+            
+            foreach (var teamUI in teamUIs)
+            {
+                teamUI.TryEnableJoinButton(true);    
+            }
+            teamUIs[teamNumber].TryEnableJoinButton(false);
+            
+            if (IsHost)
+            {
+                
+                PlayerData data = playerData.Value;
+                int oldTeam = playerData.Value.Team;
+
+                data.Team = teamNumber;
+                SessionManager.Singleton.UpdatePlayerData(data);
+                
+                removeFromTeamUI(data.ID, oldTeam);
+                addPlayerToTeamUI(data);
+                joinTeamClientRpc(data, oldTeam);
+            }
+            else
+            {
+                joinTeamServerRpc(OurNetworkManager.Singleton.LocalClientId, teamNumber);
+            }
+        }
+        
+        public void RemoveFromTeam(PlayerData playerData)
+        {
+            if (IsHost)
+            {
+                removeFromTeamUI(playerData.ID, playerData.Team);
+                removeFromTeamClientRpc(playerData);
+                
+                playerData.Team = -1;
+                SessionManager.Singleton.UpdatePlayerData(playerData);
+            }
+            else
+            {
+                removeFromTeamServerRpc(OurNetworkManager.Singleton.LocalClientId);
+            }
+        }
 
         private void Update()
         {
@@ -49,7 +102,7 @@ namespace Networking
             }
         }
 
-        void initialize()
+        private void initialize()
         {
             if (IsHost)
             {
@@ -131,59 +184,11 @@ namespace Networking
 
         private void startGame()
         {
-            OurNetworkManager.Singleton.LoadGame(gameSceneName);
-        }
-
-        public void JoinTeam(int teamNumber)
-        {
-            PlayerData? playerData = SessionManager.Singleton.GetLocalPlayerData();
-            
-            if (!playerData.HasValue) return;
-            if (!teamUIs[teamNumber].CanJoin()) return;
-            
-            foreach (var teamUI in teamUIs)
-            {
-                teamUI.TryEnableJoinButton(true);    
-            }
-            teamUIs[teamNumber].TryEnableJoinButton(false);
-            
-            if (IsHost)
-            {
-                
-                PlayerData data = playerData.Value;
-                int oldTeam = playerData.Value.Team;
-
-                data.Team = teamNumber;
-                SessionManager.Singleton.UpdatePlayerData(data);
-                
-                removeFromTeamUI(data.ID, oldTeam);
-                addPlayerToTeamUI(data);
-                JoinTeamClientRpc(data, oldTeam);
-            }
-            else
-            {
-                JoinTeamServerRpc(OurNetworkManager.Singleton.LocalClientId, teamNumber);
-            }
-        }
-        
-        public void RemoveFromTeam(PlayerData playerData)
-        {
-            if (IsHost)
-            {
-                removeFromTeamUI(playerData.ID, playerData.Team);
-                RemoveFromTeamClientRpc(playerData);
-                
-                playerData.Team = -1;
-                SessionManager.Singleton.UpdatePlayerData(playerData);
-            }
-            else
-            {
-                RemoveFromTeamServerRpc(OurNetworkManager.Singleton.LocalClientId);
-            }
+            OurNetworkManager.Singleton.LoadGameScene();
         }
 
         [ServerRpc(RequireOwnership = false)]
-        private void RemoveFromTeamServerRpc(ulong clientId, ServerRpcParams clientRpcParams = default)
+        private void removeFromTeamServerRpc(ulong clientId, ServerRpcParams clientRpcParams = default)
         {
             var playerData = SessionManager.Singleton.GetPlayerData(clientId);
             if(!playerData.HasValue) return;
@@ -191,7 +196,7 @@ namespace Networking
             if(playerData.Value.Team == -1) return;
             
             var data = playerData.Value;
-            RemoveFromTeamClientRpc(data);
+            removeFromTeamClientRpc(data);
             
             int oldTeam = data.Team;
             data.Team = -1;
@@ -201,7 +206,7 @@ namespace Networking
         }
 
         [ClientRpc]
-        private void RemoveFromTeamClientRpc(PlayerData playerData, ClientRpcParams clientRpcParams = default)
+        private void removeFromTeamClientRpc(PlayerData playerData, ClientRpcParams clientRpcParams = default)
         {
             if(IsHost) return;
             
@@ -211,7 +216,7 @@ namespace Networking
         }
 
         [ServerRpc(RequireOwnership = false)]
-        private void JoinTeamServerRpc(ulong clientId, int newTeam, ServerRpcParams clientRpcParams = default)
+        private void joinTeamServerRpc(ulong clientId, int newTeam, ServerRpcParams clientRpcParams = default)
         {
             var playerData = SessionManager.Singleton.GetPlayerData(clientId);
             if(!playerData.HasValue) return;
@@ -225,11 +230,11 @@ namespace Networking
             removeFromTeamUI(data.ID, oldTeam);
             addPlayerToTeamUI(data);
             SessionManager.Singleton.UpdatePlayerData(data);
-            JoinTeamClientRpc(data, oldTeam);
+            joinTeamClientRpc(data, oldTeam);
         }
 
         [ClientRpc]
-        private void JoinTeamClientRpc(PlayerData playerData, int oldTeamNumber, ClientRpcParams clientRpcParams = default)
+        private void joinTeamClientRpc(PlayerData playerData, int oldTeamNumber, ClientRpcParams clientRpcParams = default)
         {
             if(IsHost) return;
             
