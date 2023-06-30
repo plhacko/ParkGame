@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using Managers;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Networking
+namespace UI.Lobby
 {
     /*
      * This class is responsible for the UI of a single team in the Lobby menu.
@@ -41,20 +42,11 @@ namespace Networking
             playerUI.Initialize(lobbyMenuController, playerData, isLocalPlayer);
             playerUIs.Add(playerData.ID, playerUI);
         }
-        
-        // Can the team be joined?
-        public bool CanJoin()
-        {
-            var team = SessionManager.Singleton.GetTeam(teamNumber);
-            if (team == null) return false;
-            
-            return team.Count <= SessionManager.MaxNumPlayersPerTeam;
-        }
-        
+
         // Try to enable the join team button
         public void TryEnableJoinButton(bool interactable)
         {
-            joinButton.interactable = CanJoin() && interactable;
+            joinButton.interactable = !SessionManager.Singleton.IsTeamFull(teamNumber) && interactable;
         }
 
         // Remove a player from the team UI

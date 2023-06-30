@@ -1,8 +1,12 @@
 using Unity.Netcode;
 using UnityEngine;
 
-namespace Networking
+namespace Utils
 {
+    /*
+     * This class is a helper to create a game session for debugging without going through the menus.
+     * It actually doesn't work well anymore because it should initialize the SessionManager with some debug player data
+     */
     public class NetworkHelperUI : MonoBehaviour
     {
         public void StartServer()

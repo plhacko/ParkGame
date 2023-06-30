@@ -1,6 +1,6 @@
 using Unity.Netcode.Components;
 
-namespace Networking
+namespace Player
 {
     public class ClientNetworkAnimator : NetworkAnimator
     {

@@ -1,5 +1,5 @@
 using System;
-using Networking;
+using Managers;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
@@ -13,14 +13,20 @@ namespace Player
         private SpriteRenderer spriteRenderer;
         private Animator animator;
         private NetworkAnimator networkAnimator;
-        private Guid playerId;
+        private Guid ownerId;
 
+        // Replicated variable for sprite orientation
         private NetworkVariable<bool> xSpriteFlip = new (false,
             NetworkVariableReadPermission.Everyone,
             NetworkVariableWritePermission.Owner);
         
         private static readonly int MovementSpeed = Animator.StringToHash("MovementSpeed");
 
+        public void InitializePlayerId(Guid playerId)
+        {
+            this.ownerId = playerId;
+        }
+        
         private void initialize()
         {
             spriteRenderer = GetComponent<SpriteRenderer>();
@@ -28,13 +34,8 @@ namespace Player
 
             if (!isActualOwner())
             {
-                xSpriteFlip.OnValueChanged += OnXSpriteFlipChanged;   
+                xSpriteFlip.OnValueChanged += onXSpriteFlipChanged;   
             }
-        }
-
-        private void OnXSpriteFlipChanged(bool previousValue, bool newValue)
-        {
-            spriteRenderer.flipX = newValue;
         }
 
         public override void OnNetworkSpawn()
@@ -46,11 +47,9 @@ namespace Player
         private void Update()
         {
             if (!isActualOwner()) return;
+            if (!Application.isFocused) return;
             
-            if (Application.isFocused)
-            {
-                move();   
-            }
+            move();
         }
 
         private void move()
@@ -69,19 +68,16 @@ namespace Player
             transform.Translate(movement * Time.deltaTime);
         }
         
+        private void onXSpriteFlipChanged(bool previousValue, bool newValue)
+        {
+            spriteRenderer.flipX = newValue;
+        }
+        
+        // Normally IsOwner works well, but in case the client disconnects
+        // the ownership is automatically transferred to the host.
         private bool isActualOwner()
         {
-            if (IsHost)
-            {
-                return SessionManager.Singleton.LocalPlayerId == playerId;
-            }
-
-            return IsOwner;
-        }
-
-        public void Initialize(Guid playerId)
-        {
-            this.playerId = playerId;
+            return SessionManager.Singleton.LocalPlayerId == ownerId && IsOwner;
         }
     }
 }

@@ -1,22 +1,23 @@
-using Networking;
+using Managers;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class GameUIController : NetworkBehaviour
+/*
+ * This class is responsible for the UI of the Game menu.
+ * Players can go back to the Join Game menu from here.
+ * It's still possible to reconnect to the game from there.
+ */
+namespace UI
 {
-    [SerializeField] private string joinGameSceneName;
-    [SerializeField] private Button backButton;
-    
-    public override void OnNetworkSpawn()
+    public class GameUIController : MonoBehaviour
     {
-        base.OnNetworkSpawn();
-        initialize();
-    }
+        [SerializeField] private string joinGameSceneName;
+        [SerializeField] private Button backButton;
 
-    private void initialize()
-    {
-        backButton.onClick.AddListener(() =>
-            SessionManager.Singleton.EndSessionAndGoToScene(joinGameSceneName));
+        private void Awake()
+        {
+            backButton.onClick.AddListener(() => SessionManager.Singleton.EndSessionAndGoToScene(joinGameSceneName));
+        }
     }
 }

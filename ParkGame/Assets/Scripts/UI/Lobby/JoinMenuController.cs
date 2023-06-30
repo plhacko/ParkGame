@@ -1,11 +1,10 @@
-﻿using TMPro;
-using Unity.Services.Authentication;
-using Unity.Services.Core;
+﻿using Managers;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-namespace Networking
+namespace UI.Lobby
 {
     
     /*
@@ -19,7 +18,7 @@ namespace Networking
         [SerializeField] private Button hostButton;
         [SerializeField] private TMP_InputField joinCodeInputField;
 
-        private async void Start()
+        private void Start()
         {
             joinButton.onClick.AddListener(joinGame);
             hostButton.onClick.AddListener(hostGame);
@@ -29,17 +28,17 @@ namespace Networking
             
             // todo maybe unnecessary?
             // Initialize Unity Services and sign in anonymously
-            await UnityServices.InitializeAsync();
-            
-            if (!AuthenticationService.Instance.IsSignedIn)
-            {
-                await AuthenticationService.Instance.SignInAnonymouslyAsync();   
-            }
+            // await UnityServices.InitializeAsync();
+            //
+            // if (!AuthenticationService.Instance.IsSignedIn)
+            // {
+            //     await AuthenticationService.Instance.SignInAnonymouslyAsync();   
+            // }
             
             enableButtons(true);
             
             OurNetworkManager.Singleton.OnClientDisconnectCallback += onClientDisconnect;
-            joinCodeInputField.text = OurNetworkManager.Singleton.RoomCode;
+            joinCodeInputField.text = SessionManager.Singleton.RoomCode;
         }
 
         private void OnDestroy()
@@ -73,7 +72,7 @@ namespace Networking
             if (joined)
             {
                 // Save the room code so the player can reconnect if they disconnect
-                OurNetworkManager.Singleton.RoomCode = joinCodeInputField.text.ToUpper();
+                SessionManager.Singleton.SetRoomCode(joinCodeInputField.text.ToUpper());
                 return;
             }
             
