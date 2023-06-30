@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using UI.Lobby;
-using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -61,7 +60,7 @@ namespace Managers
             GuidToPlayerData.Remove(playerId);
         }
         
-        private ulong? GetClientId(Guid playerId)
+        public ulong? GetClientId(Guid playerId)
         {
             if (ClientIdToPlayerId.ContainsValue(playerId))
             {
@@ -176,6 +175,7 @@ namespace Managers
         
         public Guid LocalPlayerId => PlayersData.LocalPlayerData.ID;
         public PlayerData LocalPlayerData => PlayersData.LocalPlayerData;
+        public bool IsPlayerIdLocal(Guid playerId) => playerId == LocalPlayerId;
         public string RoomCode => roomCode;
         public MapMetaData MapMetaData => mapMetaData;
         public string GameSceneName => gameSceneName;

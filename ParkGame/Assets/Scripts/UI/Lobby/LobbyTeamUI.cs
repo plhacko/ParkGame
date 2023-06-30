@@ -41,12 +41,8 @@ namespace UI.Lobby
             LobbyPlayerUI playerUI = Instantiate(lobbyPlayerUIPrefab, teamParent);
             playerUI.Initialize(lobbyMenuController, playerData, isLocalPlayer);
             playerUIs.Add(playerData.ID, playerUI);
-        }
-
-        // Try to enable the join team button
-        public void TryEnableJoinButton(bool interactable)
-        {
-            joinButton.interactable = !SessionManager.Singleton.IsTeamFull(teamNumber) && interactable;
+            
+            joinButton.interactable = !SessionManager.Singleton.IsTeamFull(teamNumber);
         }
 
         // Remove a player from the team UI
@@ -54,12 +50,8 @@ namespace UI.Lobby
         {
             Destroy(playerUIs[playerId].gameObject);
             playerUIs.Remove(playerId);
-
-            // Tru to enable the join team button if the player leaving the team was the local player
-            if (SessionManager.Singleton.LocalPlayerId == playerId)
-            {
-                TryEnableJoinButton(true);   
-            }
+            
+            joinButton.interactable = !SessionManager.Singleton.IsTeamFull(teamNumber);
         }
     }
 }

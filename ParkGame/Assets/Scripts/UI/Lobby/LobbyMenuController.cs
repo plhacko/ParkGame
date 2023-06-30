@@ -96,53 +96,19 @@ namespace UI.Lobby
 
         private void onTeamJoined(Guid playerId, int previousTeam, int newTeam)
         {
+            if (previousTeam >= 0 && previousTeam < SessionManager.Singleton.MapMetaData.NumTeams)
+            {
+                var teamUI = teamUIs[previousTeam];
+                teamUI.RemovePlayerUI(playerId);
+            }
+
+            if (newTeam < 0 || newTeam >= SessionManager.Singleton.MapMetaData.NumTeams) return;
             
+            PlayerData? playerData = SessionManager.Singleton.PlayersData.GetPlayerData(playerId);
+            if (!playerData.HasValue) return;
+            
+            teamUIs[newTeam].AddPlayer(playerData.Value, SessionManager.Singleton.IsPlayerIdLocal(playerId));
         }
-        
-        // public void JoinTeam(int teamNumber)
-        // {
-        //     PlayerData playerData = SessionManager.Singleton.LocalPlayerData;
-        //     
-        //     if (SessionManager.Singleton.IsTeamFull(teamNumber)) return;
-        //     
-        //     foreach (var teamUI in teamUIs)
-        //     {
-        //         teamUI.TryEnableJoinButton(true);    
-        //     }
-        //     teamUIs[teamNumber].TryEnableJoinButton(false);
-        //     
-        //     if (OurNetworkManager.Singleton.IsHost)
-        //     {
-        //         int oldTeam = playerData.Team;
-        //     
-        //         data.Team = teamNumber;
-        //         SessionManager.Singleton.PlayersData.UpdatePlayerData(data);
-        //         
-        //         removeFromTeamUI(data.ID, oldTeam);
-        //         addPlayerToTeamUI(data);
-        //         joinTeamClientRpc(data, oldTeam);
-        //     }
-        //     else
-        //     {
-        //         joinTeamServerRpc(OurNetworkManager.Singleton.LocalClientId, teamNumber);
-        //     }
-        // }
-        
-        // public void RemoveFromTeam(PlayerData playerData)
-        // {
-        //     if (OurNetworkManager.Singleton.IsHost)
-        //     {
-        //         removeFromTeamUI(playerData.ID, playerData.Team);
-        //         removeFromTeamClientRpc(playerData);
-        //         
-        //         playerData.Team = -1;
-        //         SessionManager.Singleton.PlayersData.UpdatePlayerData(playerData);
-        //     }
-        //     else
-        //     {
-        //         removeFromTeamServerRpc(OurNetworkManager.Singleton.LocalClientId);
-        //     }
-        // }
 
         private void onClientDisconnect(ulong clientId)
         {
