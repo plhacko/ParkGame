@@ -1,13 +1,21 @@
+using Mapbox.Map;
 using System.Collections;
-using System.Collections.Generic;
 using System.Globalization;
 using UnityEngine;
 using UnityEngine.Networking;
-using static System.Net.WebRequestMethods;
+
 
 public class MapDisplayer : MonoBehaviour
 {
+    [Header("Request info")]
     public string accessToken;
+    public MapboxRequestType RequestType = MapboxRequestType.Center;
+    public enum MapboxRequestType { Center, BoundingBox };
+    public string urlProperty;
+    private Coroutine runningRequest;
+
+    [Header("Style")]
+    public MapboxStyle Style = MapboxStyle.Streets;
     public enum MapboxStyle
     {
         Streets,
@@ -20,7 +28,7 @@ public class MapDisplayer : MonoBehaviour
         NavigationPreviewNight,
     }
     private string[] MapboxStyleIDs = new string[] {
-        "streets-v12", 
+        "streets-v12",
         "outdoors-v12",
         "light-v11",
         "dark-v11",
@@ -30,72 +38,111 @@ public class MapDisplayer : MonoBehaviour
         "navigation-night-v1",
     };
 
-    public MapboxStyle style = MapboxStyle.Streets;
+    [Header("Image size")]
+    [Range(1, 1280)]
+    public int Width = 1280;
+    [Range(1, 1280)]
+    public int Height = 1280;
 
+    [Header("Center")]
     [Range(0, 22)]
-    public float zoom = 15;
-    
+    public int Zoom = 9;
     [Range(0, 360)]
-    public int bearing = 0;
-    
+    public int Bearing = 0;
     [Range(0, 60)]
-    public int pitch = 0;
+    public int Pitch = 0;
+    [Range(-180, 180)]
+    public float Longitude = -122.3486f;
+    [Range(-85.0511f, 85.0511f)]
+    public float Lattitude = 37.8169f;
 
-    private int width;
-    private int height;
+    [Header("Bounding box")]
+    public float MinLongitude = -77.043686f;
+    public float MaxLongitude = -77.028923f;
+    public float MinLatitude = 38.892035f;
+    public float MaxLatitude = 38.904192f;
 
-    public double longitude = 0;
-    public double lattitude = 0;
-    
     // Start is called before the first frame update
     void Start()
     {
-        var aspect = Camera.main.aspect;
-        if (aspect > 1)
+        if (accessToken == "")
         {
-            width = 1280;
-            height = (int)(width / aspect);
+            Debug.LogError("Please enter your access token.");
+            return;
         }
-        else
-        {
-            height = 1280;
-            width = (int)(height * aspect);
-        }
+
         InitiateMapRequest();
+    }
+
+
+    private void OnValidate()
+    {
+        InitiateMapRequest();
+    }
+
+    void Update()
+    {
+
     }
 
     void InitiateMapRequest()
     {
-        StartCoroutine(MapRequest());
+        if (runningRequest != null)
+            StopCoroutine(runningRequest);
+        runningRequest = StartCoroutine(MapRequest());        
     }
 
     // Map request
     IEnumerator MapRequest()
-    {
-        // Create a request for the URL.
-        string url = "https://api.mapbox.com/styles/v1/mapbox/" 
-            + MapboxStyleIDs[(int)style] + 
-            "/static/" + 
-            longitude.ToString(CultureInfo.InvariantCulture) + 
-            "," + 
-            lattitude.ToString(CultureInfo.InvariantCulture) + 
-            "," +
-            zoom + 
-            "," + 
-            bearing + 
-            "," + 
-            pitch + 
-            "/" + 
-            width + 
-            "x" + 
-            height 
-            + 
-            "?" 
-            + 
-            "access_token="
-            + accessToken;
+    {    
+        if (!CheckValidCoordinates())
+            yield break;
 
-        Debug.Log(url);
+        string url = "";
+        switch (RequestType)
+        {
+            case MapboxRequestType.Center:
+                url = "https://api.mapbox.com/styles/v1/mapbox/"
+                + MapboxStyleIDs[(int)Style]
+                + "/static/"
+                + Longitude.ToString(CultureInfo.InvariantCulture)
+                + ","
+                + Lattitude.ToString(CultureInfo.InvariantCulture)
+                + ","
+                + Zoom
+                + ","
+                + Bearing
+                + ","
+                + Pitch
+                + "/"
+                + Width
+                + "x"
+                + Height
+                + "@2x?access_token="
+                + accessToken;
+                break;
+            case MapboxRequestType.BoundingBox:
+                url = "https://api.mapbox.com/styles/v1/mapbox/"
+                + MapboxStyleIDs[(int)Style]
+                + "/static/["
+                + MinLongitude.ToString(CultureInfo.InvariantCulture)
+                + ","
+                + MinLatitude.ToString(CultureInfo.InvariantCulture)
+                + ","
+                + MaxLongitude.ToString(CultureInfo.InvariantCulture)
+                + ","
+                + MaxLatitude.ToString(CultureInfo.InvariantCulture)
+                + "]/"
+                + Width
+                + "x"
+                + Height
+                + "@2x?access_token="
+                + accessToken;
+                break;
+        }
+
+        urlProperty = url;
+
         UnityWebRequest request = UnityWebRequestTexture.GetTexture(url);
         yield return request.SendWebRequest();
 
@@ -109,14 +156,70 @@ public class MapDisplayer : MonoBehaviour
             // Get the texture out using the helper function
             Texture2D texture = DownloadHandlerTexture.GetContent(request);
             // Set the texture on the object
-            GetComponent<SpriteRenderer>().sprite = Sprite.Create(texture, new Rect(0, 0, width, height), new Vector2(0.5f, 0.5f));
-            Resize();
-
+            GetComponent<SpriteRenderer>().sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
         }
     }
 
-    // Resize sprite to fit screen
+    bool CheckValidCoordinates()
+    {
+        if (Width < 1 || Width > 1280)
+        {
+            Debug.LogError("Width must be between 1 and 1280.");
+            return false;
+        }
 
+        if (Height < 1 || Height > 1280)
+        {
+            Debug.LogError("Height must be between 1 and 1280.");
+            return false;
+        }
+
+        if (Longitude < -180 || Longitude > 180)
+        {
+            Debug.LogError("Longitude must be between -180 and 180.");
+            return false;
+        }
+
+        if (Lattitude < -85.0511f || Lattitude > 85.0511f)
+        {
+            Debug.LogError("Lattitude must be between -85.0511 and 85.0511.");
+            return false;
+        }
+
+        if (Zoom < 0 || Zoom > 22)
+        {
+            Debug.LogError("Zoom must be between 0 and 22.");
+            return false;
+        }
+
+        if (Bearing < 0 || Bearing > 360)
+        {
+            Debug.LogError("Bearing must be between 0 and 360.");
+            return false;
+        }
+
+        if (Pitch < 0 || Pitch > 60)
+        {
+            Debug.LogError("Pitch must be between 0 and 60.");
+            return false;
+        }
+
+        if (MinLongitude >= MaxLongitude)
+        {
+            Debug.LogError("Min longtitude must be smaller than max longtitude.");
+            return false;
+        }
+
+        if (MinLatitude >= MaxLatitude)
+        {
+            Debug.LogError("Min latitude must be smaller than max latitude.");
+            return false;
+        }
+
+        return true;
+    }
+
+    // Resize sprite to fit screen
     void Resize()
     {
         SpriteRenderer sr = GetComponent<SpriteRenderer>();
