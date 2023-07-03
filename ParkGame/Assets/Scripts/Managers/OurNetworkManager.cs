@@ -12,6 +12,31 @@ using UnityEngine.SceneManagement;
 
 namespace Managers
 {
+    public struct SerializedGuid : INetworkSerializable
+    {
+        public Guid Value;
+        
+        public SerializedGuid(Guid value)
+        {
+            Value = value;
+        }
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            if (serializer.IsWriter)
+            {
+                byte[] idBytes = Value.ToByteArray();
+                serializer.SerializeValue(ref idBytes);
+            }
+
+            if (serializer.IsReader)
+            {
+                byte[] idBytes = new byte[16];
+                serializer.SerializeValue(ref idBytes);
+                Value = new Guid(idBytes);
+            }
+        }
+    }
     
     public struct PlayerData : INetworkSerializable
     {
@@ -223,7 +248,7 @@ namespace Managers
                     joinAllocation.ConnectionData,
                     joinAllocation.HostConnectionData);
 
-                var playerName = System.Text.Encoding.ASCII.GetBytes(SessionManager.Singleton.LocalPlayerData.Name);
+                var playerName = System.Text.Encoding.ASCII.GetBytes(PlayerPrefs.GetString("PlayerName", ""));
                 
                 // When we are joining the session for the first time we just send empty playerId
                 // Otherwise we sent our cached playerId to reconnect into the game

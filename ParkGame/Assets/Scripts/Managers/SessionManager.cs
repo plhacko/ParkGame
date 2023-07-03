@@ -27,7 +27,12 @@ namespace Managers
             
             GuidToPlayerData[playerData.ID] = playerData;
         }
-        
+
+        public void InitializeLocalPlayerData(PlayerData playerData)
+        {
+            localPlayerData = playerData;
+        }
+
         // Associates a client ID with a player ID
         public void UpdateClientId(ulong clientId, Guid playerId)
         {
@@ -202,7 +207,7 @@ namespace Managers
         {
             foreach (var (clientId, playerId)  in PlayersData.ClientIdToPlayerId)
             {
-                Debug.Log($"---------- \n Client {clientId} \n playerID {playerId} \n team: {PlayersData.GuidToPlayerData[playerId].Team} \n name: {PlayersData.GuidToPlayerData[playerId].Name}");
+                // Debug.Log($"---------- \n Client {clientId} \n playerID {playerId} \n team: {PlayersData.GuidToPlayerData[playerId].Team} \n name: {PlayersData.GuidToPlayerData[playerId].Name}");
             }
         }
         
@@ -227,7 +232,13 @@ namespace Managers
         public void SetPlayerDataClientRpc(ulong clientId, PlayerData playerData, ClientRpcParams clientRpcParams = default)
         {
             if(IsHost) return;
-            
+
+            if (clientId == OurNetworkManager.Singleton.LocalClientId)
+            {
+                // only needed to be called once for the local player per session
+                PlayersData.InitializeLocalPlayerData(playerData);   
+            }
+
             PlayersData.UpdateClientId(clientId, playerData.ID);
             PlayersData.UpdatePlayerData(playerData);
 
@@ -239,6 +250,7 @@ namespace Managers
         {
             if (IsHost) return;
 
+            this.mapMetaData = mapMetaData;
             OnMapReceived?.Invoke(mapMetaData);
         }
         
@@ -271,12 +283,16 @@ namespace Managers
         public void InitializeSession(string hostName, MapMetaData mapMetaData, string roomCode)
         {
             PlayersData.ClearData();
-            PlayersData.UpdatePlayerData(new PlayerData
+            var hostData = new PlayerData
             {
                 ID = Guid.NewGuid(),
                 Name = hostName,
                 Team = -1
-            });
+            };
+            
+            PlayersData.InitializeLocalPlayerData(hostData);           
+            PlayersData.UpdatePlayerData(hostData);           
+            PlayersData.UpdateClientId(OurNetworkManager.Singleton.LocalClientId, hostData.ID);
             this.roomCode = roomCode;
             this.mapMetaData = mapMetaData;
         }
@@ -286,7 +302,7 @@ namespace Managers
             var team = PlayersData.GetTeam(teamNumber);
             if (team == null) return false;
             
-            return team.Count <= MaxNumPlayersPerTeam;
+            return team.Count >= MaxNumPlayersPerTeam;
         }
         
         public void JoinTeam(int teamNumber)
@@ -301,20 +317,20 @@ namespace Managers
                 
                 PlayersData.UpdatePlayerData(hostData);
                 OnTeamJoined.Invoke(LocalPlayerData.ID, oldTeam, teamNumber);
-                joinTeamClientRpc(hostData.ID, oldTeam);
+                joinTeamClientRpc(new SerializedGuid(hostData.ID), teamNumber);
             }
             else
             {
-                joinTeamServerRpc(LocalPlayerData.ID, teamNumber);
+                joinTeamServerRpc(new SerializedGuid(LocalPlayerData.ID), teamNumber);
             }
         }
 
         [ServerRpc(RequireOwnership = false)]
-        private void joinTeamServerRpc(Guid playerId, int newTeam, ServerRpcParams clientRpcParams = default)
+        private void joinTeamServerRpc(SerializedGuid playerId, int newTeam, ServerRpcParams clientRpcParams = default)
         {
             if(newTeam < 0 || newTeam >= MapMetaData.NumTeams) return;
 
-            var playerData = PlayersData.GetPlayerData(playerId);
+            var playerData = PlayersData.GetPlayerData(playerId.Value);
             if(!playerData.HasValue) return;
             
             PlayerData data = playerData.Value;
@@ -322,16 +338,17 @@ namespace Managers
             data.Team = newTeam;
             
             PlayersData.UpdatePlayerData(data);
-            joinTeamClientRpc(data.ID, newTeam);
-            OnTeamJoined.Invoke(playerId, oldTeam, newTeam);
+            joinTeamClientRpc(new SerializedGuid(data.ID), newTeam);
+            OnTeamJoined.Invoke(playerId.Value, oldTeam, newTeam);
+            Debug.Log("Client joined team " + playerData.Value.Name + " " + newTeam);
         }
 
         [ClientRpc]
-        private void joinTeamClientRpc(Guid playerId, int newTeamNumber, ClientRpcParams clientRpcParams = default)
+        private void joinTeamClientRpc(SerializedGuid playerId, int newTeamNumber, ClientRpcParams clientRpcParams = default)
         {
             if(OurNetworkManager.Singleton.IsHost) return;
             
-            PlayerData? playerData = PlayersData.GetPlayerData(playerId);
+            PlayerData? playerData = PlayersData.GetPlayerData(playerId.Value);
             if(!playerData.HasValue) return;
             
             PlayerData data = playerData.Value;
@@ -339,7 +356,7 @@ namespace Managers
             data.Team = newTeamNumber;
 
             PlayersData.UpdatePlayerData(data);
-            OnTeamJoined.Invoke(playerId, oldTeam, newTeamNumber);
+            OnTeamJoined.Invoke(playerId.Value, oldTeam, newTeamNumber);
         }
         
         public void RemoveFromTeam(Guid playerId)
@@ -350,20 +367,22 @@ namespace Managers
             if (OurNetworkManager.Singleton.IsHost)
             {
                 var data = playerData.Value;
+                int oldTeam = data.Team;
                 data.Team = -1;
                 PlayersData.UpdatePlayerData(data);
-                removeFromTeamClientRpc(data.ID);
+                removeFromTeamClientRpc(new SerializedGuid(data.ID));
+                OnTeamJoined.Invoke(playerId, oldTeam, data.Team);
             }
             else
             {
-                removeFromTeamServerRpc(playerData.Value.ID);
+                removeFromTeamServerRpc(new SerializedGuid(playerData.Value.ID));
             }
         }
         
         [ServerRpc(RequireOwnership = false)]
-        private void removeFromTeamServerRpc(Guid playerId, ServerRpcParams clientRpcParams = default)
+        private void removeFromTeamServerRpc(SerializedGuid playerId, ServerRpcParams clientRpcParams = default)
         {
-            var playerData = PlayersData.GetPlayerData(playerId);
+            var playerData = PlayersData.GetPlayerData(playerId.Value);
             if(!playerData.HasValue) return;
             
             if(playerData.Value.Team == -1) return;
@@ -373,16 +392,16 @@ namespace Managers
             data.Team = -1;
             
             PlayersData.UpdatePlayerData(data);
-            removeFromTeamClientRpc(data.ID);
-            OnTeamJoined.Invoke(playerId, oldTeam, data.Team);
+            removeFromTeamClientRpc(new SerializedGuid(data.ID));
+            OnTeamJoined.Invoke(playerId.Value, oldTeam, data.Team);
         }
 
         [ClientRpc]
-        private void removeFromTeamClientRpc(Guid playerId, ClientRpcParams clientRpcParams = default)
+        private void removeFromTeamClientRpc(SerializedGuid playerId, ClientRpcParams clientRpcParams = default)
         {
             if(OurNetworkManager.Singleton.IsHost) return;
             
-            var playerData = PlayersData.GetPlayerData(playerId);
+            var playerData = PlayersData.GetPlayerData(playerId.Value);
             if(!playerData.HasValue) return;
             
             if(playerData.Value.Team == -1) return;
@@ -392,7 +411,7 @@ namespace Managers
             data.Team = -1;
             
             PlayersData.UpdatePlayerData(data);
-            OnTeamJoined.Invoke(playerId, oldTeam, data.Team);
+            OnTeamJoined.Invoke(playerId.Value, oldTeam, data.Team);
         }
     }
 }

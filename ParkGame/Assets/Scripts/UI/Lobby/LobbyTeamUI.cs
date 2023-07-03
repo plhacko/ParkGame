@@ -53,5 +53,7 @@ namespace UI.Lobby
             
             joinButton.interactable = !SessionManager.Singleton.IsTeamFull(teamNumber);
         }
+
+        public bool ContainsPlayer(Guid playerDataID) => playerUIs.ContainsKey(playerDataID);
     }
 }

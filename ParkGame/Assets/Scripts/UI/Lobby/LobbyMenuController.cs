@@ -25,7 +25,7 @@ namespace UI.Lobby
 
         [SerializeField] private RectTransform teamsParent;
         
-        private List<LobbyTeamUI> teamUIs = new();
+        private readonly List<LobbyTeamUI> teamUIs = new();
 
         private void Awake()
         {
@@ -106,7 +106,7 @@ namespace UI.Lobby
             
             PlayerData? playerData = SessionManager.Singleton.PlayersData.GetPlayerData(playerId);
             if (!playerData.HasValue) return;
-            
+
             teamUIs[newTeam].AddPlayer(playerData.Value, SessionManager.Singleton.IsPlayerIdLocal(playerId));
         }
 
@@ -125,7 +125,7 @@ namespace UI.Lobby
 
         private void onSetPlayerData(PlayerData playerData)
         {
-            if(playerData.Team == -1) return;
+            if(playerData.Team == -1 || teamUIs[playerData.Team].ContainsPlayer(playerData.ID)) return;
             addPlayerToTeamUI(playerData);
         }
         
