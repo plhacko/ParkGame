@@ -13,7 +13,7 @@ namespace Player
         private SpriteRenderer spriteRenderer;
         private Animator animator;
         private NetworkAnimator networkAnimator;
-        private Guid ownerId;
+        private Guid ownerPlayerId;
 
         // Replicated variable for sprite orientation
         private NetworkVariable<bool> xSpriteFlip = new (false,
@@ -24,7 +24,7 @@ namespace Player
 
         public void InitializePlayerId(Guid playerId)
         {
-            this.ownerId = playerId;
+            this.ownerPlayerId = playerId;
         }
         
         private void initialize()
@@ -77,7 +77,15 @@ namespace Player
         // the ownership is automatically transferred to the host.
         private bool isActualOwner()
         {
-            return SessionManager.Singleton.LocalPlayerId == ownerId && IsOwner;
+            return SessionManager.Singleton.LocalPlayerId == ownerPlayerId && IsOwner;
+        }
+
+        [ClientRpc]
+        public void InitializePlayerIdClientRpc(SerializedGuid serializedGuid, ClientRpcParams clientRpcParams = default)
+        {
+            if(IsHost) return;
+
+            ownerPlayerId = serializedGuid.Value;
         }
     }
 }

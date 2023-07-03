@@ -55,6 +55,7 @@ namespace Managers
                 // We spawn the player so that the client has ownership of it
                 playerController.GetComponent<NetworkObject>().SpawnWithOwnership(clientId, true);
                 playerController.GetComponent<NetworkObject>().DontDestroyWithOwner = true;
+                playerController.InitializePlayerIdClientRpc(new SerializedGuid(playerData.Value.ID), OurNetworkManager.OneClientRpcParams(clientId));
             
                 playerControllers.Add(playerData.Value.ID, playerController);
             }
