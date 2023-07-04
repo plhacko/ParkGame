@@ -53,10 +53,11 @@ namespace Managers
                 playerController.InitializePlayerId(playerData.Value.ID);
                 
                 // We spawn the player so that the client has ownership of it
-                playerController.GetComponent<NetworkObject>().SpawnWithOwnership(clientId, true);
-                playerController.GetComponent<NetworkObject>().DontDestroyWithOwner = true;
+                var networkObject = playerController.GetComponent<NetworkObject>();
+                networkObject.SpawnWithOwnership(clientId, true);
+                networkObject.DontDestroyWithOwner = true;
                 playerController.InitializePlayerIdClientRpc(new SerializedGuid(playerData.Value.ID), OurNetworkManager.OneClientRpcParams(clientId));
-            
+                
                 playerControllers.Add(playerData.Value.ID, playerController);
             }
         }
@@ -65,12 +66,13 @@ namespace Managers
         // The connection should only be approved if the client is reconnecting
         private void onClientConnect(ulong clientId)
         {
-            var clientData = SessionManager.Singleton.PlayersData.GetPlayerData(clientId);
-            if (!clientData.HasValue) return;
-            if (!playerControllers.TryGetValue(clientData.Value.ID, out var playerController)) return;
+            var playerData = SessionManager.Singleton.PlayersData.GetPlayerData(clientId);
+            if (!playerData.HasValue) return;
+            if (!playerControllers.TryGetValue(playerData.Value.ID, out var playerController)) return;
             
             // The reconnected player will probably get a different clientId than before so we need to change the ownership
             playerController.GetComponent<NetworkObject>().ChangeOwnership(clientId);
+            playerController.InitializePlayerIdClientRpc(new SerializedGuid(playerData.Value.ID), OurNetworkManager.OneClientRpcParams(clientId));
             
             // Send the client a message that the reconnection was successful
             sendReconnectedSuccessClientRpc(OurNetworkManager.OneClientRpcParams(clientId));

@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using Managers;
 using UnityEngine;
 using UnityEngine.UI;
@@ -19,7 +21,29 @@ namespace UI
             OurNetworkManager.Singleton.OnClientDisconnect += onClientDisconnect;
             reconnectButton.onClick.AddListener(tryReconnect);
         }
-    
+
+        private void Update()
+        {
+            debugDisconnectFirstPlayer();
+        }
+
+#if UNITY_EDITOR
+        private void debugDisconnectFirstPlayer()
+        {
+            if (Input.GetKeyDown(KeyCode.X) && OurNetworkManager.Singleton.IsHost)
+            {
+                var clientData = SessionManager.Singleton.PlayersData.GuidToPlayerData.First((pair =>
+                    pair.Key != SessionManager.Singleton.PlayersData.LocalPlayerData.ID));
+
+                var clientId = SessionManager.Singleton.PlayersData.GetClientId(clientData.Key);
+                if(clientId.HasValue)
+                {
+                    OurNetworkManager.Singleton.DisconnectClient(clientId.Value);
+                }
+            }
+        }
+#endif
+        
         private void OnDestroy()
         {
             playerManager.OnClientReconnectedCallback -= onClientReconnected;
