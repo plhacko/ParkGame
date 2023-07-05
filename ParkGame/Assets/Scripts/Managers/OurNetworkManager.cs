@@ -211,7 +211,7 @@ namespace Managers
             this.serverState = ServerState.InGame;
 
             // Kick all players that don't have a team assigned
-            var copyOfKeys = new List<ulong>(ConnectedClients.Keys);
+            var copyOfKeys = new List<ulong>(SessionManager.Singleton.PlayersData.ClientIdToPlayerId.Keys);
             foreach (var clientId in copyOfKeys)
             {
                 PlayerData? playerData = SessionManager.Singleton.PlayersData.GetPlayerData(clientId);
@@ -223,7 +223,11 @@ namespace Managers
                         SessionManager.Singleton.RemovePlayerDataClientRpc(clientId);
                         SessionManager.Singleton.PlayersData.RemovePlayerData(playerId.Value);
                     }
-                    DisconnectClient(clientId);
+
+                    if (ConnectedClients.ContainsKey(clientId))
+                    {
+                        DisconnectClient(clientId);   
+                    }
                 }
             }
             

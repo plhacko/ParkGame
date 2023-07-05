@@ -203,15 +203,6 @@ namespace Managers
             }
         }
 
-        private void Update()
-        {
-            foreach (var (clientId, playerId)  in PlayersData.ClientIdToPlayerId)
-            {
-                // Debug.Log($"---------- \n Client {clientId} \n playerID {playerId} \n team: {PlayersData.GuidToPlayerData[playerId].Team} \n name: {PlayersData.GuidToPlayerData[playerId].Name}");
-            }
-        }
-        
-        
         // Returns true if the player is currently connected
         // finds client ID from player ID and checks if it is connected
         public bool IsConnected(Guid playerId)

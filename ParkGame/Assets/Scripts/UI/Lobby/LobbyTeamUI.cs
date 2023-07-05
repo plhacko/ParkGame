@@ -42,7 +42,7 @@ namespace UI.Lobby
             playerUI.Initialize(lobbyMenuController, playerData, isLocalPlayer);
             playerUIs.Add(playerData.ID, playerUI);
             
-            joinButton.interactable = !SessionManager.Singleton.IsTeamFull(teamNumber);
+            joinButton.interactable = !SessionManager.Singleton.IsTeamFull(teamNumber) && !isLocalPlayer;
         }
 
         // Remove a player from the team UI
