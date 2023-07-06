@@ -1,6 +1,7 @@
 using Mapbox.Map;
 using System.Collections;
 using System.Globalization;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -9,7 +10,7 @@ public class MapDisplayer : MonoBehaviour
 {
     [Header("Request info")]
     public string accessToken;
-    public MapboxRequestType RequestType = MapboxRequestType.Center;
+    public MapboxRequestType RequestType = MapboxRequestType.BoundingBox;
     public enum MapboxRequestType { Center, BoundingBox };
     public string urlProperty;
     private Coroutine runningRequest;
@@ -65,19 +66,14 @@ public class MapDisplayer : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        if (accessToken == "")
-        {
-            Debug.LogError("Please enter your access token.");
-            return;
-        }
-
-        InitiateMapRequest();
+        //InitiateMapRequest();
     }
 
 
     private void OnValidate()
     {
-        InitiateMapRequest();
+        if (Application.isPlaying)
+            InitiateMapRequest();
     }
 
     void Update()
@@ -85,7 +81,20 @@ public class MapDisplayer : MonoBehaviour
 
     }
 
-    void InitiateMapRequest()
+    private void OnEnable()
+    {
+        Debug.Log("OnEnable");
+        InitiateMapRequest();
+    }
+
+    private void OnDisable()
+    {
+        Debug.Log("OnDisable");
+        if (runningRequest != null)
+            StopCoroutine(runningRequest);
+    }
+
+    public void InitiateMapRequest()
     {
         if (runningRequest != null)
             StopCoroutine(runningRequest);
@@ -141,6 +150,7 @@ public class MapDisplayer : MonoBehaviour
                 break;
         }
 
+        Debug.Log("URL: " + url);
         urlProperty = url;
 
         UnityWebRequest request = UnityWebRequestTexture.GetTexture(url);

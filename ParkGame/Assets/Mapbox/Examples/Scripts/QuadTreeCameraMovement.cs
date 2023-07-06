@@ -1,4 +1,6 @@
-﻿namespace Mapbox.Examples
+﻿using Unity.VisualScripting;
+
+namespace Mapbox.Examples
 {
 	using Mapbox.Unity.Map;
 	using Mapbox.Unity.Utilities;
@@ -6,8 +8,9 @@
 	using UnityEngine;
 	using UnityEngine.EventSystems;
 	using System;
+    using UnityEngine.UI;
 
-	public class QuadTreeCameraMovement : MonoBehaviour
+    public class QuadTreeCameraMovement : MonoBehaviour
 	{
 		[SerializeField]
 		[Range(1, 20)]
@@ -32,6 +35,12 @@
 		private bool _isInitialized = false;
 		private Plane _groundPlane = new Plane(Vector3.up, 0);
 		private bool _dragStartedOnUI = false;
+
+		// Select Region
+		private bool _selectingRegion = false;
+		public LineRenderer lineRenderer;
+		private Vector3 _initialMousePosition;
+		private Vector3 _currentMousePosition;
 
 		void Awake()
 		{
@@ -64,7 +73,13 @@
 		{
 			if (!_isInitialized) { return; }
 
-			if (!_dragStartedOnUI)
+
+			if (_selectingRegion && !_dragStartedOnUI)
+			{
+				HandleSelectRegion();
+			}
+
+			if (!_dragStartedOnUI && !_selectingRegion)
 			{
 				if (Input.touchSupported && Input.touchCount > 0)
 				{
@@ -77,7 +92,62 @@
 			}
 		}
 
-		void HandleMouseAndKeyBoard()
+        private void HandleSelectRegion()
+        {
+			if (Input.touchPressureSupported && Input.touchCount > 0)
+			{
+				HandleTouchSelectRegion();
+			}
+			else
+			{
+				HandleMouseSelectRegion();
+			}
+        }
+
+        private void HandleMouseSelectRegion()
+        {
+			Vector3 mousePosition = Input.mousePosition;
+			mousePosition.z = Camera.main.transform.localPosition.y;
+
+			if (Input.GetMouseButtonDown(0))
+			{
+				lineRenderer.positionCount = 4;
+				_initialMousePosition = Camera.main.ScreenToWorldPoint(mousePosition);
+				lineRenderer.SetPosition(0, new Vector3(_initialMousePosition.x, 0.1f, _initialMousePosition.z));
+				lineRenderer.SetPosition(1, new Vector3(_initialMousePosition.x, 0.1f, _initialMousePosition.z));
+				lineRenderer.SetPosition(2, new Vector3(_initialMousePosition.x, 0.1f, _initialMousePosition.z));
+				lineRenderer.SetPosition(3, new Vector3(_initialMousePosition.x, 0.1f, _initialMousePosition.z));
+			}
+
+			if (Input.GetMouseButton(0))
+			{
+				_currentMousePosition = Camera.main.ScreenToWorldPoint(mousePosition);
+				lineRenderer.SetPosition(0, new Vector3(_initialMousePosition.x, 0.1f, _initialMousePosition.z));
+				lineRenderer.SetPosition(1, new Vector3(_currentMousePosition.x, 0.1f, _initialMousePosition.z));
+				lineRenderer.SetPosition(2, new Vector3(_currentMousePosition.x, 0.1f, _currentMousePosition.z));
+				lineRenderer.SetPosition(3, new Vector3(_initialMousePosition.x, 0.1f, _currentMousePosition.z));
+			}
+        }
+
+		public Vector4 GetSelectedRegionBoundingBox()
+		{
+			var initialLatLong = _mapManager.WorldToGeoPosition(_initialMousePosition);
+			var currentLatLong = _mapManager.WorldToGeoPosition(_currentMousePosition);
+
+			var minLat = Math.Min(initialLatLong.x, currentLatLong.x);
+			var minLong = Math.Min(initialLatLong.y, currentLatLong.y);
+			var maxLat = Math.Max(initialLatLong.x, currentLatLong.x);
+			var maxLong = Math.Max(initialLatLong.y, currentLatLong.y);
+
+			return new Vector4((float)minLong, (float)minLat, (float)maxLong, (float)maxLat);
+		}
+
+        private void HandleTouchSelectRegion()
+        {
+            throw new NotImplementedException();
+        }
+
+        void HandleMouseAndKeyBoard()
 		{
 			// zoom
 			float scrollDelta = 0.0f;
@@ -296,6 +366,12 @@
 			float distance;
 			if (!_groundPlane.Raycast(ray, out distance)) { return Vector3.zero; }
 			return ray.GetPoint(distance);
+		}
+
+		public void SelectRegionOnValueChanged(Toggle toggle)
+		{
+			_selectingRegion = toggle.isOn;
+		    lineRenderer.gameObject.SetActive(toggle.isOn);
 		}
 	}
 }
