@@ -149,7 +149,8 @@ namespace Managers
     
     /*
      * This class is responsible for managing the state of the game session.
-     * It is a singleton, keeps track of IDs and names all players in the game
+     * It is a singleton, keeps track of IDs and names and other info of all players in the game
+     * It also keeps track of the map data and the room code
      */
     public class SessionManager : NetworkBehaviour
     {
@@ -203,6 +204,11 @@ namespace Managers
             }
         }
 
+        public void SetRoomCode(string roomCode)
+        {
+            this.roomCode = roomCode;
+        }
+        
         // Returns true if the player is currently connected
         // finds client ID from player ID and checks if it is connected
         public bool IsConnected(Guid playerId)
@@ -218,6 +224,14 @@ namespace Managers
             return false;
         }
         
+        public bool IsTeamFull(int teamNumber)
+        {
+            var team = PlayersData.GetTeam(teamNumber);
+            if (team == null) return false;
+            
+            return team.Count >= MaxNumPlayersPerTeam;
+        }
+
         // Set player data for a client
         [ClientRpc]
         public void SetPlayerDataClientRpc(ulong clientId, PlayerData playerData, ClientRpcParams clientRpcParams = default)
@@ -236,6 +250,7 @@ namespace Managers
             OnSetPlayerData?.Invoke(playerData);
         }
         
+        // Set the map data
         [ClientRpc]
         public void SendMapDataClientRpc(MapMetaData mapMetaData, ClientRpcParams clientRpcParams)
         {
@@ -258,11 +273,6 @@ namespace Managers
             }
         }
 
-        public void SetRoomCode(string roomCode)
-        {
-            this.roomCode = roomCode;
-        }
-
         // Clears data of the current session, disconnects and loads a scene
         public void EndSessionAndGoToScene(string sceneName)
         {
@@ -271,6 +281,7 @@ namespace Managers
             SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
         }
 
+        // Initializes the session with the host's data
         public void InitializeSession(string hostName, MapMetaData mapMetaData, string roomCode)
         {
             PlayersData.ClearData();
@@ -288,14 +299,7 @@ namespace Managers
             this.mapMetaData = mapMetaData;
         }
 
-        public bool IsTeamFull(int teamNumber)
-        {
-            var team = PlayersData.GetTeam(teamNumber);
-            if (team == null) return false;
-            
-            return team.Count >= MaxNumPlayersPerTeam;
-        }
-        
+        // Try to join a team
         public void JoinTeam(int teamNumber)
         {
             if (IsTeamFull(teamNumber)) return;
@@ -331,7 +335,6 @@ namespace Managers
             PlayersData.UpdatePlayerData(data);
             joinTeamClientRpc(new SerializedGuid(data.ID), newTeam);
             OnTeamJoined.Invoke(playerId.Value, oldTeam, newTeam);
-            Debug.Log("Client joined team " + playerData.Value.Name + " " + newTeam);
         }
 
         [ClientRpc]

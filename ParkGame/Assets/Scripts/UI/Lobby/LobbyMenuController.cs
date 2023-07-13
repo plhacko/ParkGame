@@ -166,45 +166,10 @@ namespace UI.Lobby
             OurNetworkManager.Singleton.LoadGameScene();
         }
 
-        // [ServerRpc(RequireOwnership = false)]
-        // private void joinTeamServerRpc(ulong clientId, int newTeam, ServerRpcParams clientRpcParams = default)
-        // {
-        //     var playerData = SessionManager.Singleton.PlayersData.GetPlayerData(clientId);
-        //     if(!playerData.HasValue) return;
-        //     
-        //     if(newTeam < 0 || newTeam >= SessionManager.Singleton.MapMetaData.NumTeams) return;
-        //
-        //     var data = playerData.Value;
-        //     int oldTeam = data.Team;
-        //     data.Team = newTeam;
-        //     
-        //     removeFromTeamUI(data.ID, oldTeam);
-        //     addPlayerToTeamUI(data);
-        //     SessionManager.Singleton.PlayersData.UpdatePlayerData(data);
-        //     joinTeamClientRpc(data, oldTeam);
-        // }
-        
-        // [ClientRpc]
-        // private void joinTeamClientRpc(PlayerData playerData, int oldTeamNumber, ClientRpcParams clientRpcParams = default)
-        // {
-        //     if(OurNetworkManager.Singleton.IsHost) return;
-        //     
-        //     removeFromTeamUI(playerData.ID, oldTeamNumber);
-        //     addPlayerToTeamUI(playerData);
-        //     
-        //     SessionManager.Singleton.PlayersData.UpdatePlayerData(playerData);
-        // }
-        
         private void addPlayerToTeamUI(PlayerData playerData)
         {
             bool isLocalPlayer = playerData.ID == SessionManager.Singleton.LocalPlayerId;
             teamUIs[playerData.Team].AddPlayer(playerData, isLocalPlayer);
-        }
-
-        private void removeFromTeamUI(Guid playerId, int teamNumber)
-        {
-            if(teamNumber == -1) return;
-            teamUIs[teamNumber].RemovePlayerUI(playerId);
         }
     }
 }

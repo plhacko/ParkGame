@@ -47,12 +47,9 @@ namespace UI.Lobby
             if(OurNetworkManager.Singleton != null)
                 OurNetworkManager.Singleton.OnClientDisconnectCallback -= onClientDisconnect;
         }
-
-        // todo when is this called?
+        
         private void onClientDisconnect(ulong clientId)
         {
-            // todo don't need?
-            // OurNetworkManager.Singleton.RoomCode = "";
             joinCodeInputField.text = "";
             enableButtons(true);
         }
