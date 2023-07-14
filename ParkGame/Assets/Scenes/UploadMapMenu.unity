@@ -1961,7 +1961,7 @@ MonoBehaviour:
   - {fileID: 349936614}
   - {fileID: 1502771427}
   - {fileID: 1648738129}
-  mapName: {fileID: 725702585}
+  mapNameInputField: {fileID: 725702585}
   texture: {fileID: 2800000, guid: 5a046c0f9c5e91945a5cae58973daa2a, type: 3}
 --- !u!1 &1589949869
 GameObject:

@@ -7,32 +7,46 @@ using Firebase.Extensions;
 using Firebase.Storage;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace UI
 {
+    public static class FirebaseConstants
+    {
+        public static string STORAGE_URL = "gs://theparkgame-97204.appspot.com";
+        public static string MAP_FOLDER = "MapImages";
+        public static string MAP_DATA_FOLDER = "Maps";
+        public static long MAX_MAP_SIZE = 1024 * 1024 * 12; // 12M
+    }
+    
     public class MapData
     {
+        public string MapId;
         public int NumTeams;
         public string MapName;
-        public string GeoPosition;
-        public string MapId;
+        public double Longitude;
+        public double Latitude;
+        public int Width;
+        public int Height;
         
-        public MapData(int numTeams, string mapName, string geoPosition, Guid mapId)
+        public MapData(int numTeams, string mapName, double longitude, double latitude, int width, int height, Guid mapId)
         {
             NumTeams = numTeams;
             MapName = mapName;
-            GeoPosition = geoPosition;
+            Longitude = longitude;
+            Latitude = latitude;
+            Width = width;
+            Height = height;
             MapId = mapId.ToString();
         }
+        
     }
 
     public class MapUploaderUI : MonoBehaviour
     {
         [SerializeField] private Button uploadButton;
         [SerializeField] private List<Toggle> numTeamsToggles;
-        [FormerlySerializedAs("mapName")] [SerializeField] private TMP_InputField mapNameInputField;
+        [SerializeField] private TMP_InputField mapNameInputField;
         [SerializeField] private Texture2D texture;
         
         private DatabaseReference databaseReference;
@@ -43,8 +57,7 @@ namespace UI
             uploadButton.onClick.AddListener(uploadMap);
             FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task =>
             {
-                string url = "gs://theparkgame-97204.appspot.com";
-                storageReference = FirebaseStorage.DefaultInstance.GetReferenceFromUrl(url);
+                storageReference = FirebaseStorage.DefaultInstance.GetReferenceFromUrl(FirebaseConstants.STORAGE_URL);
                 databaseReference = FirebaseDatabase.DefaultInstance.RootReference;
             });
         }
@@ -69,10 +82,14 @@ namespace UI
             string mapName = mapNameInputField.text;
             Guid guid = Guid.NewGuid();
             byte[] bytes = texture.EncodeToPNG(); // todo get actual map
-            string geoLocation = "654612.4564684, 14654.420"; // todo get actual location
+            double longitude = 50.08044798178662; // todo get actual location
+            double latitude = 14.441389839994997;
+            
+            if(bytes.Length > FirebaseConstants.MAX_MAP_SIZE) throw new Exception("Map is too big!");
 
-            MapData mapData = new MapData(numTeams, mapName, geoLocation, guid);
-            storageReference.Child($"MapImages/{mapData.MapName}_{mapData.MapId}.jpg").PutBytesAsync(bytes).ContinueWithOnMainThread(task =>
+            MapData mapData = new MapData(numTeams, mapName, longitude, latitude, texture.width, texture.height, guid);
+
+            storageReference.Child($"{FirebaseConstants.MAP_FOLDER}/{mapData.MapName}_{mapData.MapId}.jpg").PutBytesAsync(bytes).ContinueWithOnMainThread(task =>
             {
                 if (task.Status == TaskStatus.RanToCompletion) {
                     Debug.Log("Texture uploaded successfully!");
@@ -82,7 +99,7 @@ namespace UI
             });
             
             string mapJson = JsonUtility.ToJson(mapData);
-            databaseReference.Child("Maps").Child(mapData.MapId).SetRawJsonValueAsync(mapJson);
+            databaseReference.Child(FirebaseConstants.MAP_DATA_FOLDER).Child(mapData.MapId).SetRawJsonValueAsync(mapJson);
         }
     }
    
