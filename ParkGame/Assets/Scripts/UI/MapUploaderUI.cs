@@ -1,8 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Firebase;
 using Firebase.Database;
+using Firebase.Extensions;
+using Firebase.Storage;
+using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace UI
@@ -27,15 +32,19 @@ namespace UI
     {
         [SerializeField] private Button uploadButton;
         [SerializeField] private List<Toggle> numTeamsToggles;
-        [SerializeField] private InputField mapName;
-
+        [FormerlySerializedAs("mapName")] [SerializeField] private TMP_InputField mapNameInputField;
+        [SerializeField] private Texture2D texture;
+        
         private DatabaseReference databaseReference;
+        private StorageReference storageReference;
 
         void Awake()
         {
             uploadButton.onClick.AddListener(uploadMap);
             FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task =>
             {
+                string url = "gs://theparkgame-97204.appspot.com";
+                storageReference = FirebaseStorage.DefaultInstance.GetReferenceFromUrl(url);
                 databaseReference = FirebaseDatabase.DefaultInstance.RootReference;
             });
         }
@@ -57,11 +66,23 @@ namespace UI
                 }
             }
 
+            string mapName = mapNameInputField.text;
+            Guid guid = Guid.NewGuid();
+            byte[] bytes = texture.EncodeToPNG(); // todo get actual map
             string geoLocation = "654612.4564684, 14654.420"; // todo get actual location
+
+            MapData mapData = new MapData(numTeams, mapName, geoLocation, guid);
+            storageReference.Child($"MapImages/{mapData.MapName}_{mapData.MapId}.jpg").PutBytesAsync(bytes).ContinueWithOnMainThread(task =>
+            {
+                if (task.Status == TaskStatus.RanToCompletion) {
+                    Debug.Log("Texture uploaded successfully!");
+                } else {
+                    Debug.Log("Error uploading texture: " + task.Exception);
+                }
+            });
             
-            MapData mapData = new MapData(numTeams, mapName.text, geoLocation, Guid.NewGuid());
             string mapJson = JsonUtility.ToJson(mapData);
-            databaseReference.Child("maps").Child(mapData.MapId).SetRawJsonValueAsync(mapJson);
+            databaseReference.Child("Maps").Child(mapData.MapId).SetRawJsonValueAsync(mapJson);
         }
     }
    
