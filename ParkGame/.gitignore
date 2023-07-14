@@ -71,3 +71,10 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 /[Aa]ssets/Firebase/
+
+/[Aa]ssets/Plugins/Android/
+/[Aa]ssets/Plugins/iOS/
+/[Aa]ssets/Plugins/tvOS/
+/[Aa]ssets/Plugins/Android.meta
+/[Aa]ssets/Plugins/iOS.meta
+/[Aa]ssets/Plugins/tvOS.meta
