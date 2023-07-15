@@ -89,7 +89,7 @@ namespace UI
 
             MapData mapData = new MapData(numTeams, mapName, longitude, latitude, texture.width, texture.height, guid);
 
-            storageReference.Child($"{FirebaseConstants.MAP_FOLDER}/{mapData.MapName}_{mapData.MapId}.jpg").PutBytesAsync(bytes).ContinueWithOnMainThread(task =>
+            storageReference.Child($"{FirebaseConstants.MAP_FOLDER}/{mapData.MapId}.jpg").PutBytesAsync(bytes).ContinueWithOnMainThread(task =>
             {
                 if (task.Status == TaskStatus.RanToCompletion) {
                     Debug.Log("Texture uploaded successfully!");

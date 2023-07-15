@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Firebase;
 using Firebase.Database;
 using Firebase.Storage;
+using TMPro;
 using UI;
 using Unity.Mathematics;
 using UnityEngine;
@@ -15,30 +16,66 @@ public class MapPicker : MonoBehaviour
     [SerializeField] private float maxDistance; 
     [SerializeField] private Button nextMapButton;
     [SerializeField] private Button previousMapButton;
+    [SerializeField] private RawImage image;
+    [SerializeField] private TextMeshProUGUI mapNameText;
+    [SerializeField] private TextMeshProUGUI mapDistanceText;
+    [SerializeField] private TextMeshProUGUI maxNumTeamsText;
     
     private DatabaseReference databaseReference;
     private StorageReference storageReference;
 
     private List<MapData> mapDatas = new();
-    public Texture2D[] mapTextures;
+    private Texture2D[] mapTextures;
+    private int currentMapIndex = 0;
 
     void Awake()
     {
+        nextMapButton.onClick.AddListener(onNextClicked);
+        previousMapButton.onClick.AddListener(onPreviousClicked);
         downloadMaps();
-        Debug.Log("downloading.. ");
+    }
+
+    private void onNextClicked()
+    {
+        currentMapIndex = (currentMapIndex + 1) % mapDatas.Count;
+        showCurrentMap();
+    }
+    
+    private void onPreviousClicked()
+    {
+        currentMapIndex = (currentMapIndex - 1) % mapDatas.Count;
+        if (currentMapIndex == -1)
+        {
+            currentMapIndex = mapDatas.Count - 1;
+        }
+        showCurrentMap();
+    }
+    
+    private void showCurrentMap()
+    {
+        if(currentMapIndex >= mapTextures.Length) return;
+        
+        MapData mapData = mapDatas[currentMapIndex];
+        
+        (double currentLongitude, double currentLatitude) = getCurrentGeoPosition();
+        double distance = getGeoDistance(currentLongitude, currentLatitude, mapData.Longitude, mapData.Latitude);
+
+        image.texture = mapTextures[currentMapIndex];
+        mapNameText.text = mapData.MapName;
+        mapDistanceText.text = "(" +(distance / 1000).ToString("F1") + " km)";
+        maxNumTeamsText.text = "Max teams: " + mapData.NumTeams;
     }
 
     private async void downloadMaps()
     {
+        (double currentLongitude, double currentLatitude) = getCurrentGeoPosition();
+
         await FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task => { Debug.Log(task.Status); });
         
         storageReference = FirebaseStorage.DefaultInstance.GetReferenceFromUrl(FirebaseConstants.STORAGE_URL);
         databaseReference = FirebaseDatabase.DefaultInstance.RootReference;
         
         DataSnapshot dataSnapshot = await databaseReference.Child(FirebaseConstants.MAP_DATA_FOLDER).GetValueAsync();
-        
-        double currentLongitude = 50.08044798178662; // todo get actual current geographical location
-        double currentLatitude = 14.441389839994997; // todo -----------------||----------------------
         
         foreach (var mapDataDataSnapshot in dataSnapshot.Children)
         {
@@ -63,13 +100,10 @@ public class MapPicker : MonoBehaviour
         
         var tasks = mapDatas.Select(async (mapData, index) =>
         {
-            var imageReference = storageReference.Child($"{FirebaseConstants.MAP_FOLDER}/{mapData.MapName}_{mapData.MapId}.jpg");
-            Debug.Log("Downloading " + index);
+            var imageReference = storageReference.Child($"{FirebaseConstants.MAP_FOLDER}/{mapData.MapId}.jpg");
             var imageBytes = await imageReference.GetBytesAsync(FirebaseConstants.MAX_MAP_SIZE);
-            Debug.Log("Downloaded " + index);
             Texture2D texture = new Texture2D(mapData.Width, mapData.Height); 
             texture.LoadImage(imageBytes);
-            Debug.Log("Loaded " + index);
             mapTextures[index] = texture;
             
         }).ToArray();
@@ -78,7 +112,17 @@ public class MapPicker : MonoBehaviour
         
         nextMapButton.interactable = true;
         previousMapButton.interactable = true;
-        Debug.Log("Downloaded all maps");
+
+        currentMapIndex = 0;
+        showCurrentMap();
+    }
+
+    private (double, double) getCurrentGeoPosition()
+    {
+        double currentLongitude = 50.08044798178662; // todo get actual current geographical location
+        double currentLatitude = 14.441389839994997; // todo -----------------||----------------------
+
+        return (currentLongitude, currentLatitude);
     }
     
     private double getGeoDistance(double longitude, double latitude, double otherLongitude, double otherLatitude)
