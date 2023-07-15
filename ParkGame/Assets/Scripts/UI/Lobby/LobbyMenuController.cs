@@ -20,6 +20,8 @@ namespace UI.Lobby
         
         [SerializeField] private Button goBackButton;
         [SerializeField] private Button startGameButton;
+        [SerializeField] private RawImage mapPreviewImage;
+        [SerializeField] private TextMeshProUGUI mapNameLabel;
         [SerializeField] private TextMeshProUGUI roomCodeLabel;
         [SerializeField] private LobbyTeamUI lobbyTeamUIPrefab;
 
@@ -39,7 +41,6 @@ namespace UI.Lobby
                 startGameButton.gameObject.SetActive(false);
             }
 
-            SessionManager.Singleton.OnSetPlayerData += onSetPlayerData;
             roomCodeLabel.text += SessionManager.Singleton.RoomCode;
             goBackButton.onClick.AddListener(goBack);
 
@@ -47,11 +48,11 @@ namespace UI.Lobby
             // Clients need to wait till they receive the map data and then initialize the team UI.
             if (OurNetworkManager.Singleton.IsHost)
             {
-                initializeTeamUI(SessionManager.Singleton.MapMetaData);   
+                initializeUI(SessionManager.Singleton.MapData);   
             }
             else
             {
-                SessionManager.Singleton.OnMapReceived += initializeTeamUI;
+                SessionManager.Singleton.OnMapReceived += initializeUI;
             }
             
             OurNetworkManager.Singleton.OnClientDisconnectCallback += onClientDisconnect;
@@ -62,8 +63,8 @@ namespace UI.Lobby
         {
             if (SessionManager.Singleton != null)
             {
-                SessionManager.Singleton.OnSetPlayerData -= onSetPlayerData;
-                SessionManager.Singleton.OnMapReceived -= initializeTeamUI;   
+                SessionManager.Singleton.OnMapReceived -= initializeUI;
+                SessionManager.Singleton.OnTeamJoined -= onTeamJoined;   
             }
 
             if (OurNetworkManager.Singleton != null)
@@ -96,13 +97,13 @@ namespace UI.Lobby
 
         private void onTeamJoined(Guid playerId, int previousTeam, int newTeam)
         {
-            if (previousTeam >= 0 && previousTeam < SessionManager.Singleton.MapMetaData.NumTeams)
+            if (previousTeam >= 0 && previousTeam < SessionManager.Singleton.MapData.MetaData.NumTeams)
             {
                 var teamUI = teamUIs[previousTeam];
                 teamUI.RemovePlayerUI(playerId);
             }
 
-            if (newTeam < 0 || newTeam >= SessionManager.Singleton.MapMetaData.NumTeams) return;
+            if (newTeam < 0 || newTeam >= SessionManager.Singleton.MapData.MetaData.NumTeams) return;
             
             PlayerData? playerData = SessionManager.Singleton.PlayersData.GetPlayerData(playerId);
             if (!playerData.HasValue) return;
@@ -123,18 +124,23 @@ namespace UI.Lobby
             goBack();
         }
 
-        private void onSetPlayerData(PlayerData playerData)
+        private void initializeUI(MapData mapData)
         {
-            if(playerData.Team == -1 || teamUIs[playerData.Team].ContainsPlayer(playerData.ID)) return;
-            addPlayerToTeamUI(playerData);
-        }
-        
-        private void initializeTeamUI(MapMetaData mapMetaData)
-        {
-            for (int teamNumber = 0; teamNumber < mapMetaData.NumTeams; teamNumber++)
+            mapPreviewImage.texture = mapData.Texture;
+            mapNameLabel.text = mapData.MetaData.MapName;
+            for (int teamNumber = 0; teamNumber < mapData.MetaData.NumTeams; teamNumber++)
             {
                 LobbyTeamUI teamUI = createTeamUI(teamNumber);
                 teamUIs.Add(teamUI);
+            }
+
+            var teams = SessionManager.Singleton.PlayersData.GetTeams();
+            foreach (var (_, players) in teams)
+            {
+                foreach (var player in players)
+                {
+                    addPlayerToTeamUI(player);        
+                }
             }
         }
 

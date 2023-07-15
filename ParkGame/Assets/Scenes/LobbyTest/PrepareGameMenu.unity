@@ -1683,11 +1683,7 @@ MonoBehaviour:
   joinGameSceneName: JoinGameMenu
   backButton: {fileID: 1473583322}
   createButton: {fileID: 1560430782}
-  maps:
-  - Name: Bla bla
-    NumTeams: 2
-  - Name: Blaaaa
-    NumTeams: 4
+  mapPicker: {fileID: 2076237836}
 --- !u!1 &1926720176
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Firebase;
+using Firebase.Database;
+using Firebase.Storage;
+using UI;
 using UI.Lobby;
 using Unity.Netcode;
 using UnityEngine;
@@ -172,9 +176,7 @@ namespace Managers
         }
         private static SessionManager instance;
 
-        // Called when a player's data is set
-        public event Action<PlayerData> OnSetPlayerData = null;
-        public event Action<MapMetaData> OnMapReceived = null;
+        public event Action<MapData> OnMapReceived = null;
         public event Action<Guid, int, int> OnTeamJoined = null;
         
         public readonly PlayersData PlayersData = new();
@@ -183,10 +185,10 @@ namespace Managers
         public PlayerData LocalPlayerData => PlayersData.LocalPlayerData;
         public bool IsPlayerIdLocal(Guid playerId) => playerId == LocalPlayerId;
         public string RoomCode => roomCode;
-        public MapMetaData MapMetaData => mapMetaData;
+        public MapData MapData => mapData;
         public string GameSceneName => gameSceneName;
         
-        private MapMetaData mapMetaData;
+        private MapData mapData;
         private string roomCode;
         
 
@@ -246,18 +248,40 @@ namespace Managers
 
             PlayersData.UpdateClientId(clientId, playerData.ID);
             PlayersData.UpdatePlayerData(playerData);
-
-            OnSetPlayerData?.Invoke(playerData);
         }
         
         // Set the map data
         [ClientRpc]
-        public void SendMapDataClientRpc(MapMetaData mapMetaData, ClientRpcParams clientRpcParams)
+        public void SendMapIdClientRpc(SerializedGuid mapId, ClientRpcParams clientRpcParams)
         {
             if (IsHost) return;
+            
+            downloadMapData(mapId);
+        }
 
-            this.mapMetaData = mapMetaData;
-            OnMapReceived?.Invoke(mapMetaData);
+        private async void downloadMapData(SerializedGuid mapId)
+        {
+            await FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task => { Debug.Log(task.Status); });
+            
+            var storageReference = FirebaseStorage.DefaultInstance.GetReferenceFromUrl(FirebaseConstants.STORAGE_URL);
+            var databaseReference = FirebaseDatabase.DefaultInstance.RootReference;
+        
+            DataSnapshot dataSnapshot = await databaseReference.Child(FirebaseConstants.MAP_DATA_FOLDER).Child(mapId.Value.ToString()).GetValueAsync();
+            MapMetaData mapMetaData = JsonUtility.FromJson<MapMetaData>(dataSnapshot.GetRawJsonValue());
+
+            var imageReference = storageReference.Child($"{FirebaseConstants.MAP_FOLDER}/{mapMetaData.MapId}.jpg");
+
+            var imageBytes = await imageReference.GetBytesAsync(FirebaseConstants.MAX_MAP_SIZE);
+            Texture2D texture = new Texture2D(mapMetaData.Width, mapMetaData.Height); 
+            texture.LoadImage(imageBytes);
+           
+            mapData = new MapData
+            {
+                MetaData = mapMetaData,
+                Texture = texture
+            };
+            
+            OnMapReceived?.Invoke(mapData);
         }
         
         // Message to delete data for a given clientId
@@ -282,7 +306,7 @@ namespace Managers
         }
 
         // Initializes the session with the host's data
-        public void InitializeSession(string hostName, MapMetaData mapMetaData, string roomCode)
+        public void InitializeSession(string hostName, MapData mapData, string roomCode)
         {
             PlayersData.ClearData();
             var hostData = new PlayerData
@@ -296,7 +320,7 @@ namespace Managers
             PlayersData.UpdatePlayerData(hostData);           
             PlayersData.UpdateClientId(OurNetworkManager.Singleton.LocalClientId, hostData.ID);
             this.roomCode = roomCode;
-            this.mapMetaData = mapMetaData;
+            this.mapData = mapData;
         }
 
         // Try to join a team
@@ -323,7 +347,7 @@ namespace Managers
         [ServerRpc(RequireOwnership = false)]
         private void joinTeamServerRpc(SerializedGuid playerId, int newTeam, ServerRpcParams clientRpcParams = default)
         {
-            if(newTeam < 0 || newTeam >= MapMetaData.NumTeams) return;
+            if(newTeam < 0 || newTeam >= mapData.MetaData.NumTeams) return;
 
             var playerData = PlayersData.GetPlayerData(playerId.Value);
             if(!playerData.HasValue) return;

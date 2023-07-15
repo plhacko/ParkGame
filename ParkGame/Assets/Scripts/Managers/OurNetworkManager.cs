@@ -170,9 +170,6 @@ namespace Managers
             if (!IsHost) return;
             if (clientId == LocalClientId) return;
             
-            // Send map data to the client
-            SessionManager.Singleton.SendMapDataClientRpc(SessionManager.Singleton.MapMetaData, OneClientRpcParams(clientId));
-
             // Try to get the player data of the client
             PlayerData? playerData = SessionManager.Singleton.PlayersData.GetPlayerData(clientId);
             if(playerData.HasValue)
@@ -194,6 +191,9 @@ namespace Managers
                         SessionManager.Singleton.SetPlayerDataClientRpc(currentClientId, otherPlayerData.Value, OneClientRpcParams(clientId));   
                     }
                 }
+                
+                // Send map data to the client
+                SessionManager.Singleton.SendMapIdClientRpc(new SerializedGuid(Guid.Parse(SessionManager.Singleton.MapData.MetaData.MapId)), OneClientRpcParams(clientId));
             }
             else
             {

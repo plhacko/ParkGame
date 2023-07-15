@@ -19,7 +19,7 @@ namespace UI
         public static long MAX_MAP_SIZE = 1024 * 1024 * 12; // 12M
     }
     
-    public class MapData
+    public class MapMetaData
     {
         public string MapId;
         public int NumTeams;
@@ -29,7 +29,7 @@ namespace UI
         public int Width;
         public int Height;
         
-        public MapData(int numTeams, string mapName, double longitude, double latitude, int width, int height, Guid mapId)
+        public MapMetaData(int numTeams, string mapName, double longitude, double latitude, int width, int height, Guid mapId)
         {
             NumTeams = numTeams;
             MapName = mapName;
@@ -87,9 +87,9 @@ namespace UI
             
             if(bytes.Length > FirebaseConstants.MAX_MAP_SIZE) throw new Exception("Map is too big!");
 
-            MapData mapData = new MapData(numTeams, mapName, longitude, latitude, texture.width, texture.height, guid);
+            MapMetaData mapMetaData = new MapMetaData(numTeams, mapName, longitude, latitude, texture.width, texture.height, guid);
 
-            storageReference.Child($"{FirebaseConstants.MAP_FOLDER}/{mapData.MapId}.jpg").PutBytesAsync(bytes).ContinueWithOnMainThread(task =>
+            storageReference.Child($"{FirebaseConstants.MAP_FOLDER}/{mapMetaData.MapId}.jpg").PutBytesAsync(bytes).ContinueWithOnMainThread(task =>
             {
                 if (task.Status == TaskStatus.RanToCompletion) {
                     Debug.Log("Texture uploaded successfully!");
@@ -98,8 +98,8 @@ namespace UI
                 }
             });
             
-            string mapJson = JsonUtility.ToJson(mapData);
-            databaseReference.Child(FirebaseConstants.MAP_DATA_FOLDER).Child(mapData.MapId).SetRawJsonValueAsync(mapJson);
+            string mapJson = JsonUtility.ToJson(mapMetaData);
+            databaseReference.Child(FirebaseConstants.MAP_DATA_FOLDER).Child(mapMetaData.MapId).SetRawJsonValueAsync(mapJson);
         }
     }
    

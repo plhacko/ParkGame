@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,6 +9,12 @@ using UI;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.UI;
+
+public class MapData
+{
+    public MapMetaData MetaData;
+    public Texture2D Texture;
+}
 
 public class MapPicker : MonoBehaviour
 {
@@ -25,8 +30,7 @@ public class MapPicker : MonoBehaviour
     private StorageReference storageReference;
 
     private List<MapData> mapDatas = new();
-    private Texture2D[] mapTextures;
-    private int currentMapIndex = 0;
+    private int currentMapIndex = -1;
 
     void Awake()
     {
@@ -53,17 +57,17 @@ public class MapPicker : MonoBehaviour
     
     private void showCurrentMap()
     {
-        if(currentMapIndex >= mapTextures.Length) return;
+        if(currentMapIndex >= mapDatas.Count) return;
         
-        MapData mapData = mapDatas[currentMapIndex];
+        MapMetaData mapMetaData = mapDatas[currentMapIndex].MetaData;
         
         (double currentLongitude, double currentLatitude) = getCurrentGeoPosition();
-        double distance = getGeoDistance(currentLongitude, currentLatitude, mapData.Longitude, mapData.Latitude);
+        double distance = getGeoDistance(currentLongitude, currentLatitude, mapMetaData.Longitude, mapMetaData.Latitude);
 
-        image.texture = mapTextures[currentMapIndex];
-        mapNameText.text = mapData.MapName;
+        image.texture = mapDatas[currentMapIndex].Texture;
+        mapNameText.text = mapMetaData.MapName;
         mapDistanceText.text = "(" +(distance / 1000).ToString("F1") + " km)";
-        maxNumTeamsText.text = "Max teams: " + mapData.NumTeams;
+        maxNumTeamsText.text = "Max teams: " + mapMetaData.NumTeams;
     }
 
     private async void downloadMaps()
@@ -79,11 +83,15 @@ public class MapPicker : MonoBehaviour
         
         foreach (var mapDataDataSnapshot in dataSnapshot.Children)
         {
-            MapData mapData = JsonUtility.FromJson<MapData>(mapDataDataSnapshot.GetRawJsonValue());
-            double distance = getGeoDistance(currentLongitude, currentLatitude, mapData.Longitude, mapData.Latitude);
-
+            MapMetaData mapMetaData = JsonUtility.FromJson<MapMetaData>(mapDataDataSnapshot.GetRawJsonValue());
+            double distance = getGeoDistance(currentLongitude, currentLatitude, mapMetaData.Longitude, mapMetaData.Latitude);
+            
             if (distance < maxDistance)
             {
+                MapData mapData = new MapData
+                {
+                    MetaData = mapMetaData
+                };
                 mapDatas.Add(mapData);   
             }
         }
@@ -91,20 +99,19 @@ public class MapPicker : MonoBehaviour
         // sort by geo distance from current location
         mapDatas.Sort((mapData, mapData1) =>
         {
-            double distance = getGeoDistance(currentLongitude, currentLatitude, mapData.Longitude, mapData.Latitude);
-            double distance1 = getGeoDistance(currentLongitude, currentLatitude, mapData1.Longitude, mapData1.Latitude);
+            double distance = getGeoDistance(currentLongitude, currentLatitude, mapData.MetaData.Longitude, mapData.MetaData.Latitude);
+            double distance1 = getGeoDistance(currentLongitude, currentLatitude, mapData1.MetaData.Longitude, mapData1.MetaData.Latitude);
             return distance.CompareTo(distance1);
         });
 
-        mapTextures = new Texture2D[mapDatas.Count];
-        
-        var tasks = mapDatas.Select(async (mapData, index) =>
+        var tasks = mapDatas.Select(async mapData =>
         {
-            var imageReference = storageReference.Child($"{FirebaseConstants.MAP_FOLDER}/{mapData.MapId}.jpg");
+            Debug.Log(mapData.MetaData.MapId);
+            var imageReference = storageReference.Child($"{FirebaseConstants.MAP_FOLDER}/{mapData.MetaData.MapId}.jpg");
             var imageBytes = await imageReference.GetBytesAsync(FirebaseConstants.MAX_MAP_SIZE);
-            Texture2D texture = new Texture2D(mapData.Width, mapData.Height); 
+            Texture2D texture = new Texture2D(mapData.MetaData.Width, mapData.MetaData.Height); 
             texture.LoadImage(imageBytes);
-            mapTextures[index] = texture;
+            mapData.Texture = texture;
             
         }).ToArray();
 
@@ -134,5 +141,15 @@ public class MapPicker : MonoBehaviour
         var d3 = math.pow(math.sin((d2 - d1) / 2.0), 2.0) + math.cos(d1) * math.cos(d2) * math.pow(math.sin(num2 / 2.0), 2.0);
     
         return 6376500.0 * (2.0 * math.atan2(math.sqrt(d3), math.sqrt(1.0 - d3)));
+    }
+
+    public MapData GetCurrentMapData()
+    {
+        return mapDatas[currentMapIndex];
+    }
+
+    public bool IsInitialized()
+    {
+        return currentMapIndex != -1;
     }
 }

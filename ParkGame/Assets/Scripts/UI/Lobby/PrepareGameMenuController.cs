@@ -13,26 +13,6 @@ using UnityEngine.UI;
 namespace UI.Lobby
 {
     /*
-     * This struct represents meta data for a map.
-     * It contains the name of the map and the number of teams it supports.
-     */
-    [Serializable]
-    public struct MapMetaData : INetworkSerializeByMemcpy
-    {
-        // Netcode doesn't doesn't support normal strings so we need to use the type FixedString64Bytes
-        public FixedString64Bytes Name;
-        
-        // Number of teams the map supports
-        public int NumTeams;
-        
-        public MapMetaData(MapMetaDataUI mapMetaDataUI)
-        {
-            Name = mapMetaDataUI.Name;
-            NumTeams = mapMetaDataUI.NumTeams;
-        }
-    }
-    
-    /*
      * It's the same as MapMetaData but with a string instead of FixedString64Bytes
      * We need it because FixedString64Bytes doesn't serialize well in the unity editor
      */
@@ -52,8 +32,7 @@ namespace UI.Lobby
         [SerializeField] private string joinGameSceneName;
         [SerializeField] private Button backButton;
         [SerializeField] private Button createButton;
-
-        [SerializeField] private List<MapMetaDataUI> maps = new();
+        [SerializeField] private MapPicker mapPicker;
     
         void Awake()
         {
@@ -61,7 +40,12 @@ namespace UI.Lobby
             backButton.onClick.AddListener(backJoinGameScene);
         }
 
-        // Go back to he join game scene
+        private void Update()
+        {
+            setInteractable(mapPicker.IsInitialized());
+        }
+
+        // Go back to the join game scene
         // Shutdown the network manager and load the join game scene
         private void backJoinGameScene()
         {
@@ -76,14 +60,13 @@ namespace UI.Lobby
             setInteractable(false);
             try
             {
-                MapMetaData mapMetaData = new MapMetaData(maps[0]);
-                
-                Allocation allocation = await RelayService.Instance.CreateAllocationAsync(mapMetaData.NumTeams * 4);
+                MapData mapData = mapPicker.GetCurrentMapData();
+                Allocation allocation = await RelayService.Instance.CreateAllocationAsync(mapData.MetaData.NumTeams * 4);
                 string joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
                 
                 string playerName = PlayerPrefs.GetString("PlayerName", "");
                 
-                SessionManager.Singleton.InitializeSession(playerName, mapMetaData, joinCode);
+                SessionManager.Singleton.InitializeSession(playerName, mapData, joinCode);
                 OurNetworkManager.Singleton.GetComponent<UnityTransport>().SetHostRelayData(
                     allocation.RelayServer.IpV4,
                     (ushort)allocation.RelayServer.Port,
