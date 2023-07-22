@@ -14,6 +14,7 @@ namespace Player
         private Animator animator;
         private NetworkAnimator networkAnimator;
         private Guid ownerPlayerId;
+        private Formation formation;
 
         // Replicated variable for sprite orientation
         private NetworkVariable<bool> xSpriteFlip = new (false,
@@ -31,6 +32,7 @@ namespace Player
         {
             spriteRenderer = GetComponent<SpriteRenderer>();
             animator = GetComponent<Animator>();
+            formation = GetComponent<Formation>();
 
             if (!isActualOwner())
             {
@@ -58,6 +60,12 @@ namespace Player
         
             Vector2 movement = input * movementSpeed;
             
+            if (movement == Vector2.zero) 
+            {
+                formation.ListFormationPositions();
+            } 
+
+
             animator.SetFloat(MovementSpeed, movement.magnitude);
 
             if (input.magnitude < Mathf.Epsilon) return;
