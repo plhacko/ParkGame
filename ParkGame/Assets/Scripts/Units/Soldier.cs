@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using Unity.Netcode.Components;
+using Managers;
+using System;
 
-public class Soldier : NetworkBehaviour
+public class Soldier : NetworkBehaviour, ISoldier
 {
     [SerializeField] private float movementSpeed = 1;
 
@@ -23,6 +25,9 @@ public class Soldier : NetworkBehaviour
     private Vector3 positionInFormation;
 
     [SerializeField] float DistanceFromCommander = 1.0f;//2.0f;
+
+    private NetworkVariable<int> _Team = new NetworkVariable<int>();
+    public int Team { get => _Team.Value; set => _Team.Value = value; }
 
     private void Initialize()
     {
@@ -121,5 +126,13 @@ public class Soldier : NetworkBehaviour
             // decrease commander's counter - Formation
             formation.removeFollower();
         }
+    }
+
+    void ISoldier.SetCommanderToFollow(GameObject go)
+    {
+        if (!NetworkManager.Singleton.IsServer)
+        { throw new Exception($"only server can set what the unit {go.name} can follow"); }
+
+        //TODO: ...
     }
 }
