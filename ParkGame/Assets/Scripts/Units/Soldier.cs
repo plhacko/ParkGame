@@ -38,6 +38,8 @@ public class Soldier : NetworkBehaviour, ISoldier
         SpriteRenderer = GetComponent<SpriteRenderer>();
         Animator = GetComponent<Animator>();
 
+        _Team.OnValueChanged += OnTeamChanged;
+        OnTeamChanged(0, Team);
         if (!IsOwner)
         {
             XSpriteFlip.OnValueChanged += OnXSpriteFlipChanged;
@@ -45,13 +47,19 @@ public class Soldier : NetworkBehaviour, ISoldier
     }
 
     private void OnXSpriteFlipChanged(bool previousValue, bool newValue) => SpriteRenderer.flipX = newValue;
-
+    private void OnTeamChanged(int previousValue, int newValue) //DEBUG // TODO: rm
+    {
+        SpriteRenderer sr = transform.Find("Circle")?.GetComponent<SpriteRenderer>();
+        if (sr == null) { return; }
+        if (newValue == 0) { sr.color = Color.blue; }
+        else if (newValue == 1) { sr.color = Color.yellow; }
+        else { sr.color = Color.grey; }
+    }
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
         Initialize();
     }
-
     void Update()
     {
         // following is done only on server
