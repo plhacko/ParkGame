@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 2776846833031490646}
   - component: {fileID: 2776846833031490632}
   - component: {fileID: 2776846833031490633}
+  - component: {fileID: -6153365409601833875}
   m_Layer: 0
   m_Name: Outpost
   m_TagString: Untagged
@@ -118,3 +119,16 @@ MonoBehaviour:
   MaxUnits: 3
   SpawnTime: 4
   UnitPrefab: {fileID: 2149011059489662585, guid: 767d4c3ee472ffe4ea667aae7025b849, type: 3}
+--- !u!114 &-6153365409601833875
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2776846833031490645}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6bb49af851bf9364d8a061207283ed6e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  soldierPositions: []

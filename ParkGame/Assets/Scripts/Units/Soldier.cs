@@ -5,12 +5,13 @@ using Unity.Netcode;
 using Unity.Netcode.Components;
 using Managers;
 using System;
+using System.Windows.Input;
 
 public class Soldier : NetworkBehaviour, ISoldier
 {
     [SerializeField] private float movementSpeed = 1;
 
-    private SpriteRenderer spriteRenderer;
+    private SpriteRenderer SpriteRenderer;
     private Animator animator;
     private NetworkAnimator networkanimator;
 
@@ -18,20 +19,17 @@ public class Soldier : NetworkBehaviour, ISoldier
         NetworkVariableReadPermission.Everyone,
         NetworkVariableWritePermission.Owner);
 
-    private static readonly int MovementSpeed = Animator.StringToHash("MovementSpeed");
-    private bool following;
-    private bool gotPosition;
-    private bool inPosition;
-    private Vector3 positionInFormation;
+    private static readonly int AnimatorMovementSpeedHash = Animator.StringToHash("MovementSpeed");
 
-    [SerializeField] float DistanceFromCommander = 1.0f;//2.0f;
+    private GameObject LeaderToFollow = null;
+    [SerializeField] float IdealDistanceFromCommander = 1.0f;//2.0f;
 
-    private NetworkVariable<int> _Team = new NetworkVariable<int>();
+    private NetworkVariable<int> _Team = new();
     public int Team { get => _Team.Value; set => _Team.Value = value; }
 
     private void Initialize()
     {
-        spriteRenderer = GetComponent<SpriteRenderer>();
+        SpriteRenderer = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
 
         if (!IsOwner)
@@ -42,7 +40,7 @@ public class Soldier : NetworkBehaviour, ISoldier
 
     private void OnXSpriteFlipChanged(bool previousValue, bool newValue)
     {
-        spriteRenderer.flipX = newValue;
+        SpriteRenderer.flipX = newValue;
     }
 
     public override void OnNetworkSpawn()
@@ -53,42 +51,36 @@ public class Soldier : NetworkBehaviour, ISoldier
 
     void Update()
     {
-        NetworkObject no = NetworkManager?.LocalClient?.PlayerObject;
-        if (no == null) { return; }
+        // following is done only on server
+        if (!NetworkManager.Singleton.IsServer)
+        { return; }
 
-        Vector2 direction = no.transform.position - transform.position;
+        // check for a leader
+        if (LeaderToFollow == null)
+        { return; }
+
+
+        // movement
+        Vector2 direction = LeaderToFollow.transform.position - transform.position;
         float distance = direction.magnitude;
-
-        if (distance > DistanceFromCommander && following)
+        if (distance > IdealDistanceFromCommander)
         {
             move(direction);
-            gotPosition = false;
-        } 
-        else if (following && !gotPosition) 
-        {
-            positionInFormation = no.GetComponent<Formation>().GetPositionInFormation();
-            inPosition = false;
-            gotPosition = true;
-        } 
-        else if (following && gotPosition && !inPosition) 
-        {
-            Vector2 dirToPos = positionInFormation - transform.position;
-            move(dirToPos);
         }
         else
         {
-            animator.SetFloat(MovementSpeed, 0.0f);
+            animator.SetFloat(AnimatorMovementSpeedHash, 0.0f);
         }
     }
 
     private void move(Vector2 direction)
     {
-        
-        if (direction.magnitude < 0.01f) {
-            animator.SetFloat(MovementSpeed, 0.0f);
+        if (direction.magnitude < 0.01f)
+        {
+            animator.SetFloat(AnimatorMovementSpeedHash, 0.0f);
 
             Debug.Log("direction magnitude " + direction.magnitude);
-    
+
             return;
         }
 
@@ -96,15 +88,15 @@ public class Soldier : NetworkBehaviour, ISoldier
 
         Vector2 movement = direction * movementSpeed;
 
-        animator.SetFloat(MovementSpeed, movement.magnitude);
+        animator.SetFloat(AnimatorMovementSpeedHash, movement.magnitude);
 
         if (direction.magnitude < Mathf.Epsilon)
         {
             return;
         }
         Debug.Log("MOVEMENT " + movement);
-        spriteRenderer.flipX = movement.x < 0;
-        xSpriteFlip.Value = spriteRenderer.flipX;
+        SpriteRenderer.flipX = movement.x < 0;
+        xSpriteFlip.Value = SpriteRenderer.flipX;
 
         transform.Translate(movement * Time.deltaTime);
     }
@@ -112,27 +104,38 @@ public class Soldier : NetworkBehaviour, ISoldier
     void OnMouseDown()
     {
         Debug.Log("Sprite Clicked");
-        if (!IsOwner) { return; }
 
-        following = !following; // flip boolean
-        NetworkObject commander = NetworkManager?.LocalClient?.PlayerObject;
-        var formation = commander.GetComponent<Formation>();
-        if (following) 
+        ulong clientID = NetworkManager.Singleton.LocalClientId;
+        RequestChangingCommanderToFollowServerRpc(clientID: clientID);
+    }
+
+    [ServerRpc]
+    public void RequestChangingCommanderToFollowServerRpc(ulong clientID)
+    {
+        NetworkObject clientNO = NetworkManager.Singleton?.ConnectedClients[clientID]?.PlayerObject;
+        ITeamMember teamMember = clientNO.GetComponent<ITeamMember>();
+        if (teamMember != null && teamMember.Team == Team)
         {
-            // increase commander's counter - Formation
-            formation.addFollower();
-        } else 
-        {
-            // decrease commander's counter - Formation
-            formation.removeFollower();
+            SetCommanderToFollow(clientNO.gameObject);
         }
     }
 
-    void ISoldier.SetCommanderToFollow(GameObject go)
+    /// <summary> !call only on server! </summary>
+    public void SetCommanderToFollow(GameObject leaderToFollow)
     {
         if (!NetworkManager.Singleton.IsServer)
-        { throw new Exception($"only server can set what the unit {go.name} can follow"); }
+        { throw new Exception($"only server can set what the unit ({gameObject.name}) can follow ({leaderToFollow?.name})"); }
 
-        //TODO: ...
+        if (LeaderToFollow != leaderToFollow) // change leader to follow
+        {
+            LeaderToFollow?.GetComponent<ILeader>().ReportUnfollowing(gameObject);
+            LeaderToFollow = leaderToFollow;
+            LeaderToFollow?.GetComponent<ILeader>().ReportFollowing(gameObject);
+        }
+        else // if already following, unfollow
+        {
+            LeaderToFollow?.GetComponent<ILeader>().ReportUnfollowing(gameObject);
+            LeaderToFollow = null;
+        }
     }
 }

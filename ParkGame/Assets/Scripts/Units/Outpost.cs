@@ -6,26 +6,22 @@ using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class Outpost : NetworkBehaviour, ITeamMember
+public class Outpost : NetworkBehaviour, ILeader
 {
-    [SerializeField] int InitialTeam = 0;
+    [SerializeField] int InitialTeam;
     [SerializeField] int MaxUnits = 3;
     [SerializeField] float SpawnTime = 4; // 4s
     [SerializeField] GameObject UnitPrefab;
     List<GameObject> Units = new List<GameObject>();
 
-    NetworkVariable<float> _Timer = new NetworkVariable<float>(0);
+    NetworkVariable<float> _Timer = new(0.0f);
     public float Timer { get => _Timer.Value; private set => _Timer.Value = value; }
 
-    NetworkVariable<int> _Team = new NetworkVariable<int>();
+    [SerializeField] NetworkVariable<int> _Team = new(0);
     public int Team { get => _Team.Value; set => _Team.Value = value; }
 
     private void Start()
     {
-        // rest only on server
-        if (!NetworkManager.Singleton.IsServer)
-        { return; }
-
         Team = InitialTeam;
     }
 
@@ -53,10 +49,26 @@ public class Outpost : NetworkBehaviour, ITeamMember
         if (!NetworkManager.Singleton.IsServer)
         { throw new Exception("only server can spawn unit"); }
 
-        GameObject unit = Instantiate(UnitPrefab, position: transform.position, rotation: transform.rotation);
+        Vector3 RndOffset = new Vector3(UnityEngine.Random.Range(-0.01f, 0.01f), UnityEngine.Random.Range(-0.01f, 0.01f), 0f);
+        GameObject unit = Instantiate(UnitPrefab, position: transform.position + RndOffset, rotation: transform.rotation);
         unit.GetComponent<NetworkObject>().Spawn();
-        unit.GetComponent<ITeamMember>().Team = Team;
+        unit.GetComponent<ISoldier>().Team = Team;
+        unit.GetComponent<ISoldier>().SetCommanderToFollow(gameObject);
+    }
 
-        Units.Add(unit);
+    void ILeader.ReportFollowing(GameObject go)
+    {
+        if (!NetworkManager.Singleton.IsServer)
+        { throw new Exception($"only on server can adding units to outpost be reported\n outpost: {gameObject.name}"); }
+
+        Units.Add(go);
+    }
+
+    void ILeader.ReportUnfollowing(GameObject go)
+    {
+        if (!NetworkManager.Singleton.IsServer)
+        { throw new Exception($"only on server can removing units to outpost be reported\n outpost: {gameObject.name}"); }
+
+        Units.Remove(go);
     }
 }
