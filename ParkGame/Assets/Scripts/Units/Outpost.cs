@@ -6,7 +6,7 @@ using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class Outpost : NetworkBehaviour, ILeader
+public class Outpost : NetworkBehaviour, ICommander
 {
     [SerializeField] int InitialTeam;
     [SerializeField] int MaxUnits = 3;
@@ -53,10 +53,10 @@ public class Outpost : NetworkBehaviour, ILeader
         GameObject unit = Instantiate(UnitPrefab, position: transform.position + RndOffset, rotation: transform.rotation);
         unit.GetComponent<NetworkObject>().Spawn();
         unit.GetComponent<ISoldier>().Team = Team;
-        unit.GetComponent<ISoldier>().SetCommanderToFollow(gameObject);
+        unit.GetComponent<ISoldier>().SetCommanderToFollow(transform);
     }
 
-    void ILeader.ReportFollowing(GameObject go)
+    void ICommander.ReportFollowing(GameObject go)
     {
         if (!NetworkManager.Singleton.IsServer)
         { throw new Exception($"only on server can adding units to outpost be reported\n outpost: {gameObject.name}"); }
@@ -64,7 +64,7 @@ public class Outpost : NetworkBehaviour, ILeader
         Units.Add(go);
     }
 
-    void ILeader.ReportUnfollowing(GameObject go)
+    void ICommander.ReportUnfollowing(GameObject go)
     {
         if (!NetworkManager.Singleton.IsServer)
         { throw new Exception($"only on server can removing units to outpost be reported\n outpost: {gameObject.name}"); }

@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Player
 {
-    public class PlayerController : NetworkBehaviour, ILeader
+    public class PlayerController : NetworkBehaviour, ICommander
     {
         [SerializeField] private float movementSpeed = 1;
 
@@ -59,6 +59,13 @@ namespace Player
             if (!Application.isFocused) return;
 
             move();
+
+            if (Input.GetKeyDown(KeyCode.I))
+            { CommandMovementServerRpc(); }
+            if (Input.GetKeyDown(KeyCode.O))
+            { CommandIdleServerRpc(); }
+            if (Input.GetKeyDown(KeyCode.P))
+            { CommandAttackServerRpc(); }
         }
 
         private void move()
@@ -99,20 +106,40 @@ namespace Player
         public void InitializePlayerIdClientRpc(SerializedGuid serializedGuid, ClientRpcParams clientRpcParams = default)
         {
             if (IsHost) return;
-
             ownerPlayerId = serializedGuid.Value;
         }
 
-        public void ReportFollowing(GameObject go)
-        {
-            
 
-            Units.Add(go);
+        void ICommander.ReportFollowing(GameObject go) => Units.Add(go);
+        void ICommander.ReportUnfollowing(GameObject go) => Units.Remove(go);
+
+        // commands to the units
+        [ServerRpc]
+        void CommandMovementServerRpc()
+        {
+            foreach (GameObject go in Units)
+            {
+                if (go.TryGetComponent<ISoldier>(out ISoldier soldier))
+                { soldier.SoldierBehaviour = SoldierBehaviour.Move; }
+            }
         }
-
-        public void ReportUnfollowing(GameObject go)
+        [ServerRpc]
+        void CommandIdleServerRpc()
         {
-            Units.Remove(go);
+            foreach (GameObject go in Units)
+            {
+                if (go.TryGetComponent<ISoldier>(out ISoldier soldier))
+                { soldier.SoldierBehaviour = SoldierBehaviour.Idle; }
+            }
+        }
+        [ServerRpc]
+        void CommandAttackServerRpc()
+        {
+            foreach (GameObject go in Units)
+            {
+                if (go.TryGetComponent<ISoldier>(out ISoldier soldier))
+                { soldier.SoldierBehaviour = SoldierBehaviour.Attack; }
+            }
         }
     }
 }

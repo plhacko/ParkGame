@@ -27,7 +27,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1719890416}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 1}
+  m_LocalPosition: {x: -0.039, y: -0.603, z: 1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -68,7 +68,7 @@ CircleCollider2D:
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
-  m_Radius: 2
+  m_Radius: 3
 --- !u!50 &1719890418
 Rigidbody2D:
   serializedVersion: 4
@@ -108,8 +108,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e0457561d8a1574993de3e7a432c08b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  visibleEnemies: []
   visibleFriends: []
+  visibleEnemies: []
 --- !u!1 &2149011059489662585
 GameObject:
   m_ObjectHideFlags: 0
@@ -150,7 +150,7 @@ Transform:
   - {fileID: 4624473986338285026}
   - {fileID: 1719890417}
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &6403402006258234310
 MonoBehaviour:
@@ -293,7 +293,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   movementSpeed: 1
-  IdealDistanceFromCommander: 1
+  InnerDistanceFromCommander: 1
+  OuterDistanceFromCommander: 2
+  DefendDistanceFromCommander: 3
+  AttackDistanceFromCommander: 6
+  AttackRange: 0.3
 --- !u!70 &8848524197970868838
 CapsuleCollider2D:
   m_ObjectHideFlags: 0

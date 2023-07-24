@@ -9,17 +9,24 @@ using System.Windows.Input;
 
 public class Soldier : NetworkBehaviour, ISoldier
 {
-    // logic
+    // game logic
     [SerializeField] private float movementSpeed = 1;
-    private GameObject LeaderToFollow = null;
-    [SerializeField] float IdealDistanceFromCommander = 1.0f;
+    private Transform CommanderToFollow = null;
+    [SerializeField] float InnerDistanceFromCommander = 1.0f;
+    [SerializeField] float OuterDistanceFromCommander = 2.0f;
+    [SerializeField] float DefendDistanceFromCommander = 2.5f;
+    [SerializeField] float AttackDistanceFromCommander = 6.0f;
+    [SerializeField] float AttackRange = 0.3f;
+
     private NetworkVariable<int> _Team = new();
     public int Team { get => _Team.Value; set => _Team.Value = value; }
+    public SoldierBehaviour SoldierBehaviour { get; set; } // derived form ISoldier
+    EnemyObserver EnemyObserver;
 
     // animation
     private static readonly int AnimatorMovementSpeedHash = Animator.StringToHash("MovementSpeed");
     private SpriteRenderer SpriteRenderer;
-    private Animator Änimator;
+    private Animator Animator;
     private NetworkAnimator Networkanimator;
     private NetworkVariable<bool> XSpriteFlip = new(false,
         NetworkVariableReadPermission.Everyone,
@@ -27,8 +34,9 @@ public class Soldier : NetworkBehaviour, ISoldier
 
     private void Initialize()
     {
+        EnemyObserver = GetComponentInChildren<EnemyObserver>();
         SpriteRenderer = GetComponent<SpriteRenderer>();
-        Änimator = GetComponent<Animator>();
+        Animator = GetComponent<Animator>();
 
         if (!IsOwner)
         {
@@ -50,32 +58,106 @@ public class Soldier : NetworkBehaviour, ISoldier
         if (!NetworkManager.Singleton.IsServer)
         { return; }
 
-        // check for a leader
-        if (LeaderToFollow == null)
+        // check for a Commander
+        if (CommanderToFollow == null)
         { return; }
 
-
-        // movement
-        Vector2 direction = LeaderToFollow.transform.position - transform.position;
-        float distance = direction.magnitude;
-        if (distance > IdealDistanceFromCommander)
+        switch (SoldierBehaviour)
         {
-            Move(direction);
+            case SoldierBehaviour.Idle:
+                IdleBehaviour();
+                GetComponent<SpriteRenderer>().color = Color.green; // DEBUG // TODO: rm
+                break;
+            case SoldierBehaviour.Move:
+                MovementBehaviour();
+                GetComponent<SpriteRenderer>().color = Color.blue; // DEBUG // TODO: rm
+                break;
+            case SoldierBehaviour.Attack:
+                AttackBehaviour();
+                GetComponent<SpriteRenderer>().color = Color.red; // DEBUG // TODO: rm
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void IdleBehaviour()
+    {
+        Transform enemyT = EnemyObserver.GetClosestEnemy();
+        float distanceFromCommander = Vector3.Distance(CommanderToFollow.position, transform.position);
+        if (enemyT != null && distanceFromCommander < DefendDistanceFromCommander)
+        {
+            MoveTowardsEntity(enemyT);
+            AttackEnemyIfInRAnge(enemyT);
+            return;
+        }
+
+
+        if (distanceFromCommander > OuterDistanceFromCommander)
+        {
+            MoveTowardsEntity(CommanderToFollow);
+            SoldierBehaviour = SoldierBehaviour.Move;
         }
         else
+        { Animator.SetFloat(AnimatorMovementSpeedHash, 0.0f); }
+    }
+
+    private void MovementBehaviour()
+    {
+        Transform enemyT = EnemyObserver.GetClosestEnemy();
+        if (enemyT != null)
+        { AttackEnemyIfInRAnge(enemyT); }
+
+        //  moves to the inner circle around the commander
+        if (Vector3.Distance(CommanderToFollow.position, transform.position) > InnerDistanceFromCommander)
+        { MoveTowardsEntity(CommanderToFollow); }
+        else
         {
-            Änimator.SetFloat(AnimatorMovementSpeedHash, 0.0f);
+            SoldierBehaviour = SoldierBehaviour.Idle;
+            Animator.SetFloat(AnimatorMovementSpeedHash, 0.0f);
         }
+    }
+
+    private void AttackBehaviour()
+    {
+        Transform enemyT = EnemyObserver.GetClosestEnemy();
+
+        // if the front of the group can see the enemy, the rest will go forward (to the commander), but will not stop attacking
+        if (enemyT == null)
+        { MoveTowardsEntity(CommanderToFollow); return; }
+
+        // attack the closest enemy if in range
+        AttackEnemyIfInRAnge(enemyT);
+        // go closer to the enemy
+        MoveTowardsEntity(enemyT);
+
+        // if the commander is too far, the soldier will stop attacking and will return back to the commander
+        float distanceFromCommander = (CommanderToFollow.position - transform.position).magnitude;
+        if (distanceFromCommander > AttackDistanceFromCommander)
+        {
+            SoldierBehaviour = SoldierBehaviour.Move;
+        }
+    }
+
+    private void AttackEnemyIfInRAnge(Transform enemyT)
+    {
+        if (Vector3.Distance(enemyT.position, transform.position) < AttackRange)
+        {
+            // TODO: do attack
+        }
+    }
+
+    private void MoveTowardsEntity(Transform entityT)
+    {
+        Vector2 directionToCommander = entityT.position - transform.position;
+        Move(directionToCommander);
     }
 
     private void Move(Vector2 direction)
     {
         if (direction.magnitude < 0.01f)
         {
-            Änimator.SetFloat(AnimatorMovementSpeedHash, 0.0f);
-
-            Debug.Log("direction magnitude " + direction.magnitude);
-
+            Animator.SetFloat(AnimatorMovementSpeedHash, 0.0f);
             return;
         }
 
@@ -83,13 +165,11 @@ public class Soldier : NetworkBehaviour, ISoldier
 
         Vector2 movement = direction * movementSpeed;
 
-        Änimator.SetFloat(AnimatorMovementSpeedHash, movement.magnitude);
+        Animator.SetFloat(AnimatorMovementSpeedHash, movement.magnitude);
 
         if (direction.magnitude < Mathf.Epsilon)
-        {
-            return;
-        }
-        // TODO: rm // Debug.Log("MOVEMENT " + movement);
+        { return; }
+
         SpriteRenderer.flipX = movement.x < 0;
         XSpriteFlip.Value = SpriteRenderer.flipX;
 
@@ -104,33 +184,33 @@ public class Soldier : NetworkBehaviour, ISoldier
         RequestChangingCommanderToFollowServerRpc(clientID: clientID);
     }
 
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = false)]
     public void RequestChangingCommanderToFollowServerRpc(ulong clientID)
     {
         NetworkObject clientNO = NetworkManager.Singleton?.ConnectedClients[clientID]?.PlayerObject;
         ITeamMember teamMember = clientNO.GetComponent<ITeamMember>();
         if (teamMember != null && teamMember.Team == Team)
         {
-            SetCommanderToFollow(clientNO.gameObject);
+            SetCommanderToFollow(clientNO.gameObject.transform);
         }
     }
 
     /// <summary> !call only on server! </summary>
-    public void SetCommanderToFollow(GameObject leaderToFollow)
+    public void SetCommanderToFollow(Transform commanderToFollow)
     {
         if (!NetworkManager.Singleton.IsServer)
-        { throw new Exception($"only server can set what the unit ({gameObject.name}) can follow ({leaderToFollow?.name})"); }
+        { throw new Exception($"only server can set what the unit ({gameObject.name}) can follow ({CommanderToFollow?.name})"); }
 
-        if (LeaderToFollow != leaderToFollow) // change leader to follow
+        if (CommanderToFollow != commanderToFollow) // change Commander to follow
         {
-            LeaderToFollow?.GetComponent<ILeader>().ReportUnfollowing(gameObject);
-            LeaderToFollow = leaderToFollow;
-            LeaderToFollow?.GetComponent<ILeader>().ReportFollowing(gameObject);
+            CommanderToFollow?.GetComponent<ICommander>().ReportUnfollowing(gameObject);
+            CommanderToFollow = commanderToFollow;
+            CommanderToFollow?.GetComponent<ICommander>().ReportFollowing(gameObject);
         }
         else // if already following, unfollow
         {
-            LeaderToFollow?.GetComponent<ILeader>().ReportUnfollowing(gameObject);
-            LeaderToFollow = null;
+            CommanderToFollow?.GetComponent<ICommander>().ReportUnfollowing(gameObject);
+            CommanderToFollow = null;
         }
     }
 }
