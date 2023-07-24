@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Windows.Input;
 using Managers;
 using Unity.Netcode;
@@ -26,6 +27,8 @@ namespace Player
 
         NetworkVariable<int> _Team = new(0);
         public int Team { get => _Team.Value; set => _Team.Value = value; }
+
+        List<GameObject> Units = new();
 
         public void InitializePlayerId(Guid playerId)
         {
@@ -102,12 +105,14 @@ namespace Player
 
         public void ReportFollowing(GameObject go)
         {
-            // TODO: .. count?
+            
+
+            Units.Add(go);
         }
 
         public void ReportUnfollowing(GameObject go)
         {
-            // TODO: .. count?
+            Units.Remove(go);
         }
     }
 }

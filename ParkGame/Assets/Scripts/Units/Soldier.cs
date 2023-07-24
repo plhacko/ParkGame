@@ -9,39 +9,34 @@ using System.Windows.Input;
 
 public class Soldier : NetworkBehaviour, ISoldier
 {
+    // logic
     [SerializeField] private float movementSpeed = 1;
-
-    private SpriteRenderer SpriteRenderer;
-    private Animator animator;
-    private NetworkAnimator networkanimator;
-
-    private NetworkVariable<bool> xSpriteFlip = new(false,
-        NetworkVariableReadPermission.Everyone,
-        NetworkVariableWritePermission.Owner);
-
-    private static readonly int AnimatorMovementSpeedHash = Animator.StringToHash("MovementSpeed");
-
     private GameObject LeaderToFollow = null;
-    [SerializeField] float IdealDistanceFromCommander = 1.0f;//2.0f;
-
+    [SerializeField] float IdealDistanceFromCommander = 1.0f;
     private NetworkVariable<int> _Team = new();
     public int Team { get => _Team.Value; set => _Team.Value = value; }
+
+    // animation
+    private static readonly int AnimatorMovementSpeedHash = Animator.StringToHash("MovementSpeed");
+    private SpriteRenderer SpriteRenderer;
+    private Animator Änimator;
+    private NetworkAnimator Networkanimator;
+    private NetworkVariable<bool> XSpriteFlip = new(false,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Owner);
 
     private void Initialize()
     {
         SpriteRenderer = GetComponent<SpriteRenderer>();
-        animator = GetComponent<Animator>();
+        Änimator = GetComponent<Animator>();
 
         if (!IsOwner)
         {
-            xSpriteFlip.OnValueChanged += OnXSpriteFlipChanged;
+            XSpriteFlip.OnValueChanged += OnXSpriteFlipChanged;
         }
     }
 
-    private void OnXSpriteFlipChanged(bool previousValue, bool newValue)
-    {
-        SpriteRenderer.flipX = newValue;
-    }
+    private void OnXSpriteFlipChanged(bool previousValue, bool newValue) => SpriteRenderer.flipX = newValue;
 
     public override void OnNetworkSpawn()
     {
@@ -65,19 +60,19 @@ public class Soldier : NetworkBehaviour, ISoldier
         float distance = direction.magnitude;
         if (distance > IdealDistanceFromCommander)
         {
-            move(direction);
+            Move(direction);
         }
         else
         {
-            animator.SetFloat(AnimatorMovementSpeedHash, 0.0f);
+            Änimator.SetFloat(AnimatorMovementSpeedHash, 0.0f);
         }
     }
 
-    private void move(Vector2 direction)
+    private void Move(Vector2 direction)
     {
         if (direction.magnitude < 0.01f)
         {
-            animator.SetFloat(AnimatorMovementSpeedHash, 0.0f);
+            Änimator.SetFloat(AnimatorMovementSpeedHash, 0.0f);
 
             Debug.Log("direction magnitude " + direction.magnitude);
 
@@ -88,15 +83,15 @@ public class Soldier : NetworkBehaviour, ISoldier
 
         Vector2 movement = direction * movementSpeed;
 
-        animator.SetFloat(AnimatorMovementSpeedHash, movement.magnitude);
+        Änimator.SetFloat(AnimatorMovementSpeedHash, movement.magnitude);
 
         if (direction.magnitude < Mathf.Epsilon)
         {
             return;
         }
-        Debug.Log("MOVEMENT " + movement);
+        // TODO: rm // Debug.Log("MOVEMENT " + movement);
         SpriteRenderer.flipX = movement.x < 0;
-        xSpriteFlip.Value = SpriteRenderer.flipX;
+        XSpriteFlip.Value = SpriteRenderer.flipX;
 
         transform.Translate(movement * Time.deltaTime);
     }

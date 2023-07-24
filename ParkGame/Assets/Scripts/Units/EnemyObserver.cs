@@ -7,30 +7,41 @@ using UnityEngine;
 
 public class EnemyObserver : MonoBehaviour
 {
-    [SerializeField] // TODO: rm SerializeField
-    List<Transform> visibleEnemies = new List<Transform>();
+    [SerializeField] List<Transform> visibleFriends = new();
+    [SerializeField] List<Transform> visibleEnemies = new();
+
+    ITeamMember ParentTeam;
+    private void Start()
+    {
+        ParentTeam = GetComponentInParent<ITeamMember>();
+        if (ParentTeam == null) { throw new System.Exception("parent of this object must contain component with interface ITeammember"); }
+    }
 
     public Transform GetClosestEnemy(Transform t)
         => visibleEnemies.Count > 0 ? visibleEnemies.Min(e => (Vector3.Distance(e.position, t.position), e)).e : null;
+    public Transform GetFriendEnemy(Transform t)
+        => visibleFriends.Count > 0 ? visibleFriends.Min(e => (Vector3.Distance(e.position, t.position), e)).e : null;
+    public List<Transform> GetAllEnemies() => visibleEnemies;
+    public List<Transform> GetAllFriends() => visibleFriends;
 
-    void OnCollisionEnter(Collision collision)
+    void OnCollisionEnter2D(Collision2D collision)
     {
-        // type of colision check
-        if (/*!collision.isTrigger ||*/ !collision.gameObject.CompareTag("Unit"))
-        { return; }
-
-        Debug.Log($"TriggerEnter : {collision.gameObject.name}");
-        visibleEnemies.Add(collision.transform);
+        if (collision.gameObject.TryGetComponent<ITeamMember>(out ITeamMember tm))
+        {
+            if (tm.Team == ParentTeam.Team)
+            { visibleFriends.Add(collision.transform); }
+            else
+            { visibleEnemies.Add(collision.transform); }
+        }
     }
 
-    void OnTriggerExit2D(Collider2D collision)
+    void OnCollisionExit2D(Collision2D collision)
     {
-        Debug.Log($"TriggerEnter : {collision.name}");
-
-        // type of colision check
-        if (collision.isTrigger || !collision.CompareTag("Unit"))
-        { return; }
-
-        visibleEnemies.Remove(collision.transform);
+        if (collision.gameObject.TryGetComponent<ITeamMember>(out ITeamMember tm))
+        {
+            visibleFriends.Remove(collision.transform);
+            visibleEnemies.Remove(collision.transform);
+        }
     }
+
 }
