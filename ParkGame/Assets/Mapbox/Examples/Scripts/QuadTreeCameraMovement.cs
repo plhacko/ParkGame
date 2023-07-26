@@ -142,6 +142,19 @@ namespace Mapbox.Examples
 			return new Vector4((float)minLong, (float)minLat, (float)maxLong, (float)maxLat);
 		}
 
+		public Vector2 GetSelectedRegionNormalizedSideLengths()
+		{
+			var initialXY = _initialMousePosition;
+			var currentXY = _currentMousePosition;
+
+			var xLength = Mathf.Abs(initialXY.x - currentXY.x);
+			var yLength = Mathf.Abs(initialXY.z - currentXY.z);
+
+			Debug.Log(xLength + " " + yLength);
+
+			return xLength > yLength ? new Vector2(1, yLength / xLength) : new Vector2(xLength / yLength, 1);
+		}
+
         private void HandleTouchSelectRegion()
         {
             throw new NotImplementedException();

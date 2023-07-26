@@ -17,7 +17,14 @@ public class MapSpriteBuilder : MonoBehaviour
     {
         // Called after submitting map region
         Vector4 bbox = qt.GetSelectedRegionBoundingBox();
+        Vector2 normalizedSideLengths = qt.GetSelectedRegionNormalizedSideLengths();
+        var pixelSideLengths = 1280 * normalizedSideLengths;
+
         MapDisplayer mapDisplayer = mapSprite.GetComponent<MapDisplayer>();
+
+        mapDisplayer.Width = (int)pixelSideLengths.x;
+        mapDisplayer.Height = (int)pixelSideLengths.y;
+
         mapDisplayer.MinLongitude = bbox.x;
         mapDisplayer.MinLatitude = bbox.y;
         mapDisplayer.MaxLongitude = bbox.z;
