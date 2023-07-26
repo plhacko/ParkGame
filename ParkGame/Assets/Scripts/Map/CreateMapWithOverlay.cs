@@ -11,6 +11,7 @@ using UnityEngine.Windows;
 [RequireComponent(typeof(Drawable))]
 public class CreateMapWithOverlay : MonoBehaviour
 {
+    public Camera mainCamera;
     [SerializeField] Sprite mapOverlay;
     public Tilemap tilemap;
     public TileBase pathTile;
@@ -18,15 +19,70 @@ public class CreateMapWithOverlay : MonoBehaviour
     public TileBase wallTile;
     private Texture2D drawableTexture;
     private Sprite drawableSprite;
+    private SpriteRenderer drawableSpriteRenderer;
+    private GameObject fetchedMap;
     private String path = Application.dataPath + "/Sprites/Map/customMap.png";
     
     // Start is called before the first frame update
     void Start()
     {
-        if (mapOverlay)
+        drawableSpriteRenderer = GetComponent<SpriteRenderer>();
+        if (mapOverlay) // Debug feature
             CreateNewTextureForDrawing();
+        else // Wait until map fetching from MapBox is completed
+            StartCoroutine(WaitForValue());
+        
     }
+    private IEnumerator WaitForValue()
+    {
+        float timer = 0f;
+        float maxWaitTime = 5f; // Maximum wait time in seconds
+        fetchedMap = GameObject.FindWithTag("FetchedMapSprite");
+        var fetchedMapRenderer = fetchedMap.GetComponent<SpriteRenderer>();
+        
 
+        // Continuously check for the value until it becomes non-null or the time limit is reached
+        while (fetchedMapRenderer.sprite == null && timer < maxWaitTime)
+        {
+            timer += Time.deltaTime;
+            yield return null; // Wait for one frame
+        }
+
+        if (fetchedMapRenderer.sprite != null)
+        {
+            Debug.Log("Map was fetched is now available.");
+            SetMapOverlay(fetchedMapRenderer.sprite);
+        }
+        else
+        {
+            Debug.LogWarning("Map was not fetched within the specified time.");
+        }
+    }
+    
+    private void FitCamera()
+    {
+        // Calculate the size of the object based on its distance from the camera and its local scale
+        var mapBounds = fetchedMap.GetComponent<SpriteRenderer>().bounds.size;
+        float objectHeight = mapBounds.x;
+        float objectWidth = mapBounds.y;
+
+        // Calculate the desired height and width of the object in the camera's view
+        float frustumHeight = 2.0f * mainCamera.orthographicSize;
+        float frustumWidth = frustumHeight * mainCamera.aspect;
+
+        // Calculate the scale factor to fit the object to the camera view
+        float scaleFactorHeight = frustumHeight / objectHeight;
+        float scaleFactorWidth = frustumWidth / objectWidth;
+
+        
+        
+        // Use the smaller scale factor to maintain aspect ratio and prevent stretching
+        var scaleFactor = Mathf.Min(scaleFactorWidth, scaleFactorHeight);
+
+        // gameObject.transform.localScale *= scaleFactor;
+        // fetchedMap.transform.localScale *= scaleFactor;
+        mainCamera.orthographicSize /= scaleFactorHeight;
+    }
     private void CreateNewTextureForDrawing()
     {
         // create new texture and sprite where to draw based on resolution of map snippet
@@ -51,6 +107,7 @@ public class CreateMapWithOverlay : MonoBehaviour
     {
         mapOverlay = newMapOverlay;
         CreateNewTextureForDrawing();
+        FitCamera();
     }
 
     /// <summary>
@@ -114,13 +171,20 @@ public class CreateMapWithOverlay : MonoBehaviour
     {
         tilemap.ClearAllTiles();
     }
+    
+    public void ToggleDrawable()
+    {
+        drawableSpriteRenderer.enabled = !drawableSpriteRenderer.enabled;
+    }
+    
     public void CreateTilemapFromTexture()
     {
         ClearTilemap();
         
         var spriteRectVertices = drawableSprite.vertices;
-        var topLeftCellPos = tilemap.WorldToCell(spriteRectVertices[0]);
-        var bottomRightCellPos = tilemap.WorldToCell(spriteRectVertices[1]);
+        var worldMat = transform.localToWorldMatrix;
+        var topLeftCellPos = tilemap.WorldToCell(worldMat * spriteRectVertices[0]);
+        var bottomRightCellPos = tilemap.WorldToCell(worldMat * spriteRectVertices[1]);
         // Put tile to the opposite corners to set correct tilemap bounds so fill works correctly,
         // tilemap API doesnt do this automatically...
         tilemap.SetTile(topLeftCellPos + new Vector3Int(-2, 2, 0), boundsTile);

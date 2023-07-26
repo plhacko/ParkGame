@@ -267,7 +267,7 @@ namespace FreeDraw
             // Change these to coordinates of pixels
             float pixelWidth = drawable_sprite.rect.width;
             float pixelHeight = drawable_sprite.rect.height;
-            float unitsToPixels = pixelWidth / drawable_sprite.bounds.size.x * transform.localScale.x;
+            float unitsToPixels = pixelWidth / drawable_sprite.bounds.size.x; //* transform.localScale.x;
 
             // Need to center our coordinates
             float centered_x = local_pos.x * unitsToPixels + pixelWidth / 2;
@@ -287,6 +287,8 @@ namespace FreeDraw
             drawable_texture.Apply();
         }
 
+        
+
         public void SetDrawableSprite(Sprite sprite)
         {
             if (!sprite)
@@ -302,7 +304,10 @@ namespace FreeDraw
             // Scale 2D box collider according to new texture size
             var spriteRenderer = GetComponent<SpriteRenderer>();
             spriteRenderer.sprite = sprite;
-            GetComponent<BoxCollider2D>().size = spriteRenderer.bounds.size;
+            GetComponent<BoxCollider2D>().size = new Vector2(
+                spriteRenderer.bounds.size.x * transform.localScale.x,
+                spriteRenderer.bounds.size.y * transform.localScale.y
+            );
             
             // Initialize clean pixels to use
             clean_colours_array = new Color[(int)drawable_sprite.rect.width * (int)drawable_sprite.rect.height];
