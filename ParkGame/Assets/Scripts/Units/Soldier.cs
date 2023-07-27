@@ -10,18 +10,29 @@ using System.Windows.Input;
 public class Soldier : NetworkBehaviour, ISoldier
 {
     // game logic
-    [SerializeField] private float movementSpeed = 1;
     private Transform CommanderToFollow = null;
+    [Header("initial values")]
+    [SerializeField] int InitialHP = 3;
+    [Header("game logic values")]
+    [SerializeField] float MovementSpeed = 1;
     [SerializeField] float InnerDistanceFromCommander = 1.0f;
     [SerializeField] float OuterDistanceFromCommander = 2.0f;
     [SerializeField] float DefendDistanceFromCommander = 2.5f;
     [SerializeField] float AttackDistanceFromCommander = 6.0f;
-    [SerializeField] float AttackRange = 0.3f;
+    [SerializeField] float AttackRange = 0.4f;
+    [SerializeField] float Attackcooldown = 1.0f;
+    [SerializeField] int Damage = 1;
 
+    [SerializeField] float ClosestEnemyDEBUG; // DEBUG // TODO: rm
+
+    private NetworkVariable<int> _HP = new();
+    public int HP { get => _HP.Value; set => _HP.Value = value; }
     private NetworkVariable<int> _Team = new();
     public int Team { get => _Team.Value; set => _Team.Value = value; }
-    public SoldierBehaviour SoldierBehaviour { get; set; } // derived form ISoldier
+    private NetworkVariable<SoldierBehaviour> _SoldierBehaviour = new();
+    public SoldierBehaviour SoldierBehaviour { get => _SoldierBehaviour.Value; set => _SoldierBehaviour.Value = value; } // derived form ISoldier
     EnemyObserver EnemyObserver;
+    private float AttackTimer = 0.0f;
 
     // animation
     private static readonly int AnimatorMovementSpeedHash = Animator.StringToHash("MovementSpeed");
@@ -39,15 +50,26 @@ public class Soldier : NetworkBehaviour, ISoldier
         Animator = GetComponent<Animator>();
 
         _Team.OnValueChanged += OnTeamChanged;
+        _SoldierBehaviour.OnValueChanged += OnBehaviourChange;
         OnTeamChanged(0, Team);
-        if (!IsOwner)
+        OnBehaviourChange(0, SoldierBehaviour);
+
+        if (IsServer)
+            HP = InitialHP;
+
+        if (!IsServer)
         {
             XSpriteFlip.OnValueChanged += OnXSpriteFlipChanged;
         }
     }
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+        Initialize();
+    }
 
     private void OnXSpriteFlipChanged(bool previousValue, bool newValue) => SpriteRenderer.flipX = newValue;
-    private void OnTeamChanged(int previousValue, int newValue) //DEBUG // TODO: rm
+    private void OnTeamChanged(int previousValue, int newValue) //DEBUG (just tem membership visualization) // TODO: rm
     {
         SpriteRenderer sr = transform.Find("Circle")?.GetComponent<SpriteRenderer>();
         if (sr == null) { return; }
@@ -55,34 +77,46 @@ public class Soldier : NetworkBehaviour, ISoldier
         else if (newValue == 1) { sr.color = Color.yellow; }
         else { sr.color = Color.grey; }
     }
-    public override void OnNetworkSpawn()
+    private void OnBehaviourChange(SoldierBehaviour previousValue, SoldierBehaviour newValue)
     {
-        base.OnNetworkSpawn();
-        Initialize();
+        switch (newValue)
+        {
+            case SoldierBehaviour.Idle:
+                GetComponent<SpriteRenderer>().color = Color.green; // DEBUG // TODO: rm
+                break;
+            case SoldierBehaviour.Move:
+                GetComponent<SpriteRenderer>().color = Color.blue; // DEBUG // TODO: rm
+                break;
+            case SoldierBehaviour.Attack:
+                GetComponent<SpriteRenderer>().color = Color.red; // DEBUG // TODO: rm
+                break;
+        }
     }
     void Update()
     {
         // following is done only on server
-        if (!NetworkManager.Singleton.IsServer)
+        if (!IsServer)
         { return; }
 
         // check for a Commander
         if (CommanderToFollow == null)
-        { return; }
+        { return; } // TODO: add function, that finds the nearest frienly outpost
 
+        // attack timer
+        if (AttackTimer <= Attackcooldown)
+        { AttackTimer += Time.deltaTime; }
+
+        // soldier behaviour
         switch (SoldierBehaviour)
         {
             case SoldierBehaviour.Idle:
                 IdleBehaviour();
-                GetComponent<SpriteRenderer>().color = Color.green; // DEBUG // TODO: rm
                 break;
             case SoldierBehaviour.Move:
                 MovementBehaviour();
-                GetComponent<SpriteRenderer>().color = Color.blue; // DEBUG // TODO: rm
                 break;
             case SoldierBehaviour.Attack:
                 AttackBehaviour();
-                GetComponent<SpriteRenderer>().color = Color.red; // DEBUG // TODO: rm
                 break;
             default:
                 break;
@@ -95,9 +129,8 @@ public class Soldier : NetworkBehaviour, ISoldier
         float distanceFromCommander = Vector3.Distance(CommanderToFollow.position, transform.position);
         if (enemyT != null && distanceFromCommander < DefendDistanceFromCommander)
         {
-            MoveTowardsEntity(enemyT);
-            AttackEnemyIfInRAnge(enemyT);
-            return;
+            if (AttackEnemyIfInRange(enemyT)) { return; }
+            else { MoveTowardsEntity(enemyT); return; }
         }
 
 
@@ -112,9 +145,10 @@ public class Soldier : NetworkBehaviour, ISoldier
 
     private void MovementBehaviour()
     {
-        Transform enemyT = EnemyObserver.GetClosestEnemy();
-        if (enemyT != null)
-        { AttackEnemyIfInRAnge(enemyT); }
+        // TODO: think if make sense or rm
+        // Transform enemyT = EnemyObserver.GetClosestEnemy();
+        // if (enemyT != null)
+        // { AttackEnemyIfInRAnge(enemyT); }
 
         //  moves to the inner circle around the commander
         if (Vector3.Distance(CommanderToFollow.position, transform.position) > InnerDistanceFromCommander)
@@ -135,7 +169,7 @@ public class Soldier : NetworkBehaviour, ISoldier
         { MoveTowardsEntity(CommanderToFollow); return; }
 
         // attack the closest enemy if in range
-        AttackEnemyIfInRAnge(enemyT);
+        if (AttackEnemyIfInRange(enemyT)) { return; }
         // go closer to the enemy
         MoveTowardsEntity(enemyT);
 
@@ -146,13 +180,22 @@ public class Soldier : NetworkBehaviour, ISoldier
             SoldierBehaviour = SoldierBehaviour.Move;
         }
     }
-
-    private void AttackEnemyIfInRAnge(Transform enemyT)
+    /// <summary> attacks the closest enemy in range</summary>
+    /// <returns> returns if enemy was in range </returns>
+    private bool AttackEnemyIfInRange(Transform enemyT)
     {
+        ClosestEnemyDEBUG = Vector3.Distance(enemyT.position, transform.position);
         if (Vector3.Distance(enemyT.position, transform.position) < AttackRange)
         {
-            // TODO: do attack
+            if (AttackTimer >= Attackcooldown)
+            {
+                AttackTimer = 0.0f;
+                enemyT.GetComponent<ISoldier>()?.TakeDamage(Damage);
+                Animator.SetTrigger("Attack");
+            }
+            return true;
         }
+        return false;
     }
 
     private void MoveTowardsEntity(Transform entityT)
@@ -171,7 +214,7 @@ public class Soldier : NetworkBehaviour, ISoldier
 
         direction = direction.normalized;
 
-        Vector2 movement = direction * movementSpeed;
+        Vector2 movement = direction * MovementSpeed;
 
         Animator.SetFloat(AnimatorMovementSpeedHash, movement.magnitude);
 
@@ -200,13 +243,14 @@ public class Soldier : NetworkBehaviour, ISoldier
         if (teamMember != null && teamMember.Team == Team)
         {
             SetCommanderToFollow(clientNO.gameObject.transform);
+            SoldierBehaviour = SoldierBehaviour.Move;
         }
     }
 
     /// <summary> !call only on server! </summary>
     public void SetCommanderToFollow(Transform commanderToFollow)
     {
-        if (!NetworkManager.Singleton.IsServer)
+        if (!IsServer)
         { throw new Exception($"only server can set what the unit ({gameObject.name}) can follow ({CommanderToFollow?.name})"); }
 
         if (CommanderToFollow != commanderToFollow) // change Commander to follow
@@ -220,5 +264,22 @@ public class Soldier : NetworkBehaviour, ISoldier
             CommanderToFollow?.GetComponent<ICommander>().ReportUnfollowing(gameObject);
             CommanderToFollow = null;
         }
+    }
+    /// <summary> !call only on server! </summary>
+    public void TakeDamage(int damage)
+    {
+        if (!IsServer)
+        { throw new Exception($"soldier ({gameObject.name}) can take damage only on server"); }
+
+        int hp = HP - damage;
+        if (hp < 0) { Die(); }
+        else { HP = hp; }
+    }
+    /// <summary> !call only on server! </summary>
+    public void Die()
+    {
+        HP = 0;
+        CommanderToFollow?.GetComponent<ICommander>().ReportUnfollowing(gameObject);
+        Destroy(gameObject);
     }
 }

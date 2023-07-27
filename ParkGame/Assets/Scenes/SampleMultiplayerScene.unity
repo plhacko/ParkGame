@@ -1451,6 +1451,10 @@ PrefabInstance:
       value: 3395823699
       objectReference: {fileID: 0}
     - target: {fileID: 2776846833031490633, guid: 1a614d92eed9bdd48a556d6ecb9ea243, type: 3}
+      propertyPath: MaxUnits
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2776846833031490633, guid: 1a614d92eed9bdd48a556d6ecb9ea243, type: 3}
       propertyPath: InitialTeam
       value: 1
       objectReference: {fileID: 0}

@@ -292,12 +292,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 16e878c8ac6e19f46bc87fa57d8fe0a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  movementSpeed: 1
+  InitialHP: 3
+  MovementSpeed: 1
   InnerDistanceFromCommander: 1
   OuterDistanceFromCommander: 2
   DefendDistanceFromCommander: 3
   AttackDistanceFromCommander: 6
-  AttackRange: 0.3
+  AttackRange: 0.4
+  Attackcooldown: 1
+  Damage: 1
+  ClosestEnemyDEBUG: 0
 --- !u!70 &8848524197970868838
 CapsuleCollider2D:
   m_ObjectHideFlags: 0

@@ -28,7 +28,7 @@ public class Outpost : NetworkBehaviour, ICommander
     void Update()
     {
         // updating only on server
-        if (!NetworkManager.Singleton.IsServer)
+        if (!IsServer)
         { return; }
 
         if (Units.Count >= MaxUnits)
@@ -46,7 +46,7 @@ public class Outpost : NetworkBehaviour, ICommander
     public void SpawnUnit()
     {
         // only server can spawn unit
-        if (!NetworkManager.Singleton.IsServer)
+        if (!IsServer)
         { throw new Exception("only server can spawn unit"); }
 
         Vector3 RndOffset = new Vector3(UnityEngine.Random.Range(-0.01f, 0.01f), UnityEngine.Random.Range(-0.01f, 0.01f), 0f);
@@ -58,7 +58,7 @@ public class Outpost : NetworkBehaviour, ICommander
 
     void ICommander.ReportFollowing(GameObject go)
     {
-        if (!NetworkManager.Singleton.IsServer)
+        if (!IsServer)
         { throw new Exception($"only on server can adding units to outpost be reported\n outpost: {gameObject.name}"); }
 
         Units.Add(go);
@@ -66,7 +66,7 @@ public class Outpost : NetworkBehaviour, ICommander
 
     void ICommander.ReportUnfollowing(GameObject go)
     {
-        if (!NetworkManager.Singleton.IsServer)
+        if (!IsServer)
         { throw new Exception($"only on server can removing units to outpost be reported\n outpost: {gameObject.name}"); }
 
         Units.Remove(go);
