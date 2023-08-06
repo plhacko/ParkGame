@@ -26,6 +26,9 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/LobbyTest/LobbyMenu.unity
     guid: 0ec4659de8bb37f4aa51ff1ba77fc856
+  - enabled: 1
+    path: Assets/Scenes/NavmeshMultiScene.unity
+    guid: ad5bf916dc910114193cac26c7d75383
   m_configObjects:
     com.unity.adaptiveperformance.loader_settings: {fileID: 11400000, guid: 3ad410e226113ae45a953aa6554aea9c, type: 2}
     com.unity.adaptiveperformance.simulator.provider_settings: {fileID: 11400000, guid: 439bd770a0624a141bf5dfc5e420bfcc, type: 2}
