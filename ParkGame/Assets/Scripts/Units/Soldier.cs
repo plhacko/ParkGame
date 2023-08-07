@@ -6,6 +6,7 @@ using Unity.Netcode.Components;
 using Managers;
 using System;
 using System.Windows.Input;
+using UnityEngine.AI;
 
 public class Soldier : NetworkBehaviour, ISoldier
 {
@@ -43,11 +44,15 @@ public class Soldier : NetworkBehaviour, ISoldier
         NetworkVariableReadPermission.Everyone,
         NetworkVariableWritePermission.Owner);
 
+    private NavMeshAgent Agent;
+
     private void Initialize()
     {
         EnemyObserver = GetComponentInChildren<EnemyObserver>();
         SpriteRenderer = GetComponent<SpriteRenderer>();
         Animator = GetComponent<Animator>();
+        Agent = GetComponent<NavMeshAgent>();
+        Debug.Log("agent" + Agent);
 
         _Team.OnValueChanged += OnTeamChanged;
         _SoldierBehaviour.OnValueChanged += OnBehaviourChange;
@@ -200,11 +205,12 @@ public class Soldier : NetworkBehaviour, ISoldier
 
     private void MoveTowardsEntity(Transform entityT)
     {
+
         Vector2 directionToCommander = entityT.position - transform.position;
-        Move(directionToCommander);
+        Move(directionToCommander, entityT);
     }
 
-    private void Move(Vector2 direction)
+    private void Move(Vector2 direction, Transform entityT=null)
     {
         if (direction.magnitude < 0.01f)
         {
@@ -224,7 +230,15 @@ public class Soldier : NetworkBehaviour, ISoldier
         SpriteRenderer.flipX = movement.x < 0;
         XSpriteFlip.Value = SpriteRenderer.flipX;
 
-        transform.Translate(movement * Time.deltaTime);
+        //transform.Translate(movement * Time.deltaTime);
+        
+        if (entityT) {
+            Debug.Log("go to entityT");
+            var pos = new Vector3(entityT.position.x, entityT.position.y, transform.position.z);
+            Agent.SetDestination(pos);
+        } else {
+            transform.Translate(movement * Time.deltaTime);
+        }
     }
 
     void OnMouseDown()
