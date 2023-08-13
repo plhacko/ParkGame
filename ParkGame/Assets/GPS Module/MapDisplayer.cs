@@ -1,10 +1,17 @@
+using System;
 using Mapbox.Map;
 using System.Collections;
+using System.Collections.Generic;
 using System.Globalization;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
 
+[System.Serializable]
+public class MapboxAccesToken
+{
+    public string AccessToken;
+}
 
 public class MapDisplayer : MonoBehaviour
 {
@@ -62,6 +69,20 @@ public class MapDisplayer : MonoBehaviour
     public float MaxLongitude = -77.028923f;
     public float MinLatitude = 38.892035f;
     public float MaxLatitude = 38.904192f;
+
+
+    private void Awake()
+    {
+        // automatically take access token from mapbox config
+        var mapboxConfig = Resources.Load<TextAsset>("Mapbox/MapboxConfiguration");
+        if (mapboxConfig != null)
+        {
+            // Parse JSON data into a dictionary
+            MapboxAccesToken mapboxData = JsonUtility.FromJson<MapboxAccesToken>(mapboxConfig.text);
+            if (mapboxData != null)
+                accessToken = mapboxData.AccessToken;
+        }
+    }
 
     // Start is called before the first frame update
     void Start()

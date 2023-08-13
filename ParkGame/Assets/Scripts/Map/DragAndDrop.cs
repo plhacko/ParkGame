@@ -53,46 +53,103 @@ using System.Collections.Generic;
 using FreeDraw;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Tilemaps;
 
-public class DragAndDrop : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IEndDragHandler, IDragHandler
+public class DragAndDrop : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBeginDragHandler, IEndDragHandler, IDragHandler
 {
     [SerializeField] private Canvas canvas;
     public Drawable mapDrawable;
-    public GameObject itemSlot;
+    public Camera mainCamera;
+    [SerializeField]
+    private Tilemap tilemap;
+    public Tilemap TilemapProperty
+    {
+        get => tilemap;
+        set
+        {
+            tilemap = value;
+            SetGridCellSize(value);
+        }
+    }
+    private Vector2 gridCellSize;
 
+
+    private GameObject draggedItem;
     private CanvasGroup canvasGroup;
     private RectTransform rectTransform;
     private void Awake()
     {
         rectTransform = GetComponent<RectTransform>();
         canvasGroup = GetComponent<CanvasGroup>();
+        canvas = GetComponentInParent<Canvas>();
+        if (tilemap)
+            SetGridCellSize(tilemap);
     }
 
+    private void SetGridCellSize(Tilemap value)
+    {
+        // component-wise multiplication (needed for grid-snapping)
+        gridCellSize = Vector3.Scale(value.cellSize, value.layoutGrid.transform.localScale);
+    }
+    
+    public Vector2 GetTilemapPosition()
+    {
+        return rectTransform.anchoredPosition;
+    }
+    
     public void OnBeginDrag(PointerEventData eventData)
     {
-        Debug.Log("OnBeginDrag");
-        canvasGroup.blocksRaycasts = false;
-        canvasGroup.alpha = 0.7f;
+        InDragAction(true);
     }
 
     public void OnDrag(PointerEventData eventData)
     {
-        Debug.Log("OnDrag");
-        rectTransform.anchoredPosition += eventData.delta / canvas.scaleFactor;
+        // Convert mouse position to world position
+        RectTransformUtility.ScreenPointToWorldPointInRectangle(
+            rectTransform, eventData.position, mainCamera,out var worldPosition
+        );
+        // rectTransform.anchoredPosition += eventData.delta / canvas.scaleFactor;
+        Vector3 snappedWorldPosition = new Vector3(
+            Mathf.Round(worldPosition.x / gridCellSize.x) * gridCellSize.x,
+            Mathf.Round(worldPosition.y / gridCellSize.y) * gridCellSize.y,
+            worldPosition.z
+        );
+        Vector2 snappedCanvasPosition = RectTransformUtility.WorldToScreenPoint(mainCamera, snappedWorldPosition);
+        // Calculate anchored position based on the canvas position
+        Vector2 anchoredPosition = snappedCanvasPosition - (Vector2)rectTransform.parent.GetComponent<RectTransform>().position;
+
+        // Set the RectTransform's anchored position to the snapped anchored position
+        rectTransform.anchoredPosition = anchoredPosition / canvas.scaleFactor;
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        Debug.Log("OnEndDrag");
-        mapDrawable.enabled = true;
-        canvasGroup.blocksRaycasts = true;
-        canvasGroup.alpha = 1.0f;
+        InDragAction(false);
     }
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        Debug.Log("OnPointerDown");
-        mapDrawable.enabled = false;
+        InDragAction(true);
+    }
+    public void OnPointerUp(PointerEventData eventData)
+    {
+        InDragAction(false);
+    }
+
+    public void InDragAction(bool inDrag)
+    {
+        if (inDrag)
+        {
+            mapDrawable.enabled = false;
+            canvasGroup.blocksRaycasts = false;
+            canvasGroup.alpha = 0.7f;
+        }
+        else
+        {
+            mapDrawable.enabled = true;
+            canvasGroup.blocksRaycasts = true;
+            canvasGroup.alpha = 1.0f;
+        }
     }
 
 }

@@ -17,7 +17,10 @@ public class CreateMapWithOverlay : MonoBehaviour
     public TileBase pathTile;
     public TileBase boundsTile;
     public TileBase wallTile;
+    public TileBase backgroundTile;
+    
     private Texture2D drawableTexture;
+    private Texture2D resizedDrawableTexture;
     private Sprite drawableSprite;
     private SpriteRenderer drawableSpriteRenderer;
     private GameObject fetchedMap;
@@ -27,8 +30,10 @@ public class CreateMapWithOverlay : MonoBehaviour
     void Start()
     {
         drawableSpriteRenderer = GetComponent<SpriteRenderer>();
-        if (mapOverlay) // Debug feature
+        if (mapOverlay){ // Debug feature
             CreateNewTextureForDrawing();
+            SetMapOverlay(mapOverlay);
+        }
         else // Wait until map fetching from MapBox is completed
             StartCoroutine(WaitForValue());
         
@@ -62,9 +67,13 @@ public class CreateMapWithOverlay : MonoBehaviour
     private void FitCamera()
     {
         // Calculate the size of the object based on its distance from the camera and its local scale
-        var mapBounds = fetchedMap.GetComponent<SpriteRenderer>().bounds.size;
-        float objectHeight = mapBounds.x;
-        float objectWidth = mapBounds.y;
+        Vector3 mapBounds;
+        if (fetchedMap)
+            mapBounds = fetchedMap.GetComponent<SpriteRenderer>().bounds.size;
+        else
+            mapBounds = mapOverlay.bounds.size;
+        float objectWidth = mapBounds.x;
+        float objectHeight = mapBounds.y;
 
         // Calculate the desired height and width of the object in the camera's view
         float frustumHeight = 2.0f * mainCamera.orthographicSize;
@@ -81,7 +90,7 @@ public class CreateMapWithOverlay : MonoBehaviour
 
         // gameObject.transform.localScale *= scaleFactor;
         // fetchedMap.transform.localScale *= scaleFactor;
-        mainCamera.orthographicSize /= scaleFactorHeight;
+        mainCamera.orthographicSize /= scaleFactor;
     }
     private void CreateNewTextureForDrawing()
     {
@@ -131,21 +140,6 @@ public class CreateMapWithOverlay : MonoBehaviour
 #endif 
     }
 
-    private Texture2D ScaleTexture(Texture2D source,int targetWidth,int targetHeight) {
-        // https://answers.unity.com/questions/150942/texture-scale.html
-        Texture2D result=new Texture2D(targetWidth,targetHeight,source.format,false);
-        float incX=(1.0f / (float)targetWidth);
-        float incY=(1.0f / (float)targetHeight);
-        for (int i = 0; i < result.height; ++i) {
-            for (int j = 0; j < result.width; ++j) {
-                Color newColor = source.GetPixelBilinear((float)j / (float)result.width, (float)i / (float)result.height);
-                result.SetPixel(j, i, newColor);
-            }
-        }
-        result.Apply();
-        return result;
-    }
-
     private float ColorDiff(Color color1, Color color2)
     {
         return Mathf.Sqrt(
@@ -157,13 +151,15 @@ public class CreateMapWithOverlay : MonoBehaviour
     }
     private TileBase ClosestColor(Color target)
     {
+        // Definition of mapping from color to tiles, if adding new, also add color button to UI for drawing
         var colorToTile = new Dictionary<Color, TileBase>()
         {
             {Color.yellow, pathTile},
             {Color.blue, wallTile},
             {Color.red, boundsTile},
-            {Color.clear, null}
+            {Color.clear, backgroundTile}
         };
+        // calculate closest color match 
         return colorToTile[colorToTile.Keys.OrderBy(n => ColorDiff(n, target)).First()];
     }
     
@@ -176,7 +172,18 @@ public class CreateMapWithOverlay : MonoBehaviour
     {
         drawableSpriteRenderer.enabled = !drawableSpriteRenderer.enabled;
     }
+
+    /**
+     * Returns drawn texture scaled down on small resolution needed for tilemap creation 
+     */
+    public Texture2D GetLowResTextureForTilemapCreation()
+    {
+        return resizedDrawableTexture;
+    }
     
+    /**
+     * Creates tilemap from drawn texture by scaling texture to low resolution and assigning tiles by according colors
+     */
     public void CreateTilemapFromTexture()
     {
         ClearTilemap();
@@ -195,12 +202,12 @@ public class CreateMapWithOverlay : MonoBehaviour
         // CreateOutsideBoundary();
         
         
-        var resizedTexture = TextureScaler.scaled(drawableTexture, widthTilemap, heightTilemap, FilterMode.Point);
-        var texturePixels = resizedTexture.GetPixels();
-        SaveMap(resizedTexture);
+        resizedDrawableTexture = TextureScaler.scaled(drawableTexture, widthTilemap, heightTilemap, FilterMode.Point);
+        var texturePixels = resizedDrawableTexture.GetPixels();
+        SaveMap(resizedDrawableTexture);
 
-        
-        
+
+        var tilesToAssign = new Dictionary<Vector3Int, TileBase>();
         for (var j = bottomRightCellPos.y; j < topLeftCellPos.y; j++)
         {
             for (var i = topLeftCellPos.x; i < bottomRightCellPos.x; i++)
@@ -209,13 +216,22 @@ public class CreateMapWithOverlay : MonoBehaviour
                 // var tile = tilemap.GetTile(tilePos);
                 int pixelIdx = (j - bottomRightCellPos.y) * widthTilemap + (i - topLeftCellPos.x);
                 var pixelColor = texturePixels[pixelIdx];
-                tilemap.SetTile(tilePos, ClosestColor(pixelColor));
+                var colorMatchingTile = ClosestColor(pixelColor);
+                if (colorMatchingTile == boundsTile)
+                    tilemap.SetTile(tilePos, colorMatchingTile);
+                else
+                    tilesToAssign.Add(tilePos, colorMatchingTile);
             }
             
         }
-
+        // Flood fill the boundary before setting rest of the tiles
         tilemap.FloodFill(
             new Vector3Int(topLeftCellPos.x, topLeftCellPos.y), boundsTile
             );
+        foreach (var kvp in tilesToAssign)
+        {
+            if (tilemap.GetTile(kvp.Key) == null)
+                tilemap.SetTile(kvp.Key, kvp.Value);
+        }
     }
 }
