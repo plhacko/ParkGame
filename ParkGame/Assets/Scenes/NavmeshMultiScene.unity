@@ -432,7 +432,7 @@ GameObject:
   - component: {fileID: 488851633}
   - component: {fileID: 488851635}
   m_Layer: 0
-  m_Name: Nv
+  m_Name: NavMeshSurface
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -774,7 +774,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2776846833031490632, guid: 1a614d92eed9bdd48a556d6ecb9ea243, type: 3}
       propertyPath: GlobalObjectIdHash
-      value: 1277029206
+      value: 1423648162
       objectReference: {fileID: 0}
     - target: {fileID: 2776846833031490633, guid: 1a614d92eed9bdd48a556d6ecb9ea243, type: 3}
       propertyPath: InitialTeam
@@ -1837,7 +1837,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2776846833031490632, guid: 1a614d92eed9bdd48a556d6ecb9ea243, type: 3}
       propertyPath: GlobalObjectIdHash
-      value: 3395823699
+      value: 526436590
       objectReference: {fileID: 0}
     - target: {fileID: 2776846833031490633, guid: 1a614d92eed9bdd48a556d6ecb9ea243, type: 3}
       propertyPath: MaxUnits

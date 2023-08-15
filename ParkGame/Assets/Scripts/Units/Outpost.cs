@@ -71,4 +71,9 @@ public class Outpost : NetworkBehaviour, ICommander
 
         Units.Remove(go);
     }
+
+    public ICommander.SoldierMovements GetFormation() {
+        return ICommander.SoldierMovements.Free;
+    }
+
 }
