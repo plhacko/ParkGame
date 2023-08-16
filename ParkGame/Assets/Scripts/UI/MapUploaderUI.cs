@@ -7,6 +7,7 @@ using Firebase.Extensions;
 using Firebase.Storage;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace UI
@@ -44,6 +45,8 @@ namespace UI
 
     public class MapUploaderUI : MonoBehaviour
     {
+        [SerializeField] private string mainMenuSceneName; 
+        [SerializeField] private Button goBackButton;
         [SerializeField] private Button uploadButton;
         [SerializeField] private List<Toggle> numTeamsToggles;
         [SerializeField] private TMP_InputField mapNameInputField;
@@ -52,8 +55,11 @@ namespace UI
         private DatabaseReference databaseReference;
         private StorageReference storageReference;
 
+        private bool uploading = false;
+        
         void Awake()
         {
+            goBackButton.onClick.AddListener(goBack);
             uploadButton.onClick.AddListener(uploadMap);
             FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task =>
             {
@@ -61,14 +67,25 @@ namespace UI
                 databaseReference = FirebaseDatabase.DefaultInstance.RootReference;
             });
         }
-        
+
+        private void goBack()
+        {
+            SceneManager.LoadScene(mainMenuSceneName, LoadSceneMode.Single);
+            goBackButton.interactable = false;
+            uploadButton.interactable = false;   
+        }
+
         public void Update()
         {
-            uploadButton.interactable = databaseReference != null;
+            uploadButton.interactable = databaseReference != null && !uploading;
+            goBackButton.interactable = !uploading;
         }
 
         private void uploadMap()
         {
+            goBackButton.interactable = false;
+            uploadButton.interactable = false;
+            
             int numTeams = 2;
             for (int i = 0; i < numTeamsToggles.Count; i++)
             {
@@ -89,6 +106,9 @@ namespace UI
 
             MapMetaData mapMetaData = new MapMetaData(numTeams, mapName, longitude, latitude, texture.width, texture.height, guid);
 
+            uploading = true;
+            bool uploadingImage = true;
+            bool uploadingImageMeta = true;
             storageReference.Child($"{FirebaseConstants.MAP_FOLDER}/{mapMetaData.MapId}.jpg").PutBytesAsync(bytes).ContinueWithOnMainThread(task =>
             {
                 if (task.Status == TaskStatus.RanToCompletion) {
@@ -96,10 +116,17 @@ namespace UI
                 } else {
                     Debug.Log("Error uploading texture: " + task.Exception);
                 }
+
+                uploadingImage = false;
+                uploading = uploadingImageMeta || uploadingImage;
             });
             
             string mapJson = JsonUtility.ToJson(mapMetaData);
-            databaseReference.Child(FirebaseConstants.MAP_DATA_FOLDER).Child(mapMetaData.MapId).SetRawJsonValueAsync(mapJson);
+            databaseReference.Child(FirebaseConstants.MAP_DATA_FOLDER).Child(mapMetaData.MapId).SetRawJsonValueAsync(mapJson).ContinueWithOnMainThread(task =>
+            {
+                uploadingImageMeta = false;
+                uploading = uploadingImageMeta || uploadingImage;
+            });
         }
     }
    

@@ -16,14 +16,17 @@ namespace UI.Lobby
     public class JoinMenuController : MonoBehaviour
     {
         [SerializeField] private string hostMenuSceneName;
+        [SerializeField] private string createMapMenuSceneName;
         [SerializeField] private Button joinButton;
         [SerializeField] private Button hostButton;
+        [SerializeField] private Button createMapButton;
         [SerializeField] private TMP_InputField joinCodeInputField;
 
         private async void Start()
         {
             joinButton.onClick.AddListener(joinGame);
             hostButton.onClick.AddListener(hostGame);
+            createMapButton.onClick.AddListener(createMap);
             
             // Disable buttons until the player is signed in
             enableButtons(false);
@@ -54,6 +57,13 @@ namespace UI.Lobby
             enableButtons(true);
         }
 
+        // Go to scene where the player can create a new map
+        private void createMap()
+        {
+            enableButtons(false);
+            SceneManager.LoadScene(createMapMenuSceneName, LoadSceneMode.Single);
+        }
+        
         // Go to scene where the player can host a new game
         private void hostGame()
         {
