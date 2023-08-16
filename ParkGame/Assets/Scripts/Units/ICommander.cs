@@ -6,7 +6,7 @@ public interface ICommander : ITeamMember
 
     public void ReportFollowing(GameObject go);
     public void ReportUnfollowing(GameObject go);
-    public enum SoldierMovements { Free, Circle, Rectangle };
+    public enum SoldierMovements { Free, Circle, Box };
 
-    public SoldierMovements GetFormation();
+    public Formation.FormationType GetFormation();
 }

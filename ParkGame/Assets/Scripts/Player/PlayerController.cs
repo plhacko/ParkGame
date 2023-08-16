@@ -5,7 +5,7 @@ using Managers;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
-using static ICommander;
+using static Formation;
 
 namespace Player
 {
@@ -31,9 +31,9 @@ namespace Player
 
         List<GameObject> Units = new();
 
-        public SoldierMovements SoldierMovement; // todo?
-        public SoldierMovements GetFormation() {
-            return SoldierMovement;
+        public FormationType FormationType; // todo?
+        public FormationType GetFormation() {
+            return FormationType;
         }
 
         public void InitializePlayerId(Guid playerId)
@@ -46,7 +46,7 @@ namespace Player
             spriteRenderer = GetComponent<SpriteRenderer>();
             animator = GetComponent<Animator>();
             FormationScript = GetComponent<Formation>();
-            SoldierMovement = SoldierMovements.Free; // movement without navmesh
+            FormationType = FormationType.Free; // movement without navmesh
             
 
             if (!isActualOwner())
@@ -83,16 +83,16 @@ namespace Player
         private void FormatSoldiers(KeyCode key) {
             if (key == KeyCode.C) {
                 // circle formation
-                switch (SoldierMovement) {
-                    case SoldierMovements.Rectangle:
-                    case SoldierMovements.Free:
-                        SoldierMovement = SoldierMovements.Circle;
+                switch (FormationType) {
+                    case FormationType.Box:
+                    case FormationType.Free:
+                        FormationType = FormationType.Circle;
                         // notify soldiers
                         NotifySoldiersServerRpc();
                         break;
 
-                    case SoldierMovements.Circle:
-                        SoldierMovement = SoldierMovements.Free;
+                    case FormationType.Circle:
+                        FormationType = FormationType.Free;
                         // notify soldiers
                         NotifySoldiersServerRpc();
                         break;
@@ -103,16 +103,16 @@ namespace Player
             }
             if (key == KeyCode.R) {
                 // rectangle formation
-                switch (SoldierMovement) {
-                    case SoldierMovements.Circle:
-                    case SoldierMovements.Free:
-                        SoldierMovement = SoldierMovements.Rectangle;
+                switch (FormationType) {
+                    case FormationType.Circle:
+                    case FormationType.Free:
+                        FormationType = FormationType.Box;
                         // notify soldiers
                         NotifySoldiersServerRpc();
                         break;
 
-                    case SoldierMovements.Rectangle:
-                        SoldierMovement = SoldierMovements.Free;
+                    case FormationType.Box:
+                        FormationType = FormationType.Free;
                         // notify soldiers
                         NotifySoldiersServerRpc();
                         break;
@@ -129,18 +129,21 @@ namespace Player
             Debug.Log("nu of Units: " + Units.Count);
             foreach (GameObject go in Units) {
                 if (go.TryGetComponent<ISoldier>(out ISoldier soldier)) {
-                    switch (SoldierMovement) {
-                        case SoldierMovements.Free:
+                    switch (FormationType) {
+                        case FormationType.Free:
                             Debug.Log("notify soldiers. C is OFF");
-                            soldier.NavMeshFormationSwitch(false, SoldierBehaviour.Idle, FormationScript, SoldierMovement); // behaviour is whatever
+                            soldier.NavMeshFormationSwitch(false, SoldierBehaviour.Idle, FormationScript, FormationType);
                             FormationScript.ResetFormation();
                             break;
-                        case SoldierMovements.Circle:
+                        case FormationType.Circle:
                             Debug.Log("notify them. C is ON");
-                            soldier.NavMeshFormationSwitch(true, SoldierBehaviour.FormationCircle, FormationScript, SoldierMovement);
+                            soldier.NavMeshFormationSwitch(false, SoldierBehaviour.Idle, FormationScript, FormationType);
+                            soldier.NavMeshFormationSwitch(true, SoldierBehaviour.Formation, FormationScript, FormationType);
                             break;
-                        case SoldierMovements.Rectangle:
-                            soldier.NavMeshFormationSwitch(true, SoldierBehaviour.FormationRectangle, FormationScript, SoldierMovement);
+                        case FormationType.Box:
+                            Debug.Log("notify them. R is ON");
+                            soldier.NavMeshFormationSwitch(false, SoldierBehaviour.Idle, FormationScript, FormationType);
+                            soldier.NavMeshFormationSwitch(true, SoldierBehaviour.Formation, FormationScript, FormationType);
                             break;
                         default: 
                             break;

@@ -180,6 +180,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   movementSpeed: 1
+  FormationScript: {fileID: 0}
+  SoldierMovement: 0
 --- !u!212 &4847180919347885991
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -278,7 +280,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6bb49af851bf9364d8a061207283ed6e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  PositionPrefab: {fileID: 6223394261764091226, guid: e225b3896b59c98438cc2d5cf8fdb19c, type: 3}
+  BoxRootPrefab: {fileID: 1220298409517804251, guid: 3d69ea2ca51941845b05e138397518eb, type: 3}
   soldierPositions: []
+  soldiers: []
+  justPositions: []
+  FormationCircle: []
+  BoxRoot: {fileID: 0}
 --- !u!58 &6203544456224426788
 CircleCollider2D:
   m_ObjectHideFlags: 0
