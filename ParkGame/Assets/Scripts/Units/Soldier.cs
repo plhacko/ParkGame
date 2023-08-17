@@ -202,7 +202,6 @@ public class Soldier : NetworkBehaviour, ISoldier
                     ObjectToFollowInFormation = FormationFromFollowedCommander.GetFormation(gameObject, FormationType.Circle); 
                     break;
                 case FormationType.Box:
-                    Debug.Log("follow in rectangle/box"); // todo
                     ObjectToFollowInFormation = FormationFromFollowedCommander.GetFormation(gameObject, FormationType.Box);
                     break;
                 default:
@@ -299,7 +298,7 @@ public class Soldier : NetworkBehaviour, ISoldier
         //transform.Translate(movement * Time.deltaTime);
         
         if (entityT) {
-            Debug.Log("go to entityT" + gameObject.name);
+            //Debug.Log("go to entityT" + gameObject.name);
             var pos = new Vector3(entityT.position.x, entityT.position.y, transform.position.z);
             Agent.SetDestination(pos);
         } else {

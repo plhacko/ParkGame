@@ -14,13 +14,11 @@ public class Formation : MonoBehaviour
         public bool occupated;
     }
 
-    // todo: pismenka nazvu promennych! _m vs. _M vs. m vs. M ?
     [SerializeField] GameObject PositionPrefab;
     [SerializeField] public GameObject BoxRootPrefab;
     public List<GameObject> soldiers = new List<GameObject>();
 
     // circle formation
-    //public List<PositionPair> circlePositions = new List<PositionPair>();
     public List<GameObject> FormationCircle = new List<GameObject>();
     
     // box formation
@@ -31,9 +29,9 @@ public class Formation : MonoBehaviour
     {
         var p = gameObject.transform.position;
         
-        // cannot be under commander in hierarchy! (problems with movement, asi - je to uz davno)
+        // cannot be under commander in hierarchy, problems with movement
         BoxRoot = Instantiate(BoxRootPrefab, new Vector3(p.x - 2, p.y, p.z), Quaternion.Euler(new Vector3(0, 0, 90)));
-        Hide(BoxRoot);
+        //Hide(BoxRoot);
     }
 
     // disable renderer of object
@@ -48,7 +46,6 @@ public class Formation : MonoBehaviour
         RotateBoxFormation();
 
         if (Input.GetKeyDown(KeyCode.Space)) {
-            Debug.Log("add position");
             Add1PositionToBoxFormation();
         }
     }
@@ -101,33 +98,10 @@ public class Formation : MonoBehaviour
             soldiers.RemoveAt(i);
         }
         FormationCircle.Clear();
-        FormationBox.Clear(); // vazne???
+        FormationBox.Clear(); 
         BoxRoot.GetComponent<FormationDescriptor>().NumberOfPositions = 0;
         RemoveSpheres();
        
-    }
-
-    void FitBoxFormation() {
-        // fill in gaps by reasigning soldiers
-
-    }
-
-    void FitCircularFormation() {
-        var positions = ListCircularPositions();
-        int j = 0;
-        for (int i = 0; i < FormationCircle.Count; i++) {
-            var a = FormationCircle[i].transform.position;
-            var b = positions[j];
-            double eps = 0.002f;
-            if (Vector3.Distance(a, b) <= eps) {
-                // identical, moving on
-                j++;
-            } else {
-                // not identical
-                FormationCircle[i].transform.position = b;
-                j++;
-            }
-        }
     }
 
     public void RemoveFromFormation(GameObject soldier, GameObject position, FormationType shape = FormationType.Circle) {
@@ -142,7 +116,7 @@ public class Formation : MonoBehaviour
                     pos.isAssigned = false;
                     positionList.Remove(item);
                     Destroy(position);
-                    FitCircularFormation();
+                    FitFormation(shape);
                     return;
                 }
             }
@@ -167,7 +141,6 @@ public class Formation : MonoBehaviour
             var pos = go.GetComponent<PositionDescriptor>();
             if (pos.isAssigned) { continue; }
             pos.isAssigned = true;
-            Debug.Log("assigning position" + go.transform.position);
             return go;
         }
         Debug.Log("no free position!");
@@ -188,6 +161,75 @@ public class Formation : MonoBehaviour
                 Destroy(child);
             }
         }
+    }
+
+    void FitFormation(FormationType shape) {
+        switch (shape) {
+            case FormationType.Circle:
+                FitCircularFormation();
+                break;
+            case FormationType.Box:
+                FitBoxFormation();
+                break;
+            default:
+                break;
+        }
+    }
+
+    void AdjustFormation(List<GameObject> formationList, List<Vector3> positions) {
+        int j = 0;
+        for (int i = 0; i < formationList.Count; i++) {
+           // var a = formationList[i].transform.localPosition;
+            var a = formationList[i].transform.position;
+            var b = positions[j];
+            double eps = 0.002f;
+            if (Vector3.Distance(a, b) <= eps) {
+                // identical, moving on
+                j++;
+            } else {
+                // not identical
+                formationList[i].transform.position = b;
+                j++;
+            }
+        }
+    }
+
+    void FitBoxFormation() {
+        // fill in gaps by reasigning soldiers
+        var positions = ListBoxPositions();
+        //AdjustFormation(FormationBox, positions);   
+    }
+
+    void FitCircularFormation() {
+        var positions = ListCircularPositions();
+        AdjustFormation(FormationCircle, positions);
+    }
+
+    public List<Vector3> ListBoxPositions() {
+        if (soldiers.Count < 1) { return null; }
+
+        List<Vector3> positions = new List<Vector3>();
+        var formDescr = BoxRoot.GetComponent<FormationDescriptor>();
+        float inc = formDescr.Increment;
+        var sp = formDescr.StartingPosition;
+        int c = formDescr.NumberOfPositions;
+
+        for (int i = 0; i < c; i++) {
+            Vector3 pos = sp + new Vector3(-(i % 3) * inc, -i / 3 * inc, 0);
+            pos += BoxRoot.transform.position;
+
+            Vector3 from = BoxRoot.transform.up;
+            Vector3 to = transform.position - BoxRoot.transform.position;
+            float angle = Vector3.SignedAngle(from, to, BoxRoot.transform.forward);
+            var tmp = new GameObject();
+            tmp.transform.position = pos;
+            tmp.transform.Rotate(0,0,angle);
+            pos = tmp.transform.position;
+            Destroy(tmp);
+            positions.Add(pos);
+        }
+        return positions;
+
     }
 
     public List<Vector3> ListCircularPositions() {

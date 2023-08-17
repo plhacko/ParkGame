@@ -107,12 +107,14 @@ namespace Player
                     case FormationType.Circle:
                     case FormationType.Free:
                         FormationType = FormationType.Box;
+                        FormationScript.ResetFormation();
                         // notify soldiers
                         NotifySoldiersServerRpc();
                         break;
 
                     case FormationType.Box:
                         FormationType = FormationType.Free;
+                        FormationScript.ResetFormation();
                         // notify soldiers
                         NotifySoldiersServerRpc();
                         break;
