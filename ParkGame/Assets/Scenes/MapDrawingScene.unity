@@ -207,9 +207,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2057194719}
-        m_TargetAssemblyTypeName: CreateMapWithOverlay, Assembly-CSharp
-        m_MethodName: SaveMap
+      - m_Target: {fileID: 490435435}
+        m_TargetAssemblyTypeName: MapDataFirebaseManager, Assembly-CSharp
+        m_MethodName: UploadMapData
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -564,6 +564,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2678169573675221651, guid: 9b0f03f019cad2447961d5e762ced7f8, type: 3}
+      propertyPath: tilemap
+      value: 
+      objectReference: {fileID: 1954708517}
     - target: {fileID: 2678169573675221651, guid: 9b0f03f019cad2447961d5e762ced7f8, type: 3}
       propertyPath: itemName
       value: VictoryPoint
@@ -1780,6 +1784,68 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 455082075}
   m_CullTransparentMesh: 1
+--- !u!1 &490435434
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 490435436}
+  - component: {fileID: 490435435}
+  m_Layer: 0
+  m_Name: Firebase Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &490435435
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 490435434}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98c141aedf0a457439ddc55529f5892a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MapWithOverlay: {fileID: 2057194719}
+  OutpostCounter: {fileID: 1617858403}
+  VictoryPointCounter: {fileID: 527075422}
+  CastleCounter: {fileID: 1483137972}
+  OnInitialize:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!4 &490435436
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 490435434}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 654.0575, y: 676.7494, z: -4.019206}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 7
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &527075422 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2678169573675221651, guid: 9b0f03f019cad2447961d5e762ced7f8, type: 3}
+  m_PrefabInstance: {fileID: 180307144}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e22924596563c1449082dbb11af321b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &605582467
 GameObject:
   m_ObjectHideFlags: 0
@@ -3307,6 +3373,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2678169573675221651, guid: 9b0f03f019cad2447961d5e762ced7f8, type: 3}
+      propertyPath: tilemap
+      value: 
+      objectReference: {fileID: 1954708517}
+    - target: {fileID: 2678169573675221651, guid: 9b0f03f019cad2447961d5e762ced7f8, type: 3}
       propertyPath: itemName
       value: Castles
       objectReference: {fileID: 0}
@@ -3356,6 +3426,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 2678169573675221650, guid: 9b0f03f019cad2447961d5e762ced7f8, type: 3}
   m_PrefabInstance: {fileID: 1483137970}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1483137972 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2678169573675221651, guid: 9b0f03f019cad2447961d5e762ced7f8, type: 3}
+  m_PrefabInstance: {fileID: 1483137970}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e22924596563c1449082dbb11af321b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1570939681
 GameObject:
   m_ObjectHideFlags: 0
@@ -3533,6 +3614,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 2678169573675221650, guid: 9b0f03f019cad2447961d5e762ced7f8, type: 3}
   m_PrefabInstance: {fileID: 2678169574213766640}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1617858403 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2678169573675221651, guid: 9b0f03f019cad2447961d5e762ced7f8, type: 3}
+  m_PrefabInstance: {fileID: 2678169574213766640}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e22924596563c1449082dbb11af321b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1630678966
 GameObject:
   m_ObjectHideFlags: 0
@@ -4825,6 +4917,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2678169573675221651, guid: 9b0f03f019cad2447961d5e762ced7f8, type: 3}
+      propertyPath: tilemap
+      value: 
+      objectReference: {fileID: 1954708517}
     - target: {fileID: 2678169573675221651, guid: 9b0f03f019cad2447961d5e762ced7f8, type: 3}
       propertyPath: itemName
       value: Outposts

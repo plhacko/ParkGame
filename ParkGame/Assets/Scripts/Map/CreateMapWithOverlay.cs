@@ -64,6 +64,11 @@ public class CreateMapWithOverlay : MonoBehaviour
         }
     }
     
+    public GameObject GetFetchedMap()
+    {
+        return fetchedMap;
+    }
+    
     private void FitCamera()
     {
         // Calculate the size of the object based on its distance from the camera and its local scale

@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Tilemaps;
+using static UnityEditor.Experimental.AssetDatabaseExperimental.AssetDatabaseCounters;
 
 public class StructureCounter : MonoBehaviour
 {
@@ -10,6 +12,8 @@ public class StructureCounter : MonoBehaviour
     
     public int maxStructures = 3;
     private List<GameObject> currentStructures;
+
+    public Tilemap tilemap;
 
     private void Awake()
     {
@@ -23,7 +27,24 @@ public class StructureCounter : MonoBehaviour
     public void SetMaxStructureCount(int newStructureCount)
     {
         maxStructures = newStructureCount;
-    }    
+    }
+
+    /**
+     * Get cell positions in tilemap of concrete structure type
+     * @returns tuple of name and list of cell positions  
+     */
+    public Tuple<string, List<Vector3Int>> SavePlacedStructures()
+    {
+        var gridLayout = tilemap.GetComponentInParent<GridLayout>();
+
+        var (structureName, structures) = GetStructures();
+        var structureCellPositions = new List<Vector3Int>();
+        foreach (var structure in structures)
+        {
+            structureCellPositions.Add(gridLayout.WorldToCell(Camera.main.ScreenToWorldPoint(structure.transform.position)));
+        }
+        return new Tuple<string, List<Vector3Int>>(structureName, structureCellPositions);
+    }
 
     /**
      * Returns tuple of structure name and list of structures

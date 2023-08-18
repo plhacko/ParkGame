@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "901996011760",
+    "firebase_url": "https://parkgame-a05ff-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "parkgame-a05ff",
+    "storage_bucket": "parkgame-a05ff.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:901996011760:android:067902eda26f4066b9a235",
+        "android_client_info": {
+          "package_name": "com.parkgame.unity.android"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "901996011760-7cfk2tjsnnmu5eniai73dd09i7ms5rc0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB6Y1TkwOjv1XQkUzfvoi6wJw-Gtedc5mI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "901996011760-7cfk2tjsnnmu5eniai73dd09i7ms5rc0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
