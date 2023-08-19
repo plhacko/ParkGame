@@ -11,7 +11,7 @@ namespace UI
         [SerializeField] private string joinGameSceneName = "JoinGameMenu";
         [SerializeField] private GameObject reconnectionUIParent;
         [SerializeField] private Button reconnectButton;
-    
+
         private PlayerManager playerManager;
 
         private void Awake()
@@ -24,7 +24,9 @@ namespace UI
 
         private void Update()
         {
+#if UNITY_EDITOR
             debugDisconnectFirstPlayer();
+#endif
         }
 
 #if UNITY_EDITOR
@@ -36,18 +38,18 @@ namespace UI
                     pair.Key != SessionManager.Singleton.PlayersData.LocalPlayerData.ID));
 
                 var clientId = SessionManager.Singleton.PlayersData.GetClientId(clientData.Key);
-                if(clientId.HasValue)
+                if (clientId.HasValue)
                 {
                     OurNetworkManager.Singleton.DisconnectClient(clientId.Value);
                 }
             }
         }
 #endif
-        
+
         private void OnDestroy()
         {
             playerManager.OnClientReconnectedCallback -= onClientReconnected;
-            if(OurNetworkManager.Singleton != null)
+            if (OurNetworkManager.Singleton != null)
                 OurNetworkManager.Singleton.OnClientDisconnect -= onClientDisconnect;
         }
 
@@ -55,24 +57,24 @@ namespace UI
         {
             reconnectionUIParent.SetActive(false);
         }
-    
+
         private void onClientDisconnect(bool isHost, ulong clientId)
         {
             if (isHost) return;
-        
+
             reconnectionUIParent.SetActive(true);
             reconnectButton.interactable = true;
         }
-    
+
         private async void tryReconnect()
-        { 
+        {
             reconnectButton.interactable = false;
-          
+
             bool joined = await OurNetworkManager.Singleton.JoinGame(SessionManager.Singleton.RoomCode);
             if (!joined)
             {
                 SessionManager.Singleton.EndSessionAndGoToScene(joinGameSceneName);
-            }        
+            }
         }
     }
 }
