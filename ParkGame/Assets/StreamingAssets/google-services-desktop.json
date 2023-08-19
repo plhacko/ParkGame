@@ -1,42 +1,34 @@
 {
   "project_info": {
-    "project_number": "384518119018",
-    "firebase_url": "https://theparkgame-97204-default-rtdb.europe-west1.firebasedatabase.app",
-    "project_id": "theparkgame-97204",
-    "storage_bucket": "theparkgame-97204.appspot.com"
+    "project_number": "901996011760",
+    "firebase_url": "https://parkgame-a05ff-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "parkgame-a05ff",
+    "storage_bucket": "parkgame-a05ff.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:384518119018:android:c623cade96faa2d199f413",
+        "mobilesdk_app_id": "1:901996011760:android:067902eda26f4066b9a235",
         "android_client_info": {
-          "package_name": "com.DefaultCompany.ParkGame"
+          "package_name": "com.parkgame.unity.android"
         }
       },
       "oauth_client": [
         {
-          "client_id": "384518119018-abcjelq9elv88labnr1d10rp1tfktn96.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.DefaultCompany.ParkGame",
-            "certificate_hash": "022b71fd9214a78013caf3e86b7d227210a8771a"
-          }
-        },
-        {
-          "client_id": "384518119018-1avaoft5oggrohqnkp4vubjr73fnsta2.apps.googleusercontent.com",
+          "client_id": "901996011760-7cfk2tjsnnmu5eniai73dd09i7ms5rc0.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyA5fwXZPelIYr7ph2ylc8mLBGq1o3E0KNU"
+          "current_key": "AIzaSyB6Y1TkwOjv1XQkUzfvoi6wJw-Gtedc5mI"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "384518119018-1avaoft5oggrohqnkp4vubjr73fnsta2.apps.googleusercontent.com",
+              "client_id": "901996011760-7cfk2tjsnnmu5eniai73dd09i7ms5rc0.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
