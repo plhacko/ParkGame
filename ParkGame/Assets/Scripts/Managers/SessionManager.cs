@@ -269,7 +269,7 @@ namespace Managers
             DataSnapshot dataSnapshot = await databaseReference.Child(FirebaseConstants.MAP_DATA_FOLDER).Child(mapId.Value.ToString()).GetValueAsync();
             MapMetaData mapMetaDataNew = JsonUtility.FromJson<MapMetaData>(dataSnapshot.GetRawJsonValue());
 
-            var imageReference = storageReference.Child($"{FirebaseConstants.MAP_FOLDER}/{mapMetaDataNew.MapId}.jpg");
+            var imageReference = storageReference.Child($"{FirebaseConstants.MAP_IMAGES_FOLDER}/{mapMetaDataNew.MapId}.jpg");
 
             var imageBytes = await imageReference.GetBytesAsync(FirebaseConstants.MAX_MAP_SIZE);
             Texture2D texture = new Texture2D(mapMetaDataNew.Width, mapMetaDataNew.Height); 

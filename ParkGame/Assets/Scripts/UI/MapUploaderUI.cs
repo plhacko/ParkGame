@@ -15,7 +15,7 @@ namespace UI
     public static class FirebaseConstants
     {
         public static string STORAGE_URL = "gs://theparkgame-97204.appspot.com";
-        public static string MAP_FOLDER = "MapImages";
+        public static string MAP_IMAGES_FOLDER = "MapImages";
         public static string MAP_DATA_FOLDER = "Maps";
         public static long MAX_MAP_SIZE = 1024 * 1024 * 12; // 12M
     }
@@ -40,7 +40,6 @@ namespace UI
             Height = height;
             MapId = mapId.ToString();
         }
-        
     }
 
     public class MapUploaderUI : MonoBehaviour
@@ -109,7 +108,7 @@ namespace UI
             uploading = true;
             bool uploadingImage = true;
             bool uploadingImageMeta = true;
-            storageReference.Child($"{FirebaseConstants.MAP_FOLDER}/{mapMetaData.MapId}.jpg").PutBytesAsync(bytes).ContinueWithOnMainThread(task =>
+            storageReference.Child($"{FirebaseConstants.MAP_IMAGES_FOLDER}/{mapMetaData.MapId}.jpg").PutBytesAsync(bytes).ContinueWithOnMainThread(task =>
             {
                 if (task.Status == TaskStatus.RanToCompletion) {
                     Debug.Log("Texture uploaded successfully!");

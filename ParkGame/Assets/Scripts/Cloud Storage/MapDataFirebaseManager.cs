@@ -8,6 +8,10 @@ using Firebase.Extensions;
 using Firebase.Database;
 using Firebase.Storage;
 using System;
+using Managers;
+using TMPro;
+using UI;
+using UnityEngine.SceneManagement;
 
 public class MapDataFirebaseManager : MonoBehaviour
 {
@@ -17,11 +21,10 @@ public class MapDataFirebaseManager : MonoBehaviour
     public StructureCounter VictoryPointCounter;
     public StructureCounter CastleCounter;
 
-    // TODO : Change this to the actual player ID
-    public Guid PlayerGuid = Guid.NewGuid();
-
     private bool _isInitialized = false;
     public UnityEvent OnInitialize = new UnityEvent();
+    public UnityEvent OnMapUploaded = new UnityEvent();
+    public UnityEvent OnMapUploadFailed = new UnityEvent();
 
     private FirebaseDatabase _database;
     private FirebaseStorage _storage;
@@ -46,14 +49,27 @@ public class MapDataFirebaseManager : MonoBehaviour
         });
     }
 
-    private MapMetaDataNew PrepareMapMetaData()
+    private MapMetaDataNew PrepareMapMetaData(string mapName)
     {
         MapDisplayer mapDisplayer = MapWithOverlay.GetFetchedMap().GetComponent<MapDisplayer>();
-        return new MapMetaDataNew(PlayerGuid, Guid.NewGuid(), "map name", mapDisplayer.urlProperty);
+        
+        var (outpostString, outpostGridPositions) = OutpostCounter.SavePlacedStructures(); 
+        var (victoryPointString, victoryPointGridPositions) = VictoryPointCounter.SavePlacedStructures(); 
+        var (castleString, castleGridPositions) = CastleCounter.SavePlacedStructures();
+        
+        return new MapMetaDataNew(
+            Guid.NewGuid(),
+            mapName == string.Empty ? "Untitled" : mapName,
+            mapDisplayer.urlProperty,
+            51.1,
+            51.1,
+            mapDisplayer.Width,
+            mapDisplayer.Height,
+            new MapStructures(outpostGridPositions, victoryPointGridPositions, castleGridPositions));
     }
 
     // Upload the map data to Firebase Database and initiate the upload of the map image
-    public void UploadMapData()
+    public void UploadMapData(string mapName)
     {
         if (!_isInitialized)
         {
@@ -61,36 +77,12 @@ public class MapDataFirebaseManager : MonoBehaviour
             return;
         }
 
-        MapMetaDataNew mapMetaDataNew = PrepareMapMetaData();
-        Texture2D mapImage = MapWithOverlay.GetComponent<CreateMapWithOverlay>().GetLowResTextureForTilemapCreation();
-        var (outpostString, outpostGridPositions) = OutpostCounter.SavePlacedStructures(); 
-        var (victoryPointString, victoryPointGridPositions) = VictoryPointCounter.SavePlacedStructures(); 
-        var (castleString, castleGridPositions) = CastleCounter.SavePlacedStructures();
+        MapMetaDataNew mapMetaDataNew = PrepareMapMetaData(mapName);
+        Texture2D mapImage = MapWithOverlay.GetLowResTextureForTilemapCreation();
         
         string json = JsonUtility.ToJson(mapMetaDataNew);
-        _database.GetReference($"{PlayerGuid}/{mapMetaDataNew.MapId}/").SetRawJsonValueAsync(json);
-
-        for (int i = 0; i < outpostGridPositions.Count; i++)
-        {
-            SerializedVector3Int gridPosition = new SerializedVector3Int(outpostGridPositions[i]);
-            json = JsonUtility.ToJson(gridPosition);
-            _database.GetReference($"{PlayerGuid}/{mapMetaDataNew.MapId}/{outpostString}/{i}").SetRawJsonValueAsync(json);
-        }
-
-        for (int i = 0; i < victoryPointGridPositions.Count; i++)
-        {
-            SerializedVector3Int gridPosition = new SerializedVector3Int(victoryPointGridPositions[i]);
-            json = JsonUtility.ToJson(gridPosition);
-            _database.GetReference($"{PlayerGuid}/{mapMetaDataNew.MapId}/{victoryPointString}/{i}").SetRawJsonValueAsync(json);
-        }
-
-        for (int i = 0; i < castleGridPositions.Count; i++)
-        {
-            SerializedVector3Int gridPosition = new SerializedVector3Int(castleGridPositions[i]);
-            json = JsonUtility.ToJson(gridPosition);
-            _database.GetReference($"{PlayerGuid}/{mapMetaDataNew.MapId}/{castleString}/{i}").SetRawJsonValueAsync(json);
-        }
-
+        _database.GetReference($"{FirebaseConstants.MAP_DATA_FOLDER}/{mapMetaDataNew.MapId}/").SetRawJsonValueAsync(json);
+        
         StartUploadMapImage(mapMetaDataNew, mapImage);
     }
 
@@ -109,7 +101,7 @@ public class MapDataFirebaseManager : MonoBehaviour
     // Upload the map image to Firebase Storage
     private IEnumerator UploadMapImage(MapMetaDataNew mapMetaDataNew, Texture2D image)
     {
-        var imageReference = _storage.GetReference($"/{PlayerGuid}/{mapMetaDataNew.MapId}.png");
+        var imageReference = _storage.GetReference($"/{FirebaseConstants.MAP_IMAGES_FOLDER}/{mapMetaDataNew.MapId}.png");
         var bytes = image.EncodeToPNG();
         var uploadTask = imageReference.PutBytesAsync(bytes);
         yield return new WaitUntil(() => uploadTask.IsCompleted);
@@ -117,6 +109,7 @@ public class MapDataFirebaseManager : MonoBehaviour
         if (uploadTask.Exception != null)
         {
             Debug.LogError($"Failed to upload because {uploadTask.Exception}");
+            OnMapUploadFailed.Invoke();
             yield break;
         }
 
@@ -125,10 +118,12 @@ public class MapDataFirebaseManager : MonoBehaviour
 
         if (getUrlTask.Exception != null)
         {
+            OnMapUploadFailed.Invoke();
             Debug.LogError($"Failed to get URL because {getUrlTask.Exception}");
             yield break;
         }
 
+        OnMapUploaded.Invoke();
         Debug.Log($"Uploaded to {getUrlTask.Result}");
     }
 
@@ -140,9 +135,9 @@ public class MapDataFirebaseManager : MonoBehaviour
             Debug.LogError("Firebase is not initialized");
             return;
         }
-
-        _database.GetReference($"{PlayerGuid}/{mapId}/").RemoveValueAsync();
-        var imageReference = _storage.GetReference($"/{PlayerGuid}/{mapId}.png");
+        
+        var imageReference = _storage.GetReference($"/{FirebaseConstants.MAP_IMAGES_FOLDER}/{mapId}.png");
+        _database.GetReference($"/{FirebaseConstants.MAP_DATA_FOLDER}/{mapId}/").RemoveValueAsync();
         imageReference.DeleteAsync();
 
         // TODO check if the map data is successfully deleted

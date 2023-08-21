@@ -107,7 +107,7 @@ public class MapPicker : MonoBehaviour
         var tasks = mapDatas.Select(async mapData =>
         {
             Debug.Log(mapData.MetaData.MapId);
-            var imageReference = storageReference.Child($"{FirebaseConstants.MAP_FOLDER}/{mapData.MetaData.MapId}.jpg");
+            var imageReference = storageReference.Child($"{FirebaseConstants.MAP_IMAGES_FOLDER}/{mapData.MetaData.MapId}.jpg");
             var imageBytes = await imageReference.GetBytesAsync(FirebaseConstants.MAX_MAP_SIZE);
             Texture2D texture = new Texture2D(mapData.MetaData.Width, mapData.MetaData.Height); 
             texture.LoadImage(imageBytes);
