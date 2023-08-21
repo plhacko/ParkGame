@@ -271,7 +271,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hostMenuSceneName: PrepareGameMenu
-  createMapMenuSceneName: UploadMapMenu
+  createMapMenuSceneName: ZoomableMap
   joinButton: {fileID: 1812615310}
   hostButton: {fileID: 650524174}
   createMapButton: {fileID: 465597359}

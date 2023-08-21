@@ -82,24 +82,8 @@ public class MapDisplayer : MonoBehaviour
             if (mapboxData != null)
                 accessToken = mapboxData.AccessToken;
         }
-    }
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        //InitiateMapRequest();
-    }
-
-
-    private void OnValidate()
-    {
-        if (Application.isPlaying)
-            InitiateMapRequest();
-    }
-
-    void Update()
-    {
-
+        
+        InitiateMapRequest();
     }
 
     private void OnEnable()

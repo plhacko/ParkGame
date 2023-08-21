@@ -13,7 +13,7 @@ namespace UI.Lobby
      * This class is responsible for the UI of the Join Game menu.
      * Player can join a game here with a room code or start hosting a new game.
      */ 
-    public class JoinMenuController : MonoBehaviour
+    public class MainMenuController : MonoBehaviour
     {
         [SerializeField] private string hostMenuSceneName;
         [SerializeField] private string createMapMenuSceneName;
