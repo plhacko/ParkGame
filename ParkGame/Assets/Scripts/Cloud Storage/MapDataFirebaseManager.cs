@@ -46,10 +46,10 @@ public class MapDataFirebaseManager : MonoBehaviour
         });
     }
 
-    private MapMetaData PrepareMapMetaData()
+    private MapMetaDataNew PrepareMapMetaData()
     {
         MapDisplayer mapDisplayer = MapWithOverlay.GetFetchedMap().GetComponent<MapDisplayer>();
-        return new MapMetaData(PlayerGuid, Guid.NewGuid(), "map name", mapDisplayer.urlProperty);
+        return new MapMetaDataNew(PlayerGuid, Guid.NewGuid(), "map name", mapDisplayer.urlProperty);
     }
 
     // Upload the map data to Firebase Database and initiate the upload of the map image
@@ -61,41 +61,41 @@ public class MapDataFirebaseManager : MonoBehaviour
             return;
         }
 
-        MapMetaData mapMetaData = PrepareMapMetaData();
+        MapMetaDataNew mapMetaDataNew = PrepareMapMetaData();
         Texture2D mapImage = MapWithOverlay.GetComponent<CreateMapWithOverlay>().GetLowResTextureForTilemapCreation();
         var (outpostString, outpostGridPositions) = OutpostCounter.SavePlacedStructures(); 
         var (victoryPointString, victoryPointGridPositions) = VictoryPointCounter.SavePlacedStructures(); 
         var (castleString, castleGridPositions) = CastleCounter.SavePlacedStructures();
         
-        string json = JsonUtility.ToJson(mapMetaData);
-        _database.GetReference($"{PlayerGuid}/{mapMetaData.MapId}/").SetRawJsonValueAsync(json);
+        string json = JsonUtility.ToJson(mapMetaDataNew);
+        _database.GetReference($"{PlayerGuid}/{mapMetaDataNew.MapId}/").SetRawJsonValueAsync(json);
 
         for (int i = 0; i < outpostGridPositions.Count; i++)
         {
             SerializedVector3Int gridPosition = new SerializedVector3Int(outpostGridPositions[i]);
             json = JsonUtility.ToJson(gridPosition);
-            _database.GetReference($"{PlayerGuid}/{mapMetaData.MapId}/{outpostString}/{i}").SetRawJsonValueAsync(json);
+            _database.GetReference($"{PlayerGuid}/{mapMetaDataNew.MapId}/{outpostString}/{i}").SetRawJsonValueAsync(json);
         }
 
         for (int i = 0; i < victoryPointGridPositions.Count; i++)
         {
             SerializedVector3Int gridPosition = new SerializedVector3Int(victoryPointGridPositions[i]);
             json = JsonUtility.ToJson(gridPosition);
-            _database.GetReference($"{PlayerGuid}/{mapMetaData.MapId}/{victoryPointString}/{i}").SetRawJsonValueAsync(json);
+            _database.GetReference($"{PlayerGuid}/{mapMetaDataNew.MapId}/{victoryPointString}/{i}").SetRawJsonValueAsync(json);
         }
 
         for (int i = 0; i < castleGridPositions.Count; i++)
         {
             SerializedVector3Int gridPosition = new SerializedVector3Int(castleGridPositions[i]);
             json = JsonUtility.ToJson(gridPosition);
-            _database.GetReference($"{PlayerGuid}/{mapMetaData.MapId}/{castleString}/{i}").SetRawJsonValueAsync(json);
+            _database.GetReference($"{PlayerGuid}/{mapMetaDataNew.MapId}/{castleString}/{i}").SetRawJsonValueAsync(json);
         }
 
-        StartUploadMapImage(mapMetaData, mapImage);
+        StartUploadMapImage(mapMetaDataNew, mapImage);
     }
 
     // Initiate the upload of the map image to Firebase Storage
-    private void StartUploadMapImage(MapMetaData mapMetaData, Texture2D mapImage)
+    private void StartUploadMapImage(MapMetaDataNew mapMetaDataNew, Texture2D mapImage)
     {
         if (!_isInitialized)
         {
@@ -103,13 +103,13 @@ public class MapDataFirebaseManager : MonoBehaviour
             return;
         }
 
-        StartCoroutine(UploadMapImage(mapMetaData, mapImage));
+        StartCoroutine(UploadMapImage(mapMetaDataNew, mapImage));
     }
 
     // Upload the map image to Firebase Storage
-    private IEnumerator UploadMapImage(MapMetaData mapMetaData, Texture2D image)
+    private IEnumerator UploadMapImage(MapMetaDataNew mapMetaDataNew, Texture2D image)
     {
-        var imageReference = _storage.GetReference($"/{PlayerGuid}/{mapMetaData.MapId}.png");
+        var imageReference = _storage.GetReference($"/{PlayerGuid}/{mapMetaDataNew.MapId}.png");
         var bytes = image.EncodeToPNG();
         var uploadTask = imageReference.PutBytesAsync(bytes);
         yield return new WaitUntil(() => uploadTask.IsCompleted);

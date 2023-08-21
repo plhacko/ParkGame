@@ -267,17 +267,17 @@ namespace Managers
             var databaseReference = FirebaseDatabase.DefaultInstance.RootReference;
         
             DataSnapshot dataSnapshot = await databaseReference.Child(FirebaseConstants.MAP_DATA_FOLDER).Child(mapId.Value.ToString()).GetValueAsync();
-            MapMetaData mapMetaData = JsonUtility.FromJson<MapMetaData>(dataSnapshot.GetRawJsonValue());
+            MapMetaData mapMetaDataNew = JsonUtility.FromJson<MapMetaData>(dataSnapshot.GetRawJsonValue());
 
-            var imageReference = storageReference.Child($"{FirebaseConstants.MAP_FOLDER}/{mapMetaData.MapId}.jpg");
+            var imageReference = storageReference.Child($"{FirebaseConstants.MAP_FOLDER}/{mapMetaDataNew.MapId}.jpg");
 
             var imageBytes = await imageReference.GetBytesAsync(FirebaseConstants.MAX_MAP_SIZE);
-            Texture2D texture = new Texture2D(mapMetaData.Width, mapMetaData.Height); 
+            Texture2D texture = new Texture2D(mapMetaDataNew.Width, mapMetaDataNew.Height); 
             texture.LoadImage(imageBytes);
            
             mapData = new MapData
             {
-                MetaData = mapMetaData,
+                MetaData = mapMetaDataNew,
                 Texture = texture
             };
             

@@ -1,13 +1,13 @@
 using System;
 
-public class MapMetaData
+public class MapMetaDataNew
 {
     public string OwnerId;
     public string MapId;
     public string MapQuery;
     public string MapName;
 
-    public MapMetaData(Guid ownerId, Guid mapId, string mapName, string mapQuery)
+    public MapMetaDataNew(Guid ownerId, Guid mapId, string mapName, string mapQuery)
     {
         OwnerId = ownerId.ToString();
         MapId = mapId.ToString();

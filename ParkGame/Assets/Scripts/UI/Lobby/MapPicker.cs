@@ -59,15 +59,15 @@ public class MapPicker : MonoBehaviour
     {
         if(currentMapIndex >= mapDatas.Count) return;
         
-        MapMetaData mapMetaData = mapDatas[currentMapIndex].MetaData;
+        MapMetaData mapMetaDataNew = mapDatas[currentMapIndex].MetaData;
         
         (double currentLongitude, double currentLatitude) = getCurrentGeoPosition();
-        double distance = getGeoDistance(currentLongitude, currentLatitude, mapMetaData.Longitude, mapMetaData.Latitude);
+        double distance = getGeoDistance(currentLongitude, currentLatitude, mapMetaDataNew.Longitude, mapMetaDataNew.Latitude);
 
         image.texture = mapDatas[currentMapIndex].Texture;
-        mapNameText.text = mapMetaData.MapName;
+        mapNameText.text = mapMetaDataNew.MapName;
         mapDistanceText.text = "(" +(distance / 1000).ToString("F1") + " km)";
-        maxNumTeamsText.text = "Max teams: " + mapMetaData.NumTeams;
+        maxNumTeamsText.text = "Max teams: " + mapMetaDataNew.NumTeams;
     }
 
     private async void downloadMaps()
@@ -83,14 +83,14 @@ public class MapPicker : MonoBehaviour
         
         foreach (var mapDataDataSnapshot in dataSnapshot.Children)
         {
-            MapMetaData mapMetaData = JsonUtility.FromJson<MapMetaData>(mapDataDataSnapshot.GetRawJsonValue());
-            double distance = getGeoDistance(currentLongitude, currentLatitude, mapMetaData.Longitude, mapMetaData.Latitude);
+            MapMetaData mapMetaDataNew = JsonUtility.FromJson<MapMetaData>(mapDataDataSnapshot.GetRawJsonValue());
+            double distance = getGeoDistance(currentLongitude, currentLatitude, mapMetaDataNew.Longitude, mapMetaDataNew.Latitude);
             
             if (distance < maxDistance)
             {
                 MapData mapData = new MapData
                 {
-                    MetaData = mapMetaData
+                    MetaData = mapMetaDataNew
                 };
                 mapDatas.Add(mapData);   
             }

@@ -1,4 +1,3 @@
-using Managers;
 using TMPro;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
@@ -37,7 +36,7 @@ namespace UI.Lobby
         private void login()
         {
             PlayerPrefs.SetString("PlayerName", nameInputField.text);
-            SceneManager.LoadScene("JoinGameMenu", LoadSceneMode.Single);
+            SceneManager.LoadScene("MainMenu", LoadSceneMode.Single);
         }
     
         // Disable login button until the player has entered at least one character of their name
