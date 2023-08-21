@@ -29,6 +29,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/NavmeshMultiScene.unity
     guid: ad5bf916dc910114193cac26c7d75383
+  - enabled: 1
+    path: Assets/Scenes/MapDrawingScene.unity
+    guid: 42d96b4728ac76e4b9cb8611de8042cc
   m_configObjects:
     com.unity.adaptiveperformance.loader_settings: {fileID: 11400000, guid: 3ad410e226113ae45a953aa6554aea9c, type: 2}
     com.unity.adaptiveperformance.simulator.provider_settings: {fileID: 11400000, guid: 439bd770a0624a141bf5dfc5e420bfcc, type: 2}
