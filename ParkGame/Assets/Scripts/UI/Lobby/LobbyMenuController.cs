@@ -20,17 +20,22 @@ namespace UI.Lobby
         
         [SerializeField] private Button goBackButton;
         [SerializeField] private Button startGameButton;
-        [SerializeField] private RawImage mapPreviewImage;
         [SerializeField] private TextMeshProUGUI mapNameLabel;
         [SerializeField] private TextMeshProUGUI roomCodeLabel;
         [SerializeField] private LobbyTeamUI lobbyTeamUIPrefab;
-
+        [SerializeField] private RawImage drawnTexture;
+        [SerializeField] private RawImage gpsTexture;
+        
         [SerializeField] private RectTransform teamsParent;
         
         private readonly List<LobbyTeamUI> teamUIs = new();
 
+        private float maxImageSize;
+        
         private void Awake()
         {
+            maxImageSize = drawnTexture.rectTransform.sizeDelta.x;
+            
             // Enable start button for the host
             if (OurNetworkManager.Singleton.IsHost)
             {
@@ -126,7 +131,17 @@ namespace UI.Lobby
 
         private void initializeUI(MapData mapData)
         {
-            mapPreviewImage.texture = mapData.GPSTexture;
+            drawnTexture.texture = mapData.DrawnTexture;
+            gpsTexture.texture = mapData.GPSTexture;
+
+            gpsTexture.color = Color.white;
+            drawnTexture.color = Color.white;
+            
+            Vector2 imageSize = mapData.GetImageSize() * maxImageSize;
+
+            gpsTexture.rectTransform.sizeDelta = imageSize;
+            drawnTexture.rectTransform.sizeDelta = imageSize;
+            
             mapNameLabel.text = mapData.MetaData.MapName;
             for (int teamNumber = 0; teamNumber < mapData.MetaData.NumTeams; teamNumber++)
             {

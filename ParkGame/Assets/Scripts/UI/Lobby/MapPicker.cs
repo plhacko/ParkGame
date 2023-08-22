@@ -22,8 +22,18 @@ public static class FirebaseConstants
 public class MapData
 {
     public MapMetaDataNew MetaData;
-    public Texture2D CustomTexture;
+    public Texture2D DrawnTexture;
     public Texture2D GPSTexture;
+    
+    public Vector2 GetImageSize()
+    {
+        if (GPSTexture.width > GPSTexture.height)
+        {
+            return new Vector2(1, GPSTexture.height / (float)GPSTexture.width);
+        }
+        
+        return new Vector2(GPSTexture.width / (float)GPSTexture.height, 1);
+    }
 }
 
 public class MapPicker : MonoBehaviour
@@ -79,27 +89,20 @@ public class MapPicker : MonoBehaviour
     {
         if(currentMapIndex >= mapDatas.Count) return;
         
-        MapMetaDataNew mapMetaDataNew = mapDatas[currentMapIndex].MetaData;
+        MapData mapData = mapDatas[currentMapIndex];
+        MapMetaDataNew mapMetaDataNew = mapData.MetaData;
         
         (double currentLongitude, double currentLatitude) = getCurrentGeoPosition();
         double distance = getGeoDistance(currentLongitude, currentLatitude, mapMetaDataNew.Longitude, mapMetaDataNew.Latitude);
         
-        gpsTexture.texture = mapDatas[currentMapIndex].GPSTexture;
+        gpsTexture.texture = mapData.GPSTexture;
         gpsTexture.color = gpsTexture.texture == null ? Color.clear : Color.white;
         
-        drawnTexture.texture = mapDatas[currentMapIndex].CustomTexture;
+        drawnTexture.texture = mapData.DrawnTexture;
         drawnTexture.color = drawnTexture.texture == null ? Color.clear : Color.white;
 
-        Vector2 imageSize;
-        if (gpsTexture.texture.width > gpsTexture.texture.height)
-        {
-            imageSize = new Vector2(maxImageSize, maxImageSize * (gpsTexture.texture.height / (float)gpsTexture.texture.width));
-        }
-        else
-        {
-            imageSize = new Vector2(maxImageSize * (gpsTexture.texture.width / (float)gpsTexture.texture.height), maxImageSize);   
-        }
-        
+        Vector2 imageSize = mapData.GetImageSize() * maxImageSize;
+
         gpsTexture.rectTransform.sizeDelta = imageSize;
         drawnTexture.rectTransform.sizeDelta = imageSize;
 
@@ -132,7 +135,7 @@ public class MapPicker : MonoBehaviour
             var imageBytes = await imageReference.GetBytesAsync(FirebaseConstants.MAX_MAP_SIZE);
             Texture2D texture = new Texture2D(mapData.MetaData.Width, mapData.MetaData.Height);
             texture.LoadImage(imageBytes);
-            mapData.CustomTexture = texture;
+            mapData.DrawnTexture = texture;
         }
         catch (StorageException e)
         {
@@ -159,7 +162,7 @@ public class MapPicker : MonoBehaviour
 
     private void initializeUI()
     {
-        this.mapDatas = mapDatas.Where(mapData => mapData.CustomTexture != null).ToList();
+        this.mapDatas = mapDatas.Where(mapData => mapData.DrawnTexture != null).ToList();
         
         nextMapButton.interactable = this.mapDatas.Count >= 2;
         previousMapButton.interactable = this.mapDatas.Count >= 2;

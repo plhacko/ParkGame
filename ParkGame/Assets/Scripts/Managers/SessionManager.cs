@@ -280,7 +280,7 @@ namespace Managers
             mapData = new MapData
             {
                 MetaData = mapMetaDataNew,
-                CustomTexture = texture
+                DrawnTexture = texture
             };
 
             StartCoroutine(gpsTextureRequest(mapData));
