@@ -263,11 +263,11 @@ namespace Managers
         {
             await FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task => { Debug.Log(task.Status); });
             
-            var storageReference = FirebaseStorage.DefaultInstance.GetReferenceFromUrl(FirebaseConstants.STORAGE_URL);
+            var storageReference = FirebaseStorage.DefaultInstance.RootReference;
             var databaseReference = FirebaseDatabase.DefaultInstance.RootReference;
         
             DataSnapshot dataSnapshot = await databaseReference.Child(FirebaseConstants.MAP_DATA_FOLDER).Child(mapId.Value.ToString()).GetValueAsync();
-            MapMetaData mapMetaDataNew = JsonUtility.FromJson<MapMetaData>(dataSnapshot.GetRawJsonValue());
+            MapMetaDataNew mapMetaDataNew = JsonUtility.FromJson<MapMetaDataNew>(dataSnapshot.GetRawJsonValue());
 
             var imageReference = storageReference.Child($"{FirebaseConstants.MAP_IMAGES_FOLDER}/{mapMetaDataNew.MapId}.jpg");
 

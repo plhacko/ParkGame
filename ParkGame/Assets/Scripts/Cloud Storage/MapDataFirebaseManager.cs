@@ -61,8 +61,8 @@ public class MapDataFirebaseManager : MonoBehaviour
             Guid.NewGuid(),
             mapName == string.Empty ? "Untitled" : mapName,
             mapDisplayer.urlProperty,
-            51.1,
-            51.1,
+            14.418540,
+            50.073658,
             mapDisplayer.Width,
             mapDisplayer.Height,
             new MapStructures(outpostGridPositions, victoryPointGridPositions, castleGridPositions));
@@ -78,6 +78,14 @@ public class MapDataFirebaseManager : MonoBehaviour
         }
 
         MapMetaDataNew mapMetaDataNew = PrepareMapMetaData(mapName);
+        if(mapMetaDataNew.Structures.Castles.Length is 0 or >= 4)
+        {
+            // TODO show error message to the user
+            // there must be at least 2 teams and maximum of 4 teams 
+            Debug.LogError("Map must have at least two castles"); 
+            return;
+        }
+        
         Texture2D mapImage = MapWithOverlay.GetLowResTextureForTilemapCreation();
         
         string json = JsonUtility.ToJson(mapMetaDataNew);

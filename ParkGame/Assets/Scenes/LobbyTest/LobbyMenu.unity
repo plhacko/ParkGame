@@ -753,7 +753,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eef77de0920f4cea8079dcda7616f236, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  joinMenuSceneName: JoinGameMenu
+  joinMenuSceneName: MainMenu
   goBackButton: {fileID: 1136283629}
   startGameButton: {fileID: 2080904514}
   mapPreviewImage: {fileID: 1408558079}
