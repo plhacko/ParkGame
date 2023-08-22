@@ -34,7 +34,7 @@ public class MapMetaDataNew
     public int Height;
     public MapStructures Structures;
     
-    public int NumTeams => Structures.Castles?.Length ?? 0;
+    public int NumTeams => Structures.Castles.Length;
 
     public MapMetaDataNew(Guid mapId, string mapName, string mapQuery, double longitude,
         double latitude, int width, int height, MapStructures structures)

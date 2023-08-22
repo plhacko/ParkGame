@@ -10,6 +10,14 @@ using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.UI;
 
+public static class FirebaseConstants
+{
+    public static string STORAGE_URL = "gs://theparkgame-97204.appspot.com";
+    public static string MAP_IMAGES_FOLDER = "MapImages";
+    public static string MAP_DATA_FOLDER = "Maps";
+    public static long MAX_MAP_SIZE = 1024 * 1024 * 12; // 12M
+}
+
 public class MapData
 {
     public MapMetaDataNew MetaData;
