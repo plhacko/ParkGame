@@ -126,7 +126,7 @@ namespace UI.Lobby
 
         private void initializeUI(MapData mapData)
         {
-            mapPreviewImage.texture = mapData.Texture;
+            mapPreviewImage.texture = mapData.GPSTexture;
             mapNameLabel.text = mapData.MetaData.MapName;
             for (int teamNumber = 0; teamNumber < mapData.MetaData.NumTeams; teamNumber++)
             {

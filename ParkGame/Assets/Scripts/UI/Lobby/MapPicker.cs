@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -5,9 +6,9 @@ using Firebase;
 using Firebase.Database;
 using Firebase.Storage;
 using TMPro;
-using UI;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.UI;
 
 public static class FirebaseConstants
@@ -21,7 +22,8 @@ public static class FirebaseConstants
 public class MapData
 {
     public MapMetaDataNew MetaData;
-    public Texture2D Texture;
+    public Texture2D CustomTexture;
+    public Texture2D GPSTexture;
 }
 
 public class MapPicker : MonoBehaviour
@@ -29,10 +31,14 @@ public class MapPicker : MonoBehaviour
     [SerializeField] private float maxDistance; 
     [SerializeField] private Button nextMapButton;
     [SerializeField] private Button previousMapButton;
-    [SerializeField] private RawImage image;
+    [SerializeField] private RawImage drawnTexture;
+    [SerializeField] private RawImage gpsTexture;
     [SerializeField] private TextMeshProUGUI mapNameText;
     [SerializeField] private TextMeshProUGUI mapDistanceText;
     [SerializeField] private TextMeshProUGUI maxNumTeamsText;
+    private float maxImageSize;
+
+    public List<MapData> MapDatas => mapDatas;
     
     private DatabaseReference databaseReference;
     private StorageReference storageReference;
@@ -42,6 +48,12 @@ public class MapPicker : MonoBehaviour
 
     void Awake()
     {
+        gpsTexture.color = Color.clear;
+        drawnTexture.color = Color.clear;
+        nextMapButton.interactable = false;
+        previousMapButton.interactable = false;
+        maxImageSize = drawnTexture.rectTransform.sizeDelta.x;
+        
         nextMapButton.onClick.AddListener(onNextClicked);
         previousMapButton.onClick.AddListener(onPreviousClicked);
         downloadMaps();
@@ -72,12 +84,93 @@ public class MapPicker : MonoBehaviour
         (double currentLongitude, double currentLatitude) = getCurrentGeoPosition();
         double distance = getGeoDistance(currentLongitude, currentLatitude, mapMetaDataNew.Longitude, mapMetaDataNew.Latitude);
         
-        image.texture = mapDatas[currentMapIndex].Texture;
+        gpsTexture.texture = mapDatas[currentMapIndex].GPSTexture;
+        gpsTexture.color = gpsTexture.texture == null ? Color.clear : Color.white;
+        
+        drawnTexture.texture = mapDatas[currentMapIndex].CustomTexture;
+        drawnTexture.color = drawnTexture.texture == null ? Color.clear : Color.white;
+
+        Vector2 imageSize;
+        if (gpsTexture.texture.width > gpsTexture.texture.height)
+        {
+            imageSize = new Vector2(maxImageSize, maxImageSize * (gpsTexture.texture.height / (float)gpsTexture.texture.width));
+        }
+        else
+        {
+            imageSize = new Vector2(maxImageSize * (gpsTexture.texture.width / (float)gpsTexture.texture.height), maxImageSize);   
+        }
+        
+        gpsTexture.rectTransform.sizeDelta = imageSize;
+        drawnTexture.rectTransform.sizeDelta = imageSize;
+
         mapNameText.text = mapMetaDataNew.MapName;
         mapDistanceText.text = "(" +(distance / 1000).ToString("F1") + " km)";
         maxNumTeamsText.text = "Max teams: " + mapMetaDataNew.NumTeams;
     }
 
+    IEnumerator gpsTextureRequest(MapData mapData)
+    {
+        UnityWebRequest request = UnityWebRequestTexture.GetTexture(mapData.MetaData.MapQuery);
+        yield return request.SendWebRequest();
+
+        if (request.result != UnityWebRequest.Result.Success)
+        {
+            Debug.LogWarning("API Request error: " + request.error);
+        }
+        else
+        {
+            Texture2D texture = DownloadHandlerTexture.GetContent(request);
+            mapData.GPSTexture = texture;
+        }
+    }
+    
+    async Task drawTextureRequest(MapData mapData)
+    {
+        var imageReference = storageReference.Child($"{FirebaseConstants.MAP_IMAGES_FOLDER}/{mapData.MetaData.MapId}.png");
+        try
+        {
+            var imageBytes = await imageReference.GetBytesAsync(FirebaseConstants.MAX_MAP_SIZE);
+            Texture2D texture = new Texture2D(mapData.MetaData.Width, mapData.MetaData.Height);
+            texture.LoadImage(imageBytes);
+            mapData.CustomTexture = texture;
+        }
+        catch (StorageException e)
+        {
+            Debug.LogWarning(mapData.MetaData.MapName + " " + mapData.MetaData.MapId + " " + e.Message);
+        }
+    }
+
+    IEnumerator downloadTextures()
+    {
+        var requests = new List<Coroutine>(mapDatas.Count);
+        requests.AddRange(mapDatas.Select(mapData => StartCoroutine(gpsTextureRequest(mapData))));
+
+        foreach (var request in requests)
+        {
+            yield return request;
+        }
+
+        gpsTexturesInit = true;
+        if (drawTexturesInit)
+        {
+            initializeUI();
+        }
+    }
+
+    private void initializeUI()
+    {
+        this.mapDatas = mapDatas.Where(mapData => mapData.CustomTexture != null).ToList();
+        
+        nextMapButton.interactable = this.mapDatas.Count >= 2;
+        previousMapButton.interactable = this.mapDatas.Count >= 2;
+        currentMapIndex = 0;
+
+        showCurrentMap();
+    }
+
+    private bool gpsTexturesInit;
+    private bool drawTexturesInit;
+    
     private async void downloadMaps()
     {
         (double currentLongitude, double currentLatitude) = getCurrentGeoPosition();
@@ -111,34 +204,17 @@ public class MapPicker : MonoBehaviour
             double distance1 = getGeoDistance(currentLongitude, currentLatitude, mapData1.MetaData.Longitude, mapData1.MetaData.Latitude);
             return distance.CompareTo(distance1);
         });
-
-        var tasks = mapDatas.Select(async mapData =>
-        {
-            var imageReference = storageReference.Child($"{FirebaseConstants.MAP_IMAGES_FOLDER}/{mapData.MetaData.MapId}.png");
-            try
-            {
-                var imageBytes = await imageReference.GetBytesAsync(FirebaseConstants.MAX_MAP_SIZE);
-                Texture2D texture = new Texture2D(mapData.MetaData.Width, mapData.MetaData.Height); 
-                texture.LoadImage(imageBytes);
-                mapData.Texture = texture;
-            }
-            catch (StorageException e)
-            {
-                Debug.LogWarning(mapData.MetaData.MapName + " " + mapData.MetaData.MapId + " " + e.Message);
-            }
-
-        }).ToArray();
-
-        await Task.WhenAll(tasks);
-
-        mapDatas = mapDatas.Where(mapData => mapData.Texture != null).ToList();
         
-        nextMapButton.interactable = true;
-        previousMapButton.interactable = true;
-
-        currentMapIndex = 0;
-        image.color = Color.white;
-        showCurrentMap();
+        StartCoroutine(downloadTextures());
+        
+        var tasks = mapDatas.Select(drawTextureRequest).ToArray();
+        await Task.WhenAll(tasks);
+        
+        drawTexturesInit = true;
+        if (gpsTexturesInit)
+        {
+            initializeUI();
+        }
     }
 
     private (double, double) getCurrentGeoPosition()

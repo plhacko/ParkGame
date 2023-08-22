@@ -38,6 +38,7 @@ namespace UI.Lobby
         {
             createButton.onClick.AddListener(createGame);
             backButton.onClick.AddListener(backJoinGameScene);
+            setInteractable(false);
         }
 
         private void Update()
@@ -87,7 +88,7 @@ namespace UI.Lobby
         private void setInteractable(bool interactable)
         {
             backButton.interactable = interactable;
-            createButton.interactable = interactable;
+            createButton.interactable = interactable && mapPicker.MapDatas.Count > 0;
         }
     }
 }

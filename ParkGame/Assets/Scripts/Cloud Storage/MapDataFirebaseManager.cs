@@ -49,7 +49,7 @@ public class MapDataFirebaseManager : MonoBehaviour
         });
     }
 
-    private MapMetaDataNew PrepareMapMetaData(string mapName)
+    private MapMetaDataNew PrepareMapMetaData(string mapName, Texture2D drawTexture)
     {
         MapDisplayer mapDisplayer = MapWithOverlay.GetFetchedMap().GetComponent<MapDisplayer>();
         
@@ -63,8 +63,8 @@ public class MapDataFirebaseManager : MonoBehaviour
             mapDisplayer.urlProperty,
             14.418540,
             50.073658,
-            mapDisplayer.Width,
-            mapDisplayer.Height,
+            drawTexture.width,
+            drawTexture.height,
             new MapStructures(outpostGridPositions, victoryPointGridPositions, castleGridPositions));
     }
 
@@ -77,7 +77,9 @@ public class MapDataFirebaseManager : MonoBehaviour
             return;
         }
 
-        MapMetaDataNew mapMetaDataNew = PrepareMapMetaData(mapName);
+        Texture2D mapImage = MapWithOverlay.GetLowResTextureForTilemapCreation();
+        
+        MapMetaDataNew mapMetaDataNew = PrepareMapMetaData(mapName, mapImage);
         if(mapMetaDataNew.Structures.Castles.Length is 0 or >= 4)
         {
             // TODO show error message to the user
@@ -86,7 +88,6 @@ public class MapDataFirebaseManager : MonoBehaviour
             return;
         }
         
-        Texture2D mapImage = MapWithOverlay.GetLowResTextureForTilemapCreation();
         
         string json = JsonUtility.ToJson(mapMetaDataNew);
         _database.GetReference($"{FirebaseConstants.MAP_DATA_FOLDER}/{mapMetaDataNew.MapId}/").SetRawJsonValueAsync(json);

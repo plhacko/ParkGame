@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Firebase;
@@ -8,6 +9,7 @@ using UI;
 using UI.Lobby;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 
 namespace Managers
@@ -269,7 +271,7 @@ namespace Managers
             DataSnapshot dataSnapshot = await databaseReference.Child(FirebaseConstants.MAP_DATA_FOLDER).Child(mapId.Value.ToString()).GetValueAsync();
             MapMetaDataNew mapMetaDataNew = JsonUtility.FromJson<MapMetaDataNew>(dataSnapshot.GetRawJsonValue());
 
-            var imageReference = storageReference.Child($"{FirebaseConstants.MAP_IMAGES_FOLDER}/{mapMetaDataNew.MapId}.jpg");
+            var imageReference = storageReference.Child($"{FirebaseConstants.MAP_IMAGES_FOLDER}/{mapMetaDataNew.MapId}.png");
 
             var imageBytes = await imageReference.GetBytesAsync(FirebaseConstants.MAX_MAP_SIZE);
             Texture2D texture = new Texture2D(mapMetaDataNew.Width, mapMetaDataNew.Height); 
@@ -278,8 +280,26 @@ namespace Managers
             mapData = new MapData
             {
                 MetaData = mapMetaDataNew,
-                Texture = texture
+                CustomTexture = texture
             };
+
+            StartCoroutine(gpsTextureRequest(mapData));
+        }
+        
+        IEnumerator gpsTextureRequest(MapData mapData)
+        {
+            UnityWebRequest request = UnityWebRequestTexture.GetTexture(mapData.MetaData.MapQuery);
+            yield return request.SendWebRequest();
+
+            if (request.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogWarning("API Request error: " + request.error);
+            }
+            else
+            {
+                Texture2D texture = DownloadHandlerTexture.GetContent(request);
+                mapData.GPSTexture = texture;
+            }
             
             OnMapReceived?.Invoke(mapData);
         }
