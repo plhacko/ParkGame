@@ -42,8 +42,15 @@ public class MapDataFirebaseManager : MonoBehaviour
             else
             {
                 _isInitialized = true;
+                
+#if UNITY_EDITOR // Unity sometimes crashes when Firebase Persistence is Enabled and two editors use it 
+                // FirebaseStorage.DefaultInstance.SetPersistenceEnabled(false);
+                FirebaseDatabase.DefaultInstance.SetPersistenceEnabled(false);
+#endif
+                
                 _database = FirebaseDatabase.DefaultInstance;
                 _storage = FirebaseStorage.DefaultInstance;
+
                 OnInitialize.Invoke();
             }
         });

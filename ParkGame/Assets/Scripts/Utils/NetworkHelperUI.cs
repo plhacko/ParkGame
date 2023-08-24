@@ -1,22 +1,11 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using Firebase;
-using Firebase.Database;
-using Firebase.Storage;
 using Managers;
-using Player;
-using TMPro;
 using Unity.Netcode;
-using Unity.Netcode.Transports.UTP;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
-using Unity.Services.Relay;
-using Unity.Services.Relay.Models;
 using UnityEngine;
-using UnityEngine.Networking;
-using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 namespace Utils
 {
@@ -34,8 +23,8 @@ namespace Utils
     public class NetworkHelperUI : MonoBehaviour
     {
         [SerializeField] private string mapId;
-        [SerializeField] private List<PlayerDataDebug> clients = new List<PlayerDataDebug>();
-
+        [SerializeField] private List<PlayerDataDebug> clients = new();
+        [SerializeField] private Button spawnPlayersButton; 
         private PlayerManager playerManager;
         private bool isDebugging;
         
@@ -75,7 +64,6 @@ namespace Utils
             NetworkManager.Singleton.StartServer();
         }
 
-
         public void StartHost()
         {
             OurNetworkManager.Singleton.SetServerState(ServerState.Debug);
@@ -85,8 +73,6 @@ namespace Utils
 
         private async void startHost(MapData mapData)
         {
-            Debug.Log("Map received " + mapData.MetaData.MapName);
-                
             bool success = await OurNetworkManager.Singleton.HostGame(mapData, clients[0].Name, clients[0].Team, false);
             
             if (success)
@@ -101,8 +87,9 @@ namespace Utils
             
             SessionManager.Singleton.OnMapReceived -= startHost;
             OurNetworkManager.Singleton.SetServerState(ServerState.Debug);
+            spawnPlayersButton.gameObject.SetActive(true);
         }
-        
+
         public async void StartClient()
         {
             string joinCode = PlayerPrefs.GetString("DebugRoomCode", "");

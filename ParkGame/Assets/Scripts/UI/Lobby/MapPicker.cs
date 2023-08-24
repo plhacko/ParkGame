@@ -179,10 +179,20 @@ public class MapPicker : MonoBehaviour
     {
         (double currentLongitude, double currentLatitude) = getCurrentGeoPosition();
 
-        await FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task => { Debug.Log(task.Status); });
+        await FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task =>
+        {
+            
+#if UNITY_EDITOR // Unity sometimes crashes when Firebase Persistence is Enabled and two editors use it 
+            // FirebaseStorage.DefaultInstance.SetPersistenceEnabled(false);
+            FirebaseDatabase.DefaultInstance.SetPersistenceEnabled(false);
+#endif
         
-        storageReference = FirebaseStorage.DefaultInstance.RootReference;
-        databaseReference = FirebaseDatabase.DefaultInstance.RootReference;
+            storageReference = FirebaseStorage.DefaultInstance.RootReference;
+            databaseReference = FirebaseDatabase.DefaultInstance.RootReference;
+            Debug.Log(task.Status);
+        });
+
+
         
         DataSnapshot dataSnapshot = await databaseReference.Child(FirebaseConstants.MAP_DATA_FOLDER).GetValueAsync();
         

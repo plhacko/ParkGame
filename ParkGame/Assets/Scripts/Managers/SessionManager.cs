@@ -263,8 +263,21 @@ namespace Managers
 
         public async void DownloadMapData(Guid mapId)
         {
-            await FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task => { Debug.Log(task.Status); });
-            
+            await FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task =>
+            {
+                if (task.Exception != null)
+                {
+                    Debug.LogError($"Failed to intialize Firebase with {task.Exception}");
+                    return;
+                }
+                   
+#if UNITY_EDITOR // Unity sometimes crashes when Firebase Persistence is Enabled and two editors use it 
+                // FirebaseStorage.DefaultInstance.SetPersistenceEnabled(false);
+                FirebaseDatabase.DefaultInstance.SetPersistenceEnabled(false);
+#endif
+                Debug.Log(task.Status);
+            });
+
             var storageReference = FirebaseStorage.DefaultInstance.RootReference;
             var databaseReference = FirebaseDatabase.DefaultInstance.RootReference;
         
