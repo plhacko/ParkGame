@@ -95,6 +95,7 @@ namespace UI.Lobby
         // Enable or disable all buttons
         private void enableButtons(bool isInteractable)
         {
+            createMapButton.interactable = isInteractable;
             joinButton.interactable = isInteractable;
             hostButton.interactable = isInteractable;
             joinCodeInputField.interactable = isInteractable;

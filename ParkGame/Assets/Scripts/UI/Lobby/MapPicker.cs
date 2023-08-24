@@ -57,6 +57,9 @@ public class MapPicker : MonoBehaviour
     private List<MapData> mapDatas = new();
     private int currentMapIndex = -1;
 
+    private bool gpsTexturesInit;
+    private bool drawTexturesInit;
+    
     void Awake()
     {
         gpsTexture.color = Color.clear;
@@ -165,16 +168,13 @@ public class MapPicker : MonoBehaviour
     {
         this.mapDatas = mapDatas.Where(mapData => mapData.DrawnTexture != null).ToList();
         
-        nextMapButton.interactable = this.mapDatas.Count >= 2;
-        previousMapButton.interactable = this.mapDatas.Count >= 2;
-        currentMapIndex = 0;
+        nextMapButton.interactable = mapDatas.Count >= 2;
+        previousMapButton.interactable = mapDatas.Count >= 2;
+        currentMapIndex = mapDatas.Count > 1 ? 0 : -1;
 
         showCurrentMap();
     }
 
-    private bool gpsTexturesInit;
-    private bool drawTexturesInit;
-    
     private async void downloadMaps()
     {
         (double currentLongitude, double currentLatitude) = getCurrentGeoPosition();

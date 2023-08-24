@@ -1,28 +1,11 @@
 using System;
-using System.Collections.Generic;
 using Managers;
-using Unity.Collections;
-using Unity.Netcode;
-using Unity.Netcode.Transports.UTP;
-using Unity.Services.Relay;
-using Unity.Services.Relay.Models;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace UI.Lobby
 {
-    /*
-     * It's the same as MapMetaData but with a string instead of FixedString64Bytes
-     * We need it because FixedString64Bytes doesn't serialize well in the unity editor
-     */
-    [Serializable]
-    public struct MapMetaDataUI
-    {
-        public string Name;
-        public int NumTeams;
-    }
-
     /*
      * This class is responsible for the UI where the host prepares the game - chooses a map to play
      */

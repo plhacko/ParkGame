@@ -64,6 +64,10 @@ namespace Utils
                     SessionManager.Singleton.PlayersData.UpdatePlayerData(clientPlayerData);   
                 }
             }
+            else
+            {
+                gameObject.SetActive(false);
+            }
         }
 
         public void StartServer()
