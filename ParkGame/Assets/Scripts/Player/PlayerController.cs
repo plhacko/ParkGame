@@ -36,11 +36,6 @@ namespace Player
             return FormationType;
         }
 
-        public void InitializePlayerId(Guid playerId)
-        {
-            this.ownerPlayerId = playerId;
-        }
-
         private void initialize()
         {
             spriteRenderer = GetComponent<SpriteRenderer>();
@@ -48,7 +43,6 @@ namespace Player
             FormationScript = GetComponent<Formation>();
             FormationType = FormationType.Free; // movement without navmesh
             
-
             if (!isActualOwner())
             {
                 xSpriteFlip.OnValueChanged += onXSpriteFlipChanged;
@@ -192,10 +186,22 @@ namespace Player
         public void InitializePlayerIdClientRpc(SerializedGuid serializedGuid, ClientRpcParams clientRpcParams = default)
         {
             if (IsHost) return;
-            ownerPlayerId = serializedGuid.Value;
+            
+            InitializePlayerId(serializedGuid.Value);
         }
+        
+        public void InitializePlayerId(Guid playerId)
+        {
+            ownerPlayerId = playerId;
 
-
+            var playerData = SessionManager.Singleton.PlayersData.GetPlayerData(ownerPlayerId);
+            
+            if (playerData != null)
+            {
+                Team = playerData.Value.Team;
+            }
+        }
+        
         void ICommander.ReportFollowing(GameObject go) => Units.Add(go);
         void ICommander.ReportUnfollowing(GameObject go) => Units.Remove(go);
 

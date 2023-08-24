@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,15 +14,15 @@ using UnityEngine.UI;
 
 public static class FirebaseConstants
 {
-    public static string STORAGE_URL = "gs://theparkgame-97204.appspot.com";
     public static string MAP_IMAGES_FOLDER = "MapImages";
     public static string MAP_DATA_FOLDER = "Maps";
     public static long MAX_MAP_SIZE = 1024 * 1024 * 12; // 12M
 }
 
+[Serializable]
 public class MapData
 {
-    public MapMetaDataNew MetaData;
+    public MapMetaData MetaData;
     public Texture2D DrawnTexture;
     public Texture2D GPSTexture;
     
@@ -90,10 +91,10 @@ public class MapPicker : MonoBehaviour
         if(currentMapIndex >= mapDatas.Count) return;
         
         MapData mapData = mapDatas[currentMapIndex];
-        MapMetaDataNew mapMetaDataNew = mapData.MetaData;
+        MapMetaData mapMetaData = mapData.MetaData;
         
         (double currentLongitude, double currentLatitude) = getCurrentGeoPosition();
-        double distance = getGeoDistance(currentLongitude, currentLatitude, mapMetaDataNew.Longitude, mapMetaDataNew.Latitude);
+        double distance = getGeoDistance(currentLongitude, currentLatitude, mapMetaData.Longitude, mapMetaData.Latitude);
         
         gpsTexture.texture = mapData.GPSTexture;
         gpsTexture.color = gpsTexture.texture == null ? Color.clear : Color.white;
@@ -106,9 +107,9 @@ public class MapPicker : MonoBehaviour
         gpsTexture.rectTransform.sizeDelta = imageSize;
         drawnTexture.rectTransform.sizeDelta = imageSize;
 
-        mapNameText.text = mapMetaDataNew.MapName;
+        mapNameText.text = mapMetaData.MapName;
         mapDistanceText.text = "(" +(distance / 1000).ToString("F1") + " km)";
-        maxNumTeamsText.text = "Max teams: " + mapMetaDataNew.NumTeams;
+        maxNumTeamsText.text = "Max teams: " + mapMetaData.NumTeams;
     }
 
     IEnumerator gpsTextureRequest(MapData mapData)
@@ -187,14 +188,14 @@ public class MapPicker : MonoBehaviour
         
         foreach (var mapDataDataSnapshot in dataSnapshot.Children)
         {
-            MapMetaDataNew mapMetaDataNew = JsonUtility.FromJson<MapMetaDataNew>(mapDataDataSnapshot.GetRawJsonValue());
-            double distance = getGeoDistance(currentLongitude, currentLatitude, mapMetaDataNew.Longitude, mapMetaDataNew.Latitude);
+            MapMetaData mapMetaData = JsonUtility.FromJson<MapMetaData>(mapDataDataSnapshot.GetRawJsonValue());
+            double distance = getGeoDistance(currentLongitude, currentLatitude, mapMetaData.Longitude, mapMetaData.Latitude);
             
             if (distance < maxDistance)
             {
                 MapData mapData = new MapData
                 {
-                    MetaData = mapMetaDataNew
+                    MetaData = mapMetaData
                 };
                 mapDatas.Add(mapData);   
             }

@@ -42,7 +42,10 @@ namespace UI.Lobby
             enableButtons(true);
             
             OurNetworkManager.Singleton.OnClientDisconnectCallback += onClientDisconnect;
-            joinCodeInputField.text = SessionManager.Singleton.RoomCode;
+
+            joinCodeInputField.text = SessionManager.Singleton.RoomCode != null
+                ? SessionManager.Singleton.RoomCode
+                : PlayerPrefs.GetString("DebugRoomCode", "");
         }
 
         private void OnDestroy()
@@ -76,7 +79,8 @@ namespace UI.Lobby
         {
             enableButtons(false);
             
-            bool joined = await OurNetworkManager.Singleton.JoinGame(joinCodeInputField.text);
+            string playerName = PlayerPrefs.GetString("PlayerName", "");
+            bool joined = await OurNetworkManager.Singleton.JoinGame(joinCodeInputField.text, playerName);
             if (joined)
             {
                 // Save the room code so the player can reconnect if they disconnect

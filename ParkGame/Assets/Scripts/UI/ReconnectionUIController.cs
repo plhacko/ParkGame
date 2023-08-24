@@ -70,7 +70,8 @@ namespace UI
         {
             reconnectButton.interactable = false;
 
-            bool joined = await OurNetworkManager.Singleton.JoinGame(SessionManager.Singleton.RoomCode);
+            string playerName = PlayerPrefs.GetString("PlayerName", "");
+            bool joined = await OurNetworkManager.Singleton.JoinGame(SessionManager.Singleton.RoomCode, playerName);
             if (!joined)
             {
                 SessionManager.Singleton.EndSessionAndGoToScene(joinGameSceneName);

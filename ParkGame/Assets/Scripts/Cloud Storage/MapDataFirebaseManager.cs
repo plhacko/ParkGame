@@ -49,7 +49,7 @@ public class MapDataFirebaseManager : MonoBehaviour
         });
     }
 
-    private MapMetaDataNew PrepareMapMetaData(string mapName, Texture2D drawTexture)
+    private MapMetaData PrepareMapMetaData(string mapName, Texture2D drawTexture)
     {
         MapDisplayer mapDisplayer = MapWithOverlay.GetFetchedMap().GetComponent<MapDisplayer>();
         
@@ -57,7 +57,7 @@ public class MapDataFirebaseManager : MonoBehaviour
         var (victoryPointString, victoryPointGridPositions) = VictoryPointCounter.SavePlacedStructures(); 
         var (castleString, castleGridPositions) = CastleCounter.SavePlacedStructures();
         
-        return new MapMetaDataNew(
+        return new MapMetaData(
             Guid.NewGuid(),
             mapName == string.Empty ? "Untitled" : mapName,
             mapDisplayer.urlProperty,
@@ -79,8 +79,8 @@ public class MapDataFirebaseManager : MonoBehaviour
 
         Texture2D mapImage = MapWithOverlay.GetLowResTextureForTilemapCreation();
         
-        MapMetaDataNew mapMetaDataNew = PrepareMapMetaData(mapName, mapImage);
-        if(mapMetaDataNew.Structures.Castles.Length is 0 or >= 4)
+        MapMetaData mapMetaData = PrepareMapMetaData(mapName, mapImage);
+        if(mapMetaData.Structures.Castles.Length is 0 or >= 4)
         {
             // TODO show error message to the user
             // there must be at least 2 teams and maximum of 4 teams 
@@ -89,14 +89,14 @@ public class MapDataFirebaseManager : MonoBehaviour
         }
         
         
-        string json = JsonUtility.ToJson(mapMetaDataNew);
-        _database.GetReference($"{FirebaseConstants.MAP_DATA_FOLDER}/{mapMetaDataNew.MapId}/").SetRawJsonValueAsync(json);
+        string json = JsonUtility.ToJson(mapMetaData);
+        _database.GetReference($"{FirebaseConstants.MAP_DATA_FOLDER}/{mapMetaData.MapId}/").SetRawJsonValueAsync(json);
         
-        StartUploadMapImage(mapMetaDataNew, mapImage);
+        StartUploadMapImage(mapMetaData, mapImage);
     }
 
     // Initiate the upload of the map image to Firebase Storage
-    private void StartUploadMapImage(MapMetaDataNew mapMetaDataNew, Texture2D mapImage)
+    private void StartUploadMapImage(MapMetaData mapMetaData, Texture2D mapImage)
     {
         if (!_isInitialized)
         {
@@ -104,13 +104,13 @@ public class MapDataFirebaseManager : MonoBehaviour
             return;
         }
 
-        StartCoroutine(UploadMapImage(mapMetaDataNew, mapImage));
+        StartCoroutine(UploadMapImage(mapMetaData, mapImage));
     }
 
     // Upload the map image to Firebase Storage
-    private IEnumerator UploadMapImage(MapMetaDataNew mapMetaDataNew, Texture2D image)
+    private IEnumerator UploadMapImage(MapMetaData mapMetaData, Texture2D image)
     {
-        var imageReference = _storage.GetReference($"/{FirebaseConstants.MAP_IMAGES_FOLDER}/{mapMetaDataNew.MapId}.png");
+        var imageReference = _storage.GetReference($"/{FirebaseConstants.MAP_IMAGES_FOLDER}/{mapMetaData.MapId}.png");
         var bytes = image.EncodeToPNG();
         var uploadTask = imageReference.PutBytesAsync(bytes);
         yield return new WaitUntil(() => uploadTask.IsCompleted);

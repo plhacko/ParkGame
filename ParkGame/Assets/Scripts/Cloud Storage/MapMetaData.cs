@@ -23,7 +23,8 @@ public class MapStructures
     }
 }
 
-public class MapMetaDataNew
+[Serializable]
+public class MapMetaData
 {
     public string MapId;
     public string MapQuery;
@@ -36,7 +37,7 @@ public class MapMetaDataNew
     
     public int NumTeams => Structures.Castles.Length;
 
-    public MapMetaDataNew(Guid mapId, string mapName, string mapQuery, double longitude,
+    public MapMetaData(Guid mapId, string mapName, string mapQuery, double longitude,
         double latitude, int width, int height, MapStructures structures)
     {
         MapId = mapId.ToString();

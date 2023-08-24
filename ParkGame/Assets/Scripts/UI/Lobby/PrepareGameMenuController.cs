@@ -59,28 +59,17 @@ namespace UI.Lobby
         private async void createGame()
         {
             setInteractable(false);
-            try
-            {
-                MapData mapData = mapPicker.GetCurrentMapData();
-                Allocation allocation = await RelayService.Instance.CreateAllocationAsync(mapData.MetaData.NumTeams * 4);
-                string joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
-                
-                string playerName = PlayerPrefs.GetString("PlayerName", "");
-                
-                SessionManager.Singleton.InitializeSession(playerName, mapData, joinCode);
-                OurNetworkManager.Singleton.GetComponent<UnityTransport>().SetHostRelayData(
-                    allocation.RelayServer.IpV4,
-                    (ushort)allocation.RelayServer.Port,
-                    allocation.AllocationIdBytes,
-                    allocation.Key,
-                    allocation.ConnectionData);
+            MapData mapData = mapPicker.GetCurrentMapData();
+            string playerName = PlayerPrefs.GetString("PlayerName", "");
             
-                OurNetworkManager.Singleton.StartHost();
-                OurNetworkManager.Singleton.SceneManager.LoadScene(lobbySceneName, LoadSceneMode.Single);
-            }
-            catch (RelayServiceException e)
+            bool success = await OurNetworkManager.Singleton.HostGame(mapData, playerName, -1);
+            if (success)
             {
-                Debug.LogWarning(e);
+                PlayerPrefs.SetString("DebugRoomCode", SessionManager.Singleton.RoomCode);
+                OurNetworkManager.Singleton.SceneManager.LoadScene(lobbySceneName, LoadSceneMode.Single);   
+            }
+            else
+            {
                 setInteractable(true);
             }
         }

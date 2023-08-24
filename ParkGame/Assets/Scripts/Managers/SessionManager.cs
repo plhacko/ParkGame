@@ -258,28 +258,28 @@ namespace Managers
         {
             if (IsHost) return;
             
-            downloadMapData(mapId);
+            DownloadMapData(mapId.Value);
         }
 
-        private async void downloadMapData(SerializedGuid mapId)
+        public async void DownloadMapData(Guid mapId)
         {
             await FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task => { Debug.Log(task.Status); });
             
             var storageReference = FirebaseStorage.DefaultInstance.RootReference;
             var databaseReference = FirebaseDatabase.DefaultInstance.RootReference;
         
-            DataSnapshot dataSnapshot = await databaseReference.Child(FirebaseConstants.MAP_DATA_FOLDER).Child(mapId.Value.ToString()).GetValueAsync();
-            MapMetaDataNew mapMetaDataNew = JsonUtility.FromJson<MapMetaDataNew>(dataSnapshot.GetRawJsonValue());
+            DataSnapshot dataSnapshot = await databaseReference.Child(FirebaseConstants.MAP_DATA_FOLDER).Child(mapId.ToString()).GetValueAsync();
+            MapMetaData mapMetaData = JsonUtility.FromJson<MapMetaData>(dataSnapshot.GetRawJsonValue());
 
-            var imageReference = storageReference.Child($"{FirebaseConstants.MAP_IMAGES_FOLDER}/{mapMetaDataNew.MapId}.png");
+            var imageReference = storageReference.Child($"{FirebaseConstants.MAP_IMAGES_FOLDER}/{mapMetaData.MapId}.png");
 
             var imageBytes = await imageReference.GetBytesAsync(FirebaseConstants.MAX_MAP_SIZE);
-            Texture2D texture = new Texture2D(mapMetaDataNew.Width, mapMetaDataNew.Height); 
+            Texture2D texture = new Texture2D(mapMetaData.Width, mapMetaData.Height); 
             texture.LoadImage(imageBytes);
            
             mapData = new MapData
             {
-                MetaData = mapMetaDataNew,
+                MetaData = mapMetaData,
                 DrawnTexture = texture
             };
 
@@ -326,14 +326,15 @@ namespace Managers
         }
 
         // Initializes the session with the host's data
-        public void InitializeSession(string hostName, MapData mapData, string roomCode)
+        public void InitializeSession(string hostName, int teamNumber, MapData mapData, string roomCode, bool resetData)
         {
-            PlayersData.ClearData();
+            if(resetData){ PlayersData.ClearData(); }
+            
             var hostData = new PlayerData
             {
                 ID = Guid.NewGuid(),
                 Name = hostName,
-                Team = -1
+                Team = teamNumber
             };
             
             PlayersData.InitializeLocalPlayerData(hostData);           
@@ -355,7 +356,7 @@ namespace Managers
                 hostData.Team = teamNumber;
                 
                 PlayersData.UpdatePlayerData(hostData);
-                OnTeamJoined.Invoke(LocalPlayerData.ID, oldTeam, teamNumber);
+                OnTeamJoined?.Invoke(LocalPlayerData.ID, oldTeam, teamNumber);
                 joinTeamClientRpc(new SerializedGuid(hostData.ID), teamNumber);
             }
             else

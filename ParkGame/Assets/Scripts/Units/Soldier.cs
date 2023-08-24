@@ -6,6 +6,7 @@ using Unity.Netcode.Components;
 using Managers;
 using System;
 using System.Windows.Input;
+using Player;
 using UnityEngine.AI;
 using static Formation;
 
@@ -55,8 +56,11 @@ public class Soldier : NetworkBehaviour, ISoldier
     public FormationType FormationType;
     //public Vector3 PositionToFollowInFormation; // circle formation
 
+    private PlayerManager playerManager;
+    
     private void Initialize()
     {
+        playerManager = FindObjectOfType<PlayerManager>();
         EnemyObserver = GetComponentInChildren<EnemyObserver>();
         SpriteRenderer = GetComponent<SpriteRenderer>();
         Animator = GetComponent<Animator>();
@@ -317,11 +321,10 @@ public class Soldier : NetworkBehaviour, ISoldier
     [ServerRpc(RequireOwnership = false)]
     public void RequestChangingCommanderToFollowServerRpc(ulong clientID)
     {
-        NetworkObject clientNO = NetworkManager.Singleton?.ConnectedClients[clientID]?.PlayerObject;
-        ITeamMember teamMember = clientNO.GetComponent<ITeamMember>();
-        if (teamMember != null && teamMember.Team == Team)
+        PlayerController playerController = playerManager.GetPlayerController(clientID);
+        if (playerController != null && playerController.Team == Team)
         {
-            SetCommanderToFollow(clientNO.gameObject.transform);
+            SetCommanderToFollow(playerController.gameObject.transform);
             if (SoldierBehaviour == SoldierBehaviour.Idle) {
                 SoldierBehaviour = SoldierBehaviour.Move;
             }
