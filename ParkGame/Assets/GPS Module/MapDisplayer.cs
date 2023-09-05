@@ -16,7 +16,7 @@ public class MapboxAccesToken
 public class MapDisplayer : MonoBehaviour
 {
     [Header("Request info")]
-    public string accessToken;
+    private string accessToken;
     public MapboxRequestType RequestType = MapboxRequestType.BoundingBox;
     public enum MapboxRequestType { Center, BoundingBox };
     public string urlProperty;
@@ -69,6 +69,9 @@ public class MapDisplayer : MonoBehaviour
     public float MaxLongitude = -77.028923f;
     public float MinLatitude = 38.892035f;
     public float MaxLatitude = 38.904192f;
+
+    [Header("Player Pointer")]
+    public GameObject playerPointer;
 
 
     private void Awake()
@@ -254,5 +257,10 @@ public class MapDisplayer : MonoBehaviour
         Vector3 yHeight = transform.localScale;
         yHeight.y = worldScreenHeight / height;
         transform.localScale = yHeight;
+    }
+
+    public void DisplayPlayerPointer(bool show)
+    {
+        playerPointer.SetActive(show);
     }
 }

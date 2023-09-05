@@ -56,6 +56,7 @@ public class CreateMapWithOverlay : MonoBehaviour
         if (fetchedMapRenderer.sprite != null)
         {
             Debug.Log("Map was fetched is now available.");
+            fetchedMap.transform.SetParent(transform.parent);
             SetMapOverlay(fetchedMapRenderer.sprite);
         }
         else
