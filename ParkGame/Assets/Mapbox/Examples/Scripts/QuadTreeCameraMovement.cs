@@ -10,6 +10,7 @@ namespace Mapbox.Examples
 	using System;
     using UnityEngine.UI;
 
+
     public class QuadTreeCameraMovement : MonoBehaviour
 	{
 		[SerializeField]
@@ -39,8 +40,12 @@ namespace Mapbox.Examples
 		// Select Region
 		private bool _selectingRegion = false;
 		public LineRenderer lineRenderer;
-		private Vector3 _initialMousePosition;
-		private Vector3 _currentMousePosition;
+		private Vector3 _firstCornerPosition;
+		private Vector3 _secondCornerPosition;
+
+		private Vector3 _initialPosition;
+
+		private Vector3 _lastPosition;
 
 		void Awake()
 		{
@@ -112,27 +117,27 @@ namespace Mapbox.Examples
 			if (Input.GetMouseButtonDown(0))
 			{
 				lineRenderer.positionCount = 4;
-				_initialMousePosition = Camera.main.ScreenToWorldPoint(mousePosition);
-				lineRenderer.SetPosition(0, new Vector3(_initialMousePosition.x, 0.1f, _initialMousePosition.z));
-				lineRenderer.SetPosition(1, new Vector3(_initialMousePosition.x, 0.1f, _initialMousePosition.z));
-				lineRenderer.SetPosition(2, new Vector3(_initialMousePosition.x, 0.1f, _initialMousePosition.z));
-				lineRenderer.SetPosition(3, new Vector3(_initialMousePosition.x, 0.1f, _initialMousePosition.z));
+				_firstCornerPosition = Camera.main.ScreenToWorldPoint(mousePosition);
+				lineRenderer.SetPosition(0, new Vector3(_firstCornerPosition.x, 0.1f, _firstCornerPosition.z));
+				lineRenderer.SetPosition(1, new Vector3(_firstCornerPosition.x, 0.1f, _firstCornerPosition.z));
+				lineRenderer.SetPosition(2, new Vector3(_firstCornerPosition.x, 0.1f, _firstCornerPosition.z));
+				lineRenderer.SetPosition(3, new Vector3(_firstCornerPosition.x, 0.1f, _firstCornerPosition.z));
 			}
 
 			if (Input.GetMouseButton(0))
 			{
-				_currentMousePosition = Camera.main.ScreenToWorldPoint(mousePosition);
-				lineRenderer.SetPosition(0, new Vector3(_initialMousePosition.x, 0.1f, _initialMousePosition.z));
-				lineRenderer.SetPosition(1, new Vector3(_currentMousePosition.x, 0.1f, _initialMousePosition.z));
-				lineRenderer.SetPosition(2, new Vector3(_currentMousePosition.x, 0.1f, _currentMousePosition.z));
-				lineRenderer.SetPosition(3, new Vector3(_initialMousePosition.x, 0.1f, _currentMousePosition.z));
+				_secondCornerPosition = Camera.main.ScreenToWorldPoint(mousePosition);
+				lineRenderer.SetPosition(0, new Vector3(_firstCornerPosition.x, 0.1f, _firstCornerPosition.z));
+				lineRenderer.SetPosition(1, new Vector3(_secondCornerPosition.x, 0.1f, _firstCornerPosition.z));
+				lineRenderer.SetPosition(2, new Vector3(_secondCornerPosition.x, 0.1f, _secondCornerPosition.z));
+				lineRenderer.SetPosition(3, new Vector3(_firstCornerPosition.x, 0.1f, _secondCornerPosition.z));
 			}
         }
 
 		public Vector4 GetSelectedRegionBoundingBox()
 		{
-			var initialLatLong = _mapManager.WorldToGeoPosition(_initialMousePosition);
-			var currentLatLong = _mapManager.WorldToGeoPosition(_currentMousePosition);
+			var initialLatLong = _mapManager.WorldToGeoPosition(_firstCornerPosition);
+			var currentLatLong = _mapManager.WorldToGeoPosition(_secondCornerPosition);
 
 			var minLat = Math.Min(initialLatLong.x, currentLatLong.x);
 			var minLong = Math.Min(initialLatLong.y, currentLatLong.y);
@@ -144,20 +149,51 @@ namespace Mapbox.Examples
 
 		public Vector2 GetSelectedRegionNormalizedSideLengths()
 		{
-			var initialXY = _initialMousePosition;
-			var currentXY = _currentMousePosition;
+			var initialXY = _firstCornerPosition;
+			var currentXY = _secondCornerPosition;
 
 			var xLength = Mathf.Abs(initialXY.x - currentXY.x);
 			var yLength = Mathf.Abs(initialXY.z - currentXY.z);
-
-			Debug.Log(xLength + " " + yLength);
 
 			return xLength > yLength ? new Vector2(1, yLength / xLength) : new Vector2(xLength / yLength, 1);
 		}
 
         private void HandleTouchSelectRegion()
         {
-            throw new NotImplementedException();
+			if (Input.touchCount > 1)
+			{
+				return;
+			}
+
+			Touch touch = Input.GetTouch(0);
+			
+			Vector3 touchPosition = touch.position;
+			touchPosition.z = Camera.main.transform.localPosition.y;
+
+			if (touch.phase == TouchPhase.Began)
+            {
+                // Save the initial touch position
+                _initialPosition = Camera.main.ScreenToWorldPoint(touchPosition);
+				lineRenderer.positionCount = 4;
+				lineRenderer.SetPosition(0, new Vector3(_initialPosition.x, 0.1f, _initialPosition.z));
+				lineRenderer.SetPosition(1, new Vector3(_initialPosition.x, 0.1f, _initialPosition.z));
+				lineRenderer.SetPosition(2, new Vector3(_initialPosition.x, 0.1f, _initialPosition.z));
+				lineRenderer.SetPosition(3, new Vector3(_initialPosition.x, 0.1f, _initialPosition.z));
+            }
+            else if (touch.phase == TouchPhase.Moved || touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled)
+			{            
+                // Save the last touch position
+                _lastPosition = Camera.main.ScreenToWorldPoint(touchPosition);
+				lineRenderer.SetPosition(0, new Vector3(_initialPosition.x, 0.1f, _initialPosition.z));
+				lineRenderer.SetPosition(1, new Vector3(_lastPosition.x, 0.1f, _initialPosition.z));
+				lineRenderer.SetPosition(2, new Vector3(_lastPosition.x, 0.1f, _lastPosition.z));
+				lineRenderer.SetPosition(3, new Vector3(_initialPosition.x, 0.1f, _lastPosition.z));
+			}
+			if (touch.phase == TouchPhase.Ended)
+			{
+				_firstCornerPosition = _initialPosition;
+				_secondCornerPosition = _lastPosition;
+			}
         }
 
         void HandleMouseAndKeyBoard()
