@@ -88,13 +88,11 @@ public class MapDisplayer : MonoBehaviour
 
     private void OnEnable()
     {
-        Debug.Log("OnEnable");
         InitiateMapRequest();
     }
 
     private void OnDisable()
     {
-        Debug.Log("OnDisable");
         if (runningRequest != null)
             StopCoroutine(runningRequest);
     }

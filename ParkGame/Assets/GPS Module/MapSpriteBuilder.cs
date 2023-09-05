@@ -32,8 +32,25 @@ public class MapSpriteBuilder : MonoBehaviour
 
         var mapSpriteInstance = Instantiate(mapSprite);
 
-        mapSpriteInstance.SetActive(true);
-        SceneManager.LoadScene(mapDrawingScene.name);
-        
+        // Pass map sprite to next scene and load it
+        StartCoroutine(LoadAsyncSceneWithMapSprite(mapSpriteInstance));
+    }
+
+    IEnumerator LoadAsyncSceneWithMapSprite(GameObject mapSprite)
+    {
+        Scene currentScene = SceneManager.GetActiveScene(); 
+
+        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(mapDrawingScene.name, LoadSceneMode.Additive);
+
+        // Wait until the asynchronous scene fully loads
+        while (!asyncLoad.isDone)
+        {
+            yield return null;
+        }
+
+        // Pass map sprite to next scene
+        SceneManager.MoveGameObjectToScene(mapSprite, SceneManager.GetSceneByName(mapDrawingScene.name));
+        // Unload previous scene
+        SceneManager.UnloadSceneAsync(currentScene);
     }
 }
