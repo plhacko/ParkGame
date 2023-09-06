@@ -70,9 +70,7 @@ public class MapDisplayer : MonoBehaviour
     public float MinLatitude = 38.892035f;
     public float MaxLatitude = 38.904192f;
 
-    [Header("Player Pointer")]
-    public GameObject playerPointer;
-
+    private bool mapLoaded = false;
 
     private void Awake()
     {
@@ -173,6 +171,7 @@ public class MapDisplayer : MonoBehaviour
             Texture2D texture = DownloadHandlerTexture.GetContent(request);
             // Set the texture on the object
             GetComponent<SpriteRenderer>().sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+            mapLoaded = true;
         }
     }
 
@@ -259,8 +258,8 @@ public class MapDisplayer : MonoBehaviour
         transform.localScale = yHeight;
     }
 
-    public void DisplayPlayerPointer(bool show)
+    public bool IsMapLoaded()
     {
-        playerPointer.SetActive(show);
+        return mapLoaded;
     }
 }

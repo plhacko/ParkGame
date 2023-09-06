@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 863442115086188283}
   - component: {fileID: 863442115086188282}
   - component: {fileID: 863442115086188292}
+  - component: {fileID: 1942835039810701853}
   m_Layer: 0
   m_Name: Map Sprite
   m_TagString: FetchedMapSprite
@@ -27,7 +28,7 @@ Transform:
   m_GameObject: {fileID: 863442115086188281}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3515785972462086212}
@@ -114,6 +115,29 @@ MonoBehaviour:
   MinLatitude: 37.765827
   MaxLatitude: 37.769444
   playerPointer: {fileID: 0}
+--- !u!114 &1942835039810701853
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 863442115086188281}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 002575234e680614196bfcc3602433e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pin: {fileID: 6608710486718092938}
+  pinPosition:
+    lon: 29.3
+    lat: 22.9
+  tl:
+    lon: 6.96
+    lat: 55.05772
+  br:
+    lon: 15.04338
+    lat: 47.269133
+  text: {fileID: 0}
 --- !u!1 &1477022831278706373
 GameObject:
   m_ObjectHideFlags: 0
@@ -188,7 +212,7 @@ Transform:
   m_GameObject: {fileID: 6608710486718092938}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.25, y: 0.25, z: 1}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 863442115086188283}
@@ -253,9 +277,18 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6608710486718092938}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 95a2d62d3b6b0f141b08cfabea077c74, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   mapDisplayer: {fileID: 863442115086188292}
+  pointerPosition:
+    lon: 13.404954
+    lat: 52.520008
+  tl:
+    lon: 5.86501
+    lat: 55.05772
+  br:
+    lon: 15.04338
+    lat: 47.269133
