@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using Managers;
@@ -35,6 +36,7 @@ public class Soldier : NetworkBehaviour, ISoldier
     private NetworkVariable<SoldierBehaviour> _SoldierBehaviour = new();
     public SoldierBehaviour SoldierBehaviour { get => _SoldierBehaviour.Value; set => _SoldierBehaviour.Value = value; } // derived form ISoldier
     public SoldierBehaviour Behaviour;
+    public UnityEvent BehaviourChangedEvent;
     EnemyObserver EnemyObserver;
     private float AttackTimer = 0.0f;
 
@@ -57,7 +59,7 @@ public class Soldier : NetworkBehaviour, ISoldier
     //public Vector3 PositionToFollowInFormation; // circle formation
 
     private PlayerManager playerManager;
-    
+
     private void Initialize()
     {
         playerManager = FindObjectOfType<PlayerManager>();
@@ -97,8 +99,8 @@ public class Soldier : NetworkBehaviour, ISoldier
     }
     private void OnBehaviourChange(SoldierBehaviour previousValue, SoldierBehaviour newValue)
     {
-        // tmp
-        Behaviour = SoldierBehaviour;
+        BehaviourChangedEvent.Invoke();
+        Debug.Log("Event invoked");
         switch (newValue)
         {
             case SoldierBehaviour.Idle:

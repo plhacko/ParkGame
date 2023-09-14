@@ -74,7 +74,7 @@ namespace Player
             if (Input.GetKeyDown(KeyCode.R)) { FormatSoldiers(KeyCode.R); }
         }
 
-        private void FormatSoldiers(KeyCode key) {
+        public void FormatSoldiers(KeyCode key) {
             if (key == KeyCode.C) {
                 // circle formation
                 switch (FormationType) {

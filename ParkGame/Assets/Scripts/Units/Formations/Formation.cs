@@ -31,7 +31,7 @@ public class Formation : MonoBehaviour
         
         // cannot be under commander in hierarchy, problems with movement
         BoxRoot = Instantiate(BoxRootPrefab, new Vector3(p.x - 2, p.y, p.z), Quaternion.Euler(new Vector3(0, 0, 90)));
-        //Hide(BoxRoot);
+        Hide(BoxRoot);
     }
 
     // disable renderer of object

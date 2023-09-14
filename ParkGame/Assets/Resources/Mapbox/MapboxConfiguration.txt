@@ -1,1 +1,1 @@
-{"AccessToken":"pk.eyJ1IjoiZG90YWltIiwiYSI6ImNsbGRpdDE4ZDBkeHAzamxkbmVtZGQ1ejcifQ.KXRL-x4alLBbrYwBJeK7bQ","MemoryCacheSize":500,"FileCacheSize":25000,"DefaultTimeout":30,"AutoRefreshCache":false}
+{"AccessToken":"asdf","MemoryCacheSize":500,"FileCacheSize":25000,"DefaultTimeout":30,"AutoRefreshCache":false}

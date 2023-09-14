@@ -9,7 +9,7 @@ using UnityEngine;
 public class Outpost : NetworkBehaviour, ICommander
 {
     [SerializeField] int InitialTeam;
-    [SerializeField] int MaxUnits = 3;
+    [SerializeField] int MaxUnits = 3; // in total
     [SerializeField] float SpawnTime = 4; // 4s
     [SerializeField] GameObject UnitPrefab;
     List<GameObject> Units = new List<GameObject>();
