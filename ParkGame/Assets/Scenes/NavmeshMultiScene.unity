@@ -341,7 +341,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6578423205386703686, guid: 767d4c3ee472ffe4ea667aae7025b849, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -2.2627
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6578423205386703686, guid: 767d4c3ee472ffe4ea667aae7025b849, type: 3}
       propertyPath: m_LocalRotation.w
@@ -660,6 +660,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1719890416, guid: 767d4c3ee472ffe4ea667aae7025b849, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 2149011059489662585, guid: 767d4c3ee472ffe4ea667aae7025b849, type: 3}
       propertyPath: m_Name
       value: TestUnit (4)
@@ -694,7 +698,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6578423205386703686, guid: 767d4c3ee472ffe4ea667aae7025b849, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -2.2627
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6578423205386703686, guid: 767d4c3ee472ffe4ea667aae7025b849, type: 3}
       propertyPath: m_LocalRotation.w
@@ -2122,7 +2126,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6578423205386703686, guid: 767d4c3ee472ffe4ea667aae7025b849, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -2.2627
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6578423205386703686, guid: 767d4c3ee472ffe4ea667aae7025b849, type: 3}
       propertyPath: m_LocalRotation.w
@@ -2677,6 +2681,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1719890418, guid: 767d4c3ee472ffe4ea667aae7025b849, type: 3}
+      propertyPath: m_BodyType
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2149011059489662585, guid: 767d4c3ee472ffe4ea667aae7025b849, type: 3}
       propertyPath: m_Name
       value: TestUnit

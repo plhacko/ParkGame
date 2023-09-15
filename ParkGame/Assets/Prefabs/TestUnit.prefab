@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 1719890419}
   - component: {fileID: 1719890418}
   - component: {fileID: 1719890420}
-  m_Layer: 6
+  m_Layer: 8
   m_Name: EnemyDetector
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -88,7 +88,7 @@ Rigidbody2D:
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -130,7 +130,7 @@ GameObject:
   - component: {fileID: 1858124458441567741}
   - component: {fileID: 2124107133495217878}
   - component: {fileID: 7124321394914278606}
-  m_Layer: 6
+  m_Layer: 8
   m_Name: TestUnit
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -305,6 +305,7 @@ MonoBehaviour:
   Attackcooldown: 1
   Damage: 1
   ClosestEnemyDEBUG: 0
+  TeaM: 0
   Behaviour: 0
   BehaviourChangedEvent:
     m_PersistentCalls:
@@ -342,7 +343,7 @@ CapsuleCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: -0.05836451, y: -0.30197233}
@@ -454,7 +455,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4624473986338285026}
   - component: {fileID: 4263711860561818934}
-  m_Layer: 6
+  m_Layer: 8
   m_Name: Circle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -539,7 +540,7 @@ GameObject:
   - component: {fileID: 2076007455044788045}
   - component: {fileID: 6630074952906840920}
   - component: {fileID: 4651880957751882026}
-  m_Layer: 6
+  m_Layer: 8
   m_Name: BehaviourIcon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -625,7 +626,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6166c69e079629438c1d700931403bc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BehaviourIcon: {fileID: 0}
+  SpriteRenderer: {fileID: 0}
   BehaviourEvent:
     m_PersistentCalls:
       m_Calls: []

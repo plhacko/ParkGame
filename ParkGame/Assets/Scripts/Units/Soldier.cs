@@ -31,6 +31,7 @@ public class Soldier : NetworkBehaviour, ISoldier
 
     private NetworkVariable<int> _HP = new();
     public int HP { get => _HP.Value; set => _HP.Value = value; }
+    public int TeaM;
     private NetworkVariable<int> _Team = new();
     public int Team { get => _Team.Value; set => _Team.Value = value; }
     private NetworkVariable<SoldierBehaviour> _SoldierBehaviour = new();
@@ -91,16 +92,17 @@ public class Soldier : NetworkBehaviour, ISoldier
     private void OnXSpriteFlipChanged(bool previousValue, bool newValue) => SpriteRenderer.flipX = newValue;
     private void OnTeamChanged(int previousValue, int newValue) //DEBUG (just tem membership visualization) // TODO: rm
     {
+        TeaM = newValue; // tmp
         SpriteRenderer sr = transform.Find("Circle")?.GetComponent<SpriteRenderer>();
         if (sr == null) { return; }
         if (newValue == 0) { sr.color = Color.blue; }
         else if (newValue == 1) { sr.color = Color.yellow; }
         else { sr.color = Color.grey; }
     }
-    private void OnBehaviourChange(SoldierBehaviour previousValue, SoldierBehaviour newValue)
+    public void OnBehaviourChange(SoldierBehaviour previousValue, SoldierBehaviour newValue)
     {
         BehaviourChangedEvent.Invoke();
-        Debug.Log("Event invoked");
+        Debug.Log("Behaviour change invoked to " + newValue);
         switch (newValue)
         {
             case SoldierBehaviour.Idle:
@@ -327,9 +329,9 @@ public class Soldier : NetworkBehaviour, ISoldier
         if (playerController != null && playerController.Team == Team)
         {
             SetCommanderToFollow(playerController.gameObject.transform);
-            if (SoldierBehaviour == SoldierBehaviour.Idle) {
-                SoldierBehaviour = SoldierBehaviour.Move;
-            }
+        //    if (SoldierBehaviour == SoldierBehaviour.Idle) {
+        //        SoldierBehaviour = SoldierBehaviour.Move;
+        //    }
         }
     }
 

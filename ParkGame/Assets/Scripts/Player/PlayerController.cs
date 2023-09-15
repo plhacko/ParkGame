@@ -5,7 +5,7 @@ using Managers;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
-using static Formation;
+//using static Formation;
 
 namespace Player
 {
@@ -17,7 +17,7 @@ namespace Player
         private Animator animator;
         private NetworkAnimator networkAnimator;
         private Guid ownerPlayerId;
-        public Formation FormationScript;
+        private Formation FormationScript;
 
         // Replicated variable for sprite orientation
         private NetworkVariable<bool> xSpriteFlip = new(false,
@@ -26,13 +26,14 @@ namespace Player
 
         private static readonly int MovementSpeed = Animator.StringToHash("MovementSpeed");
 
+        public int TeaM;
         NetworkVariable<int> _Team = new(0);
         public int Team { get => _Team.Value; set => _Team.Value = value; }
 
         List<GameObject> Units = new();
 
-        public FormationType FormationType; // todo?
-        public FormationType GetFormation() {
+        public Formation.FormationType FormationType; // todo?
+        public Formation.FormationType GetFormation() {
             return FormationType;
         }
 
@@ -41,7 +42,11 @@ namespace Player
             spriteRenderer = GetComponent<SpriteRenderer>();
             animator = GetComponent<Animator>();
             FormationScript = GetComponent<Formation>();
-            FormationType = FormationType.Free; // movement without navmesh
+            if (isActualOwner()) {
+                FormationScript.StartFormation(); // build prefab, get position of the commander
+            }
+
+            FormationType = Formation.FormationType.Free; // movement without navmesh
             
             if (!isActualOwner())
             {
@@ -70,23 +75,35 @@ namespace Player
             { CommandAttackServerRpc(); }
 
             // ...ServerRpc???
-            if (Input.GetKeyDown(KeyCode.C)) { FormatSoldiers(KeyCode.C); }
-            if (Input.GetKeyDown(KeyCode.R)) { FormatSoldiers(KeyCode.R); }
+            //if (Input.GetKeyDown(KeyCode.C)) { FormatSoldiers(KeyCode.C); }
+            //if (Input.GetKeyDown(KeyCode.R)) { FormatSoldiers(KeyCode.R); }
+            if (Input.GetKeyDown(KeyCode.C)) { 
+                Debug.Log("Nu of Units: " + Units.Count);
+                FormatSoldiersServerRpc(KeyCode.C); }
+            if (Input.GetKeyDown(KeyCode.R)) { 
+                Debug.Log("Nu of Units: " + Units.Count);
+                FormatSoldiersServerRpc(KeyCode.R); }
+        }
+
+        [ServerRpc]
+        public void FormatSoldiersServerRpc(KeyCode key) {
+            FormatSoldiers(key);
         }
 
         public void FormatSoldiers(KeyCode key) {
+
             if (key == KeyCode.C) {
                 // circle formation
                 switch (FormationType) {
-                    case FormationType.Box:
-                    case FormationType.Free:
-                        FormationType = FormationType.Circle;
+                    case Formation.FormationType.Box:
+                    case Formation.FormationType.Free:
+                        FormationType = Formation.FormationType.Circle;
                         // notify soldiers
                         NotifySoldiersServerRpc();
                         break;
 
-                    case FormationType.Circle:
-                        FormationType = FormationType.Free;
+                    case Formation.FormationType.Circle:
+                        FormationType = Formation.FormationType.Free;
                         // notify soldiers
                         NotifySoldiersServerRpc();
                         break;
@@ -98,16 +115,16 @@ namespace Player
             if (key == KeyCode.R) {
                 // rectangle formation
                 switch (FormationType) {
-                    case FormationType.Circle:
-                    case FormationType.Free:
-                        FormationType = FormationType.Box;
+                    case Formation.FormationType.Circle:
+                    case Formation.FormationType.Free:
+                        FormationType = Formation.FormationType.Box;
                         FormationScript.ResetFormation();
                         // notify soldiers
                         NotifySoldiersServerRpc();
                         break;
 
-                    case FormationType.Box:
-                        FormationType = FormationType.Free;
+                    case Formation.FormationType.Box:
+                        FormationType = Formation.FormationType.Free;
                         FormationScript.ResetFormation();
                         // notify soldiers
                         NotifySoldiersServerRpc();
@@ -122,21 +139,21 @@ namespace Player
         [ServerRpc]
         public void NotifySoldiersServerRpc() {
 
-            Debug.Log("nu of Units: " + Units.Count);
+            Debug.Log("number of Units: " + Units.Count);
             foreach (GameObject go in Units) {
                 if (go.TryGetComponent<ISoldier>(out ISoldier soldier)) {
                     switch (FormationType) {
-                        case FormationType.Free:
+                        case Formation.FormationType.Free:
                             Debug.Log("notify soldiers. C is OFF");
                             soldier.NavMeshFormationSwitch(false, SoldierBehaviour.Idle, FormationScript, FormationType);
                             FormationScript.ResetFormation();
                             break;
-                        case FormationType.Circle:
+                        case Formation.FormationType.Circle:
                             Debug.Log("notify them. C is ON");
                             soldier.NavMeshFormationSwitch(false, SoldierBehaviour.Idle, FormationScript, FormationType);
                             soldier.NavMeshFormationSwitch(true, SoldierBehaviour.Formation, FormationScript, FormationType);
                             break;
-                        case FormationType.Box:
+                        case Formation.FormationType.Box:
                             Debug.Log("notify them. R is ON");
                             soldier.NavMeshFormationSwitch(false, SoldierBehaviour.Idle, FormationScript, FormationType);
                             soldier.NavMeshFormationSwitch(true, SoldierBehaviour.Formation, FormationScript, FormationType);
@@ -199,6 +216,7 @@ namespace Player
             if (playerData != null)
             {
                 Team = playerData.Value.Team;
+                TeaM = Team; // tmp 
             }
         }
         

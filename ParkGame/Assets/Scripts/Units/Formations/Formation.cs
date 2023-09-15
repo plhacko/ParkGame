@@ -2,9 +2,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
-public class Formation : MonoBehaviour
-{
+public class Formation : NetworkBehaviour {
+//public class Formation : MonoBehaviour {
     public enum FormationType { Circle, Box, Free };
 
     public class PositionPair {
@@ -17,6 +18,7 @@ public class Formation : MonoBehaviour
     [SerializeField] GameObject PositionPrefab;
     [SerializeField] public GameObject BoxRootPrefab;
     public List<GameObject> soldiers = new List<GameObject>();
+    public List<GameObject> BoxesForDebugList = new List<GameObject>();
 
     // circle formation
     public List<GameObject> FormationCircle = new List<GameObject>();
@@ -25,13 +27,20 @@ public class Formation : MonoBehaviour
     public GameObject BoxRoot;
     public List<GameObject> FormationBox = new List<GameObject>(); // are in hierarchy under BoxRoot
 
-    private void Start() 
-    {
+    [ServerRpc(RequireOwnership = false)]
+    public void SpawnFormServerRpc() {
         var p = gameObject.transform.position;
-        
-        // cannot be under commander in hierarchy, problems with movement
+        if (BoxRoot) {
+            return;
+        }
         BoxRoot = Instantiate(BoxRootPrefab, new Vector3(p.x - 2, p.y, p.z), Quaternion.Euler(new Vector3(0, 0, 90)));
-        Hide(BoxRoot);
+        BoxRoot.GetComponent<NetworkObject>().Spawn();
+        BoxesForDebugList.Add(BoxRoot);
+        //Hide(BoxRoot);
+    }
+
+    public void StartFormation() {
+        SpawnFormServerRpc();
     }
 
     // disable renderer of object
@@ -94,12 +103,18 @@ public class Formation : MonoBehaviour
     }
 
     public void ResetFormation() {
+        if (!BoxRoot) {
+            //StartFormation();
+        }
+
         for (int i = 0; i < soldiers.Count; i++) {
             soldiers.RemoveAt(i);
         }
         FormationCircle.Clear();
-        FormationBox.Clear(); 
-        BoxRoot.GetComponent<FormationDescriptor>().NumberOfPositions = 0;
+        FormationBox.Clear();
+        if (BoxRoot) {
+            BoxRoot.GetComponent<FormationDescriptor>().NumberOfPositions = 0;
+        }
         RemoveSpheres();
        
     }

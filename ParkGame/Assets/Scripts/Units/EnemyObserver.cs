@@ -29,8 +29,10 @@ public class EnemyObserver : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D collision)
     {
+        Debug.Log("COLLISION");
         if (collision.gameObject.TryGetComponent<ITeamMember>(out ITeamMember tm))
         {
+            Debug.Log("FOUND ITEAMMEMEBTER");
             if (tm.Team == ParentTeam.Team)
             { visibleFriends.Add(collision.transform); }
             else

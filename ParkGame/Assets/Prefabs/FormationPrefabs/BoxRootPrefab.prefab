@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 450452078117340233}
   - component: {fileID: 2519635860870734656}
   - component: {fileID: 5067568540921773362}
+  - component: {fileID: -7992621617182016504}
   m_Layer: 0
   m_Name: BoxRootPrefab
   m_TagString: Untagged
@@ -100,3 +101,19 @@ MonoBehaviour:
   NumberOfPositions: 0
   StartingPosition: {x: 0, y: 0, z: 0}
   Increment: 0
+--- !u!114 &-7992621617182016504
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1220298409517804251}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 951099334
+  AlwaysReplicateAsRoot: 0
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
