@@ -295,7 +295,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 16e878c8ac6e19f46bc87fa57d8fe0a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  InitialHP: 3
+  InitialHP: 1
   MovementSpeed: 1
   InnerDistanceFromCommander: 1
   OuterDistanceFromCommander: 2
@@ -310,6 +310,8 @@ MonoBehaviour:
   BehaviourChangedEvent:
     m_PersistentCalls:
       m_Calls: []
+  AttackTimer: 0
+  TimeUntilDestroyed: 0
   FollowInNavMeshFormation: 0
   FormationFromFollowedCommander: {fileID: 0}
   ObjectToFollowInFormation: {fileID: 0}
@@ -333,10 +335,10 @@ CapsuleCollider2D:
   m_LayerOverridePriority: 0
   m_ForceSendLayers:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 0
   m_ForceReceiveLayers:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 0
   m_ContactCaptureLayers:
     serializedVersion: 2
     m_Bits: 4294967295
@@ -388,7 +390,7 @@ CircleCollider2D:
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 256
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0

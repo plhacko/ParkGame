@@ -27,7 +27,8 @@ public class Soldier : NetworkBehaviour, ISoldier
     [SerializeField] float Attackcooldown = 1.0f;
     [SerializeField] int Damage = 1;
 
-    [SerializeField] float ClosestEnemyDEBUG; // DEBUG // TODO: rm
+    //[SerializeField] float ClosestEnemyDEBUG; // DEBUG // TODO: rm
+    public float ClosestEnemyDEBUG; // DEBUG // TODO: rm
 
     private NetworkVariable<int> _HP = new();
     public int HP { get => _HP.Value; set => _HP.Value = value; }
@@ -39,7 +40,9 @@ public class Soldier : NetworkBehaviour, ISoldier
     public SoldierBehaviour Behaviour;
     public UnityEvent BehaviourChangedEvent;
     EnemyObserver EnemyObserver;
-    private float AttackTimer = 0.0f;
+    //private float AttackTimer = 0.0f;
+    public float AttackTimer = 0.0f;
+    public float TimeUntilDestroyed = 0.0f;
 
     // animation
     private static readonly int AnimatorMovementSpeedHash = Animator.StringToHash("MovementSpeed");
@@ -57,7 +60,6 @@ public class Soldier : NetworkBehaviour, ISoldier
     public Formation FormationFromFollowedCommander; 
     public GameObject ObjectToFollowInFormation; // other formation
     public FormationType FormationType;
-    //public Vector3 PositionToFollowInFormation; // circle formation
 
     private PlayerManager playerManager;
 
@@ -102,7 +104,7 @@ public class Soldier : NetworkBehaviour, ISoldier
     public void OnBehaviourChange(SoldierBehaviour previousValue, SoldierBehaviour newValue)
     {
         BehaviourChangedEvent.Invoke();
-        Debug.Log("Behaviour change invoked to " + newValue);
+        //Debug.Log("Behaviour change invoked to " + newValue);
         switch (newValue)
         {
             case SoldierBehaviour.Idle:
@@ -128,6 +130,11 @@ public class Soldier : NetworkBehaviour, ISoldier
         // check for a Commander
         if (CommanderToFollow == null)
         { return; } // TODO: add function, that finds the nearest frienly outpost
+
+        // death timer
+        if (TimeUntilDestroyed > 0) {
+            return;
+        }
 
         // attack timer
         if (AttackTimer <= Attackcooldown)
@@ -268,8 +275,9 @@ public class Soldier : NetworkBehaviour, ISoldier
             if (AttackTimer >= Attackcooldown)
             {
                 AttackTimer = 0.0f;
-                enemyT.GetComponent<ISoldier>()?.TakeDamage(Damage);
+                Debug.Log("ATTACK");
                 Animator.SetTrigger("Attack");
+                enemyT.GetComponent<ISoldier>()?.TakeDamage(Damage);
             }
             return true;
         }
@@ -369,7 +377,7 @@ public class Soldier : NetworkBehaviour, ISoldier
     {
         if (!IsServer)
         { throw new Exception($"soldier ({gameObject.name}) can take damage only on server"); }
-
+        Debug.Log("take damage");
         int hp = HP - damage;
         if (hp < 0) { Die(); }
         else { HP = hp; }
@@ -378,7 +386,11 @@ public class Soldier : NetworkBehaviour, ISoldier
     public void Die()
     {
         HP = 0;
+        TimeUntilDestroyed = 3;
         CommanderToFollow?.GetComponent<ICommander>().ReportUnfollowing(gameObject);
-        Destroy(gameObject);
+        Animator.SetTrigger("Die");
+        gameObject.transform.Find("Circle").GetComponent<SpriteRenderer>().color = Color.black;
+        gameObject.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;
+        Destroy(gameObject, TimeUntilDestroyed); // destroy after 3 s
     }
 }
