@@ -745,6 +745,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: TestUnit (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 2326924533560251431, guid: 767d4c3ee472ffe4ea667aae7025b849, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 6403402006258234310, guid: 767d4c3ee472ffe4ea667aae7025b849, type: 3}
       propertyPath: GlobalObjectIdHash
       value: 2994923739
