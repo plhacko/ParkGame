@@ -130,6 +130,7 @@ GameObject:
   - component: {fileID: 1858124458441567741}
   - component: {fileID: 2124107133495217878}
   - component: {fileID: 7124321394914278606}
+  - component: {fileID: 9103779003978253234}
   m_Layer: 8
   m_Name: TestArcher
   m_TagString: Untagged
@@ -302,8 +303,11 @@ MonoBehaviour:
   DefendDistanceFromCommander: 3
   AttackDistanceFromCommander: 6
   AttackRange: 4
-  Attackcooldown: 1
+  MinAttackRange: 1
+  MaxAttackRange: 2
+  Attackcooldown: 3
   Damage: 1
+  UnitType: 1
   ClosestEnemyDEBUG: 0
   TeaM: 0
   Behaviour: 0
@@ -447,6 +451,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0daf9da1e06be9746a47c0165d613f03, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &9103779003978253234
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2149011059489662585}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5773faa4e3c9fd247970b88346945c04, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ArrowPrefab: {fileID: 671494250457049604, guid: 8a338b87b7065194b9f0d7a082bcf539, type: 3}
+  Target: {fileID: 0}
+  Arrow: {fileID: 0}
+  TimeTillSelfdestruct: 3
+  ArrowTime: 0
+  TargetPosition: {x: 0, y: 0, z: 0}
 --- !u!1 &2326924533560251431
 GameObject:
   m_ObjectHideFlags: 0

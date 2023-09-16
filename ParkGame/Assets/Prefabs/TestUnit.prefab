@@ -302,8 +302,11 @@ MonoBehaviour:
   DefendDistanceFromCommander: 3
   AttackDistanceFromCommander: 6
   AttackRange: 0.4
+  MinAttackRange: 0
+  MaxAttackRange: 0.4
   Attackcooldown: 1
   Damage: 1
+  UnitType: 0
   ClosestEnemyDEBUG: 0
   TeaM: 0
   Behaviour: 0

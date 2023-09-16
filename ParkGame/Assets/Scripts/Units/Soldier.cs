@@ -11,6 +11,8 @@ using Player;
 using UnityEngine.AI;
 using static Formation;
 
+public enum UnitType { Pawn, Archer, Horseman };
+
 public class Soldier : NetworkBehaviour, ISoldier
 {
     // game logic
@@ -23,9 +25,12 @@ public class Soldier : NetworkBehaviour, ISoldier
     [SerializeField] float OuterDistanceFromCommander = 2.0f;
     [SerializeField] float DefendDistanceFromCommander = 2.5f;
     [SerializeField] float AttackDistanceFromCommander = 6.0f;
-    [SerializeField] float AttackRange = 0.4f;
+    [SerializeField] float AttackRange = 0.4f; // old pawn
+    [SerializeField] float MinAttackRange = 0.4f; // for pawn: 0
+    [SerializeField] float MaxAttackRange = 0.4f; // for pawn: 0.4
     [SerializeField] float Attackcooldown = 1.0f;
     [SerializeField] int Damage = 1;
+    [SerializeField] UnitType UnitType;
 
     //[SerializeField] float ClosestEnemyDEBUG; // DEBUG // TODO: rm
     public float ClosestEnemyDEBUG; // DEBUG // TODO: rm
@@ -255,8 +260,9 @@ public class Soldier : NetworkBehaviour, ISoldier
 
         // attack the closest enemy if in range
         if (AttackEnemyIfInRange(enemyT)) { return; }
-        // go closer to the enemy
-        MoveTowardsEntity(enemyT);
+        // go closer to the enemy 
+        MoveTowardsEntity(enemyT); 
+        // move away from entity for archer?
 
         // if the commander is too far, the soldier will stop attacking and will return back to the commander
         float distanceFromCommander = (CommanderToFollow.position - transform.position).magnitude;
@@ -270,14 +276,25 @@ public class Soldier : NetworkBehaviour, ISoldier
     private bool AttackEnemyIfInRange(Transform enemyT)
     {
         ClosestEnemyDEBUG = Vector3.Distance(enemyT.position, transform.position);
-        if (Vector3.Distance(enemyT.position, transform.position) < AttackRange)
+        if (Vector3.Distance(enemyT.position, transform.position) <= MaxAttackRange
+            && Vector3.Distance(enemyT.position, transform.position) >= MinAttackRange)
         {
             if (AttackTimer >= Attackcooldown)
             {
                 AttackTimer = 0.0f;
                 Debug.Log("ATTACK");
+                Animator.SetFloat(AnimatorMovementSpeedHash, 0.0f); //("MovementSpeed", 0);
+
                 Animator.SetTrigger("Attack");
-                enemyT.GetComponent<ISoldier>()?.TakeDamage(Damage);
+
+                if (UnitType == UnitType.Pawn) {
+                    enemyT.GetComponent<ISoldier>()?.TakeDamage(Damage);
+                }
+                if (UnitType == UnitType.Archer) {
+                    SpriteRenderer.flipX = (enemyT.position.x - transform.position.x < 0);
+                    XSpriteFlip.Value = SpriteRenderer.flipX;
+                    GetComponent<ShootScript>().Shoot(enemyT, Damage);
+                }
             }
             return true;
         }
@@ -286,7 +303,10 @@ public class Soldier : NetworkBehaviour, ISoldier
 
     private void MoveTowardsEntity(Transform entityT)
     {
-
+        // archers, don't go closer! you'd just die 
+        if (Vector3.Distance(entityT.position, transform.position) < MinAttackRange) {
+            return;
+        }
         Vector2 directionToCommander = entityT.position - transform.position;
         Move(directionToCommander, entityT);
     }
