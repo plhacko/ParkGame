@@ -35,7 +35,7 @@ public class ShootScript : NetworkBehaviour
     }
 
     private void DoDamage() {
-        if (TargetPosition == Arrow.transform.position) {
+        if (Vector3.Distance(TargetPosition, Arrow.transform.position) <= 0.1f) {
             Debug.Log("Arrow hits");
             Target.GetComponent<ISoldier>()?.TakeDamage(Damage);
         } else {

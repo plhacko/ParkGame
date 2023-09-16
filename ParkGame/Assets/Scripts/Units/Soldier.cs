@@ -10,6 +10,7 @@ using System.Windows.Input;
 using Player;
 using UnityEngine.AI;
 using static Formation;
+using DG.Tweening;
 
 public enum UnitType { Pawn, Archer, Horseman };
 
@@ -137,7 +138,7 @@ public class Soldier : NetworkBehaviour, ISoldier
         { return; } // TODO: add function, that finds the nearest frienly outpost
 
         // death timer
-        if (TimeUntilDestroyed > 0) {
+        if (TimeUntilDestroyed > 0 || HP == 0) {
             return;
         }
 
@@ -311,8 +312,8 @@ public class Soldier : NetworkBehaviour, ISoldier
         Move(directionToCommander, entityT);
     }
 
-    private void Move(Vector2 direction, Transform entityT=null)
-    {
+    private void Move(Vector2 direction, Transform entityT=null) {
+
         if (direction.magnitude < 0.01f)
         {
             Animator.SetFloat(AnimatorMovementSpeedHash, 0.0f);
@@ -406,11 +407,14 @@ public class Soldier : NetworkBehaviour, ISoldier
     public void Die()
     {
         HP = 0;
-        TimeUntilDestroyed = 3;
         CommanderToFollow?.GetComponent<ICommander>().ReportUnfollowing(gameObject);
         Animator.SetTrigger("Die");
+        TimeUntilDestroyed = 2;
+
+        SoldierBehaviour = SoldierBehaviour.Death;
         gameObject.transform.Find("Circle").GetComponent<SpriteRenderer>().color = Color.black;
+        gameObject.GetComponent<SpriteRenderer>().DOFade(0, 2);
         gameObject.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;
-        Destroy(gameObject, TimeUntilDestroyed); // destroy after 3 s
+        Destroy(gameObject, 2); // destroy after 2 s
     }
 }

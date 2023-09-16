@@ -1337,6 +1337,10 @@ PrefabInstance:
       propertyPath: MaxAttackRange
       value: 4
       objectReference: {fileID: 0}
+    - target: {fileID: 9091534314517734068, guid: d7dabec280dc4e54d93803fe26a0bb73, type: 3}
+      propertyPath: TimeUntilDestroyed
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

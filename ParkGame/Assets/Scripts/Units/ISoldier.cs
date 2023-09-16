@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public enum SoldierBehaviour { Idle, Move, Attack, Formation }
+public enum SoldierBehaviour { Idle, Move, Attack, Formation, Death }
 public interface ISoldier : ITeamMember
 {
     SoldierBehaviour SoldierBehaviour { get; set; }
