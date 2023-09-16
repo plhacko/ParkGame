@@ -1042,6 +1042,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 741560320172250126, guid: d7dabec280dc4e54d93803fe26a0bb73, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 4170487002
+      objectReference: {fileID: 0}
     - target: {fileID: 2149011059489662585, guid: d7dabec280dc4e54d93803fe26a0bb73, type: 3}
       propertyPath: m_Name
       value: TestArcher (2)
@@ -1281,6 +1285,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 741560320172250126, guid: d7dabec280dc4e54d93803fe26a0bb73, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 818169268
+      objectReference: {fileID: 0}
     - target: {fileID: 2149011059489662585, guid: d7dabec280dc4e54d93803fe26a0bb73, type: 3}
       propertyPath: m_Name
       value: TestArcher
@@ -2291,6 +2299,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 741560320172250126, guid: d7dabec280dc4e54d93803fe26a0bb73, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 2146005961
+      objectReference: {fileID: 0}
     - target: {fileID: 2149011059489662585, guid: d7dabec280dc4e54d93803fe26a0bb73, type: 3}
       propertyPath: m_Name
       value: TestArcher (1)

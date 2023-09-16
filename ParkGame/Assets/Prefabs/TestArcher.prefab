@@ -305,7 +305,7 @@ MonoBehaviour:
   AttackRange: 4
   MinAttackRange: 1
   MaxAttackRange: 2
-  Attackcooldown: 3
+  Attackcooldown: 3.2
   Damage: 1
   UnitType: 1
   ClosestEnemyDEBUG: 0
@@ -466,7 +466,7 @@ MonoBehaviour:
   ArrowPrefab: {fileID: 671494250457049604, guid: 8a338b87b7065194b9f0d7a082bcf539, type: 3}
   Target: {fileID: 0}
   Arrow: {fileID: 0}
-  TimeTillSelfdestruct: 3
+  TimeTillSelfdestruct: 1
   ArrowTime: 0
   TargetPosition: {x: 0, y: 0, z: 0}
 --- !u!1 &2326924533560251431

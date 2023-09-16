@@ -12,7 +12,10 @@ public class Outpost : NetworkBehaviour, ICommander
     [SerializeField] int MaxUnits = 3; // in total
     [SerializeField] float SpawnTime = 4; // 4s
     [SerializeField] GameObject UnitPrefab;
+    [SerializeField] GameObject ArcherPrefab;
+    //[SerializeField] GameObject HorsemanPrefab; // todo
     List<GameObject> Units = new List<GameObject>();
+    ToggleSpawnedUnitScript OutpostSpawnerChanger;
 
     NetworkVariable<float> _Timer = new(0.0f);
     public float Timer { get => _Timer.Value; private set => _Timer.Value = value; }
@@ -23,6 +26,7 @@ public class Outpost : NetworkBehaviour, ICommander
     private void Start()
     {
         Team = InitialTeam;
+        OutpostSpawnerChanger = transform.Find("IconToggler").GetComponent<ToggleSpawnedUnitScript>();
     }
 
     void Update()
@@ -43,6 +47,16 @@ public class Outpost : NetworkBehaviour, ICommander
         }
     }
 
+    GameObject SpawnWhichUnit() {
+        UnitType t = OutpostSpawnerChanger.OutpostUnitType;
+        switch (t) {
+            case UnitType.Archer:
+                return ArcherPrefab;
+            default:
+                return UnitPrefab;
+        }
+    }
+
     public void SpawnUnit()
     {
         // only server can spawn unit
@@ -50,7 +64,7 @@ public class Outpost : NetworkBehaviour, ICommander
         { throw new Exception("only server can spawn unit"); }
 
         Vector3 RndOffset = new Vector3(UnityEngine.Random.Range(-0.01f, 0.01f), UnityEngine.Random.Range(-0.01f, 0.01f), 0f);
-        GameObject unit = Instantiate(UnitPrefab, position: transform.position + RndOffset, rotation: transform.rotation);
+        GameObject unit = Instantiate(SpawnWhichUnit(), position: transform.position + RndOffset, rotation: transform.rotation);
         unit.GetComponent<NetworkObject>().Spawn();
         unit.GetComponent<ISoldier>().Team = Team;
         unit.GetComponent<ISoldier>().SetCommanderToFollow(transform);
