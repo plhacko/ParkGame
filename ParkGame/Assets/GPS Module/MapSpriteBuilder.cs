@@ -3,7 +3,6 @@ using Mapbox.Unity.Map;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -11,7 +10,7 @@ public class MapSpriteBuilder : MonoBehaviour
 {
     public GameObject mapSprite;
     public QuadTreeCameraMovement qt;
-    public SceneAsset mapDrawingScene;
+    public string mapDrawingSceneName = "MapDrawingScene";
 
     public void InstantiateMapSprite()
     {
@@ -32,8 +31,25 @@ public class MapSpriteBuilder : MonoBehaviour
 
         var mapSpriteInstance = Instantiate(mapSprite);
 
-        mapSpriteInstance.SetActive(true);
-        SceneManager.LoadScene(mapDrawingScene.name);
-        
+        // Pass map sprite to next scene and load it
+        StartCoroutine(LoadAsyncSceneWithMapSprite(mapSpriteInstance));
+    }
+
+    IEnumerator LoadAsyncSceneWithMapSprite(GameObject mapSprite)
+    {
+        Scene currentScene = SceneManager.GetActiveScene(); 
+
+        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(mapDrawingSceneName, LoadSceneMode.Additive);
+
+        // Wait until the asynchronous scene fully loads
+        while (!asyncLoad.isDone)
+        {
+            yield return null;
+        }
+
+        // Pass map sprite to next scene
+        SceneManager.MoveGameObjectToScene(mapSprite, SceneManager.GetSceneByName(mapDrawingSceneName));
+        // Unload previous scene
+        SceneManager.UnloadSceneAsync(currentScene);
     }
 }

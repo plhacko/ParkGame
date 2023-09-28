@@ -10,6 +10,12 @@ public class GPSLocator : MonoBehaviour
     [SerializeField]
     private int initializationTimeout = 15;
 
+    [SerializeField]
+    private float invokeDelay = 0.5f;
+
+    [SerializeField]
+    private float updateRate = 1.0f;
+
     public double Longitude { get { return lon; } }
     public double Lattitude { get { return lat; } }
 
@@ -91,14 +97,7 @@ public class GPSLocator : MonoBehaviour
         {
             Debug.LogFormat("Location service live. status {0}", UnityEngine.Input.location.status);
             // Access granted and location value could be retrieved
-            Debug.LogFormat("Location: "
-                + Input.location.lastData.latitude + " "
-                + Input.location.lastData.longitude + " "
-                + Input.location.lastData.altitude + " "
-                + Input.location.lastData.horizontalAccuracy + " "
-            + Input.location.lastData.timestamp);
-
-            InvokeRepeating("UpdateLocation", 0.5f, 1.0f);
+            InvokeRepeating("UpdateLocation", invokeDelay, updateRate);
         }
     }
 
@@ -111,12 +110,6 @@ public class GPSLocator : MonoBehaviour
     // TODO Check if GPS is enabled
     private void UpdateLocation()
     {
-        Debug.LogFormat("Location: "
-            + Input.location.lastData.latitude + " "
-            + Input.location.lastData.longitude + " "
-            + Input.location.lastData.altitude + " "
-            + Input.location.lastData.horizontalAccuracy + " "
-        + Input.location.lastData.timestamp);
         lat = Input.location.lastData.latitude;
         lon = Input.location.lastData.longitude;
     }

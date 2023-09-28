@@ -16,7 +16,7 @@ public class MapboxAccesToken
 public class MapDisplayer : MonoBehaviour
 {
     [Header("Request info")]
-    public string accessToken;
+    private string accessToken;
     public MapboxRequestType RequestType = MapboxRequestType.BoundingBox;
     public enum MapboxRequestType { Center, BoundingBox };
     public string urlProperty;
@@ -70,6 +70,7 @@ public class MapDisplayer : MonoBehaviour
     public float MinLatitude = 38.892035f;
     public float MaxLatitude = 38.904192f;
 
+    private bool mapLoaded = false;
 
     private void Awake()
     {
@@ -88,13 +89,11 @@ public class MapDisplayer : MonoBehaviour
 
     private void OnEnable()
     {
-        Debug.Log("OnEnable");
         InitiateMapRequest();
     }
 
     private void OnDisable()
     {
-        Debug.Log("OnDisable");
         if (runningRequest != null)
             StopCoroutine(runningRequest);
     }
@@ -172,6 +171,7 @@ public class MapDisplayer : MonoBehaviour
             Texture2D texture = DownloadHandlerTexture.GetContent(request);
             // Set the texture on the object
             GetComponent<SpriteRenderer>().sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+            mapLoaded = true;
         }
     }
 
@@ -256,5 +256,10 @@ public class MapDisplayer : MonoBehaviour
         Vector3 yHeight = transform.localScale;
         yHeight.y = worldScreenHeight / height;
         transform.localScale = yHeight;
+    }
+
+    public bool IsMapLoaded()
+    {
+        return mapLoaded;
     }
 }
