@@ -78,3 +78,7 @@ crashlytics-build.properties
 /[Aa]ssets/Plugins/Android.meta
 /[Aa]ssets/Plugins/iOS.meta
 /[Aa]ssets/Plugins/tvOS.meta
+
+# config key for mapbox
+MapboxConfiguration.txt
+

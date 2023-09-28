@@ -34,11 +34,15 @@ public class MapMetaData
     public int Width;
     public int Height;
     public MapStructures Structures;
+    public Vector3Int TopLeftTileIdx;
+    public Vector3Int BottomRightTileIdx;
     
     public int NumTeams => Structures.Castles.Length;
 
     public MapMetaData(Guid mapId, string mapName, string mapQuery, double longitude,
-        double latitude, int width, int height, MapStructures structures)
+        double latitude, int width, int height, MapStructures structures,
+        Vector3Int topLeftTileIdx, Vector3Int bottomRightTileIdx 
+    )
     {
         MapId = mapId.ToString();
         MapQuery = mapQuery;
@@ -48,6 +52,8 @@ public class MapMetaData
         Width = width;
         Height = height;
         Structures = structures;
+        TopLeftTileIdx = topLeftTileIdx;
+        BottomRightTileIdx = bottomRightTileIdx;
     }
 }
 

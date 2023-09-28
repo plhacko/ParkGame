@@ -140,13 +140,15 @@ public class DragAndDrop : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     {
         if (inDrag)
         {
-            mapDrawable.enabled = false;
+            if (mapDrawable)
+                mapDrawable.enabled = false;
             canvasGroup.blocksRaycasts = false;
             canvasGroup.alpha = 0.7f;
         }
         else
         {
-            mapDrawable.enabled = true;
+            if (mapDrawable)
+                mapDrawable.enabled = true;
             canvasGroup.blocksRaycasts = true;
             canvasGroup.alpha = 1.0f;
         }
