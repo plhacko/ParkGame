@@ -121,13 +121,7 @@ public class UIPage : MonoBehaviour
             StopCoroutine(animationCoroutine);
         }
 
-        switch (entryMode)
-        {
-            case PageEntryMode.SlideRight:
-                animationCoroutine = StartCoroutine(PageAnimator.SlideIn(rectTransform, Direction.Right, animationDuration, null));
-                break;
-        }
-        animationCoroutine = StartCoroutine(PageAnimator.SlideOut(rectTransform, direction, animationDuration, null));
+        animationCoroutine = StartCoroutine(PageAnimator.SlideIn(rectTransform, direction, animationDuration, null));
     }
 
     private void FadeIn()

@@ -358,8 +358,9 @@ GameObject:
   - component: {fileID: 1071287293673932618}
   - component: {fileID: 7428535165789143227}
   - component: {fileID: 8047939562436994447}
+  - component: {fileID: 1208775356504565797}
   m_Layer: 5
-  m_Name: Login Page
+  m_Name: Login Screen
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -551,6 +552,20 @@ MonoBehaviour:
   ExitClip: {fileID: 0}
   entryMode: 0
   exitMode: 0
+--- !u!114 &1208775356504565797
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5180419811621639846}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb97b8169f5a4f8498430305ac4284c9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  usernameInputField: {fileID: 7255686233196179010}
+  loginButton: {fileID: 2760129649963370621}
 --- !u!1 &6388896159356040500
 GameObject:
   m_ObjectHideFlags: 0
@@ -564,7 +579,7 @@ GameObject:
   - component: {fileID: 5689746965630203813}
   - component: {fileID: 7255686233196179010}
   m_Layer: 5
-  m_Name: InputField (TMP) - Login name
+  m_Name: InputField (TMP) - Name
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -844,7 +859,7 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 3545526693344609220}
   m_OnClick:
     m_PersistentCalls:
