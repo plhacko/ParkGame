@@ -26,7 +26,7 @@ public class Soldier : NetworkBehaviour, ISoldier
     [SerializeField] float OuterDistanceFromCommander = 2.0f;
     [SerializeField] float DefendDistanceFromCommander = 2.5f;
     [SerializeField] float AttackDistanceFromCommander = 6.0f;
-    [SerializeField] float AttackRange = 0.4f; // old pawn
+    //[SerializeField] float AttackRange = 0.4f; // old pawn
     [SerializeField] float MinAttackRange = 0.4f; // for pawn: 0
     [SerializeField] float MaxAttackRange = 0.4f; // for pawn: 0.4
     [SerializeField] float Attackcooldown = 1.0f;
@@ -138,7 +138,8 @@ public class Soldier : NetworkBehaviour, ISoldier
         { return; } // TODO: add function, that finds the nearest frienly outpost
 
         // death timer
-        if (TimeUntilDestroyed > 0 || HP == 0) {
+        //if (TimeUntilDestroyed > 0 || HP == 0) {
+        if (HP <= 0) {
             return;
         }
 
@@ -413,8 +414,9 @@ public class Soldier : NetworkBehaviour, ISoldier
 
         SoldierBehaviour = SoldierBehaviour.Death;
         gameObject.transform.Find("Circle").GetComponent<SpriteRenderer>().color = Color.black;
-        gameObject.GetComponent<SpriteRenderer>().DOFade(0, 2);
         gameObject.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;
-        Destroy(gameObject, 2); // destroy after 2 s
+        float fadeTime = 2f;
+        gameObject.GetComponent<SpriteRenderer>()?.DOFade(0, fadeTime);
+        Destroy(gameObject, fadeTime); // destroy after 2 s
     }
 }

@@ -11,6 +11,7 @@ public class ShootScript : NetworkBehaviour
     [SerializeField] float TimeTillSelfdestruct;
     public float ArrowTime;
     private int Damage;
+    public Transform Target; 
     public Vector3 TargetPosition;
 
     private void Start() {
@@ -53,7 +54,7 @@ public class ShootScript : NetworkBehaviour
     }
 
     private void Update() {
-        if (Arrow) {
+        if (Arrow != null) {
             //Arrow.GetComponent<Rigidbody2D>().DOJump(Target, 0.2f, 1, 3).onComplete = DestroyArrow;
             Arrow.GetComponent<Rigidbody2D>().DOMove(TargetPosition, 1.1f).onComplete = DoDamage;
             Arrow.GetComponent<SelfDestruct>().TimeLived = 0;
