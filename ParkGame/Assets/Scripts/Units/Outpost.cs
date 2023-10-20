@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
+using Player;
 
 public class Outpost : NetworkBehaviour, ICommander
 {
@@ -15,7 +16,7 @@ public class Outpost : NetworkBehaviour, ICommander
     [SerializeField] GameObject ArcherPrefab;
     //[SerializeField] GameObject HorsemanPrefab; // todo
     List<GameObject> Units = new List<GameObject>();
-    ToggleSpawnedUnitScript OutpostSpawnerChanger;
+    //ToggleSpawnedUnitScript OutpostSpawnerChanger;
 
     NetworkVariable<float> _Timer = new(0.0f);
     public float Timer { get => _Timer.Value; private set => _Timer.Value = value; }
@@ -23,10 +24,26 @@ public class Outpost : NetworkBehaviour, ICommander
     [SerializeField] NetworkVariable<int> _Team = new(0);
     public int Team { get => _Team.Value; set => _Team.Value = value; }
 
-    private void Start()
+    [SerializeField] Sprite PawnIcon;
+    [SerializeField] Sprite ArcherIcon;
+    [SerializeField] Sprite HorsemanIcon;
+    private SpriteRenderer sr;
+    private int counter;
+    public UnitType OutpostUnitType;
+    private PlayerManager playerManager;
+
+
+
+    //private void Start()
+    private void Awake()
     {
         Team = InitialTeam;
-        OutpostSpawnerChanger = transform.Find("IconToggler").GetComponent<ToggleSpawnedUnitScript>();
+        //OutpostSpawnerChanger = transform.Find("IconToggler").GetComponent<ToggleSpawnedUnitScript>();
+        playerManager = FindObjectOfType<PlayerManager>();
+
+        OutpostUnitType = UnitType.Pawn;
+        sr = GetComponent<SpriteRenderer>();
+        sr.sprite = GetIcon(0);
     }
 
     void Update()
@@ -48,7 +65,8 @@ public class Outpost : NetworkBehaviour, ICommander
     }
 
     GameObject SpawnWhichUnit() {
-        UnitType t = OutpostSpawnerChanger.OutpostUnitType;
+        //UnitType t = OutpostSpawnerChanger.OutpostUnitType;
+        UnitType t = OutpostUnitType;
         switch (t) {
             case UnitType.Archer:
                 return ArcherPrefab;
@@ -89,5 +107,55 @@ public class Outpost : NetworkBehaviour, ICommander
     public Formation.FormationType GetFormation() {
         return Formation.FormationType.Free;
     }
+
+
+
+
+    // change spawn type and icon
+    Sprite GetIcon(int n) {
+        switch (n) {
+            case 1:
+                OutpostUnitType = UnitType.Archer;
+                return Instantiate(ArcherIcon);
+            //case 2:
+            //    OutpostUnitType = UnitType.Horseman;
+            //    return Instantiate(HorsemanIcon);
+            default:
+                OutpostUnitType = UnitType.Pawn;
+                return Instantiate(PawnIcon);
+        }
+    }
+
+    [ClientRpc]
+    void ChangeIconClientRpc(int si) {
+        sr.sprite = GetIcon(si);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void RequestChangingSpawnTypeServerRpc(ulong clientID) {
+        PlayerController playerController = playerManager.GetPlayerController(clientID);
+        Debug.Log("teams: " + playerController.Team + " outpost from: " + Team);
+
+        if (playerController != null && playerController.Team == Team) {
+            Debug.Log("ZMEN IKONU!");
+            counter++;
+            //sr.sprite = GetIcon(counter % 2);
+        }
+        // + ClientRpc
+        ChangeIconClientRpc(counter % 2);
+
+
+
+    }
+
+    void OnMouseDown() {
+        Debug.Log("ICON CLICKED");
+
+        ulong clientID = NetworkManager.Singleton.LocalClientId;
+        RequestChangingSpawnTypeServerRpc(clientID);
+    }
+
+
+
 
 }

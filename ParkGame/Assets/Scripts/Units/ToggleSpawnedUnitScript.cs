@@ -1,18 +1,28 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Managers;
+using Player;
+using Unity.Netcode;
 
-public class ToggleSpawnedUnitScript : MonoBehaviour {
+// NetworkBehaviour na child objektu, kde je taky skript s NB?
+public class ToggleSpawnedUnitScript : NetworkBehaviour {
     [SerializeField] Sprite PawnIcon;
     [SerializeField] Sprite ArcherIcon;
     [SerializeField] Sprite HorsemanIcon;
     private SpriteRenderer sr;
     private int counter;
     public UnitType OutpostUnitType;
+    private PlayerManager playerManager;
+    private int Team; 
 
     private void Start() {
+        playerManager = FindObjectOfType<PlayerManager>();
+
         OutpostUnitType = UnitType.Pawn;
         sr = GetComponent<SpriteRenderer>();
+        sr.sprite = GetIcon(0);
+        Team = gameObject.GetComponentInParent<Outpost>().Team;
     }
 
     Sprite GetIcon(int n) {
@@ -29,11 +39,23 @@ public class ToggleSpawnedUnitScript : MonoBehaviour {
         }
     }
 
+    [ServerRpc(RequireOwnership = false)]
+    public void RequestChangingSpawnTypeServerRpc(ulong clientID) {
+        PlayerController playerController = playerManager.GetPlayerController(clientID);
+        Debug.Log("teams: " + playerController.Team + " outpost from: " + Team);
+
+        if (playerController != null && playerController.Team == Team) {
+            Debug.Log("ZMEN IKONU!");
+            counter++;
+            sr.sprite = GetIcon(counter % 2);
+        }
+    }
+
     void OnMouseDown() {
         Debug.Log("ICON CLICKED");
-        counter++;
-        sr.sprite = GetIcon(counter % 2);
-        
+
+        ulong clientID = NetworkManager.Singleton.LocalClientId;
+        RequestChangingSpawnTypeServerRpc(clientID);
     }
 
 }

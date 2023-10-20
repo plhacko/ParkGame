@@ -85,7 +85,8 @@ namespace Player
                 FormatSoldiersServerRpc(KeyCode.R); }
         }
 
-        [ServerRpc]
+        //[ServerRpc]
+        [ServerRpc(RequireOwnership = false)]
         public void FormatSoldiersServerRpc(KeyCode key) {
             FormatSoldiers(key);
         }

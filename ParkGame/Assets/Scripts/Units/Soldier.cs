@@ -68,7 +68,6 @@ public class Soldier : NetworkBehaviour, ISoldier
     public FormationType FormationType;
 
     private PlayerManager playerManager;
-
     private void Initialize()
     {
         playerManager = FindObjectOfType<PlayerManager>();
@@ -379,6 +378,7 @@ public class Soldier : NetworkBehaviour, ISoldier
 
             FormationType = CommanderToFollow.GetComponent<ICommander>().GetFormation();
             FormationFromFollowedCommander = CommanderToFollow.GetComponent<Formation>();
+            
             if (FormationType == FormationType.Box || FormationType == FormationType.Circle) {
                 SoldierBehaviour = SoldierBehaviour.Formation;
                 NavMeshFormationSwitch(true, SoldierBehaviour.Formation, FormationFromFollowedCommander, FormationType);
@@ -404,6 +404,13 @@ public class Soldier : NetworkBehaviour, ISoldier
         if (hp < 0) { Die(); }
         else { HP = hp; }
     }
+
+    
+    public Transform GetCommanderWhomIFollow() {
+        return CommanderToFollow;
+    }
+
+
     /// <summary> !call only on server! </summary>
     public void Die()
     {

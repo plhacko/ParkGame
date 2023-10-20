@@ -34,6 +34,7 @@ public class ShootScript : NetworkBehaviour
         Arrow.GetComponent<NetworkObject>().Spawn();
     }
 
+    // nazvy funkci: spis DrawAndShoot a misto DrawArrow je Shoot...
     public void Shoot(Transform target, int damage) {
         ArrowTime = 0;
         Target = target;

@@ -3,10 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using Player;
 
 public class Formation : NetworkBehaviour {
 //public class Formation : MonoBehaviour {
     public enum FormationType { Circle, Box, Free };
+
+    float ccc;
 
     public class PositionPair {
         public PositionPair(GameObject i1, bool i2 = false) { gobject = i1; occupated = i2; }
@@ -19,6 +22,8 @@ public class Formation : NetworkBehaviour {
     [SerializeField] public GameObject BoxRootPrefab;
     public List<GameObject> soldiers = new List<GameObject>();
     public List<GameObject> BoxesForDebugList = new List<GameObject>();
+
+    private int Team;
 
     // circle formation
     public List<GameObject> FormationCircle = new List<GameObject>();
@@ -41,6 +46,7 @@ public class Formation : NetworkBehaviour {
 
     public void StartFormation() {
         SpawnFormServerRpc();
+        Team = gameObject.GetComponent<PlayerController>().Team;
     }
 
     // disable renderer of object
@@ -54,11 +60,20 @@ public class Formation : NetworkBehaviour {
     private void Update() {
         RotateBoxFormation();
 
+        if (ccc > 10) {
+            CallToMyTeammates();
+            ccc = 0;
+        } else { 
+            ccc += Time.deltaTime;
+        }
+
         if (Input.GetKeyDown(KeyCode.Space)) {
             Add1PositionToBoxFormation();
         }
     }
 
+    // add position mesh for soldier at commander
+    // for referencing its location for A*
     GameObject AddSphere(Vector3 position, float scale, string name, GameObject parent) {
         GameObject sphere = Instantiate(PositionPrefab);
         sphere.name = name;
@@ -67,6 +82,23 @@ public class Formation : NetworkBehaviour {
         sphere.transform.localPosition = position;
         //Hide(sphere);
         return sphere;
+    }
+
+    void CallToMyTeammates() {
+        var soldiers = FindObjectsOfType<Soldier>();
+        List<GameObject> myTeamSoldiers = new List<GameObject>();
+        foreach (var s in soldiers) {
+            if (s.Team == Team) {
+                myTeamSoldiers.Add(s.gameObject);
+                // maybe not comparing transforms
+                if (s.GetCommanderWhomIFollow() == gameObject.transform) {
+                } else {
+                }
+            }
+        }
+
+        //Debug.Log("number of my team's soldiers: " + myTeamSoldiers.Count);
+
     }
 
     void Add1PositionToCircularFormation(Vector3 pos) {
@@ -86,6 +118,7 @@ public class Formation : NetworkBehaviour {
         formDescr.NumberOfPositions++;
     }
 
+    // rotate the box formation according to the commander's direction of movement
     void RotateBoxFormation() {
         if (!BoxRoot) { return; }
         Vector3 from = BoxRoot.transform.up;
