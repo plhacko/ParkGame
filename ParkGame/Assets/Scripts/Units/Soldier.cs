@@ -71,7 +71,10 @@ public class Soldier : NetworkBehaviour, ISoldier
     public GameObject ObjectToFollowInFormation; // other formation
     public FormationType FormationType;
 
+    private ShootScript shooting;
+    
     private PlayerManager playerManager;
+    
     private void Initialize()
     {
         playerManager = FindObjectOfType<PlayerManager>();
@@ -79,11 +82,13 @@ public class Soldier : NetworkBehaviour, ISoldier
         SpriteRenderer = GetComponent<SpriteRenderer>();
         Agent = GetComponent<NavMeshAgent>();
         Networkanimator = GetComponent<NetworkAnimator>();
+        shooting = GetComponent<ShootScript>();
         
         _Team.OnValueChanged += OnTeamChanged;
         _SoldierBehaviour.OnValueChanged += OnBehaviourChange;
         OnTeamChanged(0, Team);
         OnBehaviourChange(0, SoldierBehaviour);
+        SpriteRenderer.flipX = XSpriteFlip.Value;
 
         if (IsServer)
             HP = InitialHP;
@@ -100,6 +105,7 @@ public class Soldier : NetworkBehaviour, ISoldier
     }
 
     private void OnXSpriteFlipChanged(bool previousValue, bool newValue) => SpriteRenderer.flipX = newValue;
+    
     private void OnTeamChanged(int previousValue, int newValue) //DEBUG (just tem membership visualization) // TODO: rm
     {
         TeaM = newValue; // tmp
@@ -300,7 +306,7 @@ public class Soldier : NetworkBehaviour, ISoldier
                 if (UnitType == UnitType.Archer) {
                     SpriteRenderer.flipX = (enemyT.position.x - transform.position.x < 0);
                     XSpriteFlip.Value = SpriteRenderer.flipX;
-                    GetComponent<ShootScript>().Shoot(enemyT, Damage);
+                    shooting.Shoot(enemyT, Damage, XSpriteFlip.Value);
                 }
             }
             return true;
