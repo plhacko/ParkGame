@@ -340,6 +340,7 @@ MonoBehaviour:
   signUpButton: {fileID: 1100189101}
   loginSceneName: LoginMenu
   signUpSceneName: SignUpMenu
+  mainMenuSceneName: MainMenu
 --- !u!1 &568611679
 GameObject:
   m_ObjectHideFlags: 0

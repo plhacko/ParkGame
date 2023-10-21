@@ -66,7 +66,6 @@ namespace UI.Lobby
             if (result != null)
             {
                 SceneManager.LoadScene(mainMenuSceneName, LoadSceneMode.Single);
-                PlayerPrefs.SetString("PlayerName", result.User.DisplayName);
             }
             else
             {

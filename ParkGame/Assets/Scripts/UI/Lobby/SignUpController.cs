@@ -71,7 +71,6 @@ public class SignUpController : MonoBehaviour
             if (loginResult != null)
             {
                 SceneManager.LoadScene(mainMenuSceneName, LoadSceneMode.Single);  
-                PlayerPrefs.SetString("PlayerName", loginResult.User.DisplayName); 
             }
             else
             {

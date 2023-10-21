@@ -1,3 +1,4 @@
+using Firebase.Auth;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
 using UnityEngine;
@@ -12,6 +13,8 @@ public class WelcomeScreenController : MonoBehaviour
     [SerializeField] private string loginSceneName;
     [SerializeField] private string signUpSceneName; 
 
+    [SerializeField] private string mainMenuSceneName;
+    
     async void Awake()
     {
         loginButton.onClick.AddListener(login);
@@ -22,7 +25,17 @@ public class WelcomeScreenController : MonoBehaviour
         
         // Initialize Unity Services and sign in anonymously
         await UnityServices.InitializeAsync();
-        await AuthenticationService.Instance.SignInAnonymouslyAsync();
+
+        if (!AuthenticationService.Instance.IsSignedIn)
+        {
+            await AuthenticationService.Instance.SignInAnonymouslyAsync();   
+        }
+
+        if (FirebaseAuth.DefaultInstance.CurrentUser != null)
+        {
+            SceneManager.LoadScene(mainMenuSceneName, LoadSceneMode.Single);
+            return;
+        }
         
         loginButton.interactable = true;
         signUpButton.interactable = true;
