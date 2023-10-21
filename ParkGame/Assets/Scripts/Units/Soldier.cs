@@ -171,15 +171,18 @@ public class Soldier : NetworkBehaviour, ISoldier
 
     private void IdleBehaviour()
     {
+        if(Team == 1) return;
+        
         Transform enemyT = EnemyObserver.GetClosestEnemy();
         float distanceFromCommander = Vector3.Distance(CommanderToFollow.position, transform.position);
         if (enemyT != null && distanceFromCommander < DefendDistanceFromCommander)
         {
             if (AttackEnemyIfInRange(enemyT)) { return; }
-            else { MoveTowardsEntity(enemyT); return; }
+            
+            MoveTowardsEntity(enemyT); 
+            return;
         }
-
-
+        
         if (distanceFromCommander > OuterDistanceFromCommander)
         {
             MoveTowardsEntity(CommanderToFollow);
@@ -308,8 +311,8 @@ public class Soldier : NetworkBehaviour, ISoldier
         if (Vector3.Distance(entityT.position, transform.position) < MinAttackRange) {
             return;
         }
-        Vector2 directionToCommander = entityT.position - transform.position;
-        Move(directionToCommander, entityT);
+        Vector2 directionToEntity = entityT.position - transform.position;
+        Move(directionToEntity, entityT);
     }
 
     private void Move(Vector2 direction, Transform entityT=null) {

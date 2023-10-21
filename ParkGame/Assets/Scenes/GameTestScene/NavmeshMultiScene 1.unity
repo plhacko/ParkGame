@@ -512,7 +512,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2776846833031490645, guid: 1a614d92eed9bdd48a556d6ecb9ea243, type: 3}
       propertyPath: m_Name
-      value: Outpost (1)
+      value: OutpostTeam0
       objectReference: {fileID: 0}
     - target: {fileID: 2776846833031490645, guid: 1a614d92eed9bdd48a556d6ecb9ea243, type: 3}
       propertyPath: m_IsActive
@@ -520,7 +520,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2776846833031490647, guid: 1a614d92eed9bdd48a556d6ecb9ea243, type: 3}
       propertyPath: m_RootOrder
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2776846833031490647, guid: 1a614d92eed9bdd48a556d6ecb9ea243, type: 3}
       propertyPath: m_LocalScale.x
@@ -1470,7 +1470,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2776846833031490645, guid: 1a614d92eed9bdd48a556d6ecb9ea243, type: 3}
       propertyPath: m_Name
-      value: Outpost
+      value: OutpostTeam1
       objectReference: {fileID: 0}
     - target: {fileID: 2776846833031490645, guid: 1a614d92eed9bdd48a556d6ecb9ea243, type: 3}
       propertyPath: m_IsActive
@@ -1478,7 +1478,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2776846833031490647, guid: 1a614d92eed9bdd48a556d6ecb9ea243, type: 3}
       propertyPath: m_RootOrder
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 2776846833031490647, guid: 1a614d92eed9bdd48a556d6ecb9ea243, type: 3}
       propertyPath: m_LocalScale.x
