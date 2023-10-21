@@ -12,7 +12,12 @@ using UnityEngine.AI;
 using static Formation;
 using DG.Tweening;
 
-public enum UnitType { Pawn, Archer, Horseman };
+public enum UnitType
+{
+    Pawn,
+    Archer,
+    // Horseman
+};
 
 public class Soldier : NetworkBehaviour, ISoldier
 {
@@ -143,7 +148,7 @@ public class Soldier : NetworkBehaviour, ISoldier
         // attack timer
         if (AttackTimer <= Attackcooldown)
         { AttackTimer += Time.deltaTime; }
-
+        
         // soldier behaviour
         switch (SoldierBehaviour)
         {
@@ -310,10 +315,10 @@ public class Soldier : NetworkBehaviour, ISoldier
             return;
         }
         Vector2 directionToEntity = entityT.position - transform.position;
-        Move(directionToEntity, entityT);
+        Move(directionToEntity);
     }
 
-    private void Move(Vector2 direction, Transform entityT=null) {
+    private void Move(Vector2 direction) {
 
         if (direction.magnitude < 0.01f)
         {
@@ -332,15 +337,8 @@ public class Soldier : NetworkBehaviour, ISoldier
 
         SpriteRenderer.flipX = movement.x < 0;
         XSpriteFlip.Value = SpriteRenderer.flipX;
-
-        //transform.Translate(movement * Time.deltaTime);
         
-        if (entityT) {
-            var pos = new Vector3(entityT.position.x, entityT.position.y, transform.position.z);
-            Agent.SetDestination(pos);
-        } else {
-            transform.Translate(movement * Time.deltaTime);
-        }
+        Agent.SetDestination(transform.position + new Vector3(movement.x, movement.y, 0));
     }
 
     void OnMouseDown()

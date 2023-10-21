@@ -296,18 +296,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 16e878c8ac6e19f46bc87fa57d8fe0a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  InitialHP: 1
+  InitialHP: 100000
   MovementSpeed: 0.5
   InnerDistanceFromCommander: 1
   OuterDistanceFromCommander: 2
   DefendDistanceFromCommander: 3
   AttackDistanceFromCommander: 6
-  AttackRange: 4
-  MinAttackRange: 1
-  MaxAttackRange: 2
+  MinAttackRange: 2
+  MaxAttackRange: 5
   Attackcooldown: 3.2
   Damage: 1
   UnitType: 1
+  DeathFadeTime: 2
   ClosestEnemyDEBUG: 0
   TeaM: 0
   Behaviour: 0
@@ -315,7 +315,6 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   AttackTimer: 0
-  TimeUntilDestroyed: 0
   FollowInNavMeshFormation: 0
   FormationFromFollowedCommander: {fileID: 0}
   ObjectToFollowInFormation: {fileID: 0}
@@ -464,10 +463,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ArrowPrefab: {fileID: 671494250457049604, guid: 8a338b87b7065194b9f0d7a082bcf539, type: 3}
-  Target: {fileID: 0}
   Arrow: {fileID: 0}
   TimeTillSelfdestruct: 1
   ArrowTime: 0
+  Target: {fileID: 0}
   TargetPosition: {x: 0, y: 0, z: 0}
 --- !u!1 &2326924533560251431
 GameObject:

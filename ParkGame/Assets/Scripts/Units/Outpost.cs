@@ -18,8 +18,8 @@ public class Outpost : NetworkBehaviour, ICommander
     [SerializeField] Sprite PawnIcon;
     [SerializeField] Sprite ArcherIcon;
     [SerializeField] Sprite HorsemanIcon;
-    [SerializeField] private UnitType OutpostUnitType;
-    
+    [SerializeField] private UnitType InitOutpostUnitType;
+
     //[SerializeField] GameObject HorsemanPrefab; // todo
     List<GameObject> Units = new List<GameObject>();
     //ToggleSpawnedUnitScript OutpostSpawnerChanger;
@@ -30,6 +30,7 @@ public class Outpost : NetworkBehaviour, ICommander
     [SerializeField] NetworkVariable<int> _Team = new(0);
     public int Team { get => _Team.Value; set => _Team.Value = value; }
 
+    private UnitType outpostUnitType;
     private SpriteRenderer sr;
     private int counter;
     private PlayerManager playerManager;
@@ -41,9 +42,14 @@ public class Outpost : NetworkBehaviour, ICommander
         //OutpostSpawnerChanger = transform.Find("IconToggler").GetComponent<ToggleSpawnedUnitScript>();
         playerManager = FindObjectOfType<PlayerManager>();
 
-        OutpostUnitType = UnitType.Pawn;
         sr = GetComponent<SpriteRenderer>();
-        sr.sprite = GetIcon(0);
+
+        if (InitOutpostUnitType == UnitType.Archer)
+        {
+            counter = 1;
+        }
+
+        sr.sprite = ChangeSpawnType(counter);
     }
 
     void Update()
@@ -65,9 +71,7 @@ public class Outpost : NetworkBehaviour, ICommander
     }
 
     GameObject SpawnWhichUnit() {
-        //UnitType t = OutpostSpawnerChanger.OutpostUnitType;
-        UnitType t = OutpostUnitType;
-        switch (t) {
+        switch (outpostUnitType) {
             case UnitType.Archer:
                 return ArcherPrefab;
             default:
@@ -109,23 +113,23 @@ public class Outpost : NetworkBehaviour, ICommander
     }
 
     // change spawn type and icon
-    Sprite GetIcon(int n) {
+    Sprite ChangeSpawnType(int n) {
         switch (n) {
             case 1:
-                OutpostUnitType = UnitType.Archer;
-                return Instantiate(ArcherIcon);
+                outpostUnitType = UnitType.Archer;
+                return ArcherIcon;
             //case 2:
             //    OutpostUnitType = UnitType.Horseman;
             //    return Instantiate(HorsemanIcon);
             default:
-                OutpostUnitType = UnitType.Pawn;
-                return Instantiate(PawnIcon);
+                outpostUnitType = UnitType.Pawn;
+                return PawnIcon;
         }
     }
 
     [ClientRpc]
     void ChangeIconClientRpc(int si) {
-        sr.sprite = GetIcon(si);
+        sr.sprite = ChangeSpawnType(si);
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -136,10 +140,9 @@ public class Outpost : NetworkBehaviour, ICommander
         if (playerController != null && playerController.Team == Team) {
             Debug.Log("ZMEN IKONU!");
             counter++;
-            //sr.sprite = GetIcon(counter % 2);
+            int numOfUnitTypes = Enum.GetNames(typeof(UnitType)).Length;
+            ChangeIconClientRpc(counter % numOfUnitTypes);
         }
-        // + ClientRpc
-        ChangeIconClientRpc(counter % 2);
     }
 
     void OnMouseDown() {
