@@ -20,7 +20,6 @@ public class Formation : NetworkBehaviour {
     }
 
     [SerializeField] GameObject PositionPrefab;
-    [SerializeField] public GameObject BoxRootPrefab;
     public List<GameObject> soldiers = new List<GameObject>();
 
     private int Team;
@@ -33,30 +32,15 @@ public class Formation : NetworkBehaviour {
     public List<GameObject> FormationBox = new List<GameObject>(); // are in hierarchy under BoxRoot
 
     [ClientRpc]
-    void ReparentFormationClientRpc() {
+    void UnparentFormationClientRpc() {
         var p = gameObject.transform.position;
         BoxRoot.transform.SetParent(null, true);
         BoxRoot.transform.position = new Vector3(p.x - 2, p.y, p.z);
         BoxRoot.transform.rotation = Quaternion.Euler(new Vector3(0, 0, 90));
     }
 
-    [ServerRpc(RequireOwnership = false)]
-    public void SpawnFromServerRpc() {
-        //if (BoxRoot) {
-        //    return;
-        //}
-        //var p = gameObject.transform.position;
-
-        //BoxRoot = Instantiate(BoxRootPrefab, new Vector3(p.x - 2, p.y, p.z), Quaternion.Euler(new Vector3(0, 0, 90)));
-        BoxRoot = gameObject.GetComponentInChildren<FormationDescriptor>().gameObject;
-        
-        //BoxRoot.GetComponent<NetworkObject>().Spawn();
-        //Hide(BoxRoot);
-    }
-
     public void StartFormation() {
-        SpawnFromServerRpc();
-        ReparentFormationClientRpc();
+        UnparentFormationClientRpc();
         Team = gameObject.GetComponent<PlayerController>().Team;
     }
 

@@ -171,8 +171,6 @@ public class Soldier : NetworkBehaviour, ISoldier
 
     private void IdleBehaviour()
     {
-        if(Team == 1) return;
-        
         Transform enemyT = EnemyObserver.GetClosestEnemy();
         float distanceFromCommander = Vector3.Distance(CommanderToFollow.position, transform.position);
         if (enemyT != null && distanceFromCommander < DefendDistanceFromCommander)

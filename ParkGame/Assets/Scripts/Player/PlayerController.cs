@@ -41,7 +41,7 @@ namespace Player
             spriteRenderer = GetComponent<SpriteRenderer>();
             networkAnimator = GetComponent<NetworkAnimator>();
             FormationScript = GetComponent<Formation>();
-            if (isActualOwner()) {
+            if (IsServer) {
                 FormationScript.StartFormation(); // build prefab, get position of the commander
             }
 
