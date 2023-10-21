@@ -38,6 +38,10 @@ public class Soldier : NetworkBehaviour, ISoldier
     [SerializeField] int Damage = 1;
     [SerializeField] UnitType UnitType;
     [SerializeField] float DeathFadeTime = 2f;
+    
+    [SerializeField] bool initTeamDebug = false; // DEBUG // TODO: rm
+    [SerializeField] int initTeam = 0; // DEBUG // TODO: rm
+    [SerializeField] Transform debugCommander; // DEBUG // TODO: rm
 
     //[SerializeField] float ClosestEnemyDEBUG; // DEBUG // TODO: rm
     public float ClosestEnemyDEBUG; // DEBUG // TODO: rm
@@ -86,12 +90,17 @@ public class Soldier : NetworkBehaviour, ISoldier
         
         _Team.OnValueChanged += OnTeamChanged;
         _SoldierBehaviour.OnValueChanged += OnBehaviourChange;
+
+        if (initTeamDebug && IsServer)
+        {
+            Team = initTeam;
+        }
+        
         OnTeamChanged(0, Team);
         OnBehaviourChange(0, SoldierBehaviour);
         SpriteRenderer.flipX = XSpriteFlip.Value;
 
-        if (IsServer)
-            HP = InitialHP;
+        if (IsServer) HP = InitialHP;
 
         if (!IsServer)
         {
@@ -143,7 +152,10 @@ public class Soldier : NetworkBehaviour, ISoldier
 
         // check for a Commander
         if (CommanderToFollow == null)
-        { return; } // TODO: add function, that finds the nearest frienly outpost
+        {
+            CommanderToFollow = debugCommander; // DEBUG // TODO: rm
+            return;
+        } // TODO: add function, that finds the nearest frienly outpost
 
         // death timer
         //if (TimeUntilDestroyed > 0 || HP == 0) {
@@ -318,6 +330,7 @@ public class Soldier : NetworkBehaviour, ISoldier
     {
         // archers, don't go closer! you'd just die 
         if (Vector3.Distance(entityT.position, transform.position) < MinAttackRange) {
+            SoldierBehaviour = SoldierBehaviour.Idle;
             return;
         }
         Vector2 directionToEntity = entityT.position - transform.position;
@@ -398,6 +411,7 @@ public class Soldier : NetworkBehaviour, ISoldier
 
         }
     }
+    
     /// <summary> !call only on server! </summary>
     public void TakeDamage(int damage)
     {
@@ -405,22 +419,20 @@ public class Soldier : NetworkBehaviour, ISoldier
         { throw new Exception($"soldier ({gameObject.name}) can take damage only on server"); }
         Debug.Log("take damage");
         int hp = HP - damage;
-        if (hp < 0) { Die(); } // what if hp == 0
+        if (hp <= 0) { Die(); }
         else { HP = hp; }
     }
 
-    
     public Transform GetCommanderWhomIFollow() {
         return CommanderToFollow;
     }
-
-
+    
     /// <summary> !call only on server! </summary>
     public void Die()
     {
         HP = 0;
         SoldierBehaviour = SoldierBehaviour.Death;
-        CommanderToFollow?.GetComponent<ICommander>().ReportUnfollowing(gameObject);
+        CommanderToFollow?.GetComponent<ICommander>()?.ReportUnfollowing(gameObject);
         Networkanimator.SetTrigger("Die");
         handleDeath();
         handleDeathClientRpc();

@@ -295,7 +295,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 16e878c8ac6e19f46bc87fa57d8fe0a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  InitialHP: 1
+  InitialHP: 7
   MovementSpeed: 1
   InnerDistanceFromCommander: 1
   OuterDistanceFromCommander: 2
@@ -306,6 +306,10 @@ MonoBehaviour:
   Attackcooldown: 1
   Damage: 1
   UnitType: 0
+  DeathFadeTime: 2
+  initTeamDebug: 0
+  initTeam: 0
+  debugCommander: {fileID: 0}
   ClosestEnemyDEBUG: 0
   TeaM: 0
   Behaviour: 0
@@ -313,7 +317,6 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   AttackTimer: 0
-  TimeUntilDestroyed: 0
   FollowInNavMeshFormation: 0
   FormationFromFollowedCommander: {fileID: 0}
   ObjectToFollowInFormation: {fileID: 0}
@@ -434,7 +437,7 @@ NavMeshAgent:
   m_AutoBraking: 1
   m_AutoRepath: 1
   m_Height: 0.2
-  m_BaseOffset: 0.64
+  m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
 --- !u!114 &7124321394914278606
