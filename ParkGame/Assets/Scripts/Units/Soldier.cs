@@ -47,7 +47,7 @@ public class Soldier : NetworkBehaviour, ISoldier
     public UnityEvent BehaviourChangedEvent;
     EnemyObserver EnemyObserver;
     //private float AttackTimer = 0.0f;
-    public float AttackTimer = 0.0f;
+    public float AttackTimer = 0.0f; // public for debug
     public float TimeUntilDestroyed = 0.0f;
 
     // animation
@@ -75,7 +75,6 @@ public class Soldier : NetworkBehaviour, ISoldier
         SpriteRenderer = GetComponent<SpriteRenderer>();
         Animator = GetComponent<Animator>();
         Agent = GetComponent<NavMeshAgent>();
-        Debug.Log("agent" + Agent);
 
         _Team.OnValueChanged += OnTeamChanged;
         _SoldierBehaviour.OnValueChanged += OnBehaviourChange;
@@ -160,6 +159,8 @@ public class Soldier : NetworkBehaviour, ISoldier
                 break;
 
             // when in move range??? or setup from playercontroller
+            // now: when in formation, go in the formation around the commander
+            // add to it: when close to an enemy, attack him
             case SoldierBehaviour.Formation:
                 FormationBehaviour();
                 break;
@@ -335,7 +336,6 @@ public class Soldier : NetworkBehaviour, ISoldier
         //transform.Translate(movement * Time.deltaTime);
         
         if (entityT) {
-            //Debug.Log("go to entityT" + gameObject.name);
             var pos = new Vector3(entityT.position.x, entityT.position.y, transform.position.z);
             Agent.SetDestination(pos);
         } else {
@@ -401,7 +401,7 @@ public class Soldier : NetworkBehaviour, ISoldier
         { throw new Exception($"soldier ({gameObject.name}) can take damage only on server"); }
         Debug.Log("take damage");
         int hp = HP - damage;
-        if (hp < 0) { Die(); }
+        if (hp < 0) { Die(); } // what if hp == 0
         else { HP = hp; }
     }
 
@@ -417,8 +417,9 @@ public class Soldier : NetworkBehaviour, ISoldier
         HP = 0;
         CommanderToFollow?.GetComponent<ICommander>().ReportUnfollowing(gameObject);
         Animator.SetTrigger("Die");
+        
+        // visualize death: black shadow, fade soldier's sprite, and then self-destruct
         TimeUntilDestroyed = 2;
-
         SoldierBehaviour = SoldierBehaviour.Death;
         gameObject.transform.Find("Circle").GetComponent<SpriteRenderer>().color = Color.black;
         gameObject.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;

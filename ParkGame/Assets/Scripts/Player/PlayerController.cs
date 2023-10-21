@@ -78,10 +78,10 @@ namespace Player
             //if (Input.GetKeyDown(KeyCode.C)) { FormatSoldiers(KeyCode.C); }
             //if (Input.GetKeyDown(KeyCode.R)) { FormatSoldiers(KeyCode.R); }
             if (Input.GetKeyDown(KeyCode.C)) { 
-                Debug.Log("Nu of Units: " + Units.Count);
+                //Debug.Log("Nu of Units: " + Units.Count);
                 FormatSoldiersServerRpc(KeyCode.C); }
             if (Input.GetKeyDown(KeyCode.R)) { 
-                Debug.Log("Nu of Units: " + Units.Count);
+                //Debug.Log("Nu of Units: " + Units.Count);
                 FormatSoldiersServerRpc(KeyCode.R); }
         }
 

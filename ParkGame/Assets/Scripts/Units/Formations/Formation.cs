@@ -9,6 +9,7 @@ public class Formation : NetworkBehaviour {
 //public class Formation : MonoBehaviour {
     public enum FormationType { Circle, Box, Free };
 
+    // tmp counter
     float ccc;
 
     public class PositionPair {
@@ -21,31 +22,41 @@ public class Formation : NetworkBehaviour {
     [SerializeField] GameObject PositionPrefab;
     [SerializeField] public GameObject BoxRootPrefab;
     public List<GameObject> soldiers = new List<GameObject>();
-    public List<GameObject> BoxesForDebugList = new List<GameObject>();
 
     private int Team;
 
-    // circle formation
+    // circle formation - positions for soldiers
     public List<GameObject> FormationCircle = new List<GameObject>();
     
     // box formation
     public GameObject BoxRoot;
     public List<GameObject> FormationBox = new List<GameObject>(); // are in hierarchy under BoxRoot
 
-    [ServerRpc(RequireOwnership = false)]
-    public void SpawnFormServerRpc() {
+    [ClientRpc]
+    void ReparentFormationClientRpc() {
         var p = gameObject.transform.position;
-        if (BoxRoot) {
-            return;
-        }
-        BoxRoot = Instantiate(BoxRootPrefab, new Vector3(p.x - 2, p.y, p.z), Quaternion.Euler(new Vector3(0, 0, 90)));
-        BoxRoot.GetComponent<NetworkObject>().Spawn();
-        BoxesForDebugList.Add(BoxRoot);
+        BoxRoot.transform.SetParent(null, true);
+        BoxRoot.transform.position = new Vector3(p.x - 2, p.y, p.z);
+        BoxRoot.transform.rotation = Quaternion.Euler(new Vector3(0, 0, 90));
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void SpawnFromServerRpc() {
+        //if (BoxRoot) {
+        //    return;
+        //}
+        //var p = gameObject.transform.position;
+
+        //BoxRoot = Instantiate(BoxRootPrefab, new Vector3(p.x - 2, p.y, p.z), Quaternion.Euler(new Vector3(0, 0, 90)));
+        BoxRoot = gameObject.GetComponentInChildren<FormationDescriptor>().gameObject;
+        
+        //BoxRoot.GetComponent<NetworkObject>().Spawn();
         //Hide(BoxRoot);
     }
 
     public void StartFormation() {
-        SpawnFormServerRpc();
+        SpawnFromServerRpc();
+        ReparentFormationClientRpc();
         Team = gameObject.GetComponent<PlayerController>().Team;
     }
 
@@ -61,7 +72,8 @@ public class Formation : NetworkBehaviour {
         RotateBoxFormation();
 
         if (ccc > 10) {
-            CallToMyTeammates();
+            // test
+            //CallToMyTeammates();
             ccc = 0;
         } else { 
             ccc += Time.deltaTime;
@@ -296,7 +308,7 @@ public class Formation : NetworkBehaviour {
     }
 
     public void ListFormationPositions(FormationType shape = FormationType.Circle) {
-        // draw positions for the number of soldiers
+        // draw positions for following soldiers
         if (shape == FormationType.Circle) {
             var positions = ListCircularPositions();
 
@@ -305,6 +317,7 @@ public class Formation : NetworkBehaviour {
                 Add1PositionToCircularFormation(positions[positions.Count - 1]);
             }
 
+            // recount positions, ajdust the number of followers changed
             FitCircularFormation();
         }
         if (shape == FormationType.Box) {

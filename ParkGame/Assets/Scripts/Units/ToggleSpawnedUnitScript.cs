@@ -42,18 +42,16 @@ public class ToggleSpawnedUnitScript : NetworkBehaviour {
     [ServerRpc(RequireOwnership = false)]
     public void RequestChangingSpawnTypeServerRpc(ulong clientID) {
         PlayerController playerController = playerManager.GetPlayerController(clientID);
-        Debug.Log("teams: " + playerController.Team + " outpost from: " + Team);
+        //Debug.Log("teams: " + playerController.Team + " outpost from: " + Team);
 
         if (playerController != null && playerController.Team == Team) {
-            Debug.Log("ZMEN IKONU!");
             counter++;
             sr.sprite = GetIcon(counter % 2);
         }
     }
 
     void OnMouseDown() {
-        Debug.Log("ICON CLICKED");
-
+        //Debug.Log("ICON CLICKED");
         ulong clientID = NetworkManager.Singleton.LocalClientId;
         RequestChangingSpawnTypeServerRpc(clientID);
     }
