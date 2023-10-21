@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Managers;
 using TMPro;
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,7 +15,7 @@ namespace UI.Lobby
      * Players can see the room code, their team, and the other players in the game.
      * Host can start the game from here.
      */
-    public class LobbyMenuController : MonoBehaviour
+    public class UILobbyMenuController : MonoBehaviour
     {
         [SerializeField] private string joinMenuSceneName;
         
@@ -31,11 +32,12 @@ namespace UI.Lobby
         private readonly List<LobbyTeamUI> teamUIs = new();
 
         private float maxImageSize;
-        
+
         private void Start()
         {
             maxImageSize = drawnTexture.rectTransform.sizeDelta.x;
-            
+            goBackButton.onClick.AddListener(goBack);
+
             // Enable start button for the host
             if (OurNetworkManager.Singleton.IsHost)
             {
@@ -47,7 +49,6 @@ namespace UI.Lobby
             }
 
             roomCodeLabel.text += SessionManager.Singleton.RoomCode;
-            goBackButton.onClick.AddListener(goBack);
 
             // Initialize team UI for the host.
             // Clients need to wait till they receive the map data and then initialize the team UI.
@@ -62,6 +63,25 @@ namespace UI.Lobby
             
             OurNetworkManager.Singleton.OnClientDisconnectCallback += onClientDisconnect;
             SessionManager.Singleton.OnTeamJoined += onTeamJoined;
+        }
+
+        private void OnEnable()
+        {
+            
+        }
+
+        public void FillData()
+        {
+            roomCodeLabel.text += SessionManager.Singleton.RoomCode;
+
+            if (OurNetworkManager.Singleton.IsHost)
+            {
+                initializeUI(SessionManager.Singleton.MapData);   
+            }
+            else
+            {
+                SessionManager.Singleton.OnMapReceived += initializeUI;
+            } 
         }
 
         private void OnDestroy()
@@ -190,7 +210,7 @@ namespace UI.Lobby
         private void addPlayerToTeamUI(PlayerData playerData)
         {
             bool isLocalPlayer = playerData.ID == SessionManager.Singleton.LocalPlayerId;
-            teamUIs[playerData.Team].AddPlayer(playerData, isLocalPlayer);
+            teamUIs[playerData.Team].AddPlayer(playerData, isLocalPlayer,0);
         }
     }
 }

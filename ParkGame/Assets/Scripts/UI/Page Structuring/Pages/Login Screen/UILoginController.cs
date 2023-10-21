@@ -12,7 +12,7 @@ public class UILoginController : MonoBehaviour
     [SerializeField]
     private Button loginButton;
 
-    private void Awake()
+    private void Start()
     {
         loginButton.interactable = false;
         usernameInputField.onEndEdit.AddListener(delegate { OnInputFieldValueChanged(usernameInputField.text); });

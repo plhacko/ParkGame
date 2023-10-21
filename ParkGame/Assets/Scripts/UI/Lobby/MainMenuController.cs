@@ -43,6 +43,7 @@ namespace UI.Lobby
             
             OurNetworkManager.Singleton.OnClientDisconnectCallback += onClientDisconnect;
 
+            // Debug.Log(SessionManager.Singleton);
             joinCodeInputField.text = SessionManager.Singleton.RoomCode != null
                 ? SessionManager.Singleton.RoomCode
                 : PlayerPrefs.GetString("DebugRoomCode", "");

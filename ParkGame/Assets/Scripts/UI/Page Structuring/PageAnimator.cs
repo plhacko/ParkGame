@@ -12,13 +12,13 @@ public class PageAnimator
         float duration, 
         UnityEvent OnEnd)
     {
-        Vector2 targetPosition = rectTransform.anchoredPosition;
-        Vector2 startPosition = rectTransform.anchoredPosition;
+        Vector2 targetPosition = Vector2.zero;
+        Vector2 startPosition = Vector2.zero;
 
         switch (direction)
         {
             case Direction.Left:
-                startPosition.x += Screen.width;
+                startPosition.x = Screen.width;
                 break;
             case Direction.Right:
                 startPosition.x -= Screen.width;
@@ -52,8 +52,8 @@ public class PageAnimator
         float duration,
         UnityEvent OnEnd)
     {
-        Vector2 targetPosition = rectTransform.anchoredPosition;
-        Vector2 startPosition = rectTransform.anchoredPosition;
+        Vector2 targetPosition = Vector2.zero;
+        Vector2 startPosition = Vector2.zero;
 
         switch (direction)
         {
