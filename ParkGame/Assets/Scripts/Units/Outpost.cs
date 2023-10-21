@@ -14,6 +14,12 @@ public class Outpost : NetworkBehaviour, ICommander
     [SerializeField] float SpawnTime = 4; // 4s
     [SerializeField] GameObject UnitPrefab;
     [SerializeField] GameObject ArcherPrefab;
+
+    [SerializeField] Sprite PawnIcon;
+    [SerializeField] Sprite ArcherIcon;
+    [SerializeField] Sprite HorsemanIcon;
+    [SerializeField] private UnitType OutpostUnitType;
+    
     //[SerializeField] GameObject HorsemanPrefab; // todo
     List<GameObject> Units = new List<GameObject>();
     //ToggleSpawnedUnitScript OutpostSpawnerChanger;
@@ -24,16 +30,10 @@ public class Outpost : NetworkBehaviour, ICommander
     [SerializeField] NetworkVariable<int> _Team = new(0);
     public int Team { get => _Team.Value; set => _Team.Value = value; }
 
-    [SerializeField] Sprite PawnIcon;
-    [SerializeField] Sprite ArcherIcon;
-    [SerializeField] Sprite HorsemanIcon;
     private SpriteRenderer sr;
     private int counter;
-    public UnitType OutpostUnitType;
     private PlayerManager playerManager;
-
-
-
+    
     //private void Start()
     private void Awake()
     {
@@ -108,9 +108,6 @@ public class Outpost : NetworkBehaviour, ICommander
         return Formation.FormationType.Free;
     }
 
-
-
-
     // change spawn type and icon
     Sprite GetIcon(int n) {
         switch (n) {
@@ -143,9 +140,6 @@ public class Outpost : NetworkBehaviour, ICommander
         }
         // + ClientRpc
         ChangeIconClientRpc(counter % 2);
-
-
-
     }
 
     void OnMouseDown() {
@@ -154,8 +148,4 @@ public class Outpost : NetworkBehaviour, ICommander
         ulong clientID = NetworkManager.Singleton.LocalClientId;
         RequestChangingSpawnTypeServerRpc(clientID);
     }
-
-
-
-
 }

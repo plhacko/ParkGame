@@ -32,6 +32,7 @@ public class Soldier : NetworkBehaviour, ISoldier
     [SerializeField] float Attackcooldown = 1.0f;
     [SerializeField] int Damage = 1;
     [SerializeField] UnitType UnitType;
+    [SerializeField] float DeathFadeTime = 2f;
 
     //[SerializeField] float ClosestEnemyDEBUG; // DEBUG // TODO: rm
     public float ClosestEnemyDEBUG; // DEBUG // TODO: rm
@@ -48,12 +49,10 @@ public class Soldier : NetworkBehaviour, ISoldier
     EnemyObserver EnemyObserver;
     //private float AttackTimer = 0.0f;
     public float AttackTimer = 0.0f; // public for debug
-    public float TimeUntilDestroyed = 0.0f;
 
     // animation
     private static readonly int AnimatorMovementSpeedHash = Animator.StringToHash("MovementSpeed");
     private SpriteRenderer SpriteRenderer;
-    private Animator Animator;
     private NetworkAnimator Networkanimator;
     private NetworkVariable<bool> XSpriteFlip = new(false,
         NetworkVariableReadPermission.Everyone,
@@ -73,9 +72,9 @@ public class Soldier : NetworkBehaviour, ISoldier
         playerManager = FindObjectOfType<PlayerManager>();
         EnemyObserver = GetComponentInChildren<EnemyObserver>();
         SpriteRenderer = GetComponent<SpriteRenderer>();
-        Animator = GetComponent<Animator>();
         Agent = GetComponent<NavMeshAgent>();
-
+        Networkanimator = GetComponent<NetworkAnimator>();
+        
         _Team.OnValueChanged += OnTeamChanged;
         _SoldierBehaviour.OnValueChanged += OnBehaviourChange;
         OnTeamChanged(0, Team);
@@ -187,7 +186,7 @@ public class Soldier : NetworkBehaviour, ISoldier
             SoldierBehaviour = SoldierBehaviour.Move;
         }
         else
-        { Animator.SetFloat(AnimatorMovementSpeedHash, 0.0f); }
+        { Networkanimator.Animator.SetFloat(AnimatorMovementSpeedHash, 0.0f); }
     }
 
     private void MovementBehaviour()
@@ -203,7 +202,7 @@ public class Soldier : NetworkBehaviour, ISoldier
         else
         {
             SoldierBehaviour = SoldierBehaviour.Idle;
-            Animator.SetFloat(AnimatorMovementSpeedHash, 0.0f);
+            Networkanimator.Animator.SetFloat(AnimatorMovementSpeedHash, 0.0f);
         }
     }
 
@@ -242,9 +241,9 @@ public class Soldier : NetworkBehaviour, ISoldier
             
             Vector2 direction = ObjectToFollowInFormation.transform.position - gameObject.transform.position;
             if (direction.magnitude < 0.001f) {
-                Animator.SetFloat(AnimatorMovementSpeedHash, 0.0f);
+                Networkanimator.Animator.SetFloat(AnimatorMovementSpeedHash, 0.0f);
             } else {
-                Animator.SetFloat(AnimatorMovementSpeedHash, 1.0f);
+                Networkanimator.Animator.SetFloat(AnimatorMovementSpeedHash, 1.0f);
             }
             SpriteRenderer.flipX = direction.x < 0;
             XSpriteFlip.Value = SpriteRenderer.flipX;
@@ -285,10 +284,10 @@ public class Soldier : NetworkBehaviour, ISoldier
             {
                 AttackTimer = 0.0f;
                 Debug.Log("ATTACK");
-                Animator.SetFloat(AnimatorMovementSpeedHash, 0.0f); //("MovementSpeed", 0);
+                Networkanimator.Animator.SetFloat(AnimatorMovementSpeedHash, 0.0f); //("MovementSpeed", 0);
 
-                Animator.SetTrigger("Attack");
-
+                Networkanimator.SetTrigger("Attack");
+                
                 if (UnitType == UnitType.Pawn) {
                     enemyT.GetComponent<ISoldier>()?.TakeDamage(Damage);
                 }
@@ -317,7 +316,7 @@ public class Soldier : NetworkBehaviour, ISoldier
 
         if (direction.magnitude < 0.01f)
         {
-            Animator.SetFloat(AnimatorMovementSpeedHash, 0.0f);
+            Networkanimator.Animator.SetFloat(AnimatorMovementSpeedHash, 0.0f);
             return;
         }
 
@@ -325,7 +324,7 @@ public class Soldier : NetworkBehaviour, ISoldier
 
         Vector2 movement = direction * MovementSpeed;
 
-        Animator.SetFloat(AnimatorMovementSpeedHash, movement.magnitude);
+        Networkanimator.Animator.SetFloat(AnimatorMovementSpeedHash, movement.magnitude);
 
         if (direction.magnitude < Mathf.Epsilon)
         { return; }
@@ -415,16 +414,30 @@ public class Soldier : NetworkBehaviour, ISoldier
     public void Die()
     {
         HP = 0;
-        CommanderToFollow?.GetComponent<ICommander>().ReportUnfollowing(gameObject);
-        Animator.SetTrigger("Die");
-        
-        // visualize death: black shadow, fade soldier's sprite, and then self-destruct
-        TimeUntilDestroyed = 2;
         SoldierBehaviour = SoldierBehaviour.Death;
+        CommanderToFollow?.GetComponent<ICommander>().ReportUnfollowing(gameObject);
+        Networkanimator.SetTrigger("Die");
+        handleDeath();
+        handleDeathClientRpc();
+    }
+
+    [ClientRpc]
+    public void handleDeathClientRpc(ClientRpcParams clientRpcParams = default)
+    {
+        if (IsHost) return;
+        handleDeath();
+    }
+    
+    private void handleDeath()
+    {
+        // visualize death: black shadow, fade soldier's sprite, and then self-destruct
         gameObject.transform.Find("Circle").GetComponent<SpriteRenderer>().color = Color.black;
         gameObject.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;
-        float fadeTime = 2f;
-        gameObject.GetComponent<SpriteRenderer>()?.DOFade(0, fadeTime);
-        Destroy(gameObject, fadeTime); // destroy after 2 s
+        gameObject.GetComponent<SpriteRenderer>()?.DOFade(0, DeathFadeTime);
+
+        if (IsServer)
+        {
+            Destroy(gameObject, DeathFadeTime);   
+        }
     }
 }

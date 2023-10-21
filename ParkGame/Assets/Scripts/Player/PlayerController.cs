@@ -14,7 +14,6 @@ namespace Player
         [SerializeField] private float movementSpeed = 1;
 
         private SpriteRenderer spriteRenderer;
-        private Animator animator;
         private NetworkAnimator networkAnimator;
         private Guid ownerPlayerId;
         private Formation FormationScript;
@@ -40,7 +39,7 @@ namespace Player
         private void initialize()
         {
             spriteRenderer = GetComponent<SpriteRenderer>();
-            animator = GetComponent<Animator>();
+            networkAnimator = GetComponent<NetworkAnimator>();
             FormationScript = GetComponent<Formation>();
             if (isActualOwner()) {
                 FormationScript.StartFormation(); // build prefab, get position of the commander
@@ -176,9 +175,8 @@ namespace Player
             {
                 //FormationScript.ListFormationPositions();
             }
-
-
-            animator.SetFloat(MovementSpeed, movement.magnitude);
+            
+            networkAnimator.Animator.SetFloat(MovementSpeed, movement.magnitude);
 
             if (input.magnitude < Mathf.Epsilon) return;
 

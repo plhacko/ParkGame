@@ -123,7 +123,7 @@ GameObject:
   - component: {fileID: 2403692571140172980}
   - component: {fileID: 2751979071187238722}
   - component: {fileID: 5625801460732714589}
-  - component: {fileID: 59607779333161792}
+  - component: {fileID: 201797290003125593}
   - component: {fileID: 9091534314517734068}
   - component: {fileID: 8848524197970868838}
   - component: {fileID: 112822024680283683}
@@ -269,7 +269,7 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
---- !u!114 &59607779333161792
+--- !u!114 &201797290003125593
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -278,7 +278,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2149011059489662585}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 115a9a5bc3c16154594842d6f91a66ff, type: 3}
+  m_Script: {fileID: 11500000, guid: e8d0727d5ae3244e3b569694d3912374, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   TransitionStateInfoList: []
@@ -301,7 +301,6 @@ MonoBehaviour:
   OuterDistanceFromCommander: 2
   DefendDistanceFromCommander: 3
   AttackDistanceFromCommander: 6
-  AttackRange: 0.4
   MinAttackRange: 0
   MaxAttackRange: 0.4
   Attackcooldown: 1
