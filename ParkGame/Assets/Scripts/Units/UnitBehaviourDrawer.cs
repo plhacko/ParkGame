@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -14,7 +12,7 @@ public class UnitBehaviourDrawer : MonoBehaviour
     [SerializeField] Sprite FormationIcon;
     [SerializeField] Sprite MovementIcon;
 
-    void Start()
+    void Awake()
     {
         SpriteRenderer = GetComponent<SpriteRenderer>();
         TheSoldier = GetComponentInParent<Soldier>();

@@ -38,6 +38,10 @@ namespace Units.Archer
         {
             if(!IsServer) return;
             if(this.spawnTime + delay > Time.time) return;
+            if(target == null)
+            {
+                Destroy(gameObject);   
+            }
             
             Vector3 targetPosition = target.position;
             Vector3 toTarget = (targetPosition - transform.position).normalized;

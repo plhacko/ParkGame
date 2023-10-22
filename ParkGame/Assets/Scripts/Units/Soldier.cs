@@ -441,7 +441,7 @@ public class Soldier : NetworkBehaviour, ISoldier
     [ClientRpc]
     public void handleDeathClientRpc(ClientRpcParams clientRpcParams = default)
     {
-        if (IsHost) return;
+        if (IsServer) return;
         handleDeath();
     }
     
