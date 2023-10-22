@@ -2,12 +2,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Firebase;
 using Firebase.Database;
 using Firebase.Storage;
-using UI;
-using UI.Lobby;
 using Unity.Netcode;
+using Unity.Services.Authentication;
+using Unity.Services.Core;
+using Unity.Services.Lobbies;
+using Unity.Services.Lobbies.Models;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
@@ -193,6 +196,12 @@ namespace Managers
         private MapData mapData;
         private string roomCode;
         
+        public Task UnityServicesInitializationTask { get; private set; }
+
+        private Lobby hostLobby;
+        private Coroutine hostLobbyHeartbeatCoroutine;
+        private Lobby joinedLobby;
+        private Coroutine updateJoinedLobbyCoroutine;
 
         private void Awake()
         {
@@ -205,6 +214,7 @@ namespace Managers
                 PlayersData.ClearData();
                 instance = this;
                 DontDestroyOnLoad(gameObject);
+                UnityServicesInitializationTask = UnityServices.InitializeAsync();
             }
             // if (instance == null)
             // {
@@ -481,6 +491,113 @@ namespace Managers
             
             PlayersData.UpdatePlayerData(data);
             OnTeamJoined.Invoke(playerId.Value, oldTeam, data.Team);
+        }
+
+        // Lobby using UGS ------------------------------------------------------------------------------------------------------
+        public async void CreateLobby()
+        {
+            try 
+            {
+                string lobbyName = "My Lobby"; 
+                int maxPlayers = 4;
+
+                Lobby lobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, maxPlayers);
+                hostLobby = lobby;
+                joinedLobby = lobby;
+                // TODO these freeze the game
+                // hostLobbyHeartbeatCoroutine = StartCoroutine(HostLobbyHeartbeat());
+                // updateJoinedLobbyCoroutine = StartCoroutine(UpdateJoinedLobby());
+                Debug.Log($"Lobby created with ID: {lobby.Id}" + $" and name: {lobby.Name}" + $" and max players: {lobby.MaxPlayers}" + $" and code: {lobby.LobbyCode}");
+                PrintPlayers(lobby); 
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e);
+            }
+        }
+
+        public async void ListLobbies()
+        {
+            try
+            {
+                QueryResponse queryResponse = await Lobbies.Instance.QueryLobbiesAsync();
+
+                Debug.Log($"Lobbies found: {queryResponse.Results.Count}");
+                
+                foreach (var lobby in queryResponse.Results)
+                {
+                    Debug.Log($"Lobby found with ID: {lobby.Id}" + $" and name: {lobby.Name}" + $" and max players: {lobby.MaxPlayers}" + " code: " + lobby.LobbyCode);
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e);
+            }
+        }
+
+        IEnumerator HostLobbyHeartbeat()
+        {
+            while (true)
+            {
+                if (hostLobby == null) yield break;
+                
+                LobbyService.Instance.SendHeartbeatPingAsync(hostLobby.Id);
+             
+                yield return new WaitForSecondsRealtime(15.0f);
+            }
+        }
+
+        IEnumerator UpdateJoinedLobby() 
+        {
+            while (true)
+            {
+                yield return new WaitForSeconds(1.1f);
+
+                if (joinedLobby == null) yield break;
+                
+                var task =  LobbyService.Instance.GetLobbyAsync(joinedLobby.Id);
+                
+                joinedLobby = task.Result;
+                if (joinedLobby.HostId == AuthenticationService.Instance.PlayerId)
+                {
+                    hostLobby = joinedLobby;
+                }
+             
+                yield return new WaitUntil(() => task.IsCompleted);
+            }
+        }
+
+        public async void JoinLobbyByCode(string code)
+        {
+            try 
+            {
+                joinedLobby = await Lobbies.Instance.JoinLobbyByCodeAsync(code);
+                updateJoinedLobbyCoroutine = StartCoroutine(UpdateJoinedLobby());
+
+                Debug.Log($"Joined lobby with code: {code}");
+
+                PrintPlayers(joinedLobby);
+            }
+            catch (LobbyServiceException e)
+            {
+                Debug.Log(e);
+            }
+        }
+
+        public void PrintPlayers(Lobby lobby)
+        {
+            foreach (var player in lobby.Players)
+            {
+                Debug.Log($"Player found with ID: {player.Id}");
+            }
+        }
+
+        public bool IsLobbyHost => joinedLobby.HostId == AuthenticationService.Instance.PlayerId;
+
+
+        public void CreateLobbyForMap(MapData mapData)
+        {
+            // TODO
         }
     }
 }

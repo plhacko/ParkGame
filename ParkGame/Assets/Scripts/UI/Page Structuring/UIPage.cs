@@ -22,9 +22,9 @@ public class UIPage : MonoBehaviour
     private AudioClip ExitClip;
 
     [SerializeField]
-    private PageEntryMode entryMode = PageEntryMode.SlideRight;
+    private PageEntryMode entryMode = PageEntryMode.None;
     [SerializeField]
-    private PageEntryMode exitMode = PageEntryMode.SlideLeft;
+    private PageEntryMode exitMode = PageEntryMode.None;
 
     private Coroutine animationCoroutine;
     private Coroutine audioCoroutine;

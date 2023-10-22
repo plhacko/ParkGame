@@ -5,6 +5,7 @@ using TMPro;
 using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace UI.Lobby
@@ -19,8 +20,13 @@ namespace UI.Lobby
     {
         [SerializeField] private string joinMenuSceneName;
         
-        [SerializeField] private Button goBackButton;
+        [SerializeField] private Button backButton;
+        [SerializeField] private UnityEvent onBackPressed;
+        [SerializeField] private UnityEvent onGoBack;
+
         [SerializeField] private Button startGameButton;
+        [SerializeField] private UnityEvent onStartGamePressed;
+
         [SerializeField] private TextMeshProUGUI mapNameLabel;
         [SerializeField] private TextMeshProUGUI roomCodeLabel;
         [SerializeField] private LobbyTeamUI lobbyTeamUIPrefab;
@@ -36,8 +42,23 @@ namespace UI.Lobby
         private void Start()
         {
             maxImageSize = drawnTexture.rectTransform.sizeDelta.x;
-            goBackButton.onClick.AddListener(goBack);
+            backButton.onClick.AddListener(goBack);            
+            OurNetworkManager.Singleton.OnClientDisconnectCallback += onClientDisconnect;
+            SessionManager.Singleton.OnTeamJoined += onTeamJoined;
+        }
 
+        public void OnEnter()
+        {
+            FillData();
+        }
+
+        public void OnExit()
+        {
+            EmptyData();
+        }
+
+        private void FillData()
+        {
             // Enable start button for the host
             if (OurNetworkManager.Singleton.IsHost)
             {
@@ -47,31 +68,6 @@ namespace UI.Lobby
             {
                 startGameButton.gameObject.SetActive(false);
             }
-
-            roomCodeLabel.text += SessionManager.Singleton.RoomCode;
-
-            // Initialize team UI for the host.
-            // Clients need to wait till they receive the map data and then initialize the team UI.
-            if (OurNetworkManager.Singleton.IsHost)
-            {
-                initializeUI(SessionManager.Singleton.MapData);   
-            }
-            else
-            {
-                SessionManager.Singleton.OnMapReceived += initializeUI;
-            }
-            
-            OurNetworkManager.Singleton.OnClientDisconnectCallback += onClientDisconnect;
-            SessionManager.Singleton.OnTeamJoined += onTeamJoined;
-        }
-
-        private void OnEnable()
-        {
-            
-        }
-
-        public void FillData()
-        {
             roomCodeLabel.text += SessionManager.Singleton.RoomCode;
 
             if (OurNetworkManager.Singleton.IsHost)
@@ -82,6 +78,17 @@ namespace UI.Lobby
             {
                 SessionManager.Singleton.OnMapReceived += initializeUI;
             } 
+        }
+
+        private void EmptyData()
+        {
+            roomCodeLabel.text = "Code: ";
+            mapNameLabel.text = "";
+            foreach (var teamUI in teamUIs)
+            {
+                Destroy(teamUI.gameObject);
+            }
+            teamUIs.Clear();
         }
 
         private void OnDestroy()
@@ -133,7 +140,7 @@ namespace UI.Lobby
             PlayerData? playerData = SessionManager.Singleton.PlayersData.GetPlayerData(playerId);
             if (!playerData.HasValue) return;
 
-            teamUIs[newTeam].AddPlayer(playerData.Value, SessionManager.Singleton.IsPlayerIdLocal(playerId));
+            teamUIs[newTeam].AddPlayer(playerData.Value, SessionManager.Singleton.IsPlayerIdLocal(playerId), 0);
         }
 
         private void onClientDisconnect(ulong clientId)
@@ -199,7 +206,8 @@ namespace UI.Lobby
                 }
             }
 
-            SessionManager.Singleton.EndSessionAndGoToScene(joinMenuSceneName);
+            SessionManager.Singleton.EndSession();
+            onGoBack.Invoke();
         }
 
         private void startGame()
@@ -210,7 +218,7 @@ namespace UI.Lobby
         private void addPlayerToTeamUI(PlayerData playerData)
         {
             bool isLocalPlayer = playerData.ID == SessionManager.Singleton.LocalPlayerId;
-            teamUIs[playerData.Team].AddPlayer(playerData, isLocalPlayer,0);
+            teamUIs[playerData.Team].AddPlayer(playerData, isLocalPlayer, 0);
         }
     }
 }

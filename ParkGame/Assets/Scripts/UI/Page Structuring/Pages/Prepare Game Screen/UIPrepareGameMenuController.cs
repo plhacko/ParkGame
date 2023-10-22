@@ -9,16 +9,24 @@ using UnityEngine.Events;
 public class UIPrepareGameMenuController : MonoBehaviour
 {
     [SerializeField] private string lobbySceneName;
-    [SerializeField] private string joinGameSceneName;
+
     [SerializeField] private Button backButton;
-    [SerializeField] private Button createButton;
+    [SerializeField] private UnityEvent onBackPressed;
+   
     [SerializeField] private MapPicker mapPicker;
-    [SerializeField] private UnityEvent onCreatedGame;
+    
+    [SerializeField] private Button createButton;
+    [SerializeField] private UnityEvent onCreatePressed;
+    [SerializeField] private UnityEvent onCreateGame;
 
     void Start()
     {
+        backButton.onClick.AddListener(backToMainMenu);
+        backButton.onClick.AddListener(onBackPressed.Invoke);
+
         createButton.onClick.AddListener(createGame);
-        backButton.onClick.AddListener(backJoinGameScene);
+        createButton.onClick.AddListener(onCreatePressed.Invoke);
+
         setInteractable(false);
     }
 
@@ -29,7 +37,7 @@ public class UIPrepareGameMenuController : MonoBehaviour
 
     // Go back to the join game scene
     // Shutdown the network manager and load the join game scene
-    private void backJoinGameScene()
+    private void backToMainMenu()
     {
         setInteractable(false);
         OurNetworkManager.Singleton.Shutdown();
@@ -47,13 +55,21 @@ public class UIPrepareGameMenuController : MonoBehaviour
         {
             PlayerPrefs.SetString("DebugRoomCode", SessionManager.Singleton.RoomCode);
             // TODO push lobby page without loading scene
-            //OurNetworkManager.Singleton.SceneManager.LoadScene(lobbySceneName, LoadSceneMode.Single); 
-            onCreatedGame.Invoke();
+            // OurNetworkManager.Singleton.SceneManager.LoadScene(lobbySceneName, LoadSceneMode.Single);
+            // SessionManager.Singleton.CreateLobbyForMap(mapData); 
+            onCreateGame.Invoke();
         }
         else
         {
             setInteractable(true);
         }
+    }
+
+    private void CreateLobby()
+    {
+        MapData mapData = mapPicker.GetCurrentMapData();
+        SessionManager.Singleton.CreateLobbyForMap(mapData);
+        onCreateGame.Invoke();
     }
 
     private void setInteractable(bool interactable)

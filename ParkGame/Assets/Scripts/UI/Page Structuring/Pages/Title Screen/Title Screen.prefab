@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 2954184167899350903}
   - component: {fileID: 8175595728044492237}
   - component: {fileID: 5697204347693231425}
+  - component: {fileID: 6179568006192890378}
   m_Layer: 5
   m_Name: Title Screen
   m_TagString: Untagged
@@ -203,11 +204,33 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   animationDuration: 1
-  ExitOnNextPage: 0
+  ExitOnNextPage: 1
   EntryClip: {fileID: 0}
   ExitClip: {fileID: 0}
   entryMode: 0
   exitMode: 0
+  onEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  onExit:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &6179568006192890378
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5180419811621639846}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 87a614ed7c4ee704289d09503e78f52c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enterButton: {fileID: 7135857564677052518}
+  onEnterPressed:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &5397276008431287094
 GameObject:
   m_ObjectHideFlags: 0

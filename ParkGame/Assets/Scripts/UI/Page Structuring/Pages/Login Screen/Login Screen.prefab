@@ -552,6 +552,12 @@ MonoBehaviour:
   ExitClip: {fileID: 0}
   entryMode: 0
   exitMode: 0
+  onEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  onExit:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &1208775356504565797
 MonoBehaviour:
   m_ObjectHideFlags: 0

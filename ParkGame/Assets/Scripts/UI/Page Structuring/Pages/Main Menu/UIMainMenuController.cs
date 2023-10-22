@@ -7,34 +7,30 @@ using Unity.Services.Core;
 using Unity.Services.Authentication;
 using UnityEngine.SceneManagement;
 using Managers;
+using UnityEngine.Events;
 
 public class UIMainMenuController : MonoBehaviour
 {
-    [SerializeField] private string hostMenuSceneName;
-    [SerializeField] private string createMapMenuSceneName;
-    [SerializeField] private Button joinButton;
-    [SerializeField] private Button hostButton;
+    [SerializeField] private string createMapMenuSceneName; 
     [SerializeField] private Button createMapButton;
+    [SerializeField] private UnityEvent onCreateMapPressed;
+    
+    [SerializeField] private Button hostButton;
+    [SerializeField] private UnityEvent onHostPressed;
+    
     [SerializeField] private TMP_InputField joinCodeInputField;
-
-    private async void Start()
+    [SerializeField] private Button joinButton;
+    [SerializeField] private UnityEvent onJoinPressed;
+    
+    private void Start()
     {
         joinButton.onClick.AddListener(joinGame);
-        hostButton.onClick.AddListener(hostGame);
+        joinButton.onClick.AddListener(onJoinPressed.Invoke);
+
+        hostButton.onClick.AddListener(onHostPressed.Invoke);
+        
         createMapButton.onClick.AddListener(createMap);
-        
-        // Disable buttons until the player is signed in
-        enableButtons(false);
-        
-        // Initialize Unity Services and sign in anonymously
-        await UnityServices.InitializeAsync();
-        
-        if (!AuthenticationService.Instance.IsSignedIn)
-        {
-            await AuthenticationService.Instance.SignInAnonymouslyAsync();   
-        }
-        
-        enableButtons(true);
+        createMapButton.onClick.AddListener(onCreateMapPressed.Invoke);
         
         OurNetworkManager.Singleton.OnClientDisconnectCallback += onClientDisconnect;
 
@@ -60,36 +56,32 @@ public class UIMainMenuController : MonoBehaviour
     {
         SceneManager.LoadScene(createMapMenuSceneName, LoadSceneMode.Single);
     }
-    
-    // Go to scene where the player can host a new game
-    private void hostGame()
-    {
-    }
 
     // Join a game with the room code entered in the input field
     private async void joinGame()
     {
-        enableButtons(false);
+        // enableButtons(false);
         
-        string playerName = PlayerPrefs.GetString("PlayerName", "");
-        bool joined = await OurNetworkManager.Singleton.JoinGame(joinCodeInputField.text, playerName);
-        if (joined)
-        {
-            // Save the room code so the player can reconnect if they disconnect
-            SessionManager.Singleton.SetRoomCode(joinCodeInputField.text.ToUpper());
-            return;
-        }
+        // string playerName = PlayerPrefs.GetString("PlayerName", "");
+        // bool joined = await OurNetworkManager.Singleton.JoinGame(joinCodeInputField.text, playerName);
+        // if (joined)
+        // {
+        //     // Save the room code so the player can reconnect if they disconnect
+        //     SessionManager.Singleton.SetRoomCode(joinCodeInputField.text.ToUpper());
+        //     return;
+        // }
         
-        enableButtons(true);
-        joinCodeInputField.text = "";
+        // enableButtons(true);
+        // joinCodeInputField.text = "";
+        SessionManager.Singleton.JoinLobbyByCode(joinCodeInputField.text.ToUpper());
     }
 
     // Enable or disable all buttons
     private void enableButtons(bool isInteractable)
     {
         createMapButton.interactable = isInteractable;
-        joinButton.interactable = isInteractable;
         hostButton.interactable = isInteractable;
         joinCodeInputField.interactable = isInteractable;
+        joinButton.interactable = isInteractable;
     }
 }
