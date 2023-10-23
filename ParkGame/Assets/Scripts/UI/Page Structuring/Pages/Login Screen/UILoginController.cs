@@ -34,6 +34,8 @@ public class UILoginController : MonoBehaviour
 
     public async void Login()
     {
+        loginButton.interactable = false;
+        
         AuthenticationService.Instance.SignedIn += () => onLoginSuccess.Invoke();
 #if UNITY_EDITOR
         if (ParrelSync.ClonesManager.IsClone())
@@ -44,7 +46,11 @@ public class UILoginController : MonoBehaviour
 #endif
         await AuthenticationService.Instance.SignInAnonymouslyAsync();
 
-        Debug.Log("Signed in anonymously" + AuthenticationService.Instance.PlayerId);
+        Debug.Log("Signed in anonymously" + AuthenticationService.Instance.PlayerId + " as " + usernameInputField.text);
+
+        PlayerPrefs.SetString("PlayerName", usernameInputField.text);
+
+        loginButton.interactable = true;
     }
 
 }

@@ -21,10 +21,9 @@ public class UIPrepareGameMenuController : MonoBehaviour
 
     void Start()
     {
-        backButton.onClick.AddListener(backToMainMenu);
         backButton.onClick.AddListener(onBackPressed.Invoke);
 
-        createButton.onClick.AddListener(createGame);
+        createButton.onClick.AddListener(CreateLobby);
         createButton.onClick.AddListener(onCreatePressed.Invoke);
 
         setInteractable(false);
@@ -35,46 +34,16 @@ public class UIPrepareGameMenuController : MonoBehaviour
         setInteractable(mapPicker.IsInitialized());
     }
 
-    // Go back to the join game scene
-    // Shutdown the network manager and load the join game scene
-    private void backToMainMenu()
+    private void setInteractable(bool interactable)
     {
-        setInteractable(false);
-        OurNetworkManager.Singleton.Shutdown();
-    }
-
-    // Start hosting a new game
-    private async void createGame()
-    {
-        setInteractable(false);
-        MapData mapData = mapPicker.GetCurrentMapData();
-        string playerName = PlayerPrefs.GetString("PlayerName", "");
-        
-        bool success = await OurNetworkManager.Singleton.HostGame(mapData, playerName, -1);
-        if (success)
-        {
-            PlayerPrefs.SetString("DebugRoomCode", SessionManager.Singleton.RoomCode);
-            // TODO push lobby page without loading scene
-            // OurNetworkManager.Singleton.SceneManager.LoadScene(lobbySceneName, LoadSceneMode.Single);
-            // SessionManager.Singleton.CreateLobbyForMap(mapData); 
-            onCreateGame.Invoke();
-        }
-        else
-        {
-            setInteractable(true);
-        }
+        backButton.interactable = interactable;
+        createButton.interactable = interactable && mapPicker.MapDatas.Count > 0;
     }
 
     private void CreateLobby()
     {
         MapData mapData = mapPicker.GetCurrentMapData();
-        SessionManager.Singleton.CreateLobbyForMap(mapData);
+        LobbyManager.Singleton.CreateLobbyForMap(mapData);
         onCreateGame.Invoke();
-    }
-
-    private void setInteractable(bool interactable)
-    {
-        backButton.interactable = interactable;
-        createButton.interactable = interactable && mapPicker.MapDatas.Count > 0;
     }
 }

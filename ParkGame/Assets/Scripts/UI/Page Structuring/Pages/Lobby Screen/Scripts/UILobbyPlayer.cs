@@ -19,6 +19,6 @@ public class UILobbyPlayer : MonoBehaviour
 
     private void Update()
     {
-        removeButton.gameObject.SetActive(SessionManager.Singleton.IsLobbyHost);
+        removeButton.gameObject.SetActive(LobbyManager.Singleton.IsHost);
     }
 }

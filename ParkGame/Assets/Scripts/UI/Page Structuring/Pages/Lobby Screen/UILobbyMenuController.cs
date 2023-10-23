@@ -30,6 +30,7 @@ namespace UI.Lobby
         [SerializeField] private TextMeshProUGUI mapNameLabel;
         [SerializeField] private TextMeshProUGUI roomCodeLabel;
         [SerializeField] private LobbyTeamUI lobbyTeamUIPrefab;
+        [SerializeField] private UILobbyTeam lobbyTeamPrefab;
         [SerializeField] private RawImage drawnTexture;
         [SerializeField] private RawImage gpsTexture;
         
@@ -68,16 +69,44 @@ namespace UI.Lobby
             {
                 startGameButton.gameObject.SetActive(false);
             }
-            roomCodeLabel.text += SessionManager.Singleton.RoomCode;
 
-            if (OurNetworkManager.Singleton.IsHost)
+            roomCodeLabel.text += LobbyManager.Singleton.Lobby.LobbyCode;
+
+            if (LobbyManager.Singleton.IsHost)
             {
-                initializeUI(SessionManager.Singleton.MapData);   
+                InitializeUIwithMapData(LobbyManager.Singleton.MapData);   
             }
             else
             {
                 SessionManager.Singleton.OnMapReceived += initializeUI;
             } 
+        }
+
+        private void InitializeUIwithMapData(MapData mapData)
+        {
+            drawnTexture.texture = mapData.DrawnTexture;
+            gpsTexture.texture = mapData.GPSTexture;
+
+            gpsTexture.color = Color.white;
+            drawnTexture.color = Color.white;
+
+            Vector2 imageSize = mapData.GetImageSize() * maxImageSize;
+
+            gpsTexture.rectTransform.sizeDelta = imageSize;
+            drawnTexture.rectTransform.sizeDelta = imageSize;
+
+            mapNameLabel.text = mapData.MetaData.MapName;
+            for (int teamNumber = 0; teamNumber < mapData.MetaData.NumTeams; teamNumber++)
+            {
+                UILobbyTeam lobbyTeam = InitializeTeamUI(teamNumber);
+            }
+        }
+
+        private UILobbyTeam InitializeTeamUI(int teamNumber)
+        {
+            var lobbyTeam = Instantiate(lobbyTeamPrefab, teamsParent);
+            lobbyTeam.Initialize(teamNumber, LobbyManager.Singleton.JoinTeam);
+            return lobbyTeam;
         }
 
         private void EmptyData()

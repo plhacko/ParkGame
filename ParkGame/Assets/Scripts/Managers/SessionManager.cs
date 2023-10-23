@@ -595,9 +595,27 @@ namespace Managers
         public bool IsLobbyHost => joinedLobby.HostId == AuthenticationService.Instance.PlayerId;
 
 
-        public void CreateLobbyForMap(MapData mapData)
+        public async void CreateLobbyForMap(MapData mapData)
         {
-            // TODO
+            try
+            {
+                string lobbyName = "My Lobby";
+                // TODO each team has 4 players for now
+                int maxPlayers = mapData.MetaData.NumTeams * 4;
+
+                Lobby lobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, maxPlayers);
+                hostLobby = lobby;
+                joinedLobby = lobby;
+
+                string code = lobby.LobbyCode;
+                this.mapData = mapData;
+                this.roomCode = code;
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e);
+            }
         }
+    
     }
 }

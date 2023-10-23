@@ -234,10 +234,17 @@ MonoBehaviour:
   onBackPressed:
     m_PersistentCalls:
       m_Calls: []
+  onGoBack:
+    m_PersistentCalls:
+      m_Calls: []
   startGameButton: {fileID: 5034220328677501603}
+  onStartGamePressed:
+    m_PersistentCalls:
+      m_Calls: []
   mapNameLabel: {fileID: 5034220327070859217}
   roomCodeLabel: {fileID: 5034220328473467774}
   lobbyTeamUIPrefab: {fileID: 5719480191540753893, guid: 05e620151527e2440979015ea4e64daa, type: 3}
+  lobbyTeamPrefab: {fileID: 5716820410546878884, guid: ede3ced9443b7aa41b3908e5666c0157, type: 3}
   drawnTexture: {fileID: 5034220327450392694}
   gpsTexture: {fileID: 5034220328010882078}
   teamsParent: {fileID: 5034220328917699829}
