@@ -73,7 +73,9 @@ public class UIMainMenuController : MonoBehaviour
         
         // enableButtons(true);
         // joinCodeInputField.text = "";
+        // TODO validate room code
         LobbyManager.Singleton.JoinLobbyByCode(joinCodeInputField.text.ToUpper());
+        onJoinPressed?.Invoke();
     }
 
     // Enable or disable all buttons
