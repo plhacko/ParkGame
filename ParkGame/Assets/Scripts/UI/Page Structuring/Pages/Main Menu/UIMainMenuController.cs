@@ -58,7 +58,7 @@ public class UIMainMenuController : MonoBehaviour
     }
 
     // Join a game with the room code entered in the input field
-    private async void joinGame()
+    private void joinGame()
     {
         // enableButtons(false);
         

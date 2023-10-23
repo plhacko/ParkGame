@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using TMPro;
 using System;
 using Managers;
+using Unity.Services.Lobbies.Models;
 
 public class UILobbyTeam : MonoBehaviour
 {
@@ -13,29 +14,27 @@ public class UILobbyTeam : MonoBehaviour
     [SerializeField] private Button joinButton;
     [SerializeField] private RectTransform teamLayoutGroup;
 
-    private int teamNumber;
-
-    private readonly Dictionary<Guid, UILobbyPlayer> playerGuidtoUI = new();
+    private string playerId;
 
     public void Initialize(int teamNumber, Action<int> onJoinTeam)
     {
         teamLabel.text = $"Team {teamNumber + 1}";
-        this.teamNumber = teamNumber;
         joinButton.onClick.AddListener(() => onJoinTeam?.Invoke(teamNumber));
     }
 
-    public void AddPlayerUI(PlayerData playerData, Action onRemovePlayer)
+    public void AddPlayerUI(Unity.Services.Lobbies.Models.Player player, Action onRemovePlayer, Func<bool> isHost)
     {
         UILobbyPlayer lobbyPlayerUI = Instantiate(lobbyPlayerPrefab, teamLayoutGroup);
-        lobbyPlayerUI.Initialize(playerData, onRemovePlayer);
-        playerGuidtoUI.Add(playerData.ID, lobbyPlayerUI);
-        joinButton.interactable = !SessionManager.Singleton.IsTeamFull(teamNumber);
+        lobbyPlayerUI.Initialize(player, onRemovePlayer, isHost);
+        // TODO disable join button if team is full
+        // joinButton.interactable = !SessionManager.Singleton.IsTeamFull(teamNumber);
     }
 
-    public void RemovePlayer(Guid playerId)
+    public void Clear()
     {
-        Destroy(playerGuidtoUI[playerId].gameObject);
-        playerGuidtoUI.Remove(playerId);
-        joinButton.interactable = !SessionManager.Singleton.IsTeamFull(teamNumber);
+        foreach (Transform child in teamLayoutGroup)
+        {
+            Destroy(child.gameObject);
+        }
     }
 }

@@ -7,10 +7,37 @@ using System;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
 using System.Threading.Tasks;
+using System.Linq;
 
 
 namespace Managers
 {
+    public struct LobbyModel 
+    {
+        public string Id;
+        public string LobbyCode;
+        public string HostId;
+        public string Name;
+        public int MaxPlayers;
+        public Dictionary<string, int> Teams;
+
+        // Content equality check
+        public override bool Equals(object obj)
+        {
+            return obj is LobbyModel model &&
+                   Id == model.Id &&
+                   LobbyCode == model.LobbyCode &&
+                   HostId == model.HostId &&
+                   Name == model.Name &&
+                   MaxPlayers == model.MaxPlayers &&
+                   Teams.OrderBy(x => x.Key).SequenceEqual(model.Teams.OrderBy(x => x.Key));
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Id, LobbyCode, HostId, Name, MaxPlayers, Teams);
+        }
+    }
     public class LobbyManager : MonoBehaviour
     {
         public static LobbyManager Singleton { get; private set; }
@@ -20,7 +47,10 @@ namespace Managers
 
         private MapData mapData;
         public MapData MapData { get { return mapData; } }
-        
+
+        private LobbyModel lobbyModel;
+        public LobbyModel LobbyModel { get { return lobbyModel; } } 
+        public Action OnLobbyInvalidated;
         public bool IsHost { get { return lobby != null && lobby.HostId == AuthenticationService.Instance.PlayerId; } }
 
         private void Awake()
@@ -117,7 +147,7 @@ namespace Managers
 
         IEnumerator PollLobbyCoroutine()
         {
-            var delay = new WaitForSeconds(15);
+            var delay = new WaitForSeconds(1);
 
             while (true)
             {
@@ -125,6 +155,13 @@ namespace Managers
                 yield return new WaitUntil(() => t.IsCompleted);
 
                 lobby = t.Result;
+                var model = GetLobbyModel();
+                if (!model.Equals(lobbyModel))
+                {
+                    lobbyModel = model;
+                    Debug.Log("Lobby updated");
+                    OnLobbyInvalidated?.Invoke();
+                }
                 yield return delay;
             }
         }
@@ -183,6 +220,56 @@ namespace Managers
             {
                 Debug.LogError("Failed to join team: " + e.Message);
             }
+        }
+
+        public async void ChangeTeamForPlayer(string playerId, int teamNumber)
+        {
+            try 
+            {
+                var player = lobby.Players.Find(x => x.Id == playerId);
+                player.Data["TeamNumber"].Value = teamNumber.ToString();
+
+                UpdatePlayerOptions updatePlayerOptions = new()
+                {
+                    Data = player.Data,
+                };
+
+                await Lobbies.Instance.UpdatePlayerAsync(lobby.Id, playerId, updatePlayerOptions);
+
+                Debug.Log("Player " + playerId + " joined team " + teamNumber);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("Failed to join team: " + e.Message);
+            }
+        }
+
+        public LobbyModel GetLobbyModel()
+        {
+            return new LobbyModel
+            {
+                Id = lobby.Id,
+                LobbyCode = lobby.LobbyCode,
+                HostId = lobby.HostId,
+                Name = lobby.Name,
+                MaxPlayers = lobby.MaxPlayers,
+                Teams = GetTeams()
+            };
+        }
+
+        public Dictionary<string, int> GetTeams()
+        {
+            Dictionary<string, int> teams = new();
+
+            foreach (var player in lobby.Players)
+            {
+                if (player.Data.ContainsKey("TeamNumber"))
+                {
+                    teams.Add(player.Id, int.Parse(player.Data["TeamNumber"].Value));
+                }
+            }
+
+            return teams;
         }
     }
 }

@@ -37,6 +37,7 @@ namespace UI.Lobby
         [SerializeField] private RectTransform teamsParent;
         
         private readonly List<LobbyTeamUI> teamUIs = new();
+        private List<UILobbyTeam> newTeamUIs = new ();
 
         private float maxImageSize;
 
@@ -46,6 +47,35 @@ namespace UI.Lobby
             backButton.onClick.AddListener(goBack);            
             OurNetworkManager.Singleton.OnClientDisconnectCallback += onClientDisconnect;
             SessionManager.Singleton.OnTeamJoined += onTeamJoined;
+            LobbyManager.Singleton.OnLobbyInvalidated += UpdateUI;
+        }
+
+        private void UpdateUI()
+        {
+            var model = LobbyManager.Singleton.LobbyModel;
+            var lobby = LobbyManager.Singleton.Lobby;
+
+            foreach (var teamUI in newTeamUIs)
+            {
+                teamUI.Clear();
+            }
+
+            foreach (var entry in model.Teams)
+            {
+                var playedId = entry.Key;
+                var player = lobby.Players.Find(x => x.Id == playedId);
+                var teamNumber = entry.Value;
+                
+                if (teamNumber != -1)
+                {
+                    newTeamUIs[teamNumber].AddPlayerUI(
+                        player, 
+                        () => LobbyManager.Singleton.ChangeTeamForPlayer(playedId, -1),
+                        () => LobbyManager.Singleton.IsHost
+                    );
+
+                }
+            }
         }
 
         public void OnEnter()
@@ -99,6 +129,7 @@ namespace UI.Lobby
             for (int teamNumber = 0; teamNumber < mapData.MetaData.NumTeams; teamNumber++)
             {
                 UILobbyTeam lobbyTeam = InitializeTeamUI(teamNumber);
+                newTeamUIs.Add(lobbyTeam);
             }
         }
 

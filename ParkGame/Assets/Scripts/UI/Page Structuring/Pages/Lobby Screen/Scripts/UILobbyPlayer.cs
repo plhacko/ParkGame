@@ -11,14 +11,16 @@ public class UILobbyPlayer : MonoBehaviour
     [SerializeField] private TextMeshProUGUI playerNameLabel;
     [SerializeField] private Button removeButton;
 
-    public void Initialize(PlayerData playerData, Action onRemovePlayer)
+    private Func<bool> isHost;
+    public void Initialize(Unity.Services.Lobbies.Models.Player player, Action onRemovePlayer, Func<bool> isHost)
     {
-        playerNameLabel.text = playerData.Name;
+        playerNameLabel.text = player.Data["PlayerName"].Value;
         removeButton.onClick.AddListener(() => onRemovePlayer?.Invoke());
+        this.isHost = isHost;
     }
 
     private void Update()
     {
-        removeButton.gameObject.SetActive(LobbyManager.Singleton.IsHost);
+        removeButton.gameObject.SetActive(isHost?.Invoke() ?? false);
     }
 }
