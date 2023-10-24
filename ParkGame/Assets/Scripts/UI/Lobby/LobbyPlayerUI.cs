@@ -24,15 +24,5 @@ namespace UI.Lobby
                 lobbyMenuController.RemoveFromTeam(playerData.ID));
         }
 
-        public void Initialize(UILobbyMenuController lobbyMenuController, PlayerData playerData, bool isLocalPlayer)
-        {
-            playerNameLabel.text = playerData.Name;
-            
-            if(!isLocalPlayer) return;
-            
-            playerUnReadyButton.gameObject.SetActive(true);
-            playerUnReadyButton.onClick.AddListener(() => 
-                lobbyMenuController.RemoveFromTeam(playerData.ID));
-        }
     }
 }

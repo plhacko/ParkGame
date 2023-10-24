@@ -36,34 +36,12 @@ namespace UI.Lobby
             joinButton.onClick.AddListener(() => lobbyMenuController.JoinTeam(teamNumber));
         }
 
-        public void Initialize(UILobbyMenuController lobbyMenuController, int teamNumber)
-        {
-            this.uiLobbyMenuController = lobbyMenuController;
-            this.teamNumber = teamNumber;
-            teamNameLabel.text = $"Team {teamNumber + 1}";
-            
-            // todo maybe remove this?
-            // playerUIs.Clear();
-            joinButton.onClick.AddListener(() => lobbyMenuController.JoinTeam(teamNumber));
-        }
-
         // Add a player to the team UI
         public void AddPlayer(PlayerData playerData, bool isLocalPlayer)
         {
             // Create new player UI, initialize it, and add it to the team UIs
             LobbyPlayerUI playerUI = Instantiate(lobbyPlayerUIPrefab, teamParent);
             playerUI.Initialize(lobbyMenuController, playerData, isLocalPlayer);
-            playerUIs.Add(playerData.ID, playerUI);
-            
-            joinButton.interactable = !SessionManager.Singleton.IsTeamFull(teamNumber) && !isLocalPlayer;
-        }
-
-        // Add a player to the team UI, temporarary for new ui system
-        public void AddPlayer(PlayerData playerData, bool isLocalPlayer, int _)
-        {
-            // Create new player UI, initialize it, and add it to the team UIs
-            LobbyPlayerUI playerUI = Instantiate(lobbyPlayerUIPrefab, teamParent);
-            playerUI.Initialize(uiLobbyMenuController, playerData, isLocalPlayer);
             playerUIs.Add(playerData.ID, playerUI);
             
             joinButton.interactable = !SessionManager.Singleton.IsTeamFull(teamNumber) && !isLocalPlayer;

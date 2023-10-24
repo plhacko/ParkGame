@@ -10,7 +10,11 @@ using System.Threading.Tasks;
 using System.Linq;
 using Mapbox.Map;
 using UnityEditor;
-
+using Firebase;
+using Firebase.Storage;
+using Firebase.Database;
+using UnityEngine.Networking;
+using UnityEngine.TextCore.LowLevel;
 
 namespace Managers
 {
@@ -49,11 +53,22 @@ namespace Managers
         private Lobby lobby;
         public Lobby Lobby { get { return lobby; } }
 
-        private MapData mapData;
+        private MapData mapData = null;
         public MapData MapData { get { return mapData; } }
 
         private LobbyModel lobbyModel;
-        public LobbyModel LobbyModel { get { return lobbyModel; } } 
+        public LobbyModel LobbyModel { 
+            get
+            { 
+                return lobbyModel; 
+            } 
+            private set 
+            { 
+                lobbyModel = value; 
+                OnLobbyInvalidated?.Invoke();
+            }
+        }
+     
         public Action OnLobbyInvalidated;
         public bool IsHost { get { return lobby != null && lobby.HostId == AuthenticationService.Instance.PlayerId; } }
 
@@ -102,8 +117,8 @@ namespace Managers
                     Data = GetLobbyData(),
                 };
 
-                Lobby lobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, maxPlayers, createLobbyOptions);
-                this.lobby = lobby;
+                lobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, maxPlayers, createLobbyOptions);
+                LobbyModel = GetLobbyModel();
 
                 StartCoroutine(HeatbeatLobbyCoroutine(lobby));
                 StartCoroutine(PollLobbyCoroutine());
@@ -127,9 +142,8 @@ namespace Managers
                     Player = GetPlayerWithData(),
                 };
 
-                Lobby lobby = await LobbyService.Instance.JoinLobbyByCodeAsync(code, joinLobbyByCodeOptions);
-                this.lobby = lobby;
-                lobbyModel = GetLobbyModel();
+                lobby = await LobbyService.Instance.JoinLobbyByCodeAsync(code, joinLobbyByCodeOptions);
+                LobbyModel = GetLobbyModel();
 
 
                 StartCoroutine(PollLobbyCoroutine());
@@ -166,13 +180,8 @@ namespace Managers
                 yield return new WaitUntil(() => t.IsCompleted);
 
                 lobby = t.Result;
-                var model = GetLobbyModel();
-                if (!model.Equals(lobbyModel))
-                {
-                    lobbyModel = model;
-                    Debug.Log("Lobby updated");
-                    OnLobbyInvalidated?.Invoke();
-                }
+                LobbyModel = GetLobbyModel();
+
                 yield return delay;
             }
         }
@@ -246,7 +255,8 @@ namespace Managers
                     Data = player.Data,
                 };
 
-                await Lobbies.Instance.UpdatePlayerAsync(lobby.Id, AuthenticationService.Instance.PlayerId, updatePlayerOptions);
+                lobby = await Lobbies.Instance.UpdatePlayerAsync(lobby.Id, AuthenticationService.Instance.PlayerId, updatePlayerOptions);
+                LobbyModel = GetLobbyModel();
 
                 Debug.Log("Player " + AuthenticationService.Instance.PlayerId + " joined team " + teamNumber);
             }
@@ -307,12 +317,75 @@ namespace Managers
             return teams;
         }
 
-        public MapData GetMapData()
+        public async Task GetMapData()
         {
             var mapId = lobbyModel.MapId;
+            var mapDataDownload = await DownloadMapData(mapId);
+            
+            if (!mapDataDownload.Item1)
+            {
+                Debug.LogError("Failed to download map data");
+            }
 
+            mapData = mapDataDownload.Item2;
+        }
 
-            return mapData;
+        private async Task<Tuple<bool,MapData>> DownloadMapData(string mapId)
+        {
+            await FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task =>
+                {
+                    if (task.Exception != null)
+                    {
+                        Debug.LogError($"Failed to intialize Firebase with {task.Exception}");
+                        return;
+                    }
+                   
+#if UNITY_EDITOR
+                    // Unity sometimes crashes when Firebase Persistence is Enabled and two editors use it 
+                    // FirebaseStorage.DefaultInstance.SetPersistenceEnabled(false);
+                    FirebaseDatabase.DefaultInstance.SetPersistenceEnabled(false);
+#endif
+                    Debug.Log(task.Status);
+                }
+            );
+
+            var storageReference = FirebaseStorage.DefaultInstance.RootReference;
+            var databaseReference = FirebaseDatabase.DefaultInstance.RootReference;
+        
+            DataSnapshot dataSnapshot = await databaseReference.Child(FirebaseConstants.MAP_DATA_FOLDER).Child(mapId).GetValueAsync();
+            MapMetaData mapMetaData = JsonUtility.FromJson<MapMetaData>(dataSnapshot.GetRawJsonValue());
+
+            var imageReference = storageReference.Child($"{FirebaseConstants.MAP_IMAGES_FOLDER}/{mapMetaData.MapId}.png");
+
+            var imageBytes = await imageReference.GetBytesAsync(FirebaseConstants.MAX_MAP_SIZE);
+            Texture2D texture = new Texture2D(mapMetaData.Width, mapMetaData.Height); 
+            texture.LoadImage(imageBytes);
+           
+            mapData = new MapData
+            {
+                MetaData = mapMetaData,
+                DrawnTexture = texture
+            };
+
+            var request = UnityWebRequestTexture.GetTexture(mapData.MetaData.MapQuery);
+
+            var operation = request.SendWebRequest();
+            
+            while (!operation.isDone)
+            {
+                await Task.Yield();
+            }
+
+            if (request.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogWarning("API Request error: " + request.error);
+                return new Tuple<bool, MapData>(false, mapData);
+            }
+      
+            Texture2D texture2 = DownloadHandlerTexture.GetContent(request);
+            mapData.GPSTexture = texture2;
+
+            return new Tuple<bool, MapData>(true, mapData);
         }
     }
 }
