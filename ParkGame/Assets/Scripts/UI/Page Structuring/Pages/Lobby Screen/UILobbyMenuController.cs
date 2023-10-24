@@ -34,14 +34,17 @@ namespace UI.Lobby
             backButton.onClick.AddListener(Back);  
             startGameButton.onClick.AddListener(StartGame);
 
+    
             LobbyManager.Singleton.OnLobbyInvalidat += UpdateUI;
             LobbyManager.Singleton.OnDisconnect += OnDisconnect;
         }
 
         private void OnDestroy()
         {
+            if (LobbyManager.Singleton == null) return;
+
             LobbyManager.Singleton.OnLobbyInvalidat -= UpdateUI;
-                LobbyManager.Singleton.OnDisconnect -= OnDisconnect;
+            LobbyManager.Singleton.OnDisconnect -= OnDisconnect;
         }
 
         public override async void OnEnter()
