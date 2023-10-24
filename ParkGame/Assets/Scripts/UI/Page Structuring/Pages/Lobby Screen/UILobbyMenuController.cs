@@ -1,11 +1,7 @@
-using System;
 using System.Collections.Generic;
 using Managers;
 using TMPro;
-using Unity.Netcode;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace UI.Lobby
@@ -16,28 +12,17 @@ namespace UI.Lobby
      * Players can see the room code, their team, and the other players in the game.
      * Host can start the game from here.
      */
-    public class UILobbyMenuController : MonoBehaviour
+    public class UILobbyMenuController : UIPageController
     {
-        [SerializeField] private string joinMenuSceneName;
-        
         [SerializeField] private Button backButton;
-        [SerializeField] private UnityEvent onBackPressed;
-        [SerializeField] private UnityEvent onGoBack;
-
         [SerializeField] private Button startGameButton;
-        [SerializeField] private UnityEvent onStartGamePressed;
-
         [SerializeField] private TextMeshProUGUI mapNameLabel;
         [SerializeField] private TextMeshProUGUI roomCodeLabel;
-        [SerializeField] private LobbyTeamUI lobbyTeamUIPrefab;
         [SerializeField] private UILobbyTeam lobbyTeamPrefab;
         [SerializeField] private RawImage drawnTexture;
         [SerializeField] private RawImage gpsTexture;
-        
         [SerializeField] private RectTransform teamsParent;
 
-        [SerializeField] private UnityEvent onDisconnect;
-        
         private List<UILobbyTeam> newTeamUIs = new ();
 
         private float maxImageSize;
@@ -45,9 +30,39 @@ namespace UI.Lobby
         private void Start()
         {
             maxImageSize = drawnTexture.rectTransform.sizeDelta.x;
-            backButton.onClick.AddListener(goBack);            
+            
+            backButton.onClick.AddListener(Back);  
+            startGameButton.onClick.AddListener(StartGame);
+
             LobbyManager.Singleton.OnLobbyInvalidat += UpdateUI;
-            LobbyManager.Singleton.OnDisconnect += onDisconnect.Invoke;
+            LobbyManager.Singleton.OnDisconnect += OnDisconnect;
+        }
+
+        private void OnDestroy()
+        {
+            LobbyManager.Singleton.OnLobbyInvalidat -= UpdateUI;
+                LobbyManager.Singleton.OnDisconnect -= OnDisconnect;
+        }
+
+        public override async void OnEnter()
+        {
+            if (LobbyManager.Singleton.MapData == null)
+            {
+                await LobbyManager.Singleton.DownloadMapData();
+            }
+
+            InitializeUIwithMapData(LobbyManager.Singleton.MapData);
+        }
+
+        public override void OnExit()
+        {
+            roomCodeLabel.text = "Code: ";
+            mapNameLabel.text = "";
+            foreach (var teamUI in newTeamUIs)
+            {
+                Destroy(teamUI.gameObject);
+            }
+            newTeamUIs.Clear();
         }
 
         private void UpdateUI()
@@ -89,27 +104,6 @@ namespace UI.Lobby
             }
         }
 
-        public async void OnEnter()
-        {
-            if (LobbyManager.Singleton.MapData == null)
-            {
-                await LobbyManager.Singleton.DownloadMapData();
-            }
-
-            InitializeUIwithMapData(LobbyManager.Singleton.MapData);
-        }
-
-        public void OnExit()
-        {
-            roomCodeLabel.text = "Code: ";
-            mapNameLabel.text = "";
-            foreach (var teamUI in newTeamUIs)
-            {
-                Destroy(teamUI.gameObject);
-            }
-            newTeamUIs.Clear();
-        }
-
         private void InitializeUIwithMapData(MapData mapData)
         {
             drawnTexture.texture = mapData.DrawnTexture;
@@ -145,31 +139,23 @@ namespace UI.Lobby
             return lobbyTeam;
         }
 
-        private void OnDestroy()
-        {
-            if (LobbyManager.Singleton != null)
-            {
-                LobbyManager.Singleton.OnLobbyInvalidat -= UpdateUI;
-                LobbyManager.Singleton.OnDisconnect -= onDisconnect.Invoke;
-            }
-        }
-        
-        private async void goBack()
+        private async void Back()
         {
             bool success = await LobbyManager.Singleton.LeaveLobby();
             if (success)
             {
                 UIController.Singleton.PopUIPage();
             }
-            else
-            {
-                Debug.LogError("Failed to leave lobby");
-            }
         }
 
-        private void startGame()
+        private void StartGame()
         {
-            OurNetworkManager.Singleton.LoadGameScene();
+            // TODO
+        }
+
+        private void OnDisconnect()
+        {
+            UIController.Singleton.PopUIPage();
         }
     }
 }

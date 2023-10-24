@@ -171,12 +171,23 @@ namespace Managers
 
             while (true)
             {
-                var t = Task.Run(async () => await LobbyService.Instance.GetLobbyAsync(Lobby.Id));
+                var t = Task.Run(
+                    async () => 
+                    {
+                        try
+                        { 
+                            return await LobbyService.Instance.GetLobbyAsync(Lobby.Id);
+                        }
+                        catch (Exception e)
+                        {
+                            return null;
+                        }
+                    }
+                );
                 yield return new WaitUntil(() => t.IsCompleted);
 
-                if (t.IsFaulted)
+                if (t.Result == null)
                 {
-                    Debug.LogError("Failed to get lobby: " + t.Exception.Message);
                     OnDisconnect?.Invoke();
                     Reset();
                     yield break;

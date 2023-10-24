@@ -1,22 +1,29 @@
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.Events;
 using Managers;
 
-public class UITitleScreenController : MonoBehaviour
+public class UITitleScreenController : UIPageController
 {
     [SerializeField] private Button enterButton;
-    [SerializeField] private UnityEvent onEnterPressed;
+    [SerializeField] private UIPage loginPage;
     
-    void Start()
+    private void Start()
     {
         enterButton.onClick.AddListener(Enter);
     }
 
-    async void Enter()
+    public override void OnEnter()
+    {
+    }
+
+    public override void OnExit()
+    {
+    }
+
+    private async void Enter()
     {
         await SessionManager.Singleton.UnityServicesInitializationTask;
 
-        onEnterPressed.Invoke();
+        UIController.Singleton.PushUIPage(loginPage);
     }
 }

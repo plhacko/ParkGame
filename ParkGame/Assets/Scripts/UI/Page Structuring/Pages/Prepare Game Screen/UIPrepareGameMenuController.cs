@@ -1,37 +1,38 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement;
 using Managers;
-using UnityEngine.Events;
 
-public class UIPrepareGameMenuController : MonoBehaviour
+public class UIPrepareGameMenuController : UIPageController
 {
-    [SerializeField] private string lobbySceneName;
-
+    [SerializeField] private UIPage lobbyPage;
     [SerializeField] private Button backButton;
-    [SerializeField] private UnityEvent onBackPressed;
-   
     [SerializeField] private MapPicker mapPicker;
-    
     [SerializeField] private Button createButton;
-    [SerializeField] private UnityEvent onCreatePressed;
-    [SerializeField] private UnityEvent onCreateGame;
-
+    private bool processing = false;
     void Start()
     {
-        backButton.onClick.AddListener(onBackPressed.Invoke);
-
-        createButton.onClick.AddListener(CreateLobby);
-        createButton.onClick.AddListener(onCreatePressed.Invoke);
-
-        setInteractable(false);
+        backButton.onClick.AddListener(Back);
+        createButton.onClick.AddListener(Create);
     }
 
     private void Update()
     {
-        setInteractable(mapPicker.IsInitialized());
+        setInteractable(mapPicker.IsInitialized() && !processing);
+    }
+
+    public override void OnEnter()
+    {
+        setInteractable(false);
+        processing = false;
+    }
+
+    public override void OnExit()
+    {
+    }
+
+    private void Back()
+    {
+        UIController.Singleton.PopUIPage();
     }
 
     private void setInteractable(bool interactable)
@@ -40,12 +41,21 @@ public class UIPrepareGameMenuController : MonoBehaviour
         createButton.interactable = interactable && mapPicker.MapDatas.Count > 0;
     }
 
-    private async void CreateLobby()
+    private async void Create()
     {
         setInteractable(false);
+        
         MapData mapData = mapPicker.GetCurrentMapData();
+        
+        processing = true;
+        
         bool success = await LobbyManager.Singleton.CreateLobbyForMap(mapData);
+        // TODO notify when unsuccessful create
         if (success)
-            onCreateGame.Invoke();
+        {
+            UIController.Singleton.PushUIPage(lobbyPage);
+        }
+
+        processing = false;
     }
 }

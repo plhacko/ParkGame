@@ -1,20 +1,20 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
 
 public class PageAnimator
 {
     public static IEnumerator SlideIn(
         RectTransform rectTransform,
+        CanvasGroup canvasGroup,
         Direction direction, 
         float duration, 
-        UnityEvent OnEnd)
+        Action OnEnd)
     {
         Vector2 targetPosition = Vector2.zero;
         Vector2 startPosition = Vector2.zero;
 
+        
         switch (direction)
         {
             case Direction.Left:
@@ -32,6 +32,7 @@ public class PageAnimator
         }
 
         rectTransform.anchoredPosition = startPosition;
+        canvasGroup.interactable = false;
 
         float time = 0f;
         while (time < duration)
@@ -42,15 +43,17 @@ public class PageAnimator
         }
 
         rectTransform.anchoredPosition = targetPosition;
+        canvasGroup.interactable = true;
 
         OnEnd?.Invoke();
     }
 
     public static IEnumerator SlideOut(
         RectTransform rectTransform,
+        CanvasGroup canvasGroup,
         Direction direction,
         float duration,
-        UnityEvent OnEnd)
+        Action OnEnd)
     {
         Vector2 targetPosition = Vector2.zero;
         Vector2 startPosition = Vector2.zero;
@@ -72,6 +75,7 @@ public class PageAnimator
         }
 
         rectTransform.anchoredPosition = startPosition;
+        canvasGroup.interactable = false;
 
         float time = 0f;
         while (time < duration)
@@ -82,15 +86,19 @@ public class PageAnimator
         }
 
         rectTransform.anchoredPosition = targetPosition;
+        canvasGroup.interactable = true;
 
         OnEnd?.Invoke();
     }
 
     public static IEnumerator ZoomIn(
         RectTransform rectTransform, 
+        CanvasGroup canvasGroup,
         float duration, 
-        UnityEvent OnEnd)
+        Action OnEnd)
     {
+        canvasGroup.interactable = false;   
+
         float time = 0f;
         while (time < duration)
         {
@@ -100,15 +108,19 @@ public class PageAnimator
         }
 
         rectTransform.localScale = Vector2.one;
+        canvasGroup.interactable = true;
 
         OnEnd?.Invoke();
     }
 
     public static IEnumerator ZoomOut(
         RectTransform rectTransform, 
+        CanvasGroup canvasGroup,
         float duration, 
-        UnityEvent OnEnd)
+        Action OnEnd)
     {
+        canvasGroup.interactable = false;
+
         float time = 0f;
         while (time < duration)
         {
@@ -118,6 +130,7 @@ public class PageAnimator
         }
 
         rectTransform.localScale = Vector2.zero;
+        canvasGroup.interactable = true;
 
         OnEnd?.Invoke();
 
@@ -127,9 +140,11 @@ public class PageAnimator
     public static IEnumerator FadeIn(
         CanvasGroup canvasGroup,
         float duration,
-        UnityEvent OnEnd)
+        Action OnEnd)
     {
         canvasGroup.alpha = 0f;
+        canvasGroup.interactable = false;
+
         float time = 0f;
         while (time < duration)
         {
@@ -140,7 +155,7 @@ public class PageAnimator
         }
 
         canvasGroup.alpha = 1f;
-
+        
         canvasGroup.blocksRaycasts = true;
         canvasGroup.interactable = true;
 
@@ -150,7 +165,7 @@ public class PageAnimator
     public static IEnumerator FadeOut(
         CanvasGroup canvasGroup,
         float duration,
-        UnityEvent OnEnd)
+        Action OnEnd)
     {
         canvasGroup.blocksRaycasts = false;
         canvasGroup.interactable = false;

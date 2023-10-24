@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UIElements;
 
-[RequireComponent(typeof(AudioSource), typeof(CanvasGroup))]
+[RequireComponent(typeof(AudioSource), typeof(CanvasGroup), typeof(UIPageController))]
 [DisallowMultipleComponent]
 public class UIPage : MonoBehaviour
 {
@@ -29,8 +29,9 @@ public class UIPage : MonoBehaviour
     private Coroutine animationCoroutine;
     private Coroutine audioCoroutine;
 
-    [SerializeField] private UnityEvent onEnter;
-    [SerializeField] private UnityEvent onExit;
+    private UIPageController pageController;
+    [SerializeField] private Action onEnter;
+    [SerializeField] private Action onExit;
 
     private void Awake()
     {
@@ -42,6 +43,10 @@ public class UIPage : MonoBehaviour
         audioSource.loop = false;
         audioSource.spatialBlend = 0f;
         audioSource.enabled = false;
+
+        pageController = GetComponent<UIPageController>();
+        onEnter = pageController.OnEnter;
+        onExit = pageController.OnExit;
     }
 
     public void Enter(bool playSound)
@@ -110,32 +115,32 @@ public class UIPage : MonoBehaviour
         }
     }
 
-    private void None(UnityEvent callback)
+    private void None(Action callback)
     {
         callback?.Invoke();
     }
 
-    private void ZoomIn(UnityEvent callback)
+    private void ZoomIn(Action callback)
     {
         if (animationCoroutine != null)
         {
             StopCoroutine(animationCoroutine);
         }
 
-        animationCoroutine = StartCoroutine(PageAnimator.ZoomIn(rectTransform, animationDuration, callback));
+        animationCoroutine = StartCoroutine(PageAnimator.ZoomIn(rectTransform, canvasGroup, animationDuration, callback));
     }
 
-    private void SlideIn(Direction direction, UnityEvent callback)
+    private void SlideIn(Direction direction, Action callback)
     {
         if (animationCoroutine != null)
         {
             StopCoroutine(animationCoroutine);
         }
 
-        animationCoroutine = StartCoroutine(PageAnimator.SlideIn(rectTransform, direction, animationDuration, callback));
+        animationCoroutine = StartCoroutine(PageAnimator.SlideIn(rectTransform, canvasGroup, direction, animationDuration, callback));
     }
 
-    private void FadeIn(UnityEvent callback)
+    private void FadeIn(Action callback)
     {
         if (animationCoroutine != null)
         {
@@ -145,27 +150,27 @@ public class UIPage : MonoBehaviour
         animationCoroutine = StartCoroutine(PageAnimator.FadeIn(canvasGroup, animationDuration, callback));
     }
 
-    private void ZoomOut(UnityEvent callback)
+    private void ZoomOut(Action callback)
     {
         if (animationCoroutine != null)
         {
             StopCoroutine(animationCoroutine);
         }
 
-        animationCoroutine = StartCoroutine(PageAnimator.ZoomOut(rectTransform, animationDuration, callback));
+        animationCoroutine = StartCoroutine(PageAnimator.ZoomOut(rectTransform, canvasGroup, animationDuration, callback));
     }
 
-    private void SlideOut(Direction direction, UnityEvent callback)
+    private void SlideOut(Direction direction, Action callback)
     {
         if (animationCoroutine != null)
         {
             StopCoroutine(animationCoroutine);
         }
 
-        animationCoroutine = StartCoroutine(PageAnimator.SlideOut(rectTransform, direction, animationDuration, callback));
+        animationCoroutine = StartCoroutine(PageAnimator.SlideOut(rectTransform, canvasGroup, direction, animationDuration, callback));
     }
 
-    private void FadeOut(UnityEvent callback)
+    private void FadeOut(Action callback)
     {
         if (animationCoroutine != null)
         {

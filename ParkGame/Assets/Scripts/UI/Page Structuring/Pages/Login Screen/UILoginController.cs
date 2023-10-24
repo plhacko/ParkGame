@@ -1,30 +1,30 @@
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
-using UnityEngine.Events;
 using Unity.Services.Authentication;
-using Unity.Services.Core;
-using Managers;
 
-public class UILoginController : MonoBehaviour
+public class UILoginController : UIPageController
 {
     [SerializeField] private TMP_InputField usernameInputField;
     [SerializeField] private Button loginButton;
-    [SerializeField] private UnityEvent onLoginPressed;
-    [SerializeField] private UnityEvent onLoginSuccess;
+    [SerializeField] private UIPage mainMenuPage;
 
     private void Start()
     {
-        loginButton.interactable = false;
-        loginButton.onClick.AddListener(onLoginPressed.Invoke);
         loginButton.onClick.AddListener(Login);
-
         usernameInputField.onEndEdit.AddListener(delegate { OnInputFieldValueChanged(usernameInputField.text); });
         usernameInputField.onValueChanged.AddListener(delegate { OnInputFieldValueChanged(usernameInputField.text); });
 
+    }
+
+    public override void OnEnter()
+    {
+        loginButton.interactable = false;
+        usernameInputField.text = "";
+    }
+
+    public override void OnExit()
+    {
     }
 
     public void OnInputFieldValueChanged(string text)
@@ -36,7 +36,7 @@ public class UILoginController : MonoBehaviour
     {
         loginButton.interactable = false;
         
-        AuthenticationService.Instance.SignedIn += () => onLoginSuccess.Invoke();
+        AuthenticationService.Instance.SignedIn += () => UIController.Singleton.PushUIPage(mainMenuPage);
 #if UNITY_EDITOR
         if (ParrelSync.ClonesManager.IsClone())
         {
@@ -48,9 +48,8 @@ public class UILoginController : MonoBehaviour
 
         Debug.Log("Signed in anonymously" + AuthenticationService.Instance.PlayerId + " as " + usernameInputField.text);
 
+        // TODO change this to a more secure way of storing the player name
         PlayerPrefs.SetString("PlayerName", usernameInputField.text);
-
-        loginButton.interactable = true;
     }
 
 }

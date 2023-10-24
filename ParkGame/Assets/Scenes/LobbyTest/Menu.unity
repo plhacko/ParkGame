@@ -353,6 +353,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2743409682758637164, guid: 86bc216476a79ad40b20578ef1f2bf2a, type: 3}
+      propertyPath: lobbyPage
+      value: 
+      objectReference: {fileID: 1625839850}
+    - target: {fileID: 2743409682758637164, guid: 86bc216476a79ad40b20578ef1f2bf2a, type: 3}
       propertyPath: onCreateGame.m_PersistentCalls.m_Calls.Array.size
       value: 1
       objectReference: {fileID: 0}
@@ -867,6 +871,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 354576630}
     m_Modifications:
     - target: {fileID: 1208775356504565797, guid: a7331c562ff4f834caf2176ca98f0dda, type: 3}
+      propertyPath: mainMenuPage
+      value: 
+      objectReference: {fileID: 1552875232}
+    - target: {fileID: 1208775356504565797, guid: a7331c562ff4f834caf2176ca98f0dda, type: 3}
       propertyPath: onLoginPressed.m_PersistentCalls.m_Calls.Array.size
       value: 0
       objectReference: {fileID: 0}
@@ -1107,6 +1115,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Main Menu
       objectReference: {fileID: 0}
+    - target: {fileID: 5676856695780570432, guid: 8a470efe2e66477429ad01189b03d26a, type: 3}
+      propertyPath: lobbyPage
+      value: 
+      objectReference: {fileID: 482643410}
+    - target: {fileID: 5676856695780570432, guid: 8a470efe2e66477429ad01189b03d26a, type: 3}
+      propertyPath: prepareGamePage
+      value: 
+      objectReference: {fileID: 1565515578}
     - target: {fileID: 5676856695780570432, guid: 8a470efe2e66477429ad01189b03d26a, type: 3}
       propertyPath: onHostPressed.m_PersistentCalls.m_Calls.Array.size
       value: 1
@@ -1376,6 +1392,10 @@ PrefabInstance:
       propertyPath: entryMode
       value: 6
       objectReference: {fileID: 0}
+    - target: {fileID: 6179568006192890378, guid: 78db9bdf6f57a3945a43425a6e6f6f81, type: 3}
+      propertyPath: loginPage
+      value: 
+      objectReference: {fileID: 482643410}
     - target: {fileID: 6179568006192890378, guid: 78db9bdf6f57a3945a43425a6e6f6f81, type: 3}
       propertyPath: onEnterPressed.m_PersistentCalls.m_Calls.Array.size
       value: 1
