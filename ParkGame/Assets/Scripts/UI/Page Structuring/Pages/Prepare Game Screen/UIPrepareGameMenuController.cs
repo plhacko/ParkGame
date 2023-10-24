@@ -42,6 +42,7 @@ public class UIPrepareGameMenuController : MonoBehaviour
 
     private async void CreateLobby()
     {
+        setInteractable(false);
         MapData mapData = mapPicker.GetCurrentMapData();
         bool success = await LobbyManager.Singleton.CreateLobbyForMap(mapData);
         if (success)

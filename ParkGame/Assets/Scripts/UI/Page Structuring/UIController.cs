@@ -9,6 +9,7 @@ using UnityEngine.EventSystems;
 [DisallowMultipleComponent]
 public class UIController : MonoBehaviour
 {
+    public static UIController Singleton { get; private set; }
     [SerializeField]
     private UIPage initialPage;
     [SerializeField]
@@ -19,6 +20,12 @@ public class UIController : MonoBehaviour
 
     private void Awake()
     {
+        if (Singleton != null)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Singleton = this;
         canvas = GetComponent<Canvas>();
     }
 

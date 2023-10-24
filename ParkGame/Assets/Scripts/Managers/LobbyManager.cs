@@ -15,6 +15,7 @@ using Firebase.Storage;
 using Firebase.Database;
 using UnityEngine.Networking;
 using UnityEngine.TextCore.LowLevel;
+using Unity.VisualScripting;
 
 namespace Managers
 {
@@ -50,27 +51,21 @@ namespace Managers
     {
         public static LobbyManager Singleton { get; private set; }
 
-        private Lobby lobby;
-        public Lobby Lobby { get { return lobby; } }
+        private Lobby _lobby;
+        public Lobby Lobby { get { return _lobby; } private set { _lobby = value; } }
 
         private MapData mapData = null;
         public MapData MapData { get { return mapData; } }
 
-        private LobbyModel lobbyModel;
-        public LobbyModel LobbyModel { 
-            get
-            { 
-                return lobbyModel; 
-            } 
-            private set 
-            { 
-                lobbyModel = value; 
-                OnLobbyInvalidated?.Invoke();
-            }
-        }
+        public string PlayerId => AuthenticationService.Instance.PlayerId;
+
+        private LobbyModel _lobbyModel;
+        public LobbyModel LobbyModel { get { return _lobbyModel; } private set { _lobbyModel = value; } }
      
-        public Action OnLobbyInvalidated;
-        public bool IsHost { get { return lobby != null && lobby.HostId == AuthenticationService.Instance.PlayerId; } }
+        public Action OnLobbyInvalidat;
+        public Action OnDisconnect;
+     
+        public bool IsHost { get { return Lobby != null && Lobby.HostId == AuthenticationService.Instance.PlayerId; } }
 
         private void Awake()
         {
@@ -95,10 +90,9 @@ namespace Managers
         {
             if (Input.GetKeyDown(KeyCode.L))
             {
-                PrintPlayers(lobby);
+                PrintPlayers(Lobby);
             }
         }
-
 
         public async Task<bool> CreateLobbyForMap(MapData mapData)
         {
@@ -117,13 +111,15 @@ namespace Managers
                     Data = GetLobbyData(),
                 };
 
-                lobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, maxPlayers, createLobbyOptions);
+                Lobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, maxPlayers, createLobbyOptions);
                 LobbyModel = GetLobbyModel();
 
-                StartCoroutine(HeatbeatLobbyCoroutine(lobby));
+                StartCoroutine(HeatbeatLobbyCoroutine(Lobby));
                 StartCoroutine(PollLobbyCoroutine());
 
-                Debug.Log("Lobby created with ID: " + lobby.Id + " and code: " + lobby.LobbyCode);
+                PlayerPrefs.SetString("DebugRoomCode", Lobby.LobbyCode);
+
+                Debug.Log("Lobby created with ID: " + Lobby.Id + " and code: " + Lobby.LobbyCode);
                 return true;
             } 
             catch (Exception e)
@@ -142,13 +138,12 @@ namespace Managers
                     Player = GetPlayerWithData(),
                 };
 
-                lobby = await LobbyService.Instance.JoinLobbyByCodeAsync(code, joinLobbyByCodeOptions);
+                Lobby = await LobbyService.Instance.JoinLobbyByCodeAsync(code, joinLobbyByCodeOptions);
                 LobbyModel = GetLobbyModel();
-
 
                 StartCoroutine(PollLobbyCoroutine());
 
-                Debug.Log("Lobby joined with ID: " + lobby.Id + " and code: " + lobby.LobbyCode);
+                Debug.Log("Lobby joined with ID: " + Lobby.Id + " and code: " + Lobby.LobbyCode);
 
                 return true;
             }
@@ -176,11 +171,24 @@ namespace Managers
 
             while (true)
             {
-                var t = Task.Run(async () => await LobbyService.Instance.GetLobbyAsync(lobby.Id));
+                var t = Task.Run(async () => await LobbyService.Instance.GetLobbyAsync(Lobby.Id));
                 yield return new WaitUntil(() => t.IsCompleted);
 
-                lobby = t.Result;
-                LobbyModel = GetLobbyModel();
+                if (t.IsFaulted)
+                {
+                    Debug.LogError("Failed to get lobby: " + t.Exception.Message);
+                    OnDisconnect?.Invoke();
+                    Reset();
+                    yield break;
+                }
+
+                Lobby = t.Result;
+                var model = GetLobbyModel();
+                if (!model.Equals(LobbyModel))
+                {
+                    LobbyModel = model;
+                    OnLobbyInvalidat?.Invoke();
+                }
 
                 yield return delay;
             }
@@ -243,7 +251,7 @@ namespace Managers
             };
         }
 
-        public async void JoinTeam(int teamNumber)
+        public async Task<bool> JoinTeam(int teamNumber)
         {
             try 
             {
@@ -255,22 +263,25 @@ namespace Managers
                     Data = player.Data,
                 };
 
-                lobby = await Lobbies.Instance.UpdatePlayerAsync(lobby.Id, AuthenticationService.Instance.PlayerId, updatePlayerOptions);
-                LobbyModel = GetLobbyModel();
-
+                Lobby = await Lobbies.Instance.UpdatePlayerAsync(Lobby.Id, AuthenticationService.Instance.PlayerId, updatePlayerOptions);
+                
                 Debug.Log("Player " + AuthenticationService.Instance.PlayerId + " joined team " + teamNumber);
+
+                return true;
             }
             catch (Exception e)
             {
                 Debug.LogError("Failed to join team: " + e.Message);
+
+                return false;
             }
         }
 
-        public async void ChangeTeamForPlayer(string playerId, int teamNumber)
+        public async Task<bool> ChangeTeamForPlayer(string playerId, int teamNumber)
         {
             try 
             {
-                var player = lobby.Players.Find(x => x.Id == playerId);
+                var player = Lobby.Players.Find(x => x.Id == playerId);
                 player.Data["TeamNumber"].Value = teamNumber.ToString();
 
                 UpdatePlayerOptions updatePlayerOptions = new()
@@ -278,13 +289,17 @@ namespace Managers
                     Data = player.Data,
                 };
 
-                await Lobbies.Instance.UpdatePlayerAsync(lobby.Id, playerId, updatePlayerOptions);
+                await Lobbies.Instance.UpdatePlayerAsync(Lobby.Id, playerId, updatePlayerOptions);
 
                 Debug.Log("Player " + playerId + " joined team " + teamNumber);
+
+                return true;
             }
             catch (Exception e)
             {
                 Debug.LogError("Failed to join team: " + e.Message);
+
+                return false;
             }
         }
 
@@ -292,12 +307,12 @@ namespace Managers
         {
             return new LobbyModel
             {
-                Id = lobby.Id,
-                LobbyCode = lobby.LobbyCode,
-                MapId = lobby.Data["MapId"].Value,
-                HostId = lobby.HostId,
-                Name = lobby.Name,
-                MaxPlayers = lobby.MaxPlayers,
+                Id = Lobby.Id,
+                LobbyCode = Lobby.LobbyCode,
+                MapId = Lobby.Data["MapId"].Value,
+                HostId = Lobby.HostId,
+                Name = Lobby.Name,
+                MaxPlayers = Lobby.MaxPlayers,
                 Teams = GetTeams()
             };
         }
@@ -306,7 +321,7 @@ namespace Managers
         {
             Dictionary<string, int> teams = new();
 
-            foreach (var player in lobby.Players)
+            foreach (var player in Lobby.Players)
             {
                 if (player.Data.ContainsKey("TeamNumber"))
                 {
@@ -317,9 +332,9 @@ namespace Managers
             return teams;
         }
 
-        public async Task GetMapData()
+        public async Task DownloadMapData()
         {
-            var mapId = lobbyModel.MapId;
+            var mapId = _lobbyModel.MapId;
             var mapDataDownload = await DownloadMapData(mapId);
             
             if (!mapDataDownload.Item1)
@@ -386,6 +401,43 @@ namespace Managers
             mapData.GPSTexture = texture2;
 
             return new Tuple<bool, MapData>(true, mapData);
+        }
+   
+        public async Task<bool> RemovePlayerFromLobby(string playerId)
+        {
+            try
+            {
+                await Lobbies.Instance.RemovePlayerAsync(Lobby.Id, playerId);
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("Failed to remove player: " + e.Message);
+
+                return false;
+            }
+        }
+
+        public async Task<bool> LeaveLobby()
+        {
+            bool success = await RemovePlayerFromLobby(PlayerId);
+
+            if (success)
+            {
+                Reset();
+                return true;
+            }
+
+            return false;
+        }
+
+        private void Reset()
+        {
+            Lobby = null;
+            LobbyModel = new LobbyModel();
+            mapData = null;
+            StopAllCoroutines();
         }
     }
 }

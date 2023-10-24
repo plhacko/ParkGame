@@ -25,7 +25,7 @@ public class UIMainMenuController : MonoBehaviour
     private void Start()
     {
         joinButton.onClick.AddListener(joinGame);
-        joinButton.onClick.AddListener(onJoinPressed.Invoke);
+        // joinButton.onClick.AddListener(onJoinPressed.Invoke);
 
         hostButton.onClick.AddListener(onHostPressed.Invoke);
         
@@ -34,9 +34,7 @@ public class UIMainMenuController : MonoBehaviour
         
         OurNetworkManager.Singleton.OnClientDisconnectCallback += onClientDisconnect;
 
-        joinCodeInputField.text = SessionManager.Singleton.RoomCode != null
-            ? SessionManager.Singleton.RoomCode
-            : PlayerPrefs.GetString("DebugRoomCode", "");
+        joinCodeInputField.text = PlayerPrefs.GetString("DebugRoomCode", "");
     }
 
     private void OnDestroy()

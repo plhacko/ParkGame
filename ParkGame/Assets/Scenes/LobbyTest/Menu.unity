@@ -1598,6 +1598,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2483579972529308819, guid: 7fb96de73383a7541ae7aa63fb6a76c5, type: 3}
+      propertyPath: onDisconnect.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2483579972529308819, guid: 7fb96de73383a7541ae7aa63fb6a76c5, type: 3}
       propertyPath: onGoBack.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
       value: 1
       objectReference: {fileID: 0}
@@ -1606,11 +1610,27 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 354576631}
     - target: {fileID: 2483579972529308819, guid: 7fb96de73383a7541ae7aa63fb6a76c5, type: 3}
+      propertyPath: onDisconnect.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2483579972529308819, guid: 7fb96de73383a7541ae7aa63fb6a76c5, type: 3}
       propertyPath: onGoBack.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2483579972529308819, guid: 7fb96de73383a7541ae7aa63fb6a76c5, type: 3}
+      propertyPath: onDisconnect.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 354576631}
+    - target: {fileID: 2483579972529308819, guid: 7fb96de73383a7541ae7aa63fb6a76c5, type: 3}
       propertyPath: onGoBack.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: PopUIPage
+      objectReference: {fileID: 0}
+    - target: {fileID: 2483579972529308819, guid: 7fb96de73383a7541ae7aa63fb6a76c5, type: 3}
+      propertyPath: onDisconnect.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2483579972529308819, guid: 7fb96de73383a7541ae7aa63fb6a76c5, type: 3}
+      propertyPath: onDisconnect.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: PopUIPage
       objectReference: {fileID: 0}
     - target: {fileID: 2483579972529308819, guid: 7fb96de73383a7541ae7aa63fb6a76c5, type: 3}
@@ -1618,7 +1638,15 @@ PrefabInstance:
       value: UIController, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 2483579972529308819, guid: 7fb96de73383a7541ae7aa63fb6a76c5, type: 3}
+      propertyPath: onDisconnect.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: UIController, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 2483579972529308819, guid: 7fb96de73383a7541ae7aa63fb6a76c5, type: 3}
       propertyPath: onGoBack.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 2483579972529308819, guid: 7fb96de73383a7541ae7aa63fb6a76c5, type: 3}
+      propertyPath: onDisconnect.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 6412095738284844239, guid: 7fb96de73383a7541ae7aa63fb6a76c5, type: 3}

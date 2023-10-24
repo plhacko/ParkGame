@@ -35,8 +35,9 @@ namespace UI.Lobby
         [SerializeField] private RawImage gpsTexture;
         
         [SerializeField] private RectTransform teamsParent;
+
+        [SerializeField] private UnityEvent onDisconnect;
         
-        private readonly List<LobbyTeamUI> teamUIs = new();
         private List<UILobbyTeam> newTeamUIs = new ();
 
         private float maxImageSize;
@@ -45,7 +46,8 @@ namespace UI.Lobby
         {
             maxImageSize = drawnTexture.rectTransform.sizeDelta.x;
             backButton.onClick.AddListener(goBack);            
-            LobbyManager.Singleton.OnLobbyInvalidated += UpdateUI;
+            LobbyManager.Singleton.OnLobbyInvalidat += UpdateUI;
+            LobbyManager.Singleton.OnDisconnect += onDisconnect.Invoke;
         }
 
         private void UpdateUI()
@@ -79,7 +81,7 @@ namespace UI.Lobby
                 {
                     newTeamUIs[teamNumber].AddPlayerUI(
                         player, 
-                        () => LobbyManager.Singleton.ChangeTeamForPlayer(playedId, -1),
+                        async () => await LobbyManager.Singleton.RemovePlayerFromLobby(playedId),
                         () => LobbyManager.Singleton.IsHost
                     );
 
@@ -91,7 +93,7 @@ namespace UI.Lobby
         {
             if (LobbyManager.Singleton.MapData == null)
             {
-                await LobbyManager.Singleton.GetMapData();
+                await LobbyManager.Singleton.DownloadMapData();
             }
 
             InitializeUIwithMapData(LobbyManager.Singleton.MapData);
@@ -101,11 +103,11 @@ namespace UI.Lobby
         {
             roomCodeLabel.text = "Code: ";
             mapNameLabel.text = "";
-            foreach (var teamUI in teamUIs)
+            foreach (var teamUI in newTeamUIs)
             {
                 Destroy(teamUI.gameObject);
             }
-            teamUIs.Clear();
+            newTeamUIs.Clear();
         }
 
         private void InitializeUIwithMapData(MapData mapData)
@@ -127,12 +129,19 @@ namespace UI.Lobby
                 UILobbyTeam lobbyTeam = InitializeTeamUI(teamNumber);
                 newTeamUIs.Add(lobbyTeam);
             }
+
+            UpdateUI();
         }
 
         private UILobbyTeam InitializeTeamUI(int teamNumber)
         {
             var lobbyTeam = Instantiate(lobbyTeamPrefab, teamsParent);
-            lobbyTeam.Initialize(teamNumber, LobbyManager.Singleton.JoinTeam);
+            lobbyTeam.Initialize(teamNumber,
+                async (teamNumber) => 
+                {
+                    await LobbyManager.Singleton.JoinTeam(teamNumber);
+                }
+            );
             return lobbyTeam;
         }
 
@@ -140,25 +149,22 @@ namespace UI.Lobby
         {
             if (LobbyManager.Singleton != null)
             {
-                LobbyManager.Singleton.OnLobbyInvalidated -= UpdateUI;
+                LobbyManager.Singleton.OnLobbyInvalidat -= UpdateUI;
+                LobbyManager.Singleton.OnDisconnect -= onDisconnect.Invoke;
             }
         }
         
-        private void goBack()
+        private async void goBack()
         {
-            if (OurNetworkManager.Singleton.IsHost)
+            bool success = await LobbyManager.Singleton.LeaveLobby();
+            if (success)
             {
-                var copyOfKeys = new List<ulong>(OurNetworkManager.Singleton.ConnectedClients.Keys);
-                
-                foreach (var clientId in copyOfKeys)
-                {
-                    if(clientId == OurNetworkManager.Singleton.LocalClientId) continue;
-                    OurNetworkManager.Singleton.DisconnectClient(clientId);
-                }
+                UIController.Singleton.PopUIPage();
             }
-
-            SessionManager.Singleton.EndSession();
-            onGoBack.Invoke();
+            else
+            {
+                Debug.LogError("Failed to leave lobby");
+            }
         }
 
         private void startGame()
