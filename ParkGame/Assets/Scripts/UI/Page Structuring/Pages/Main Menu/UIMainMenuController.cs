@@ -58,7 +58,7 @@ public class UIMainMenuController : MonoBehaviour
     }
 
     // Join a game with the room code entered in the input field
-    private void joinGame()
+    private async void joinGame()
     {
         // enableButtons(false);
         
@@ -74,8 +74,9 @@ public class UIMainMenuController : MonoBehaviour
         // enableButtons(true);
         // joinCodeInputField.text = "";
         // TODO validate room code
-        LobbyManager.Singleton.JoinLobbyByCode(joinCodeInputField.text.ToUpper());
-        onJoinPressed?.Invoke();
+        bool success = await LobbyManager.Singleton.JoinLobbyByCode(joinCodeInputField.text.ToUpper());
+        if (success)
+            onJoinPressed?.Invoke();
     }
 
     // Enable or disable all buttons

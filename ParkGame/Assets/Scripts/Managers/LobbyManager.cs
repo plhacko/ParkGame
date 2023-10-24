@@ -8,6 +8,8 @@ using Unity.Services.Authentication;
 using Unity.Services.Core;
 using System.Threading.Tasks;
 using System.Linq;
+using Mapbox.Map;
+using UnityEditor;
 
 
 namespace Managers
@@ -17,6 +19,7 @@ namespace Managers
         public string Id;
         public string LobbyCode;
         public string HostId;
+        public string MapId;
         public string Name;
         public int MaxPlayers;
         public Dictionary<string, int> Teams;
@@ -28,6 +31,7 @@ namespace Managers
                    Id == model.Id &&
                    LobbyCode == model.LobbyCode &&
                    HostId == model.HostId &&
+                   MapId == model.MapId &&
                    Name == model.Name &&
                    MaxPlayers == model.MaxPlayers &&
                    Teams.OrderBy(x => x.Key).SequenceEqual(model.Teams.OrderBy(x => x.Key));
@@ -81,7 +85,7 @@ namespace Managers
         }
 
 
-        public async void CreateLobbyForMap(MapData mapData)
+        public async Task<bool> CreateLobbyForMap(MapData mapData)
         {
             try 
             {
@@ -89,11 +93,13 @@ namespace Managers
                 string lobbyName = "My Lobby";
                 // TODO temporary max players
                 int maxPlayers = mapData.MetaData.NumTeams * 4;
+                this.mapData = mapData;
 
                 CreateLobbyOptions createLobbyOptions = new()
                 {
                     IsPrivate = true,
-                    Player = GetPlayer(),
+                    Player = GetPlayerWithData(),
+                    Data = GetLobbyData(),
                 };
 
                 Lobby lobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, maxPlayers, createLobbyOptions);
@@ -102,35 +108,40 @@ namespace Managers
                 StartCoroutine(HeatbeatLobbyCoroutine(lobby));
                 StartCoroutine(PollLobbyCoroutine());
 
-                this.mapData = mapData;
-
                 Debug.Log("Lobby created with ID: " + lobby.Id + " and code: " + lobby.LobbyCode);
+                return true;
             } 
             catch (Exception e)
             {
                 Debug.LogError("Failed to create lobby: " + e.Message);
+                return false;
             }
         }
 
-        public async void JoinLobbyByCode(string code)
+        public async Task<bool> JoinLobbyByCode(string code)
         {
             try
             {
                 JoinLobbyByCodeOptions joinLobbyByCodeOptions = new()
                 {
-                    Player = GetPlayer(),
+                    Player = GetPlayerWithData(),
                 };
 
                 Lobby lobby = await LobbyService.Instance.JoinLobbyByCodeAsync(code, joinLobbyByCodeOptions);
                 this.lobby = lobby;
+                lobbyModel = GetLobbyModel();
+
 
                 StartCoroutine(PollLobbyCoroutine());
 
                 Debug.Log("Lobby joined with ID: " + lobby.Id + " and code: " + lobby.LobbyCode);
+
+                return true;
             }
             catch (Exception e)
             {
                 Debug.LogError("Failed to join lobby: " + e.Message);
+                return false;
             }
         }
 
@@ -174,7 +185,7 @@ namespace Managers
             }
         }
 
-        private Unity.Services.Lobbies.Models.Player GetPlayer()
+        private Unity.Services.Lobbies.Models.Player GetPlayerWithData()
         {
             return new() 
             {
@@ -200,11 +211,34 @@ namespace Managers
             };
         }
 
+        private Dictionary<string, DataObject> GetLobbyData()
+        {
+            return new()
+            {
+                {
+                    "MapId",
+                    new DataObject
+                    (
+                        DataObject.VisibilityOptions.Public,
+                        mapData.MetaData.MapId
+                    )
+                },
+                {
+                    "MapName",
+                    new DataObject
+                    (
+                        DataObject.VisibilityOptions.Public,
+                        mapData.MetaData.MapName
+                    )
+                }
+            };
+        }
+
         public async void JoinTeam(int teamNumber)
         {
             try 
             {
-                var player = GetPlayer();
+                var player = GetPlayerWithData();
                 player.Data["TeamNumber"].Value = teamNumber.ToString();
 
                 UpdatePlayerOptions updatePlayerOptions = new()
@@ -250,6 +284,7 @@ namespace Managers
             {
                 Id = lobby.Id,
                 LobbyCode = lobby.LobbyCode,
+                MapId = lobby.Data["MapId"].Value,
                 HostId = lobby.HostId,
                 Name = lobby.Name,
                 MaxPlayers = lobby.MaxPlayers,
@@ -270,6 +305,14 @@ namespace Managers
             }
 
             return teams;
+        }
+
+        public MapData GetMapData()
+        {
+            var mapId = lobbyModel.MapId;
+
+
+            return mapData;
         }
     }
 }

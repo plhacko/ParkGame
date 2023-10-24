@@ -40,10 +40,11 @@ public class UIPrepareGameMenuController : MonoBehaviour
         createButton.interactable = interactable && mapPicker.MapDatas.Count > 0;
     }
 
-    private void CreateLobby()
+    private async void CreateLobby()
     {
         MapData mapData = mapPicker.GetCurrentMapData();
-        LobbyManager.Singleton.CreateLobbyForMap(mapData);
-        onCreateGame.Invoke();
+        bool success = await LobbyManager.Singleton.CreateLobbyForMap(mapData);
+        if (success)
+            onCreateGame.Invoke();
     }
 }
