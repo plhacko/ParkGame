@@ -2,12 +2,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Firebase;
 using Firebase.Database;
 using Firebase.Storage;
-using UI;
-using UI.Lobby;
 using Unity.Netcode;
+using Unity.Services.Authentication;
+using Unity.Services.Core;
+using Unity.Services.Lobbies;
+using Unity.Services.Lobbies.Models;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
@@ -193,19 +196,34 @@ namespace Managers
         private MapData mapData;
         private string roomCode;
         
+        private Lobby hostLobby;
+        private Coroutine hostLobbyHeartbeatCoroutine;
+        private Lobby joinedLobby;
+        private Coroutine updateJoinedLobbyCoroutine;
 
         private void Awake()
         {
-            if (instance == null)
+            if (instance != null && instance != this)
+            {
+                Destroy(gameObject);
+            }
+            else
             {
                 PlayersData.ClearData();
                 instance = this;
                 DontDestroyOnLoad(gameObject);
             }
-            else
-            {
-                Destroy(gameObject);
-            }
+            // if (instance == null)
+            // {
+            //     PlayersData.ClearData();
+            //     instance = this;
+            //     DontDestroyOnLoad(gameObject);
+            // }
+            // else
+            // {
+            //     Debug.LogWarning("SessionManager already exists, destroying this instance");
+            //     Destroy(gameObject);
+            // }
         }
 
         public void SetRoomCode(string roomCode)
@@ -336,6 +354,12 @@ namespace Managers
             PlayersData.ClearData();
             OurNetworkManager.Singleton.Shutdown();
             SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
+        }
+
+        public void EndSession() 
+        {
+            PlayersData.ClearData();
+            OurNetworkManager.Singleton.Shutdown();
         }
 
         // Initializes the session with the host's data

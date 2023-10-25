@@ -32,7 +32,7 @@ namespace UI.Lobby
 
         private float maxImageSize;
         
-        private void Awake()
+        private void Start()
         {
             maxImageSize = drawnTexture.rectTransform.sizeDelta.x;
             
