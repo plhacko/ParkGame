@@ -4,11 +4,12 @@ using Managers;
 
 public class UIPrepareGameMenuController : UIPageController
 {
-    [SerializeField] private UIPage lobbyPage;
     [SerializeField] private Button backButton;
     [SerializeField] private MapPicker mapPicker;
     [SerializeField] private Button createButton;
+    [SerializeField] private UIPage lobbyPage;
     private bool processing = false;
+   
     void Start()
     {
         backButton.onClick.AddListener(Back);
@@ -20,10 +21,11 @@ public class UIPrepareGameMenuController : UIPageController
         setInteractable(mapPicker.IsInitialized() && !processing);
     }
 
-    public override void OnEnter()
+    public override async void OnEnter()
     {
         setInteractable(false);
         processing = false;
+        await mapPicker.DownloadMaps();
     }
 
     public override void OnExit()

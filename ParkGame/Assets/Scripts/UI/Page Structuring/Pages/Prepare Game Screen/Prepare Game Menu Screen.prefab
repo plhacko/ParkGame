@@ -613,7 +613,7 @@ GameObject:
   - component: {fileID: 3167335047415915864}
   - component: {fileID: 3167335047415915865}
   m_Layer: 5
-  m_Name: CreateButton
+  m_Name: Button - Create
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -735,7 +735,7 @@ GameObject:
   - component: {fileID: 3167335047569716540}
   - component: {fileID: 3167335047569716541}
   m_Layer: 5
-  m_Name: GoBackButton
+  m_Name: Button - Back
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1320,7 +1320,7 @@ GameObject:
   - component: {fileID: 3167335048040697324}
   - component: {fileID: 3167335048040697323}
   m_Layer: 5
-  m_Name: MapPicker
+  m_Name: Map Picker
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1659,7 +1659,7 @@ GameObject:
   - component: {fileID: 5897103049968510762}
   - component: {fileID: 2743409682758637164}
   m_Layer: 5
-  m_Name: Prepare Game Menu Page
+  m_Name: Prepare Game Menu Screen
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1864,8 +1864,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06045a0b44d24c84daa2754e5b9a5e27, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lobbySceneName: LobbyMenu
-  joinGameSceneName: MainMenu
+  lobbyPage: {fileID: 0}
   backButton: {fileID: 3167335047569716541}
-  createButton: {fileID: 3167335047415915865}
   mapPicker: {fileID: 3167335048040697323}
+  createButton: {fileID: 3167335047415915865}

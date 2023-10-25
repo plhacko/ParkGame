@@ -211,12 +211,6 @@ MonoBehaviour:
   ExitClip: {fileID: 0}
   entryMode: 3
   exitMode: 2
-  onEnter:
-    m_PersistentCalls:
-      m_Calls: []
-  onExit:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!114 &2483579972529308819
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -229,21 +223,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 834822ae385dc074fa333e677f52b26c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  joinMenuSceneName: MainMenu
   backButton: {fileID: 5034220328284139532}
-  onBackPressed:
-    m_PersistentCalls:
-      m_Calls: []
-  onGoBack:
-    m_PersistentCalls:
-      m_Calls: []
   startGameButton: {fileID: 5034220328677501603}
-  onStartGamePressed:
-    m_PersistentCalls:
-      m_Calls: []
   mapNameLabel: {fileID: 5034220327070859217}
   roomCodeLabel: {fileID: 5034220328473467774}
-  lobbyTeamUIPrefab: {fileID: 5719480191540753893, guid: 05e620151527e2440979015ea4e64daa, type: 3}
   lobbyTeamPrefab: {fileID: 5716820410546878884, guid: ede3ced9443b7aa41b3908e5666c0157, type: 3}
   drawnTexture: {fileID: 5034220327450392694}
   gpsTexture: {fileID: 5034220328010882078}
@@ -260,7 +243,7 @@ GameObject:
   - component: {fileID: 5034220327070859216}
   - component: {fileID: 5034220327070859217}
   m_Layer: 5
-  m_Name: MapNameText
+  m_Name: Text (TMP) - Map name
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -393,7 +376,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5034220327388002670}
   m_Layer: 5
-  m_Name: MapData
+  m_Name: Map Data
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -434,7 +417,7 @@ GameObject:
   - component: {fileID: 5034220327450392697}
   - component: {fileID: 5034220327450392694}
   m_Layer: 5
-  m_Name: Image (1)
+  m_Name: Image - Ovelay
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -777,7 +760,7 @@ GameObject:
   - component: {fileID: 5034220328010882017}
   - component: {fileID: 5034220328010882078}
   m_Layer: 5
-  m_Name: Image
+  m_Name: Image - Map
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -851,7 +834,7 @@ GameObject:
   - component: {fileID: 5034220328284139535}
   - component: {fileID: 5034220328284139532}
   m_Layer: 5
-  m_Name: GoBackButton
+  m_Name: Button - Button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -972,7 +955,7 @@ GameObject:
   - component: {fileID: 5034220328473467713}
   - component: {fileID: 5034220328473467774}
   m_Layer: 5
-  m_Name: RoomCodeLabel
+  m_Name: Text (TMP) - Room Code
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1108,7 +1091,7 @@ GameObject:
   - component: {fileID: 5034220328677501602}
   - component: {fileID: 5034220328677501603}
   m_Layer: 5
-  m_Name: StartButton
+  m_Name: Button - Start
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1228,7 +1211,7 @@ GameObject:
   - component: {fileID: 5034220328917699829}
   - component: {fileID: 5034220328917699828}
   m_Layer: 5
-  m_Name: Teams
+  m_Name: Layout Group - Teams
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

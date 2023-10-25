@@ -70,7 +70,6 @@ public class MapPicker : MonoBehaviour
         
         nextMapButton.onClick.AddListener(onNextClicked);
         previousMapButton.onClick.AddListener(onPreviousClicked);
-        downloadMaps();
     }
 
     private void onNextClicked()
@@ -175,7 +174,7 @@ public class MapPicker : MonoBehaviour
         showCurrentMap();
     }
 
-    private async void downloadMaps()
+    public async Task DownloadMaps()
     {
         (double currentLongitude, double currentLatitude) = getCurrentGeoPosition();
 

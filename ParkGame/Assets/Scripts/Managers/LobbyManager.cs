@@ -16,6 +16,7 @@ using Firebase.Database;
 using UnityEngine.Networking;
 using UnityEngine.TextCore.LowLevel;
 using Unity.VisualScripting;
+using Firebase.Auth;
 
 namespace Managers
 {
@@ -67,6 +68,8 @@ namespace Managers
      
         public bool IsHost { get { return Lobby != null && Lobby.HostId == AuthenticationService.Instance.PlayerId; } }
 
+        public Task UnityServicesInitializeTask { get; private set; }
+
         private void Awake()
         {
             if (Singleton != null)
@@ -75,6 +78,7 @@ namespace Managers
                 return;
             }
 
+            UnityServicesInitializeTask = UnityServices.InitializeAsync();
             Singleton = this;
         }
 
@@ -83,14 +87,6 @@ namespace Managers
             if (Singleton == this)
             {
                 Singleton = null;
-            }
-        }
-
-        private void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.L))
-            {
-                PrintPlayers(Lobby);
             }
         }
 
@@ -178,7 +174,7 @@ namespace Managers
                         { 
                             return await LobbyService.Instance.GetLobbyAsync(Lobby.Id);
                         }
-                        catch (Exception e)
+                        catch (Exception)
                         {
                             return null;
                         }
@@ -205,14 +201,6 @@ namespace Managers
             }
         }
 
-        private void PrintPlayers(Lobby lobby)
-        {
-            foreach (var player in lobby.Players)
-            {
-                Debug.Log("Player: " + player.Id + " " + player.Data["PlayerName"].Value + " " + player.Data["TeamNumber"].Value);  
-            }
-        }
-
         private Unity.Services.Lobbies.Models.Player GetPlayerWithData()
         {
             return new() 
@@ -224,7 +212,7 @@ namespace Managers
                         new PlayerDataObject
                         (
                             PlayerDataObject.VisibilityOptions.Member,
-                            PlayerPrefs.GetString("PlayerName", "Player")
+                            FirebaseAuth.DefaultInstance.CurrentUser?.DisplayName ?? "Name not found"
                         )
                     },
                     {

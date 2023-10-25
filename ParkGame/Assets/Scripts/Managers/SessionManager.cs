@@ -196,8 +196,6 @@ namespace Managers
         private MapData mapData;
         private string roomCode;
         
-        public Task UnityServicesInitializationTask { get; private set; }
-
         private Lobby hostLobby;
         private Coroutine hostLobbyHeartbeatCoroutine;
         private Lobby joinedLobby;
@@ -214,7 +212,6 @@ namespace Managers
                 PlayersData.ClearData();
                 instance = this;
                 DontDestroyOnLoad(gameObject);
-                UnityServicesInitializationTask = UnityServices.InitializeAsync();
             }
             // if (instance == null)
             // {
@@ -492,130 +489,5 @@ namespace Managers
             PlayersData.UpdatePlayerData(data);
             OnTeamJoined.Invoke(playerId.Value, oldTeam, data.Team);
         }
-
-        // Lobby using UGS ------------------------------------------------------------------------------------------------------
-        public async void CreateLobby()
-        {
-            try 
-            {
-                string lobbyName = "My Lobby"; 
-                int maxPlayers = 4;
-
-                Lobby lobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, maxPlayers);
-                hostLobby = lobby;
-                joinedLobby = lobby;
-                // TODO these freeze the game
-                // hostLobbyHeartbeatCoroutine = StartCoroutine(HostLobbyHeartbeat());
-                // updateJoinedLobbyCoroutine = StartCoroutine(UpdateJoinedLobby());
-                Debug.Log($"Lobby created with ID: {lobby.Id}" + $" and name: {lobby.Name}" + $" and max players: {lobby.MaxPlayers}" + $" and code: {lobby.LobbyCode}");
-                PrintPlayers(lobby); 
-            }
-            catch (Exception e)
-            {
-                Debug.Log(e);
-            }
-        }
-
-        public async void ListLobbies()
-        {
-            try
-            {
-                QueryResponse queryResponse = await Lobbies.Instance.QueryLobbiesAsync();
-
-                Debug.Log($"Lobbies found: {queryResponse.Results.Count}");
-                
-                foreach (var lobby in queryResponse.Results)
-                {
-                    Debug.Log($"Lobby found with ID: {lobby.Id}" + $" and name: {lobby.Name}" + $" and max players: {lobby.MaxPlayers}" + " code: " + lobby.LobbyCode);
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.Log(e);
-            }
-        }
-
-        IEnumerator HostLobbyHeartbeat()
-        {
-            while (true)
-            {
-                if (hostLobby == null) yield break;
-                
-                LobbyService.Instance.SendHeartbeatPingAsync(hostLobby.Id);
-             
-                yield return new WaitForSecondsRealtime(15.0f);
-            }
-        }
-
-        IEnumerator UpdateJoinedLobby() 
-        {
-            while (true)
-            {
-                yield return new WaitForSeconds(1.1f);
-
-                if (joinedLobby == null) yield break;
-                
-                var task =  LobbyService.Instance.GetLobbyAsync(joinedLobby.Id);
-                
-                joinedLobby = task.Result;
-                if (joinedLobby.HostId == AuthenticationService.Instance.PlayerId)
-                {
-                    hostLobby = joinedLobby;
-                }
-             
-                yield return new WaitUntil(() => task.IsCompleted);
-            }
-        }
-
-        public async void JoinLobbyByCode(string code)
-        {
-            try 
-            {
-                joinedLobby = await Lobbies.Instance.JoinLobbyByCodeAsync(code);
-                updateJoinedLobbyCoroutine = StartCoroutine(UpdateJoinedLobby());
-
-                Debug.Log($"Joined lobby with code: {code}");
-
-                PrintPlayers(joinedLobby);
-            }
-            catch (LobbyServiceException e)
-            {
-                Debug.Log(e);
-            }
-        }
-
-        public void PrintPlayers(Lobby lobby)
-        {
-            foreach (var player in lobby.Players)
-            {
-                Debug.Log($"Player found with ID: {player.Id}");
-            }
-        }
-
-        public bool IsLobbyHost => joinedLobby.HostId == AuthenticationService.Instance.PlayerId;
-
-
-        public async void CreateLobbyForMap(MapData mapData)
-        {
-            try
-            {
-                string lobbyName = "My Lobby";
-                // TODO each team has 4 players for now
-                int maxPlayers = mapData.MetaData.NumTeams * 4;
-
-                Lobby lobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, maxPlayers);
-                hostLobby = lobby;
-                joinedLobby = lobby;
-
-                string code = lobby.LobbyCode;
-                this.mapData = mapData;
-                this.roomCode = code;
-            }
-            catch (Exception e)
-            {
-                Debug.Log(e);
-            }
-        }
-    
     }
 }

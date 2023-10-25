@@ -3,16 +3,19 @@ using UnityEngine.UI;
 using TMPro;
 using UnityEngine.SceneManagement;
 using Managers;
+using Firebase.Auth;
 
 public class UIMainMenuController : UIPageController
 {
-    [SerializeField] private string createMapMenuSceneName; 
     [SerializeField] private Button createMapButton; 
-    [SerializeField] private UIPage prepareGamePage;
     [SerializeField] private Button hostButton;
-    [SerializeField] private UIPage lobbyPage;
     [SerializeField] private TMP_InputField joinCodeInputField;
     [SerializeField] private Button joinButton;
+    [SerializeField] private Button signOutButton;
+    [SerializeField] private UIPage welcomePage;
+    [SerializeField] private UIPage lobbyPage;
+    [SerializeField] private UIPage prepareGamePage;
+    [SerializeField] private string createMapMenuSceneName; 
     
     
     private void Start()
@@ -20,6 +23,7 @@ public class UIMainMenuController : UIPageController
         createMapButton.onClick.AddListener(Create);
         hostButton.onClick.AddListener(Host);
         joinButton.onClick.AddListener(Join);
+        signOutButton.onClick.AddListener(SignOut);
 
         // TODO remove this
         joinCodeInputField.text = PlayerPrefs.GetString("DebugRoomCode", "");
@@ -59,11 +63,20 @@ public class UIMainMenuController : UIPageController
         enableButtons(true);
     }
 
+    private void SignOut()
+    {
+        enableButtons(false);
+        FirebaseAuth.DefaultInstance.SignOut();
+        UIController.Singleton.PopUIPage();
+        UIController.Singleton.PushUIPage(welcomePage);
+    }
+
     private void enableButtons(bool isInteractable)
     {
         createMapButton.interactable = isInteractable;
         hostButton.interactable = isInteractable;
         joinCodeInputField.interactable = isInteractable;
         joinButton.interactable = isInteractable;
+        signOutButton.interactable = isInteractable;
     }
 }

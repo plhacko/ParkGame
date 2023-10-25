@@ -5,7 +5,7 @@ using Managers;
 public class UITitleScreenController : UIPageController
 {
     [SerializeField] private Button enterButton;
-    [SerializeField] private UIPage loginPage;
+    [SerializeField] private UIPage welcomePage;
     
     private void Start()
     {
@@ -22,8 +22,8 @@ public class UITitleScreenController : UIPageController
 
     private async void Enter()
     {
-        await SessionManager.Singleton.UnityServicesInitializationTask;
+        await LobbyManager.Singleton.UnityServicesInitializeTask;
 
-        UIController.Singleton.PushUIPage(loginPage);
+        UIController.Singleton.PushUIPage(welcomePage);
     }
 }
