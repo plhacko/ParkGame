@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PageAnimator
 {
@@ -14,20 +15,21 @@ public class PageAnimator
         Vector2 targetPosition = Vector2.zero;
         Vector2 startPosition = Vector2.zero;
 
+        var cavnasScaler = rectTransform.GetComponentInParent<CanvasScaler>();
         
         switch (direction)
         {
             case Direction.Left:
-                startPosition.x = Screen.width;
+                startPosition.x += cavnasScaler.referenceResolution.x;
                 break;
             case Direction.Right:
-                startPosition.x -= Screen.width;
+                startPosition.x -= cavnasScaler.referenceResolution.x;
                 break;
             case Direction.Up:
-                startPosition.y -= Screen.height;
+                startPosition.y -= cavnasScaler.referenceResolution.y;
                 break;
             case Direction.Down:
-                startPosition.y += Screen.height;
+                startPosition.y += cavnasScaler.referenceResolution.y;
                 break;
         }
 
@@ -58,19 +60,21 @@ public class PageAnimator
         Vector2 targetPosition = Vector2.zero;
         Vector2 startPosition = Vector2.zero;
 
+        var cavnasScaler = rectTransform.GetComponentInParent<CanvasScaler>();
+
         switch (direction)
         {
             case Direction.Left:
-                targetPosition.x -= Screen.width;
+                targetPosition.x -= cavnasScaler.referenceResolution.x;
                 break;
             case Direction.Right:
-                targetPosition.x += Screen.width;
+                targetPosition.x += cavnasScaler.referenceResolution.x;
                 break;
             case Direction.Up:
-                targetPosition.y += Screen.height;
+                targetPosition.y += cavnasScaler.referenceResolution.y;
                 break;
             case Direction.Down:
-                targetPosition.y -= Screen.height;
+                targetPosition.y -= cavnasScaler.referenceResolution.y;
                 break;
         }
 
