@@ -27,7 +27,7 @@ namespace Utils
         [SerializeField] private Button spawnPlayersButton; 
         private PlayerManager playerManager;
         private bool isDebugging;
-        
+
         private async void Start()
         {
             playerManager = FindObjectOfType<PlayerManager>();
@@ -101,9 +101,18 @@ namespace Utils
             }
         }
 
+        void StartAllVictoryPoints() {
+            var vps = FindObjectsOfType<VictoryPoint>();
+            foreach (VictoryPoint vp in vps) {
+                vp.SetStartTime();
+            }
+        }
+
         public void SpawnPlayers()
         {
             playerManager.DebugSpawnPlayers();
+            // start victory points
+            StartAllVictoryPoints();
         }
     }
 }

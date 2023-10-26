@@ -147,9 +147,7 @@ public class Soldier : NetworkBehaviour, ISoldier
     }
 
     Transform ClosestOutpost() {
-        // Outpost or Commander - implementing ICommander class, filter by the Team
-
-        GameObject selectedCommander = gameObject; // to be sure... 
+        GameObject selectedCommander = gameObject; // just to be sure that something is returned
         float shortestDist = float.PositiveInfinity;
         
         var outposts = FindObjectsOfType<Outpost>();
@@ -165,7 +163,6 @@ public class Soldier : NetworkBehaviour, ISoldier
         }
 
         return selectedCommander.transform;
-
 
     }
 
