@@ -4,9 +4,13 @@ using System.Collections.Generic;
 using System.Linq;
 using FreeDraw;
 using Managers;
+using Unity.AI;
+using Unity.AI.Navigation;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.Tilemaps;
 using UnityEngine.Windows;
+using NavMeshSurface = NavMeshPlus.Components.NavMeshSurface;
 
 [RequireComponent(typeof(Drawable))]
 public class CreateMapWithOverlay : MonoBehaviour
@@ -28,6 +32,7 @@ public class CreateMapWithOverlay : MonoBehaviour
     public StructureCounter castles;
     public bool doNotFetch = false;
     public bool loadFromSessionManager = false;
+    public NavMeshSurface navMesh;
     
     private Texture2D drawableTexture;
     private Texture2D resizedDrawableTexture;
@@ -55,6 +60,8 @@ public class CreateMapWithOverlay : MonoBehaviour
             CreateTilemapFromTexture(fromUploadedTexture: true, structures: mapData.MetaData.Structures);
             // Disable drawable component since it won't be used
             gameObject.GetComponent<Drawable>().enabled = false;
+            navMesh.BuildNavMesh();
+            
         }
         else if (!doNotFetch) // Wait until map fetching from MapBox is completed
             StartCoroutine(WaitForValue());
