@@ -11,6 +11,7 @@ using Player;
 using UnityEngine.AI;
 using static Formation;
 using DG.Tweening;
+using System.Linq;
 
 public enum UnitType
 {
@@ -144,6 +145,30 @@ public class Soldier : NetworkBehaviour, ISoldier
                 break;
         }
     }
+
+    Transform ClosestOutpost() {
+        // Outpost or Commander - implementing ICommander class, filter by the Team
+
+        GameObject selectedCommander = gameObject; // to be sure... 
+        float shortestDist = float.PositiveInfinity;
+        
+        var outposts = FindObjectsOfType<Outpost>();
+               
+        foreach (var iCom in outposts) {
+            if (iCom.Team == Team) {
+                float distCom = Vector3.Distance(transform.position, iCom.gameObject.transform.position);
+                if (distCom < shortestDist) {
+                    shortestDist = distCom;
+                    selectedCommander = iCom.gameObject;
+                }
+            }
+        }
+
+        return selectedCommander.transform;
+
+
+    }
+
     void Update()
     {
         // following is done only on server
@@ -153,7 +178,8 @@ public class Soldier : NetworkBehaviour, ISoldier
         // check for a Commander
         if (CommanderToFollow == null)
         {
-            CommanderToFollow = debugCommander; // DEBUG // TODO: rm
+            //    CommanderToFollow = debugCommander; // DEBUG // TODO: rm
+            CommanderToFollow = ClosestOutpost();
             return;
         } // TODO: add function, that finds the nearest frienly outpost
 
