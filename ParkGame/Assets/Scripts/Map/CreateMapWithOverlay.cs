@@ -51,6 +51,8 @@ public class CreateMapWithOverlay : MonoBehaviour
             SetLowResTextureForTilemapCreation(mapData.DrawnTexture);
             SetTilemapBounds(mapData.MetaData.TopLeftTileIdx, mapData.MetaData.BottomRightTileIdx);
             CreateTilemapFromTexture(fromUploadedTexture: true, structures: mapData.MetaData.Structures);
+            // Disable drawable component since it won't be used
+            gameObject.GetComponent<Drawable>().enabled = false;
         }
         else if (!doNotFetch) // Wait until map fetching from MapBox is completed
             StartCoroutine(WaitForValue());
@@ -226,12 +228,20 @@ public class CreateMapWithOverlay : MonoBehaviour
 
     private void SetStructureTiles(Dictionary<Vector3Int, TileBase> structuresToAssign)
     {
+        var structureRadius = 3;
         foreach (var kvp in structuresToAssign)
         {
-            if (tilemap.GetTile(kvp.Key) != boundsTile)
-                tilemap.SetTile(kvp.Key, kvp.Value);
-            else
-                throw new ArgumentException("Cannot place structure out of map bounds");
+            for (int x = -structureRadius; x <= structureRadius; x++)
+            {
+                for (int y = -structureRadius; y <= structureRadius; y++)
+                {
+                    var offsetPosition = kvp.Key + new Vector3Int(x, y, 0);
+                    if (tilemap.GetTile(offsetPosition) != boundsTile)
+                        tilemap.SetTile(offsetPosition, kvp.Value);
+                    else
+                        throw new ArgumentException("Cannot place structure out of map bounds");
+                }
+            }
         }
     }
 

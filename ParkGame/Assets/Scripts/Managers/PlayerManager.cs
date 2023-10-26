@@ -84,6 +84,10 @@ namespace Managers
             if (playerData == null) return;
             
             PlayerController playerController = Instantiate(playerControllerPrefab);
+            if (Camera.main != null)
+            {
+                Camera.main.gameObject.transform.SetParent(playerController.transform);
+            }
             playerController.InitializePlayerId(playerData.Value.ID);
                 
             // We spawn the player so that the client has ownership of it
