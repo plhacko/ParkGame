@@ -13,7 +13,9 @@ public class CreateMapWithOverlay : MonoBehaviour
 {
     public Camera mainCamera;
     [SerializeField] Sprite mapOverlay;
-    public Tilemap tilemap;
+    public Tilemap baseTilemap;
+    public Tilemap actionTilemap;
+    public Tilemap blockingTilemap;
     public TileBase pathTile;
     public TileBase boundsTile;
     public TileBase wallTile;
@@ -202,7 +204,9 @@ public class CreateMapWithOverlay : MonoBehaviour
     
     public void ClearTilemap()
     {
-        tilemap.ClearAllTiles();
+        baseTilemap.ClearAllTiles();
+        actionTilemap.ClearAllTiles();
+        blockingTilemap.ClearAllTiles();
     }
     
     public void ToggleDrawable()
@@ -228,7 +232,7 @@ public class CreateMapWithOverlay : MonoBehaviour
 
     private void SetStructureTiles(Dictionary<Vector3Int, TileBase> structuresToAssign)
     {
-        var structureRadius = 3;
+        var structureRadius = 2;
         foreach (var kvp in structuresToAssign)
         {
             for (int x = -structureRadius; x <= structureRadius; x++)
@@ -236,8 +240,8 @@ public class CreateMapWithOverlay : MonoBehaviour
                 for (int y = -structureRadius; y <= structureRadius; y++)
                 {
                     var offsetPosition = kvp.Key + new Vector3Int(x, y, 0);
-                    if (tilemap.GetTile(offsetPosition) != boundsTile)
-                        tilemap.SetTile(offsetPosition, kvp.Value);
+                    if (actionTilemap.GetTile(offsetPosition) != boundsTile)
+                        actionTilemap.SetTile(offsetPosition, kvp.Value);
                     else
                         throw new ArgumentException("Cannot place structure out of map bounds");
                 }
@@ -263,13 +267,13 @@ public class CreateMapWithOverlay : MonoBehaviour
         {
             var spriteRectVertices = drawableSprite.vertices;
             var worldMat = transform.localToWorldMatrix;
-            topLeftCellPos = tilemap.WorldToCell(worldMat * spriteRectVertices[0]);
-            bottomRightCellPos = tilemap.WorldToCell(worldMat * spriteRectVertices[1]);
+            topLeftCellPos = baseTilemap.WorldToCell(worldMat * spriteRectVertices[0]);
+            bottomRightCellPos = baseTilemap.WorldToCell(worldMat * spriteRectVertices[1]);
         }
         // Put tile to the opposite corners to set correct tilemap bounds so fill works correctly,
         // tilemap API doesnt do this automatically...
-        tilemap.SetTile(topLeftCellPos + new Vector3Int(-2, 2, 0), boundsTile);
-        tilemap.SetTile(bottomRightCellPos + new Vector3Int(2, -2, 0), boundsTile);
+        blockingTilemap.SetTile(topLeftCellPos + new Vector3Int(-2, 2, 0), boundsTile);
+        blockingTilemap.SetTile(bottomRightCellPos + new Vector3Int(2, -2, 0), boundsTile);
         
         var widthTilemap = bottomRightCellPos.x - topLeftCellPos.x;
         var heightTilemap = topLeftCellPos.y - bottomRightCellPos.y;
@@ -292,15 +296,16 @@ public class CreateMapWithOverlay : MonoBehaviour
                 int pixelIdx = (j - bottomRightCellPos.y) * widthTilemap + (i - topLeftCellPos.x);
                 var pixelColor = texturePixels[pixelIdx];
                 var colorMatchingTile = ClosestColor(pixelColor);
-                if (colorMatchingTile == boundsTile)
-                    tilemap.SetTile(tilePos, colorMatchingTile);
+                if (colorMatchingTile == boundsTile || colorMatchingTile == wallTile)
+                    blockingTilemap.SetTile(tilePos, colorMatchingTile);
                 else
-                    tilesToAssign.Add(tilePos, colorMatchingTile);
+                    baseTilemap.SetTile(tilePos, colorMatchingTile);
+                    // tilesToAssign.Add(tilePos, colorMatchingTile);
             }
             
         }
         // Flood fill the boundary before setting rest of the tiles
-        tilemap.FloodFill(
+        blockingTilemap.FloodFill(
             new Vector3Int(topLeftCellPos.x, topLeftCellPos.y), boundsTile
             );
         var structuresToAssign = new Dictionary<Vector3Int, TileBase>();
@@ -325,11 +330,11 @@ public class CreateMapWithOverlay : MonoBehaviour
                 structuresToAssign.Add(new Vector3Int(tilePos.x, tilePos.y, tilePos.z), victoryPointTile);
         }
         
-        foreach (var kvp in tilesToAssign)
-        {
-            if (tilemap.GetTile(kvp.Key) == null)
-                tilemap.SetTile(kvp.Key, kvp.Value);
-        }
+        // foreach (var kvp in tilesToAssign)
+        // {
+        //     if (tilemap.GetTile(kvp.Key) == null)
+        //         tilemap.SetTile(kvp.Key, kvp.Value);
+        // }
         
         SetStructureTiles(structuresToAssign);
     }
