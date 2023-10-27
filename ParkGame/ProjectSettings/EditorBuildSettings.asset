@@ -53,6 +53,27 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/LobbyTest/WelcomeScreen.unity
     guid: d130a2f3276763047a1343340a4a19fe
+  - enabled: 1
+    path: Assets/Scenes/NavmeshMultiScene.unity
+    guid: ad5bf916dc910114193cac26c7d75383
+  - enabled: 1
+    path: Assets/Scenes/NavmeshMultiScene.unity
+    guid: ad5bf916dc910114193cac26c7d75383
+  - enabled: 1
+    path: Assets/Scenes/NavmeshMultiScene.unity
+    guid: ad5bf916dc910114193cac26c7d75383
+  - enabled: 1
+    path: Assets/Scenes/NavmeshMultiScene.unity
+    guid: ad5bf916dc910114193cac26c7d75383
+  - enabled: 1
+    path: Assets/Scenes/NavmeshMultiScene.unity
+    guid: ad5bf916dc910114193cac26c7d75383
+  - enabled: 1
+    path: Assets/Scenes/NavmeshMultiScene.unity
+    guid: ad5bf916dc910114193cac26c7d75383
+  - enabled: 1
+    path: Assets/Scenes/NavmeshMultiScene.unity
+    guid: ad5bf916dc910114193cac26c7d75383
   m_configObjects:
     com.unity.adaptiveperformance.google.android.provider_settings: {fileID: 11400000, guid: 0ab3f1c24dc16ed4686af1c343f5f8e8, type: 2}
     com.unity.adaptiveperformance.loader_settings: {fileID: 11400000, guid: 3ad410e226113ae45a953aa6554aea9c, type: 2}
