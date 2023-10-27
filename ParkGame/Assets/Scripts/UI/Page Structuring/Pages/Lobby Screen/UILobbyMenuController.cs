@@ -35,7 +35,7 @@ namespace UI.Lobby
             startGameButton.onClick.AddListener(StartGame);
 
     
-            LobbyManager.Singleton.OnLobbyInvalidat += UpdateUI;
+            LobbyManager.Singleton.OnLobbyInvalidate += UpdateUI;
             LobbyManager.Singleton.OnDisconnect += OnDisconnect;
         }
 
@@ -43,7 +43,7 @@ namespace UI.Lobby
         {
             if (LobbyManager.Singleton == null) return;
 
-            LobbyManager.Singleton.OnLobbyInvalidat -= UpdateUI;
+            LobbyManager.Singleton.OnLobbyInvalidate -= UpdateUI;
             LobbyManager.Singleton.OnDisconnect -= OnDisconnect;
         }
 

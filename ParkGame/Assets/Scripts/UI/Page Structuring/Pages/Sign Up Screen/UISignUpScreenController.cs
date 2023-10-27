@@ -2,6 +2,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using Firebase.Auth;
+using Unity.Services.Authentication;
 
 public class UISignUpScreenController : UIPageController 
 {
@@ -62,6 +63,16 @@ public class UISignUpScreenController : UIPageController
         // Login user
         if (result != null)
         {
+
+#if UNITY_EDITOR
+        if (ParrelSync.ClonesManager.IsClone())
+        {
+            string customArgument = ParrelSync.ClonesManager.GetArgument();
+            AuthenticationService.Instance.SwitchProfile($"Clone_{customArgument}_Profile");
+        }
+#endif
+        await AuthenticationService.Instance.SignInAnonymouslyAsync();
+
             var userProfile = new UserProfile();
             userProfile.DisplayName = nameInputField.text;
             await result.User.UpdateUserProfileAsync(userProfile);

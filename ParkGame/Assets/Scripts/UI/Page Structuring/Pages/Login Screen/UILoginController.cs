@@ -35,7 +35,7 @@ public class UILoginController : UIPageController
     private async void Login()
     {
         processing = true;
-;
+
 #if UNITY_EDITOR
         if (ParrelSync.ClonesManager.IsClone())
         {
