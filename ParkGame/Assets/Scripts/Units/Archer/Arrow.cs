@@ -41,6 +41,7 @@ namespace Units.Archer
             if(target == null)
             {
                 Destroy(gameObject);   
+                return;
             }
             
             Vector3 targetPosition = target.position;
