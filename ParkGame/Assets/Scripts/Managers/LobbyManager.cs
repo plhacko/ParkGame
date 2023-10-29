@@ -63,12 +63,16 @@ namespace Managers
         private LobbyModel _lobbyModel;
         public LobbyModel LobbyModel { get { return _lobbyModel; } private set { _lobbyModel = value; } }
      
-        public Action OnLobbyInvalidat;
+        public Action OnLobbyInvalidate;
         public Action OnDisconnect;
      
         public bool IsHost { get { return Lobby != null && Lobby.HostId == AuthenticationService.Instance.PlayerId; } }
 
         public Task UnityServicesInitializeTask { get; private set; }
+
+        private ILobbyEvents events;
+
+        private float heartbeatTimer;
 
         private void Awake()
         {
@@ -87,6 +91,26 @@ namespace Managers
             if (Singleton == this)
             {
                 Singleton = null;
+            }
+        }
+
+        private void Update()
+        {
+            HandleLobbyHeartbeat();
+        }
+
+        private async void HandleLobbyHeartbeat()
+        {
+            if (Lobby == null || !IsHost) return;
+
+            heartbeatTimer -= Time.deltaTime;
+            if (heartbeatTimer < 0f)
+            {
+                float heartbeatTimerMax = 15f;
+                heartbeatTimer = heartbeatTimerMax;
+
+                Debug.Log("Heartbeat");
+                await LobbyService.Instance.SendHeartbeatPingAsync(Lobby.Id);
             }
         }
 
@@ -110,8 +134,12 @@ namespace Managers
                 Lobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, maxPlayers, createLobbyOptions);
                 LobbyModel = GetLobbyModel();
 
-                StartCoroutine(HeatbeatLobbyCoroutine(Lobby));
-                StartCoroutine(PollLobbyCoroutine());
+                var callbacks = new LobbyEventCallbacks();
+                callbacks.LobbyChanged += OnLobbyChanged;
+                callbacks.KickedFromLobby += OnKickedFromLobby;
+                callbacks.LobbyEventConnectionStateChanged += OnLobbyEventConnectionStateChanged;
+
+                events = await LobbyService.Instance.SubscribeToLobbyEventsAsync(Lobby.Id, callbacks);
 
                 PlayerPrefs.SetString("DebugRoomCode", Lobby.LobbyCode);
 
@@ -122,6 +150,43 @@ namespace Managers
             {
                 Debug.LogError("Failed to create lobby: " + e.Message);
                 return false;
+            }
+        }
+
+        private void OnLobbyChanged(ILobbyChanges changes)
+        {
+            Debug.Log("Lobby changed");
+
+            if (changes.LobbyDeleted)
+            {
+                OnDisconnect?.Invoke();
+                Reset();
+            }
+            else
+            {
+                changes.ApplyToLobby(Lobby);
+                LobbyModel = GetLobbyModel();
+                OnLobbyInvalidate?.Invoke();
+            }
+        }
+
+        private void OnKickedFromLobby()
+        {
+            Debug.Log("Kicked from lobby");
+            OnDisconnect?.Invoke();
+            Reset();
+        }
+
+        private void OnLobbyEventConnectionStateChanged(LobbyEventConnectionState state)
+        {
+            Debug.Log("Lobby event connection state changed: " + state);
+            switch (state)
+            {
+                case LobbyEventConnectionState.Unsubscribed: /* Update the UI if necessary, as the subscription has been stopped. */ break;
+                case LobbyEventConnectionState.Subscribing: /* Update the UI if necessary, while waiting to be subscribed. */ break;
+                case LobbyEventConnectionState.Subscribed: /* Update the UI if necessary, to show subscription is working. */ break;
+                case LobbyEventConnectionState.Unsynced: /* Update the UI to show connection problems. Lobby will attempt to reconnect automatically. */ break;
+                case LobbyEventConnectionState.Error: /* Update the UI to show the connection has errored. Lobby will not attempt to reconnect as something has gone wrong. */ break;
             }
         }
 
@@ -137,7 +202,12 @@ namespace Managers
                 Lobby = await LobbyService.Instance.JoinLobbyByCodeAsync(code, joinLobbyByCodeOptions);
                 LobbyModel = GetLobbyModel();
 
-                StartCoroutine(PollLobbyCoroutine());
+                var callbacks = new LobbyEventCallbacks();
+                callbacks.LobbyChanged += OnLobbyChanged;
+                callbacks.KickedFromLobby += OnKickedFromLobby;
+                callbacks.LobbyEventConnectionStateChanged += OnLobbyEventConnectionStateChanged;
+
+                events = await LobbyService.Instance.SubscribeToLobbyEventsAsync(Lobby.Id, callbacks);
 
                 Debug.Log("Lobby joined with ID: " + Lobby.Id + " and code: " + Lobby.LobbyCode);
 
@@ -147,57 +217,6 @@ namespace Managers
             {
                 Debug.LogError("Failed to join lobby: " + e.Message);
                 return false;
-            }
-        }
-
-        IEnumerator HeatbeatLobbyCoroutine(Lobby lobby)
-        {
-            var delay = new WaitForSeconds(15);
-
-            while (true)
-            {
-                LobbyService.Instance.SendHeartbeatPingAsync(lobby.Id);
-                yield return delay;
-            }
-        }
-
-        IEnumerator PollLobbyCoroutine()
-        {
-            var delay = new WaitForSeconds(1);
-
-            while (true)
-            {
-                var t = Task.Run(
-                    async () => 
-                    {
-                        try
-                        { 
-                            return await LobbyService.Instance.GetLobbyAsync(Lobby.Id);
-                        }
-                        catch (Exception)
-                        {
-                            return null;
-                        }
-                    }
-                );
-                yield return new WaitUntil(() => t.IsCompleted);
-
-                if (t.Result == null)
-                {
-                    OnDisconnect?.Invoke();
-                    Reset();
-                    yield break;
-                }
-
-                Lobby = t.Result;
-                var model = GetLobbyModel();
-                if (!model.Equals(LobbyModel))
-                {
-                    LobbyModel = model;
-                    OnLobbyInvalidat?.Invoke();
-                }
-
-                yield return delay;
             }
         }
 
@@ -433,6 +452,7 @@ namespace Managers
 
         private void Reset()
         {
+            events = null;
             Lobby = null;
             LobbyModel = new LobbyModel();
             mapData = null;
