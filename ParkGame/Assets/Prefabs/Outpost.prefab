@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 2776846833031490633}
   - component: {fileID: 1737851833670286082}
   - component: {fileID: -6080753142415193819}
+  - component: {fileID: -5153471224490584319}
   m_Layer: 0
   m_Name: Outpost
   m_TagString: Untagged
@@ -199,6 +200,19 @@ MonoBehaviour:
   ScaleThreshold: 0.01
   InLocalSpace: 0
   Interpolate: 1
+--- !u!114 &-5153471224490584319
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2776846833031490645}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53eb9b7e8e02ecd4d9e835d35245af24, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Shader: {fileID: 4800000, guid: 6a731f9a56e00be4b86162ee046e0493, type: 3}
 --- !u!1001 &5361308661487119236
 PrefabInstance:
   m_ObjectHideFlags: 0

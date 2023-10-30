@@ -50,7 +50,7 @@ public class Soldier : NetworkBehaviour, ISoldier
     private NetworkVariable<int> _HP = new();
     public int HP { get => _HP.Value; set => _HP.Value = value; }
     public int TeaM;
-    private NetworkVariable<int> _Team = new();
+    private NetworkVariable<int> _Team = new(-1);
     public int Team { get => _Team.Value; set => _Team.Value = value; }
     private NetworkVariable<SoldierBehaviour> _SoldierBehaviour = new();
     public SoldierBehaviour SoldierBehaviour { get => _SoldierBehaviour.Value; set => _SoldierBehaviour.Value = value; } // derived form ISoldier
@@ -97,7 +97,7 @@ public class Soldier : NetworkBehaviour, ISoldier
             Team = initTeam;
         }
         
-        OnTeamChanged(0, Team);
+        OnTeamChanged(-1, Team);
         OnBehaviourChange(0, SoldierBehaviour);
         SpriteRenderer.flipX = XSpriteFlip.Value;
 
