@@ -1,3 +1,6 @@
 ParkGame/.idea/
 ParkGame_clone_*/
 ParkGame/Assets/Sprites/Map/customMap.png
+# config key for mapbox
+ParkGame/Assets/Resources/Mapbox*
+
