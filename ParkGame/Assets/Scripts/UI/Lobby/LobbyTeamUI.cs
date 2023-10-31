@@ -18,6 +18,8 @@ namespace UI.Lobby
         [SerializeField] private TextMeshProUGUI teamNameLabel;
         
         private LobbyMenuController lobbyMenuController;
+        private UILobbyMenuController uiLobbyMenuController;
+
         private int teamNumber; // team number is in 0 - 3 range
 
         // player ID -> player UI

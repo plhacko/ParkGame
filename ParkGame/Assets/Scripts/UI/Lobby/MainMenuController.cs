@@ -1,4 +1,5 @@
-﻿using Managers;
+﻿using Firebase.Auth;
+using Managers;
 using TMPro;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
@@ -17,9 +18,11 @@ namespace UI.Lobby
     {
         [SerializeField] private string hostMenuSceneName;
         [SerializeField] private string createMapMenuSceneName;
+        [SerializeField] private string welcomeMenuSceneName;
         [SerializeField] private Button joinButton;
         [SerializeField] private Button hostButton;
         [SerializeField] private Button createMapButton;
+        [SerializeField] private Button logOutButton; 
         [SerializeField] private TMP_InputField joinCodeInputField;
 
         private async void Start()
@@ -27,6 +30,7 @@ namespace UI.Lobby
             joinButton.onClick.AddListener(joinGame);
             hostButton.onClick.AddListener(hostGame);
             createMapButton.onClick.AddListener(createMap);
+            logOutButton.onClick.AddListener(logOut);
             
             // Disable buttons until the player is signed in
             enableButtons(false);
@@ -43,6 +47,7 @@ namespace UI.Lobby
             
             OurNetworkManager.Singleton.OnClientDisconnectCallback += onClientDisconnect;
 
+            // Debug.Log(SessionManager.Singleton);
             joinCodeInputField.text = SessionManager.Singleton.RoomCode != null
                 ? SessionManager.Singleton.RoomCode
                 : PlayerPrefs.GetString("DebugRoomCode", "");
@@ -58,6 +63,13 @@ namespace UI.Lobby
         {
             joinCodeInputField.text = "";
             enableButtons(true);
+        }
+
+        private void logOut()
+        {
+            enableButtons(false);
+            FirebaseAuth.DefaultInstance.SignOut();
+            SceneManager.LoadScene(welcomeMenuSceneName);
         }
 
         // Go to scene where the player can create a new map
@@ -78,8 +90,8 @@ namespace UI.Lobby
         private async void joinGame()
         {
             enableButtons(false);
-            
-            string playerName = PlayerPrefs.GetString("PlayerName", "");
+
+            string playerName = FirebaseAuth.DefaultInstance.CurrentUser?.DisplayName ?? "Name not found";
             bool joined = await OurNetworkManager.Singleton.JoinGame(joinCodeInputField.text, playerName);
             if (joined)
             {
@@ -99,6 +111,7 @@ namespace UI.Lobby
             joinButton.interactable = isInteractable;
             hostButton.interactable = isInteractable;
             joinCodeInputField.interactable = isInteractable;
+            logOutButton.interactable = isInteractable;
         }
     }
 }

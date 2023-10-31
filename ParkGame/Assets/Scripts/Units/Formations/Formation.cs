@@ -2,10 +2,15 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
+using Player;
 
-public class Formation : MonoBehaviour
-{
+public class Formation : NetworkBehaviour {
+//public class Formation : MonoBehaviour {
     public enum FormationType { Circle, Box, Free };
+
+    // tmp counter
+    float ccc;
 
     public class PositionPair {
         public PositionPair(GameObject i1, bool i2 = false) { gobject = i1; occupated = i2; }
@@ -15,23 +20,28 @@ public class Formation : MonoBehaviour
     }
 
     [SerializeField] GameObject PositionPrefab;
-    [SerializeField] public GameObject BoxRootPrefab;
     public List<GameObject> soldiers = new List<GameObject>();
 
-    // circle formation
+    private int Team;
+
+    // circle formation - positions for soldiers
     public List<GameObject> FormationCircle = new List<GameObject>();
     
     // box formation
     public GameObject BoxRoot;
     public List<GameObject> FormationBox = new List<GameObject>(); // are in hierarchy under BoxRoot
 
-    private void Start() 
-    {
+    [ClientRpc]
+    void UnparentFormationClientRpc() {
         var p = gameObject.transform.position;
-        
-        // cannot be under commander in hierarchy, problems with movement
-        BoxRoot = Instantiate(BoxRootPrefab, new Vector3(p.x - 2, p.y, p.z), Quaternion.Euler(new Vector3(0, 0, 90)));
-        //Hide(BoxRoot);
+        BoxRoot.transform.SetParent(null, true);
+        BoxRoot.transform.position = new Vector3(p.x - 2, p.y, p.z);
+        BoxRoot.transform.rotation = Quaternion.Euler(new Vector3(0, 0, 90));
+    }
+
+    public void StartFormation() {
+        UnparentFormationClientRpc();
+        Team = gameObject.GetComponent<PlayerController>().Team;
     }
 
     // disable renderer of object
@@ -45,11 +55,21 @@ public class Formation : MonoBehaviour
     private void Update() {
         RotateBoxFormation();
 
+        if (ccc > 10) {
+            // test
+            //CallToMyTeammates();
+            ccc = 0;
+        } else { 
+            ccc += Time.deltaTime;
+        }
+
         if (Input.GetKeyDown(KeyCode.Space)) {
             Add1PositionToBoxFormation();
         }
     }
 
+    // add position mesh for soldier at commander
+    // for referencing its location for A*
     GameObject AddSphere(Vector3 position, float scale, string name, GameObject parent) {
         GameObject sphere = Instantiate(PositionPrefab);
         sphere.name = name;
@@ -58,6 +78,23 @@ public class Formation : MonoBehaviour
         sphere.transform.localPosition = position;
         //Hide(sphere);
         return sphere;
+    }
+
+    void CallToMyTeammates() {
+        var soldiers = FindObjectsOfType<Soldier>();
+        List<GameObject> myTeamSoldiers = new List<GameObject>();
+        foreach (var s in soldiers) {
+            if (s.Team == Team) {
+                myTeamSoldiers.Add(s.gameObject);
+                // maybe not comparing transforms
+                if (s.GetCommanderWhomIFollow() == gameObject.transform) {
+                } else {
+                }
+            }
+        }
+
+        //Debug.Log("number of my team's soldiers: " + myTeamSoldiers.Count);
+
     }
 
     void Add1PositionToCircularFormation(Vector3 pos) {
@@ -77,6 +114,7 @@ public class Formation : MonoBehaviour
         formDescr.NumberOfPositions++;
     }
 
+    // rotate the box formation according to the commander's direction of movement
     void RotateBoxFormation() {
         if (!BoxRoot) { return; }
         Vector3 from = BoxRoot.transform.up;
@@ -94,12 +132,18 @@ public class Formation : MonoBehaviour
     }
 
     public void ResetFormation() {
+        if (!BoxRoot) {
+            //StartFormation();
+        }
+
         for (int i = 0; i < soldiers.Count; i++) {
             soldiers.RemoveAt(i);
         }
         FormationCircle.Clear();
-        FormationBox.Clear(); 
-        BoxRoot.GetComponent<FormationDescriptor>().NumberOfPositions = 0;
+        FormationBox.Clear();
+        if (BoxRoot) {
+            BoxRoot.GetComponent<FormationDescriptor>().NumberOfPositions = 0;
+        }
         RemoveSpheres();
        
     }
@@ -248,7 +292,7 @@ public class Formation : MonoBehaviour
     }
 
     public void ListFormationPositions(FormationType shape = FormationType.Circle) {
-        // draw positions for the number of soldiers
+        // draw positions for following soldiers
         if (shape == FormationType.Circle) {
             var positions = ListCircularPositions();
 
@@ -257,6 +301,7 @@ public class Formation : MonoBehaviour
                 Add1PositionToCircularFormation(positions[positions.Count - 1]);
             }
 
+            // recount positions, ajdust the number of followers changed
             FitCircularFormation();
         }
         if (shape == FormationType.Box) {

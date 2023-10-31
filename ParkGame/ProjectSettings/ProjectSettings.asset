@@ -780,7 +780,8 @@ PlayerSettings:
   webGLMemoryGeometricGrowthStep: 0.2
   webGLMemoryGeometricGrowthCap: 96
   webGLPowerPreference: 2
-  scriptingDefineSymbols: {}
+  scriptingDefineSymbols:
+    Android: UGS_BETA_LOBBY_EVENTS;UGS_LOBBY_EVENTS
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend: {}
@@ -874,11 +875,11 @@ PlayerSettings:
   apiCompatibilityLevel: 6
   activeInputHandler: 0
   windowsGamepadBackendHint: 0
-  cloudProjectId: 269a2803-10de-4a78-9784-7c3fbbdd4ece
+  cloudProjectId: c8cd3d83-ef02-4e44-9e97-f3aab02dda2f
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
   projectName: ParkGame
-  organizationId: swproject
+  organizationId: beta_caroten
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
   hmiLoadingImage: {fileID: 0}

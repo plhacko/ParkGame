@@ -23,5 +23,6 @@ namespace UI.Lobby
             playerUnReadyButton.onClick.AddListener(() => 
                 lobbyMenuController.RemoveFromTeam(playerData.ID));
         }
+
     }
 }
