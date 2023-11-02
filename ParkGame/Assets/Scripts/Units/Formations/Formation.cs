@@ -37,6 +37,7 @@ public class Formation : NetworkBehaviour {
         BoxRoot.transform.SetParent(null, true);
         BoxRoot.transform.position = new Vector3(p.x - 2, p.y, p.z);
         BoxRoot.transform.rotation = Quaternion.Euler(new Vector3(0, 0, 90));
+        Hide(BoxRoot);
     }
 
     public void StartFormation() {

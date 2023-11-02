@@ -224,7 +224,7 @@ namespace Player
 
         // commands to the units
         [ServerRpc]
-        void CommandMovementServerRpc()
+        public void CommandMovementServerRpc()
         {
             foreach (GameObject go in Units)
             {
@@ -233,7 +233,7 @@ namespace Player
             }
         }
         [ServerRpc]
-        void CommandIdleServerRpc()
+        public void CommandIdleServerRpc()
         {
             foreach (GameObject go in Units)
             {
@@ -242,7 +242,7 @@ namespace Player
             }
         }
         [ServerRpc]
-        void CommandAttackServerRpc()
+        public void CommandAttackServerRpc()
         {
             foreach (GameObject go in Units)
             {
