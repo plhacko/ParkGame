@@ -3,6 +3,7 @@ using UnityEngine;
 public class PlayerPointerPlacer : MonoBehaviour
 {
     public GameObject pin;
+    public GameObject accuracyCircle;
 
     private Coordinate pinPosition = new Coordinate()
     {
@@ -102,5 +103,9 @@ public class PlayerPointerPlacer : MonoBehaviour
 
         // Do something with the world position
         pin.transform.position = worldPosition;
+        accuracyCircle.transform.position = worldPosition;
+        var scale = mapDisplayer.GetMapScale();
+        float accuracyRadius = (float)(GPSLocator.instance.HorizontalAccuracy * scale * 2);
+        accuracyCircle.transform.localScale = new Vector3(accuracyRadius, accuracyRadius, accuracyRadius);
     }
 }

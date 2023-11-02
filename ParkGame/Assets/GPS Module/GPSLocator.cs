@@ -18,9 +18,11 @@ public class GPSLocator : MonoBehaviour
 
     public double Longitude { get { return lon; } }
     public double Lattitude { get { return lat; } }
+    public double HorizontalAccuracy { get { return horAcc; } }
 
     private double lon;
     private double lat;
+    private double horAcc;
 
     private void Awake()
     {
@@ -112,6 +114,7 @@ public class GPSLocator : MonoBehaviour
     {
         lat = Input.location.lastData.latitude;
         lon = Input.location.lastData.longitude;
+        horAcc = Input.location.lastData.horizontalAccuracy;
     }
 
     public bool IsLocationServiceEnabled()

@@ -262,4 +262,36 @@ public class MapDisplayer : MonoBehaviour
     {
         return mapLoaded;
     }
+
+    // Calculate the map scale for the bounding box given in lat/lon coordinates unity unit/m
+    public double GetMapScale()
+    {
+        // Convert latitude and longitude to radians
+        double lat1Rad = MinLatitude * Math.PI / 180.0;
+        double lon1Rad = MinLongitude * Math.PI / 180.0;
+        double lat2Rad = MaxLatitude * Math.PI / 180.0;
+        double lon2Rad = MaxLongitude * Math.PI / 180.0;
+
+        // Calculate the distance between the corners of the bounding box using the Haversine formula
+        double dLat = lat2Rad - lat1Rad;
+        double dLon = lon2Rad - lon1Rad;
+        double a = Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
+                Math.Cos(lat1Rad) * Math.Cos(lat2Rad) *
+                Math.Sin(dLon / 2) * Math.Sin(dLon / 2);
+        double c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+        double realWorldDistance = 6371 * c; // Distance in kilometers
+        realWorldDistance *= 1000; // Convert to meters
+
+        // Get the sprite renderer component
+        SpriteRenderer sr = GetComponent<SpriteRenderer>();
+        // Get the size of the sprite in pixels
+        float width = sr.sprite.bounds.size.x;
+        float height = sr.sprite.bounds.size.y;
+        float diagonalLengthUnityUnits = Mathf.Sqrt(width * width + height * height);
+
+        // Calculate the scale as the ratio of the real-world distance to the diagonal length of the bounding box in pixels
+        double scale = diagonalLengthUnityUnits / realWorldDistance;
+
+        return scale;
+    }
 }
