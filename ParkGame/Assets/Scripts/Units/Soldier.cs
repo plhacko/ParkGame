@@ -161,9 +161,7 @@ public class Soldier : NetworkBehaviour, ISoldier
     }
 
     Transform ClosestOutpost() {
-        // Outpost or Commander - implementing ICommander class, filter by the Team
-
-        GameObject selectedCommander = gameObject; // to be sure... 
+        GameObject selectedCommander = gameObject; // just to be sure that something is returned
         float shortestDist = float.PositiveInfinity;
         
         var outposts = FindObjectsOfType<Outpost>();
@@ -179,7 +177,6 @@ public class Soldier : NetworkBehaviour, ISoldier
         }
 
         return selectedCommander.transform;
-
 
     }
 
@@ -295,23 +292,33 @@ public class Soldier : NetworkBehaviour, ISoldier
         }
     }
 
+    private void FollowObjectWithAnimation(Transform toFollow) {
+        Agent.SetDestination(toFollow.position);
+        Vector2 direction = toFollow.position - gameObject.transform.position;
+        if (direction.magnitude < 0.001f) {
+            Networkanimator.Animator.SetFloat(AnimatorMovementSpeedHash, 0.0f);
+        } else {
+            Networkanimator.Animator.SetFloat(AnimatorMovementSpeedHash, 1.0f);
+        }
+        SpriteRenderer.flipX = direction.x < 0;
+        XSpriteFlip.Value = SpriteRenderer.flipX;
+    }
+
     private void FormationBehaviour() {
         if (FollowInNavMeshFormation) {
             if (!ObjectToFollowInFormation) {
                 return;
             }
 
-            Agent.SetDestination(ObjectToFollowInFormation.transform.position);
-            
-            Vector2 direction = ObjectToFollowInFormation.transform.position - gameObject.transform.position;
-            if (direction.magnitude < 0.001f) {
-                Networkanimator.Animator.SetFloat(AnimatorMovementSpeedHash, 0.0f);
-            } else {
-                Networkanimator.Animator.SetFloat(AnimatorMovementSpeedHash, 1.0f);
+            // Attack if enemy close by and in range 
+            Transform enemyT = EnemyObserver.GetClosestEnemy();
+            float distanceFromCommander = Vector3.Distance(CommanderToFollow.position, transform.position);
+            if (enemyT != null && distanceFromCommander < DefendDistanceFromCommander) {
+                AttackEnemyIfInRange(enemyT);
+                return;
             }
-            SpriteRenderer.flipX = direction.x < 0;
-            XSpriteFlip.Value = SpriteRenderer.flipX;
-            
+            // Follow commander
+            FollowObjectWithAnimation(ObjectToFollowInFormation.transform);
         }
     }
 
@@ -373,8 +380,7 @@ public class Soldier : NetworkBehaviour, ISoldier
             SoldierBehaviour = SoldierBehaviour.Idle;
             return;
         }
-        Vector2 directionToEntity = entityT.position - transform.position;
-        Move(directionToEntity);
+        FollowObjectWithAnimation(entityT);
     }
 
     private void Move(Vector2 direction) {
@@ -397,7 +403,7 @@ public class Soldier : NetworkBehaviour, ISoldier
         SpriteRenderer.flipX = movement.x < 0;
         XSpriteFlip.Value = SpriteRenderer.flipX;
         
-        Agent.SetDestination(transform.position + new Vector3(movement.x, movement.y, 0));
+        Agent.SetDestination(transform.position + new Vector3(movement.x, movement.y, 0)); 
     }
 
     void OnMouseDown()
