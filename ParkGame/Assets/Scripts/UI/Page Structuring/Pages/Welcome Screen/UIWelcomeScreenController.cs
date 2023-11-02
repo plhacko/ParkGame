@@ -12,24 +12,23 @@ public class UIWelcomeScreenController : UIPageController
 
     private void Start()
     {
-        loginButton.onClick.AddListener(Login);
-        loginButton.interactable = false;
-        
+        loginButton.onClick.AddListener(Login);    
         signUpButton.onClick.AddListener(SignUp);
-        signUpButton.interactable = false;
-
-        // Already logged in
-        if (FirebaseAuth.DefaultInstance.CurrentUser != null)
-        {
-            UIController.Singleton.PushUIPage(mainMenuPage);
-        }
-        
-        loginButton.interactable = true;
-        signUpButton.interactable = true;
     }
 
     public override void OnEnter()
     {
+        loginButton.interactable = false;
+        signUpButton.interactable = false;
+
+        if (FirebaseAuth.DefaultInstance.CurrentUser != null)
+        {
+            Debug.Log("User already logged in as " + FirebaseAuth.DefaultInstance.CurrentUser.DisplayName);
+            UIController.Singleton.PushUIPage(mainMenuPage);
+        }
+
+        loginButton.interactable = true;
+        signUpButton.interactable = true;
     }
 
     public override void OnExit()
