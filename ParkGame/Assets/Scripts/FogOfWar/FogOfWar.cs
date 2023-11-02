@@ -9,7 +9,8 @@ public class FogOfWar : MonoBehaviour
     [SerializeField] private int fogSizeInUnits = 100;
     [SerializeField] private int pixelsPerUnit = 32;
     [SerializeField] private int edgeWidth = 3;
-    
+    [SerializeField] private bool debug = false;
+
     private int textureSize;
     private Texture2D fogTexture;
     private Color32[] fogBuffer;
@@ -92,6 +93,12 @@ public class FogOfWar : MonoBehaviour
 
                 fogBuffer[x + y * textureSize] = Color32.Lerp(hiddenColor, new Color32(0, 0, 0, 0), maxVisibility);
                 revealerBuffer[x + y * textureSize] = maxVisibility > 0 ? new Color32(0, 0, 0, 255) : new Color32(0, 0, 0, 0);
+
+                if (debug)
+                {
+                    fogBuffer[x + y * textureSize] = new Color32(0, 0, 0, 0);
+                    revealerBuffer[x + y * textureSize] = new Color32(0, 0, 0, 255);
+                }
             }
         }
         fogTexture.SetPixels32(fogBuffer);

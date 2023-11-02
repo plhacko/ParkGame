@@ -32,6 +32,9 @@ public class Outpost : NetworkBehaviour, ICommander
     private SpriteRenderer sr;
     private int counter;
     private PlayerManager playerManager;
+    private FogOfWar fogOfWar;
+    private Revealer revealer;
+    private ChangeMaterial changeMaterial;
     
     //private void Start()
     private void Awake()
@@ -39,7 +42,10 @@ public class Outpost : NetworkBehaviour, ICommander
         Team = InitialTeam;
         //OutpostSpawnerChanger = transform.Find("IconToggler").GetComponent<ToggleSpawnedUnitScript>();
         playerManager = FindObjectOfType<PlayerManager>();
-
+        fogOfWar = FindObjectOfType<FogOfWar>();
+        revealer = GetComponent<Revealer>();
+        changeMaterial = GetComponent<ChangeMaterial>();
+        
         sr = GetComponent<SpriteRenderer>();
 
         if (InitOutpostUnitType == UnitType.Archer)
@@ -48,6 +54,15 @@ public class Outpost : NetworkBehaviour, ICommander
         }
 
         sr.sprite = ChangeSpawnType(counter);
+        
+        if (InitialTeam == 0) // todo change if is local player's
+        {
+            fogOfWar.RegisterAsRevealer(revealer);
+        }
+        else
+        {
+            changeMaterial.Change();
+        }
     }
 
     void Update()
