@@ -53,20 +53,26 @@ public class CreateMapWithOverlay : MonoBehaviour
         }
         else if (loadFromSessionManager)
         {
-            // Load selected map from session manager 
-            var mapData = SessionManager.Singleton.MapData;
-            SetLowResTextureForTilemapCreation(mapData.DrawnTexture);
-            SetTilemapBounds(mapData.MetaData.TopLeftTileIdx, mapData.MetaData.BottomRightTileIdx);
-            CreateTilemapFromTexture(fromUploadedTexture: true, structures: mapData.MetaData.Structures);
+            // Create map from session manager once its fetched
+            SessionManager.Singleton.OnMapReceived += CreateTilemapFromFetchedMap;
+            
             // Disable drawable component since it won't be used
             gameObject.GetComponent<Drawable>().enabled = false;
-            navMesh.BuildNavMesh();
-            
         }
         else if (!doNotFetch) // Wait until map fetching from MapBox is completed
             StartCoroutine(WaitForValue());
         
     }
+
+    private void CreateTilemapFromFetchedMap(MapData mapData)
+    {
+        SetLowResTextureForTilemapCreation(mapData.DrawnTexture);
+        SetTilemapBounds(mapData.MetaData.TopLeftTileIdx, mapData.MetaData.BottomRightTileIdx);
+        CreateTilemapFromTexture(fromUploadedTexture: true, structures: mapData.MetaData.Structures);
+        navMesh.BuildNavMesh();
+        SessionManager.Singleton.OnMapReceived -= CreateTilemapFromFetchedMap;
+    }
+    
     private IEnumerator WaitForValue()
     {
         float timer = 0f;
