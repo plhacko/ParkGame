@@ -8,9 +8,13 @@ using Firebase.Extensions;
 using Firebase.Database;
 using Firebase.Storage;
 using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Managers;
 using TMPro;
 using UI;
+using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 
 public class MapDataFirebaseManager : MonoBehaviour
@@ -60,9 +64,11 @@ public class MapDataFirebaseManager : MonoBehaviour
     {
         MapDisplayer mapDisplayer = MapWithOverlay.GetFetchedMap().GetComponent<MapDisplayer>();
         
-        var (outpostString, outpostGridPositions) = OutpostCounter.SavePlacedStructures(); 
-        var (victoryPointString, victoryPointGridPositions) = VictoryPointCounter.SavePlacedStructures(); 
-        var (castleString, castleGridPositions) = CastleCounter.SavePlacedStructures();
+        var (outpostString, outpostGridPositions) = OutpostCounter.GetPlacedStructurePositions(); 
+        var (victoryPointString, victoryPointGridPositions) = VictoryPointCounter.GetPlacedStructurePositions(); 
+        var (castleString, castleGridPositions) = CastleCounter.GetPlacedStructurePositions();
+
+        var (topLeft, bottomRight) = MapWithOverlay.GetTilemapBounds();
         
         return new MapMetaData(
             Guid.NewGuid(),
@@ -72,7 +78,10 @@ public class MapDataFirebaseManager : MonoBehaviour
             50.073658,
             drawTexture.width,
             drawTexture.height,
-            new MapStructures(outpostGridPositions, victoryPointGridPositions, castleGridPositions));
+            new MapStructures(outpostGridPositions, victoryPointGridPositions, castleGridPositions),
+            topLeft,
+            bottomRight
+            );
     }
 
     // Upload the map data to Firebase Database and initiate the upload of the map image

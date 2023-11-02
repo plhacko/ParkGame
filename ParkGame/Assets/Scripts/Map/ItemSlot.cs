@@ -37,6 +37,19 @@ public class ItemSlot : MonoBehaviour, IDropHandler, IPointerDownHandler
         return new Tuple<string, List<Vector3Int>>(structureName, structureCellPositions);
     }
 
+    public void InstantiateAndAddNewStructure(Vector3 position)
+    {
+        // Add new structure to center of screen
+        var newStructure = Instantiate(structureItem, transform.parent);
+
+        newStructure.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+        newStructure.transform.position = position;
+        counter.AddMapStructure(newStructure);
+        var dragAndDrop = newStructure.GetComponent<DragAndDrop>();
+        dragAndDrop.mapDrawable = mapDrawable;
+        dragAndDrop.TilemapProperty = tilemap;
+        dragAndDrop.mainCamera = mainCamera;
+    }
     public void OnPointerDown(PointerEventData eventData)
     {
         if (counter.AllStructuresPlaced())
@@ -44,14 +57,7 @@ public class ItemSlot : MonoBehaviour, IDropHandler, IPointerDownHandler
             Debug.Log("All structures placed");
             return;
         }
-        var newStructure = Instantiate(structureItem, transform.parent);
-        // Add new structure to center of screen
-        newStructure.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
-        counter.AddMapStructure(newStructure);
-        var dragAndDrop = newStructure.GetComponent<DragAndDrop>();
-        dragAndDrop.mapDrawable = mapDrawable;
-        dragAndDrop.TilemapProperty = tilemap;
-        dragAndDrop.mainCamera = mainCamera;
+        InstantiateAndAddNewStructure(new Vector3(Screen.width / 2.0f, Screen.height / 2.0f, 0));
     }
     
     public void OnDrop(PointerEventData eventData)
@@ -66,7 +72,4 @@ public class ItemSlot : MonoBehaviour, IDropHandler, IPointerDownHandler
             Destroy(eventData.pointerDrag);
         }
     }
-
-
-    
 }

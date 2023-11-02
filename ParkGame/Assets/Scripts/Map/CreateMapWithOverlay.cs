@@ -3,21 +3,36 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using FreeDraw;
+using Managers;
+using Unity.AI;
+using Unity.AI.Navigation;
 using UnityEngine;
-using UnityEngine.Experimental.Rendering;
+using UnityEngine.AI;
 using UnityEngine.Tilemaps;
 using UnityEngine.Windows;
+using NavMeshSurface = NavMeshPlus.Components.NavMeshSurface;
 
 [RequireComponent(typeof(Drawable))]
 public class CreateMapWithOverlay : MonoBehaviour
 {
     public Camera mainCamera;
     [SerializeField] Sprite mapOverlay;
-    public Tilemap tilemap;
+    public Tilemap baseTilemap;
+    public Tilemap actionTilemap;
+    public Tilemap blockingTilemap;
     public TileBase pathTile;
     public TileBase boundsTile;
     public TileBase wallTile;
     public TileBase backgroundTile;
+    public TileBase outpostTile;
+    public TileBase victoryPointTile;
+    public TileBase castleTile;
+    public StructureCounter outposts;
+    public StructureCounter victoryPoint;
+    public StructureCounter castles;
+    public bool doNotFetch = false;
+    public bool loadFromSessionManager = false;
+    public NavMeshSurface navMesh;
     
     private Texture2D drawableTexture;
     private Texture2D resizedDrawableTexture;
@@ -26,6 +41,8 @@ public class CreateMapWithOverlay : MonoBehaviour
     private GameObject fetchedMap;
     private String path = Application.dataPath + "/Sprites/Map/customMap.png";
     
+    private Vector3Int topLeftCellPos, bottomRightCellPos; // Used for tilemap recreation
+
     // Start is called before the first frame update
     void Start()
     {
@@ -34,7 +51,19 @@ public class CreateMapWithOverlay : MonoBehaviour
             CreateNewTextureForDrawing();
             SetMapOverlay(mapOverlay);
         }
-        else // Wait until map fetching from MapBox is completed
+        else if (loadFromSessionManager)
+        {
+            // Load selected map from session manager 
+            var mapData = SessionManager.Singleton.MapData;
+            SetLowResTextureForTilemapCreation(mapData.DrawnTexture);
+            SetTilemapBounds(mapData.MetaData.TopLeftTileIdx, mapData.MetaData.BottomRightTileIdx);
+            CreateTilemapFromTexture(fromUploadedTexture: true, structures: mapData.MetaData.Structures);
+            // Disable drawable component since it won't be used
+            gameObject.GetComponent<Drawable>().enabled = false;
+            navMesh.BuildNavMesh();
+            
+        }
+        else if (!doNotFetch) // Wait until map fetching from MapBox is completed
             StartCoroutine(WaitForValue());
         
     }
@@ -125,6 +154,17 @@ public class CreateMapWithOverlay : MonoBehaviour
         FitCamera();
     }
 
+    public void SetTilemapBounds(Vector3Int newTopLeftCellPos, Vector3Int newBottomRightCellPos)
+    {
+        topLeftCellPos = newTopLeftCellPos;
+        bottomRightCellPos = newBottomRightCellPos;
+    }
+    
+    public Tuple<Vector3Int,Vector3Int> GetTilemapBounds()
+    {
+        return new Tuple<Vector3Int, Vector3Int>(topLeftCellPos, bottomRightCellPos);
+    }
+
     /// <summary>
     /// Save drawn map into file into `path` set in class variable
     /// </summary>
@@ -171,7 +211,9 @@ public class CreateMapWithOverlay : MonoBehaviour
     
     public void ClearTilemap()
     {
-        tilemap.ClearAllTiles();
+        baseTilemap.ClearAllTiles();
+        actionTilemap.ClearAllTiles();
+        blockingTilemap.ClearAllTiles();
     }
     
     public void ToggleDrawable()
@@ -186,32 +228,70 @@ public class CreateMapWithOverlay : MonoBehaviour
     {
         return resizedDrawableTexture;
     }
-    
+    public void SetLowResTextureForTilemapCreation(Texture2D uploadedTexture)
+    {
+        resizedDrawableTexture = uploadedTexture;
+        // Debug feature
+        // drawableSpriteRenderer.sprite = Sprite.Create(
+        //    uploadedTexture, new Rect(0, 0, uploadedTexture.width, uploadedTexture.height), Vector2.one * 0.5f
+        // );
+    }
+
+    private void SetStructureTiles(Dictionary<Vector3Int, TileBase> structuresToAssign)
+    {
+        var structureRadius = 2;
+        foreach (var kvp in structuresToAssign)
+        {
+            for (int x = -structureRadius; x <= structureRadius; x++)
+            {
+                for (int y = -structureRadius; y <= structureRadius; y++)
+                {
+                    var offsetPosition = kvp.Key + new Vector3Int(x, y, 0);
+                    if (actionTilemap.GetTile(offsetPosition) != boundsTile)
+                        actionTilemap.SetTile(offsetPosition, kvp.Value);
+                    else
+                        throw new ArgumentException("Cannot place structure out of map bounds");
+                }
+            }
+        }
+    }
+
+    /**
+     * Helper funtion for creating tilemap without parameters so it can be set in button OnClick section
+     */
+    public void ProcessTilemap()
+    {
+        CreateTilemapFromTexture(false, null);
+    }
     /**
      * Creates tilemap from drawn texture by scaling texture to low resolution and assigning tiles by according colors
      */
-    public void CreateTilemapFromTexture()
+    private void CreateTilemapFromTexture(bool fromUploadedTexture = false, MapStructures structures = null)
     {
         ClearTilemap();
-        
-        var spriteRectVertices = drawableSprite.vertices;
-        var worldMat = transform.localToWorldMatrix;
-        var topLeftCellPos = tilemap.WorldToCell(worldMat * spriteRectVertices[0]);
-        var bottomRightCellPos = tilemap.WorldToCell(worldMat * spriteRectVertices[1]);
+
+        if (!fromUploadedTexture)
+        {
+            var spriteRectVertices = drawableSprite.vertices;
+            var worldMat = transform.localToWorldMatrix;
+            topLeftCellPos = baseTilemap.WorldToCell(worldMat * spriteRectVertices[0]);
+            bottomRightCellPos = baseTilemap.WorldToCell(worldMat * spriteRectVertices[1]);
+        }
         // Put tile to the opposite corners to set correct tilemap bounds so fill works correctly,
         // tilemap API doesnt do this automatically...
-        tilemap.SetTile(topLeftCellPos + new Vector3Int(-2, 2, 0), boundsTile);
-        tilemap.SetTile(bottomRightCellPos + new Vector3Int(2, -2, 0), boundsTile);
+        blockingTilemap.SetTile(topLeftCellPos + new Vector3Int(-2, 2, 0), boundsTile);
+        blockingTilemap.SetTile(bottomRightCellPos + new Vector3Int(2, -2, 0), boundsTile);
         
         var widthTilemap = bottomRightCellPos.x - topLeftCellPos.x;
         var heightTilemap = topLeftCellPos.y - bottomRightCellPos.y;
         // CreateOutsideBoundary();
         
-        
-        resizedDrawableTexture = TextureScaler.scaled(drawableTexture, widthTilemap, heightTilemap, FilterMode.Point);
+        if (!fromUploadedTexture)
+        {
+            resizedDrawableTexture = TextureScaler.scaled(drawableTexture, widthTilemap, heightTilemap, FilterMode.Point);
+            // SaveMap(resizedDrawableTexture);
+        }
         var texturePixels = resizedDrawableTexture.GetPixels();
-        SaveMap(resizedDrawableTexture);
-
 
         var tilesToAssign = new Dictionary<Vector3Int, TileBase>();
         for (var j = bottomRightCellPos.y; j < topLeftCellPos.y; j++)
@@ -223,21 +303,46 @@ public class CreateMapWithOverlay : MonoBehaviour
                 int pixelIdx = (j - bottomRightCellPos.y) * widthTilemap + (i - topLeftCellPos.x);
                 var pixelColor = texturePixels[pixelIdx];
                 var colorMatchingTile = ClosestColor(pixelColor);
-                if (colorMatchingTile == boundsTile)
-                    tilemap.SetTile(tilePos, colorMatchingTile);
+                if (colorMatchingTile == boundsTile || colorMatchingTile == wallTile)
+                    blockingTilemap.SetTile(tilePos, colorMatchingTile);
                 else
-                    tilesToAssign.Add(tilePos, colorMatchingTile);
+                    baseTilemap.SetTile(tilePos, colorMatchingTile);
+                    // tilesToAssign.Add(tilePos, colorMatchingTile);
             }
             
         }
         // Flood fill the boundary before setting rest of the tiles
-        tilemap.FloodFill(
+        blockingTilemap.FloodFill(
             new Vector3Int(topLeftCellPos.x, topLeftCellPos.y), boundsTile
             );
-        foreach (var kvp in tilesToAssign)
+        var structuresToAssign = new Dictionary<Vector3Int, TileBase>();
+        if (structures == null)
         {
-            if (tilemap.GetTile(kvp.Key) == null)
-                tilemap.SetTile(kvp.Key, kvp.Value);
+            // Also for adjusting uploaded tilemap (Not used for now)
+            foreach (var tilePos in outposts.GetPlacedStructurePositions().Item2)
+                structuresToAssign.Add(tilePos, outpostTile);
+            foreach (var tilePos in castles.GetPlacedStructurePositions().Item2)
+                structuresToAssign.Add(tilePos, castleTile);
+            foreach (var tilePos in victoryPoint.GetPlacedStructurePositions().Item2)
+                structuresToAssign.Add(tilePos, victoryPointTile);
         }
+        else
+        {
+            // Structures from uploaded map 
+            foreach (var tilePos in structures.Outposts)
+                structuresToAssign.Add(new Vector3Int(tilePos.x, tilePos.y, tilePos.z), outpostTile);
+            foreach (var tilePos in structures.Castles)
+                structuresToAssign.Add(new Vector3Int(tilePos.x, tilePos.y, tilePos.z), castleTile);
+            foreach (var tilePos in structures.VictoryPoints)
+                structuresToAssign.Add(new Vector3Int(tilePos.x, tilePos.y, tilePos.z), victoryPointTile);
+        }
+        
+        // foreach (var kvp in tilesToAssign)
+        // {
+        //     if (tilemap.GetTile(kvp.Key) == null)
+        //         tilemap.SetTile(kvp.Key, kvp.Value);
+        // }
+        
+        SetStructureTiles(structuresToAssign);
     }
 }
