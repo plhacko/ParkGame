@@ -55,10 +55,13 @@ public class FogOfWar : MonoBehaviour
         revealerTargets.Add(target);
     }
     
+    public void DeregisterAsRevealer(Revealer target)
+    {
+        revealerTargets.Remove(target);
+    }
+    
     private void Update()
     {
-        revealerTargets.RemoveAll(revealer => revealer == null);
-        
         Vector2 position = transform.position;
         position -= new Vector2(0.5f * textureSize / pixelsPerUnit, 0.5f * textureSize / pixelsPerUnit);
 

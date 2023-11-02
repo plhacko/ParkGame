@@ -46,6 +46,7 @@ namespace Player
             FormationScript = GetComponent<Formation>();
             fogOfWar = FindObjectOfType<FogOfWar>();
             revealer = GetComponent<Revealer>();
+            changeMaterial = GetComponent<ChangeMaterial>();
             
             if (IsServer) {
                 FormationScript.StartFormation(); // build prefab, get position of the commander

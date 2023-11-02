@@ -235,6 +235,26 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 2776846833031490647}
     m_Modifications:
+    - target: {fileID: 771668979171714260, guid: 48861cb72fa4179449fc8af1f8a0fc93, type: 3}
+      propertyPath: m_SortingOrder
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1059665035477988799, guid: 48861cb72fa4179449fc8af1f8a0fc93, type: 3}
+      propertyPath: m_SortingOrder
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3341151061524201756, guid: 48861cb72fa4179449fc8af1f8a0fc93, type: 3}
+      propertyPath: m_SortingOrder
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3725239117398286188, guid: 48861cb72fa4179449fc8af1f8a0fc93, type: 3}
+      propertyPath: m_SortingOrder
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4372284252363352271, guid: 48861cb72fa4179449fc8af1f8a0fc93, type: 3}
+      propertyPath: m_SortingOrder
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4388496590651871188, guid: 48861cb72fa4179449fc8af1f8a0fc93, type: 3}
       propertyPath: m_Name
       value: ConquerModule
@@ -282,6 +302,18 @@ PrefabInstance:
     - target: {fileID: 4388496590651871189, guid: 48861cb72fa4179449fc8af1f8a0fc93, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5057229964963574410, guid: 48861cb72fa4179449fc8af1f8a0fc93, type: 3}
+      propertyPath: m_SortingOrder
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6732427957199181810, guid: 48861cb72fa4179449fc8af1f8a0fc93, type: 3}
+      propertyPath: m_SortingOrder
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8109958139200121044, guid: 48861cb72fa4179449fc8af1f8a0fc93, type: 3}
+      propertyPath: m_SortingOrder
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
