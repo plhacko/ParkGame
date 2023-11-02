@@ -284,8 +284,15 @@ public class Soldier : NetworkBehaviour, ISoldier
                 return;
             }
 
+            // Attack if enemy close by and in range 
+            Transform enemyT = EnemyObserver.GetClosestEnemy();
+            float distanceFromCommander = Vector3.Distance(CommanderToFollow.position, transform.position);
+            if (enemyT != null && distanceFromCommander < DefendDistanceFromCommander) {
+                AttackEnemyIfInRange(enemyT);
+                return;
+            } 
+            // Follow commander
             Agent.SetDestination(ObjectToFollowInFormation.transform.position);
-            
             Vector2 direction = ObjectToFollowInFormation.transform.position - gameObject.transform.position;
             if (direction.magnitude < 0.001f) {
                 Networkanimator.Animator.SetFloat(AnimatorMovementSpeedHash, 0.0f);
