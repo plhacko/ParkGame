@@ -17,7 +17,10 @@ namespace Player
         private NetworkAnimator networkAnimator;
         private Guid ownerPlayerId;
         private Formation FormationScript;
-
+        private ChangeMaterial changeMaterial;
+        private FogOfWar fogOfWar;
+        private Revealer revealer;
+        
         // Replicated variable for sprite orientation
         private NetworkVariable<bool> xSpriteFlip = new(false,
             NetworkVariableReadPermission.Everyone,
@@ -41,6 +44,9 @@ namespace Player
             spriteRenderer = GetComponent<SpriteRenderer>();
             networkAnimator = GetComponent<NetworkAnimator>();
             FormationScript = GetComponent<Formation>();
+            fogOfWar = FindObjectOfType<FogOfWar>();
+            revealer = GetComponent<Revealer>();
+            
             if (IsServer) {
                 FormationScript.StartFormation(); // build prefab, get position of the commander
             }
@@ -50,6 +56,15 @@ namespace Player
             if (!isActualOwner())
             {
                 xSpriteFlip.OnValueChanged += onXSpriteFlipChanged;
+            }
+            
+            if (isActualOwner())
+            {
+                fogOfWar.RegisterAsRevealer(revealer);
+            }
+            else
+            {
+                changeMaterial.Change();
             }
         }
 

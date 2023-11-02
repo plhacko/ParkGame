@@ -75,19 +75,24 @@ public class Soldier : NetworkBehaviour, ISoldier
     public Formation FormationFromFollowedCommander; 
     public GameObject ObjectToFollowInFormation; // other formation
     public FormationType FormationType;
-
-    private ShootScript shooting;
     
+    private ShootScript shooting;
     private PlayerManager playerManager;
+    private FogOfWar fogOfWar;
+    private ChangeMaterial changeMaterial;
+    private Revealer revealer;
     
     private void Initialize()
     {
         playerManager = FindObjectOfType<PlayerManager>();
+        fogOfWar = FindObjectOfType<FogOfWar>();
         EnemyObserver = GetComponentInChildren<EnemyObserver>();
         SpriteRenderer = GetComponent<SpriteRenderer>();
         Agent = GetComponent<NavMeshAgent>();
         Networkanimator = GetComponent<NetworkAnimator>();
         shooting = GetComponent<ShootScript>();
+        changeMaterial = GetComponent<ChangeMaterial>();
+        revealer = GetComponent<Revealer>();
         
         _Team.OnValueChanged += OnTeamChanged;
         _SoldierBehaviour.OnValueChanged += OnBehaviourChange;
@@ -124,6 +129,15 @@ public class Soldier : NetworkBehaviour, ISoldier
         if (newValue == 0) { sr.color = Color.blue; }
         else if (newValue == 1) { sr.color = Color.yellow; }
         else { sr.color = Color.grey; }
+
+        if (newValue == 0) // todo change if is local player's
+        {
+            fogOfWar.RegisterAsRevealer(revealer);
+        }
+        else
+        {
+            changeMaterial.Change();
+        }
     }
     public void OnBehaviourChange(SoldierBehaviour previousValue, SoldierBehaviour newValue)
     {

@@ -56,10 +56,11 @@ public class FogOfWar : MonoBehaviour
     
     private void Update()
     {
+        revealerTargets.RemoveAll(revealer => revealer == null);
+        
         Vector2 position = transform.position;
         position -= new Vector2(0.5f * textureSize / pixelsPerUnit, 0.5f * textureSize / pixelsPerUnit);
-        
-        
+
         for (int y = 0; y < textureSize; y++)
         {
             for (int x = 0; x < textureSize; x++)
