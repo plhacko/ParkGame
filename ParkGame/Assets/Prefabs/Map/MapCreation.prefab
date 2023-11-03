@@ -469,6 +469,7 @@ MonoBehaviour:
   doNotFetch: 0
   loadFromSessionManager: 0
   navMesh: {fileID: 0}
+  mapSprite: {fileID: 863442115086188281, guid: 53f9e5c24c8a22141afc0ba340f28b3e, type: 3}
 --- !u!212 &2284287231549463749
 SpriteRenderer:
   m_ObjectHideFlags: 0
