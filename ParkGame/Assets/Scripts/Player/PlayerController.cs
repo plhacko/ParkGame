@@ -17,7 +17,10 @@ namespace Player
         private NetworkAnimator networkAnimator;
         private Guid ownerPlayerId;
         private Formation FormationScript;
-
+        private ChangeMaterial changeMaterial;
+        private FogOfWar fogOfWar;
+        private Revealer revealer;
+        
         // Replicated variable for sprite orientation
         private NetworkVariable<bool> xSpriteFlip = new(false,
             NetworkVariableReadPermission.Everyone,
@@ -41,6 +44,10 @@ namespace Player
             spriteRenderer = GetComponent<SpriteRenderer>();
             networkAnimator = GetComponent<NetworkAnimator>();
             FormationScript = GetComponent<Formation>();
+            fogOfWar = FindObjectOfType<FogOfWar>();
+            revealer = GetComponent<Revealer>();
+            changeMaterial = GetComponent<ChangeMaterial>();
+            
             if (IsServer) {
                 FormationScript.StartFormation(); // build prefab, get position of the commander
             }
@@ -50,6 +57,15 @@ namespace Player
             if (!isActualOwner())
             {
                 xSpriteFlip.OnValueChanged += onXSpriteFlipChanged;
+            }
+            
+            if (isActualOwner())
+            {
+                fogOfWar.RegisterAsRevealer(revealer);
+            }
+            else
+            {
+                changeMaterial.Change();
             }
         }
 
@@ -224,7 +240,7 @@ namespace Player
 
         // commands to the units
         [ServerRpc]
-        void CommandMovementServerRpc()
+        public void CommandMovementServerRpc()
         {
             foreach (GameObject go in Units)
             {
@@ -233,7 +249,7 @@ namespace Player
             }
         }
         [ServerRpc]
-        void CommandIdleServerRpc()
+        public void CommandIdleServerRpc()
         {
             foreach (GameObject go in Units)
             {
@@ -242,7 +258,7 @@ namespace Player
             }
         }
         [ServerRpc]
-        void CommandAttackServerRpc()
+        public void CommandAttackServerRpc()
         {
             foreach (GameObject go in Units)
             {

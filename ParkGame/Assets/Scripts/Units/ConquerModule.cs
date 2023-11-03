@@ -20,6 +20,8 @@ public class ConquerModule : NetworkBehaviour, ITeamMember
     [SerializeField] List<Transform> VisibleConquerUnits = new();
     [SerializeField] List<Transform> VisibleOtherUnits = new();
 
+    public VictoryPoint victoryPoint;
+
     public float ConquerPoints { get => _ConquerPoints.Value; set => _ConquerPoints.Value = value; }
 
     private IProgressBar ProgressBar = null;
@@ -31,7 +33,6 @@ public class ConquerModule : NetworkBehaviour, ITeamMember
     {
         // initialize the team member (the object we will be setting Team)
         TeamMember = transform.parent?.GetComponent<ITeamMember>();
-
         // progress bar
         ProgressBar = GetComponentInChildren<IProgressBar>();
         if (ProgressBar != null)
@@ -39,6 +40,10 @@ public class ConquerModule : NetworkBehaviour, ITeamMember
             ProgressBar?.SetMaxValue(ConquerPointsRequired);
             _ConquerPoints.OnValueChanged += UpdateProgressBarDelegate;
         }
+        
+        // if on victory point
+        victoryPoint = gameObject.GetComponentInParent<VictoryPoint>();
+
     }
     void UpdateProgressBarDelegate(float oldValue, float newValue) => ProgressBar?.SetValue(newValue);
 
@@ -71,6 +76,10 @@ public class ConquerModule : NetworkBehaviour, ITeamMember
 
             VisibleOtherUnits = VisibleConquerUnits;
             VisibleConquerUnits = new List<Transform>();
+        
+            if (victoryPoint) {
+                victoryPoint.ConquerThisVP();
+            }
         }
     }
 

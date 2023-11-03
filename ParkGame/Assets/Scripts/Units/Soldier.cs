@@ -50,7 +50,7 @@ public class Soldier : NetworkBehaviour, ISoldier
     private NetworkVariable<int> _HP = new();
     public int HP { get => _HP.Value; set => _HP.Value = value; }
     public int TeaM;
-    private NetworkVariable<int> _Team = new();
+    private NetworkVariable<int> _Team = new(-1);
     public int Team { get => _Team.Value; set => _Team.Value = value; }
     private NetworkVariable<SoldierBehaviour> _SoldierBehaviour = new();
     public SoldierBehaviour SoldierBehaviour { get => _SoldierBehaviour.Value; set => _SoldierBehaviour.Value = value; } // derived form ISoldier
@@ -75,19 +75,24 @@ public class Soldier : NetworkBehaviour, ISoldier
     public Formation FormationFromFollowedCommander; 
     public GameObject ObjectToFollowInFormation; // other formation
     public FormationType FormationType;
-
-    private ShootScript shooting;
     
+    private ShootScript shooting;
     private PlayerManager playerManager;
+    private FogOfWar fogOfWar;
+    private ChangeMaterial changeMaterial;
+    private Revealer revealer;
     
     private void Initialize()
     {
         playerManager = FindObjectOfType<PlayerManager>();
+        fogOfWar = FindObjectOfType<FogOfWar>();
         EnemyObserver = GetComponentInChildren<EnemyObserver>();
         SpriteRenderer = GetComponent<SpriteRenderer>();
         Agent = GetComponent<NavMeshAgent>();
         Networkanimator = GetComponent<NetworkAnimator>();
         shooting = GetComponent<ShootScript>();
+        changeMaterial = GetComponent<ChangeMaterial>();
+        revealer = GetComponent<Revealer>();
         
         _Team.OnValueChanged += OnTeamChanged;
         _SoldierBehaviour.OnValueChanged += OnBehaviourChange;
@@ -97,7 +102,7 @@ public class Soldier : NetworkBehaviour, ISoldier
             Team = initTeam;
         }
         
-        OnTeamChanged(0, Team);
+        OnTeamChanged(-1, Team);
         OnBehaviourChange(0, SoldierBehaviour);
         SpriteRenderer.flipX = XSpriteFlip.Value;
 
@@ -124,6 +129,15 @@ public class Soldier : NetworkBehaviour, ISoldier
         if (newValue == 0) { sr.color = Color.blue; }
         else if (newValue == 1) { sr.color = Color.yellow; }
         else { sr.color = Color.grey; }
+
+        if (newValue == 0) // todo change if is local player's
+        {
+            fogOfWar.RegisterAsRevealer(revealer);
+        }
+        else
+        {
+            changeMaterial.Change();
+        }
     }
     public void OnBehaviourChange(SoldierBehaviour previousValue, SoldierBehaviour newValue)
     {
@@ -147,9 +161,7 @@ public class Soldier : NetworkBehaviour, ISoldier
     }
 
     Transform ClosestOutpost() {
-        // Outpost or Commander - implementing ICommander class, filter by the Team
-
-        GameObject selectedCommander = gameObject; // to be sure... 
+        GameObject selectedCommander = gameObject; // just to be sure that something is returned
         float shortestDist = float.PositiveInfinity;
         
         var outposts = FindObjectsOfType<Outpost>();
@@ -165,7 +177,6 @@ public class Soldier : NetworkBehaviour, ISoldier
         }
 
         return selectedCommander.transform;
-
 
     }
 
@@ -281,23 +292,33 @@ public class Soldier : NetworkBehaviour, ISoldier
         }
     }
 
+    private void FollowObjectWithAnimation(Transform toFollow) {
+        Agent.SetDestination(toFollow.position);
+        Vector2 direction = toFollow.position - gameObject.transform.position;
+        if (direction.magnitude < 0.001f) {
+            Networkanimator.Animator.SetFloat(AnimatorMovementSpeedHash, 0.0f);
+        } else {
+            Networkanimator.Animator.SetFloat(AnimatorMovementSpeedHash, 1.0f);
+        }
+        SpriteRenderer.flipX = direction.x < 0;
+        XSpriteFlip.Value = SpriteRenderer.flipX;
+    }
+
     private void FormationBehaviour() {
         if (FollowInNavMeshFormation) {
             if (!ObjectToFollowInFormation) {
                 return;
             }
 
-            Agent.SetDestination(ObjectToFollowInFormation.transform.position);
-            
-            Vector2 direction = ObjectToFollowInFormation.transform.position - gameObject.transform.position;
-            if (direction.magnitude < 0.001f) {
-                Networkanimator.Animator.SetFloat(AnimatorMovementSpeedHash, 0.0f);
-            } else {
-                Networkanimator.Animator.SetFloat(AnimatorMovementSpeedHash, 1.0f);
+            // Attack if enemy close by and in range 
+            Transform enemyT = EnemyObserver.GetClosestEnemy();
+            float distanceFromCommander = Vector3.Distance(CommanderToFollow.position, transform.position);
+            if (enemyT != null && distanceFromCommander < DefendDistanceFromCommander) {
+                AttackEnemyIfInRange(enemyT);
+                return;
             }
-            SpriteRenderer.flipX = direction.x < 0;
-            XSpriteFlip.Value = SpriteRenderer.flipX;
-            
+            // Follow commander
+            FollowObjectWithAnimation(ObjectToFollowInFormation.transform);
         }
     }
 
@@ -359,8 +380,7 @@ public class Soldier : NetworkBehaviour, ISoldier
             SoldierBehaviour = SoldierBehaviour.Idle;
             return;
         }
-        Vector2 directionToEntity = entityT.position - transform.position;
-        Move(directionToEntity);
+        FollowObjectWithAnimation(entityT);
     }
 
     private void Move(Vector2 direction) {
@@ -383,7 +403,7 @@ public class Soldier : NetworkBehaviour, ISoldier
         SpriteRenderer.flipX = movement.x < 0;
         XSpriteFlip.Value = SpriteRenderer.flipX;
         
-        Agent.SetDestination(transform.position + new Vector3(movement.x, movement.y, 0));
+        Agent.SetDestination(transform.position + new Vector3(movement.x, movement.y, 0)); 
     }
 
     void OnMouseDown()

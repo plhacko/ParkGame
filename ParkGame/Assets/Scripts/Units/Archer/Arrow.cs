@@ -40,7 +40,7 @@ namespace Units.Archer
             if(this.spawnTime + delay > Time.time) return;
             if(target == null)
             {
-                Destroy(gameObject);   
+                Destroy(gameObject);
                 return;
             }
             

@@ -11,34 +11,34 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/SampleMultiplayerScene.unity
     guid: 74c43dccafad75644ae217038456d828
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/LobbyTest/LoginMenu.unity
     guid: fb457bc51a056074a9e4083e70eb2df6
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/LobbyTest/MainMenu.unity
     guid: 3b96ce2e566a5c64fbb496e5b972b7e3
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/LobbyTest/SignUpMenu.unity
     guid: e6430dd968511f5429b4fcdb984837fc
   - enabled: 0
     path: Assets/Scenes/LobbyTest/SampleGame.unity
     guid: 7be7a330872ab8046b9a094441b24f8f
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/LobbyTest/PrepareGameMenu.unity
     guid: 5584524944ca372439dfdb893adfcb25
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/LobbyTest/LobbyMenu.unity
     guid: 0ec4659de8bb37f4aa51ff1ba77fc856
-  - enabled: 1
+  - enabled: 0
     path: Assets/GPS Module/ZoomableMap.unity
     guid: 2c7147d54825142878b256c67aae5704
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/MapDrawingScene.unity
     guid: 42d96b4728ac76e4b9cb8611de8042cc
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Battleground.unity
     guid: 647d2e1dcea76b14bb34f120269fd498
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/GameTestScene/NavmeshMultiScene 1.unity
     guid: 3c4367d77bba9ac48b6bfd2a0a66513e
   - enabled: 1
@@ -48,7 +48,7 @@ EditorBuildSettings:
     path: Assets/Scenes/LobbyTest/WelcomeScreen.unity
     guid: d130a2f3276763047a1343340a4a19fe
   - enabled: 1
-    path: Assets/Scenes/NavmeshMultiScene.unity
+    path: Assets/Scenes/NavmeshMultiSceneWithTilemap.unity
     guid: ad5bf916dc910114193cac26c7d75383
   m_configObjects:
     com.unity.adaptiveperformance.google.android.provider_settings: {fileID: 11400000, guid: 0ab3f1c24dc16ed4686af1c343f5f8e8, type: 2}
