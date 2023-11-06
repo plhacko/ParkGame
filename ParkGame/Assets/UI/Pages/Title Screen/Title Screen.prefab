@@ -209,12 +209,6 @@ MonoBehaviour:
   ExitClip: {fileID: 0}
   entryMode: 0
   exitMode: 0
-  onEnter:
-    m_PersistentCalls:
-      m_Calls: []
-  onExit:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!114 &6179568006192890378
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -228,9 +222,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enterButton: {fileID: 7135857564677052518}
-  onEnterPressed:
-    m_PersistentCalls:
-      m_Calls: []
+  welcomePage: {fileID: 7888895157239260194, guid: c0cb439c9b24fa74b85169aa71c692b7, type: 3}
 --- !u!1 &5397276008431287094
 GameObject:
   m_ObjectHideFlags: 0

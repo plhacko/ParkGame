@@ -13,7 +13,7 @@ public class UploadMapDialog : MonoBehaviour
     [SerializeField] private Button goBackButton;
     [SerializeField] private TextMeshProUGUI statusText;
     [SerializeField] private GameObject root;
-    
+    [SerializeField] private UIPage mainMenu; 
     private void Awake()
     {
         root.SetActive(false);
@@ -45,7 +45,8 @@ public class UploadMapDialog : MonoBehaviour
             uploadButton.interactable = false;
             goBackButton.interactable = false;
             Destroy(mapWithOverlay.GetFetchedMap().gameObject);
-            SceneManager.LoadScene("MainMenu");
+            // SceneManager.LoadScene("MainMenu");
+            UIController.Singleton.PushUIPage(mainMenu);
         });
         
         goBackButton.onClick.AddListener(() =>

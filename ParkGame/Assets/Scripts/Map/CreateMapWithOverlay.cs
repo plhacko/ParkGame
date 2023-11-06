@@ -8,6 +8,7 @@ using FreeDraw;
 using Managers;
 using Unity.AI;
 using Unity.AI.Navigation;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Tilemaps;
@@ -46,6 +47,7 @@ public class CreateMapWithOverlay : MonoBehaviour
     private Vector3Int topLeftCellPos, bottomRightCellPos; // Used for tilemap recreation
 
     [SerializeField] private GameObject mapSprite;
+    public MapDisplayer BaseMap {get; private set;}
 
     // Start is called before the first frame update
     void Start()
@@ -68,12 +70,12 @@ public class CreateMapWithOverlay : MonoBehaviour
         
     }
 
-    private void CreateTilemapFromFetchedMap(MapData mapData)
+    public void CreateTilemapFromFetchedMap(MapData mapData)
     {
         SetLowResTextureForTilemapCreation(mapData.DrawnTexture);
         SetTilemapBounds(mapData.MetaData.TopLeftTileIdx, mapData.MetaData.BottomRightTileIdx);
         CreateTilemapFromTexture(fromUploadedTexture: true, structures: mapData.MetaData.Structures);
-        navMesh.BuildNavMesh();
+        // TODO navMesh.BuildNavMesh();
 
         var dimensions = ExtractDimensionsFromUrl(mapData.MetaData.MapQuery);
         var boundingBox = ExtractBoundingBoxFromUrl(mapData.MetaData.MapQuery);
@@ -85,9 +87,16 @@ public class CreateMapWithOverlay : MonoBehaviour
         mapDisplayer.MinLatitude = boundingBox.y;
         mapDisplayer.MaxLongitude = boundingBox.z;
         mapDisplayer.MaxLatitude = boundingBox.w;
+        fetchedMap = mapDisplayer.transform.gameObject;
 
-        Instantiate(mapSprite, transform);
+        BaseMap = Instantiate(mapSprite, transform).GetComponent<MapDisplayer>();
+
         SessionManager.Singleton.OnMapReceived -= CreateTilemapFromFetchedMap;
+    }
+
+    public bool IsBaseMapLoaded()
+    {
+        return BaseMap.IsMapLoaded();
     }
 
     public Vector2 ExtractDimensionsFromUrl(string url)
@@ -165,7 +174,7 @@ public class CreateMapWithOverlay : MonoBehaviour
         return fetchedMap;
     }
     
-    private void FitCamera()
+    public void FitCamera()
     {
         // Calculate the size of the object based on its distance from the camera and its local scale
         Vector3 mapBounds;

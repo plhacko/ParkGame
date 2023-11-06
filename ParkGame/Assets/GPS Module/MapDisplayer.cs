@@ -6,6 +6,7 @@ using System.Globalization;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
+using Unity.VisualScripting;
 
 [System.Serializable]
 public class MapboxAccesToken
@@ -71,6 +72,7 @@ public class MapDisplayer : MonoBehaviour
     public float MaxLatitude = 38.904192f;
 
     private bool mapLoaded = false;
+    public Action OnMapLoaded;
 
     private void Awake()
     {
@@ -172,6 +174,7 @@ public class MapDisplayer : MonoBehaviour
             // Set the texture on the object
             GetComponent<SpriteRenderer>().sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
             mapLoaded = true;
+            OnMapLoaded?.Invoke();
         }
     }
 

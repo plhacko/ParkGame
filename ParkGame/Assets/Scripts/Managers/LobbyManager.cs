@@ -17,6 +17,12 @@ using UnityEngine.Networking;
 using UnityEngine.TextCore.LowLevel;
 using Unity.VisualScripting;
 using Firebase.Auth;
+using Unity.Services.Relay.Models;
+using Unity.Services.Relay;
+using Unity.Netcode.Transports.UTP;
+using Unity.Networking.Transport.Relay;
+using UnityEngine.SceneManagement;
+using Unity.Netcode;
 
 namespace Managers
 {
@@ -74,6 +80,9 @@ namespace Managers
 
         private float heartbeatTimer;
 
+        private string relayJoinCode = "";
+        [SerializeField] private string GameScene = "GameScene";
+
         private void Awake()
         {
             if (Singleton != null)
@@ -124,6 +133,9 @@ namespace Managers
                 int maxPlayers = mapData.MetaData.NumTeams * 4;
                 this.mapData = mapData;
 
+                Allocation allocation = await CreateRelayAllocation();
+                relayJoinCode = await GetRelayJoinCode(allocation);
+
                 CreateLobbyOptions createLobbyOptions = new()
                 {
                     IsPrivate = true,
@@ -132,6 +144,7 @@ namespace Managers
                 };
 
                 Lobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, maxPlayers, createLobbyOptions);
+                
                 LobbyModel = GetLobbyModel();
 
                 var callbacks = new LobbyEventCallbacks();
@@ -144,6 +157,13 @@ namespace Managers
                 PlayerPrefs.SetString("DebugRoomCode", Lobby.LobbyCode);
 
                 Debug.Log("Lobby created with ID: " + Lobby.Id + " and code: " + Lobby.LobbyCode);
+
+                NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(
+                    new RelayServerData (allocation, "dtls")
+                );
+
+                NetworkManager.Singleton.StartHost();
+
                 return true;
             } 
             catch (Exception e)
@@ -173,6 +193,7 @@ namespace Managers
         private void OnKickedFromLobby()
         {
             Debug.Log("Kicked from lobby");
+
             OnDisconnect?.Invoke();
             Reset();
         }
@@ -210,6 +231,14 @@ namespace Managers
                 events = await LobbyService.Instance.SubscribeToLobbyEventsAsync(Lobby.Id, callbacks);
 
                 Debug.Log("Lobby joined with ID: " + Lobby.Id + " and code: " + Lobby.LobbyCode);
+
+                var relayJoinCode = Lobby.Data["RelayJoinCode"].Value;
+                var joinAllocation = await JoinRelay(relayJoinCode);
+                NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(
+                    new RelayServerData (joinAllocation, "dtls")
+                );
+
+                NetworkManager.Singleton.StartClient();
 
                 return true;
             }
@@ -250,6 +279,14 @@ namespace Managers
         {
             return new()
             {
+                {
+                    "RelayJoinCode",
+                    new DataObject
+                    (
+                        DataObject.VisibilityOptions.Public,
+                        relayJoinCode
+                    )
+                },
                 {
                     "MapId",
                     new DataObject
@@ -457,6 +494,52 @@ namespace Managers
             LobbyModel = new LobbyModel();
             mapData = null;
             StopAllCoroutines();
+        }
+
+        private async Task<Allocation> CreateRelayAllocation()
+        {
+            try {
+                Allocation allocation = await RelayService.Instance.CreateAllocationAsync(MapData.MetaData.NumTeams * 4 - 1);
+                return allocation;
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("Failed to create relay allocation: " + e.Message);
+                return null;
+            }
+        }
+
+        private async Task<string> GetRelayJoinCode(Allocation allocation)
+        {
+            try
+            {
+                var joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
+                return joinCode;
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("Failed to get relay join code: " + e.Message);
+                return null;
+            }
+        }
+
+        private async Task<JoinAllocation> JoinRelay(string joinCode)
+        {
+            try
+            {
+                var joinAllocation = await RelayService.Instance.JoinAllocationAsync(joinCode);
+                return joinAllocation;
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("Failed to join relay: " + e.Message);
+                return null;
+            }
+        }
+
+        public void StartGame()
+        {
+            NetworkManager.Singleton.SceneManager.LoadScene(GameScene, LoadSceneMode.Single);
         }
     }
 }

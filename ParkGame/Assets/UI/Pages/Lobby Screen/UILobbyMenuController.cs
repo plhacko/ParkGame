@@ -153,7 +153,7 @@ namespace UI.Lobby
 
         private void StartGame()
         {
-            // TODO
+            LobbyManager.Singleton.StartGame();
         }
 
         private void OnDisconnect()

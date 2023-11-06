@@ -941,6 +941,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: OurNetworkManager
       objectReference: {fileID: 0}
+    - target: {fileID: 2701756891909124428, guid: d8407ffff0944664fb148b47cfc495a0, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2701756891909124429, guid: d8407ffff0944664fb148b47cfc495a0, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2701756891909124430, guid: d8407ffff0944664fb148b47cfc495a0, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2701756891909124431, guid: d8407ffff0944664fb148b47cfc495a0, type: 3}
       propertyPath: m_RootOrder
       value: 4
@@ -990,6 +1002,75 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d8407ffff0944664fb148b47cfc495a0, type: 3}
+--- !u!1 &1039970118 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4594097729532512673, guid: 540dbc279a9cb564abaee4d5ed8fb823, type: 3}
+  m_PrefabInstance: {fileID: 4396941200549873016}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1039970121
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1039970118}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6960e84d07fb87f47956e7a81d71c4e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_ProtocolType: 1
+  m_MaxPacketQueueSize: 128
+  m_MaxPayloadSize: 6144
+  m_HeartbeatTimeoutMS: 500
+  m_ConnectTimeoutMS: 1000
+  m_MaxConnectAttempts: 60
+  m_DisconnectTimeoutMS: 30000
+  ConnectionData:
+    Address: 127.0.0.1
+    Port: 7777
+    ServerListenAddress: 127.0.0.1
+  DebugSimulator:
+    PacketDelayMS: 0
+    PacketJitterMS: 0
+    PacketDropRate: 0
+--- !u!114 &1039970122
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1039970118}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 593a2fe42fa9d37498c96f9a383b6521, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  RunInBackground: 1
+  LogLevel: 1
+  NetworkConfig:
+    ProtocolVersion: 0
+    NetworkTransport: {fileID: 1039970121}
+    PlayerPrefab: {fileID: 0}
+    Prefabs:
+      NetworkPrefabsLists:
+      - {fileID: 11400000, guid: f36479150aa54b740b3e094d8fbc8263, type: 2}
+    TickRate: 30
+    ClientConnectionBufferTimeout: 10
+    ConnectionApproval: 0
+    ConnectionData: 
+    EnableTimeResync: 0
+    TimeResyncInterval: 30
+    EnsureNetworkVariableLengthSafety: 0
+    EnableSceneManagement: 1
+    ForceSamePrefabs: 1
+    RecycleNetworkIds: 1
+    NetworkIdRecycleDelay: 120
+    RpcHashSize: 0
+    LoadSceneTimeOut: 120
+    SpawnTimeout: 1
+    EnableNetworkLogs: 1
+    OldPrefabList: []
 --- !u!224 &1058658631 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 7530403938473826165, guid: 78db9bdf6f57a3945a43425a6e6f6f81, type: 3}
@@ -1631,6 +1712,22 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8571878025802163854, guid: 8a470efe2e66477429ad01189b03d26a, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8571878025802163854, guid: 8a470efe2e66477429ad01189b03d26a, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8571878025802163854, guid: 8a470efe2e66477429ad01189b03d26a, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8571878025802163854, guid: 8a470efe2e66477429ad01189b03d26a, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2129,5 +2226,11 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4594097729532512673, guid: 540dbc279a9cb564abaee4d5ed8fb823, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1039970122}
+    - targetCorrespondingSourceObject: {fileID: 4594097729532512673, guid: 540dbc279a9cb564abaee4d5ed8fb823, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1039970121}
   m_SourcePrefab: {fileID: 100100000, guid: 540dbc279a9cb564abaee4d5ed8fb823, type: 3}
