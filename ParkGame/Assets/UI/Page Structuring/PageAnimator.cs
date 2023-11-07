@@ -1,10 +1,53 @@
 using System;
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class PageAnimator
 {
+
+    public static void PrepareAnimation(
+        RectTransform rectTransform,
+        CanvasGroup canvasGroup,
+        PageEntryMode entryMode
+    )
+    {
+
+        var canvasRectTransform = rectTransform.GetComponentInParent<Canvas>().GetComponent<RectTransform>();
+        var canvasSize = canvasRectTransform.sizeDelta;
+
+        rectTransform.localScale = Vector2.one;
+        rectTransform.anchoredPosition = Vector2.zero;
+        canvasGroup.alpha = 1f;
+        canvasGroup.interactable = false;
+
+        switch (entryMode)
+        {
+            case PageEntryMode.None:
+                canvasGroup.alpha = 0f;
+                break;
+            case PageEntryMode.Fade:
+                canvasGroup.alpha = 0f;
+                break;
+            case PageEntryMode.SlideLeft:
+                rectTransform.anchoredPosition = new Vector2(canvasSize.x, 0f);
+                break;
+            case PageEntryMode.SlideRight:
+                rectTransform.anchoredPosition = new Vector2(-canvasSize.x, 0f);
+                break;
+            case PageEntryMode.SlideUp:
+                rectTransform.anchoredPosition = new Vector2(0f, -canvasSize.y);
+                break;
+            case PageEntryMode.SlideDown:
+                rectTransform.anchoredPosition = new Vector2(0f, canvasSize.y);
+                break;
+            case PageEntryMode.Zoom:
+                rectTransform.localScale = Vector2.zero;
+                break;
+        }
+    }
+
     public static IEnumerator SlideIn(
         RectTransform rectTransform,
         CanvasGroup canvasGroup,
@@ -15,21 +58,22 @@ public class PageAnimator
         Vector2 targetPosition = Vector2.zero;
         Vector2 startPosition = Vector2.zero;
 
-        var cavnasScaler = rectTransform.GetComponentInParent<CanvasScaler>();
-        
+        var canvasRectTransform = rectTransform.GetComponentInParent<Canvas>().GetComponent<RectTransform>();
+        var canvasSize = canvasRectTransform.sizeDelta;
+
         switch (direction)
         {
             case Direction.Left:
-                startPosition.x += cavnasScaler.referenceResolution.x;
+                startPosition.x += canvasSize.x;
                 break;
             case Direction.Right:
-                startPosition.x -= cavnasScaler.referenceResolution.x;
+                startPosition.x -= canvasSize.x;
                 break;
             case Direction.Up:
-                startPosition.y -= cavnasScaler.referenceResolution.y;
+                startPosition.y -= canvasSize.y;
                 break;
             case Direction.Down:
-                startPosition.y += cavnasScaler.referenceResolution.y;
+                startPosition.y += canvasSize.y;
                 break;
         }
 
@@ -60,21 +104,22 @@ public class PageAnimator
         Vector2 targetPosition = Vector2.zero;
         Vector2 startPosition = Vector2.zero;
 
-        var cavnasScaler = rectTransform.GetComponentInParent<CanvasScaler>();
+        var canvasRectTransform = rectTransform.GetComponentInParent<Canvas>().GetComponent<RectTransform>();
+        var canvasSize = canvasRectTransform.sizeDelta;
 
         switch (direction)
         {
             case Direction.Left:
-                targetPosition.x -= cavnasScaler.referenceResolution.x;
+                targetPosition.x -= canvasSize.x;
                 break;
             case Direction.Right:
-                targetPosition.x += cavnasScaler.referenceResolution.x;
+                targetPosition.x += canvasSize.x;
                 break;
             case Direction.Up:
-                targetPosition.y += cavnasScaler.referenceResolution.y;
+                targetPosition.y += canvasSize.y;
                 break;
             case Direction.Down:
-                targetPosition.y -= cavnasScaler.referenceResolution.y;
+                targetPosition.y -= canvasSize.y;
                 break;
         }
 

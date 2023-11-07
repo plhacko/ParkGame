@@ -21,11 +21,6 @@ public class UIWelcomeScreenController : UIPageController
         loginButton.interactable = false;
         signUpButton.interactable = false;
 
-        if (FirebaseAuth.DefaultInstance.CurrentUser != null)
-        {
-            Debug.Log("User already logged in as " + FirebaseAuth.DefaultInstance.CurrentUser.DisplayName);
-            UIController.Singleton.PushUIPage(mainMenuPage);
-        }
 
         loginButton.interactable = true;
         signUpButton.interactable = true;

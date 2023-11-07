@@ -57,6 +57,11 @@ public class UIPrepareGameMenuController : UIPageController
         {
             UIController.Singleton.PushUIPage(lobbyPage);
         }
+        else 
+        {
+            Debug.LogWarning("Failed to create lobby");
+            setInteractable(true);
+        }
 
         processing = false;
     }

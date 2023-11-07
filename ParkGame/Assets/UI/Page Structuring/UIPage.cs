@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UIElements;
@@ -49,12 +50,17 @@ public class UIPage : MonoBehaviour
         onExit = pageController.OnExit;
     }
 
+    private void Start()
+    {
+        PageAnimator.PrepareAnimation(rectTransform, canvasGroup, entryMode);
+    }
+
     public void Enter(bool playSound)
     {
         switch (entryMode)
         {
             case PageEntryMode.None:
-                None(onEnter);
+                NoneIn(onEnter);
                 break;
             case PageEntryMode.Fade:
                 FadeIn(onEnter);
@@ -87,7 +93,7 @@ public class UIPage : MonoBehaviour
         switch (exitMode)
         {
             case PageEntryMode.None:
-                None(onExit);
+                NoneOut(onExit);
                 break;
             case PageEntryMode.Fade:
                 FadeOut(onExit);
@@ -113,11 +119,18 @@ public class UIPage : MonoBehaviour
         {
             PlayExitClip();
         }
+
+        PageAnimator.PrepareAnimation(rectTransform, canvasGroup, entryMode);
     }
 
-    private void None(Action callback)
+    private void NoneIn(Action callback)
     {
-        callback?.Invoke();
+        if (animationCoroutine != null)
+        {
+            StopCoroutine(animationCoroutine);
+        }
+
+        animationCoroutine = StartCoroutine(PageAnimator.FadeIn(canvasGroup, 0f, callback));
     }
 
     private void ZoomIn(Action callback)
@@ -148,6 +161,16 @@ public class UIPage : MonoBehaviour
         }
 
         animationCoroutine = StartCoroutine(PageAnimator.FadeIn(canvasGroup, animationDuration, callback));
+    }
+
+    private void NoneOut(Action callback)
+    {
+        if (animationCoroutine != null)
+        {
+            StopCoroutine(animationCoroutine);
+        }
+
+        animationCoroutine = StartCoroutine(PageAnimator.FadeOut(canvasGroup, 0f, callback));
     }
 
     private void ZoomOut(Action callback)

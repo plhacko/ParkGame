@@ -23,9 +23,18 @@ public class UILoginController : UIPageController
         backButton.onClick.AddListener(Back);
     }
 
-    public override void OnEnter()
+    public override async void OnEnter()
     {
         loginButton.interactable = false;
+
+        if (FirebaseAuth.DefaultInstance.CurrentUser != null)
+        {
+            await AuthenticationService.Instance.SignInAnonymouslyAsync();
+
+            Debug.Log("User already logged in as " + FirebaseAuth.DefaultInstance.CurrentUser.DisplayName);
+            UIController.Singleton.PushUIPage(mainMenuPage);
+        }
+
     }
 
     public override void OnExit()

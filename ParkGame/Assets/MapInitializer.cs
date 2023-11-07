@@ -17,7 +17,7 @@ public class MapInitializer : MonoBehaviour
         baseMap.OnMapLoaded += () =>
         {
             Debug.Log("Map loaded");
-            mapCreator.FitCamera();
+            mapCreator.FitCameraToMap();
         };  
     }
 

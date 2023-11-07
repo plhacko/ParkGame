@@ -75,7 +75,7 @@ public class CreateMapWithOverlay : MonoBehaviour
         SetLowResTextureForTilemapCreation(mapData.DrawnTexture);
         SetTilemapBounds(mapData.MetaData.TopLeftTileIdx, mapData.MetaData.BottomRightTileIdx);
         CreateTilemapFromTexture(fromUploadedTexture: true, structures: mapData.MetaData.Structures);
-        // TODO navMesh.BuildNavMesh();
+        navMesh.BuildNavMesh();
 
         var dimensions = ExtractDimensionsFromUrl(mapData.MetaData.MapQuery);
         var boundingBox = ExtractBoundingBoxFromUrl(mapData.MetaData.MapQuery);
@@ -173,8 +173,34 @@ public class CreateMapWithOverlay : MonoBehaviour
     {
         return fetchedMap;
     }
+
+    public void FitCameraToMap()
+    {
+        // Calculate the size of the object based on its distance from the camera and its local scale
+        Vector3 mapBounds = BaseMap.GetComponent<SpriteRenderer>().bounds.size;
+        float objectWidth = mapBounds.x;
+        float objectHeight = mapBounds.y;
+
+        // Calculate the desired height and width of the object in the camera's view
+        float frustumHeight = 2.0f * mainCamera.orthographicSize;
+        float frustumWidth = frustumHeight * mainCamera.aspect;
+
+        // Calculate the scale factor to fit the object to the camera view
+        float scaleFactorHeight = frustumHeight / objectHeight;
+        float scaleFactorWidth = frustumWidth / objectWidth;
+
+        
+        
+        // Use the smaller scale factor to maintain aspect ratio and prevent stretching
+        var scaleFactor = Mathf.Min(scaleFactorWidth, scaleFactorHeight);
+
+        // gameObject.transform.localScale *= scaleFactor;
+        // fetchedMap.transform.localScale *= scaleFactor;
+        mainCamera.orthographicSize /= scaleFactor;
+        
+    }   
     
-    public void FitCamera()
+    private void FitCamera()
     {
         // Calculate the size of the object based on its distance from the camera and its local scale
         Vector3 mapBounds;
