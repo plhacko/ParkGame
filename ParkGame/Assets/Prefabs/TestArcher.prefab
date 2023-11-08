@@ -269,7 +269,7 @@ MonoBehaviour:
   MaxAttackRange: 5
   Attackcooldown: 3.2
   Damage: 1
-  UnitType: 1
+  TypeOfUnit: 1
   DeathFadeTime: 2
   initTeamDebug: 0
   initTeam: 0

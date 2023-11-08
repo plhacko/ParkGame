@@ -21,6 +21,9 @@ public class Formation : NetworkBehaviour {
 
     [SerializeField] GameObject PositionPrefab;
     public List<GameObject> soldiers = new List<GameObject>();
+    
+    public List<GameObject> soldiersSwordmen = new List<GameObject>();
+    public List<GameObject> soldiersArchers = new List<GameObject>();
 
     private int Team;
 
@@ -87,14 +90,11 @@ public class Formation : NetworkBehaviour {
         foreach (var s in soldiers) {
             if (s.Team == Team) {
                 myTeamSoldiers.Add(s.gameObject);
-                // maybe not comparing transforms
                 if (s.GetCommanderWhomIFollow() == gameObject.transform) {
                 } else {
                 }
             }
         }
-
-        //Debug.Log("number of my team's soldiers: " + myTeamSoldiers.Count);
 
     }
 
@@ -137,9 +137,10 @@ public class Formation : NetworkBehaviour {
             //StartFormation();
         }
 
-        for (int i = 0; i < soldiers.Count; i++) {
-            soldiers.RemoveAt(i);
-        }
+        soldiers.Clear();
+        soldiersArchers.Clear();
+        soldiersSwordmen.Clear();
+
         FormationCircle.Clear();
         FormationBox.Clear();
         if (BoxRoot) {
@@ -168,11 +169,29 @@ public class Formation : NetworkBehaviour {
         }
     }
 
+    void AddSoldierByType(GameObject sol) {
+        Soldier.UnitType type = sol.GetComponent<Soldier>().GetUnitType();
+        switch (type) {
+            case Soldier.UnitType.Pawn:
+                soldiersSwordmen.Add(sol);
+                break;
+            case Soldier.UnitType.Archer:
+                soldiersArchers.Add(sol);
+                break;
+            
+            default:
+                break;
+            
+        }
+    }
 
-    public GameObject GetFormation(GameObject soldier, FormationType shape = FormationType.Circle) {
+    public GameObject GetPositionInFormation(GameObject soldier, FormationType shape = FormationType.Circle) {
         if (soldiers.Contains(soldier)) { return null; } // soldier already there?
 
-        soldiers.Add(soldier); 
+        soldiers.Add(soldier);
+
+        AddSoldierByType(soldier);
+
         ListFormationPositions(shape);
         return GetPosition(shape);
     }
@@ -278,9 +297,13 @@ public class Formation : NetworkBehaviour {
     }
 
     public List<Vector3> ListCircularPositions() {
+
         if (soldiers.Count < 1) { return null; }
         float radius = 1f; // radius from commander
         float alpha = 2 * Mathf.PI / soldiers.Count;
+
+        int counter = 0;
+        float inc = 0.1f;
 
         List<Vector3> positions = new List<Vector3>();
         for (int i = 0; i < soldiers.Count; i++) {
@@ -288,10 +311,15 @@ public class Formation : NetworkBehaviour {
             float y = transform.position.y - radius * Mathf.Sin(i * alpha);
             Vector3 vec = new Vector3(x, y, 0);
             positions.Add(vec);
+            counter++;
         }
+
+
         return positions;
     }
 
+    // list positions and add new gameobject for the position if needed
+    // then adjust the position objects (now only for circle)
     public void ListFormationPositions(FormationType shape = FormationType.Circle) {
         // draw positions for following soldiers
         if (shape == FormationType.Circle) {

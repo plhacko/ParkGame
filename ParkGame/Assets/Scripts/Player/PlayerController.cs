@@ -114,6 +114,7 @@ namespace Player
                     case Formation.FormationType.Box:
                     case Formation.FormationType.Free:
                         FormationType = Formation.FormationType.Circle;
+                        FormationScript.ResetFormation();
                         // notify soldiers
                         NotifySoldiersServerRpc();
                         break;
@@ -155,22 +156,24 @@ namespace Player
         [ServerRpc]
         public void NotifySoldiersServerRpc() {
 
-            Debug.Log("number of Units: " + Units.Count);
+            //Debug.Log("number of Units: " + Units.Count);
+
+            // sort the Units and notify them in some order?????
             foreach (GameObject go in Units) {
                 if (go.TryGetComponent<ISoldier>(out ISoldier soldier)) {
                     switch (FormationType) {
                         case Formation.FormationType.Free:
-                            Debug.Log("notify soldiers. C is OFF");
+                            //Debug.Log("notify soldiers. C is OFF");
                             soldier.NavMeshFormationSwitch(false, SoldierBehaviour.Idle, FormationScript, FormationType);
                             FormationScript.ResetFormation();
                             break;
                         case Formation.FormationType.Circle:
-                            Debug.Log("notify them. C is ON");
+                            //Debug.Log("notify them. C is ON");
                             soldier.NavMeshFormationSwitch(false, SoldierBehaviour.Idle, FormationScript, FormationType);
                             soldier.NavMeshFormationSwitch(true, SoldierBehaviour.Formation, FormationScript, FormationType);
                             break;
                         case Formation.FormationType.Box:
-                            Debug.Log("notify them. R is ON");
+                            //Debug.Log("notify them. R is ON");
                             soldier.NavMeshFormationSwitch(false, SoldierBehaviour.Idle, FormationScript, FormationType);
                             soldier.NavMeshFormationSwitch(true, SoldierBehaviour.Formation, FormationScript, FormationType);
                             break;
