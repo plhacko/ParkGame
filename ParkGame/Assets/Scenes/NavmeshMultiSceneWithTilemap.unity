@@ -15028,11 +15028,11 @@ MonoBehaviour:
   CollisionTag: 
   EventReference:
     Guid:
-      Data1: 1911858993
-      Data2: 1201853077
-      Data3: -1861684859
-      Data4: -1068912374
-    Path: event:/Music/MountainsOfThunder
+      Data1: -1580478060
+      Data2: 1289592002
+      Data3: -1047650172
+      Data4: 679949240
+    Path: event:/Music/wow
   Event: 
   PlayEvent: 11
   StopEvent: 12

@@ -1,5 +1,59 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-8274207355073697879
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Music/wow
+  m_EditorClassIdentifier: 
+  Path: event:/Music/wow
+  Guid:
+    Data1: -1580478060
+    Data2: 1289592002
+    Data3: -1047650172
+    Data4: 679949240
+  Banks:
+  - {fileID: 1797049273175031372}
+  IsStream: 1
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 355657
+--- !u!114 &-6402444900260619163
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/SwordHit
+  m_EditorClassIdentifier: 
+  Path: event:/SFX/SwordHit
+  Guid:
+    Data1: 1200299268
+    Data2: 1172053139
+    Data3: 887985854
+    Data4: -671774217
+  Banks:
+  - {fileID: 1797049273175031372}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 0
 --- !u!114 &-5964614369774135526
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15,7 +69,7 @@ MonoBehaviour:
   Path: FMOD/FMODProject/Build/Desktop/Master.bank
   Name: Master
   StudioPath: bank:/Master
-  lastModified: 638346193633548506
+  lastModified: 638350535422766567
   FileSizes:
   - Name: Desktop
     Value: 4616608
@@ -35,10 +89,59 @@ MonoBehaviour:
   Path: FMOD/FMODProject/Build/Desktop/Master.strings.bank
   Name: Master.strings
   StudioPath: bank:/Master.strings
-  lastModified: 638346193633578411
+  lastModified: 638350535422776531
   FileSizes:
   - Name: Desktop
     Value: 774
+  Exists: 1
+--- !u!114 &-1289074139653049163
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/ArrowDraw
+  m_EditorClassIdentifier: 
+  Path: event:/SFX/ArrowDraw
+  Guid:
+    Data1: -2000762997
+    Data2: 1188203862
+    Data3: -1162553450
+    Data4: 1799356684
+  Banks:
+  - {fileID: 1797049273175031372}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 0
+--- !u!114 &-625123021922913339
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
+  m_Name: bank:/Master.strings.bank
+  m_EditorClassIdentifier: 
+  Path: FMOD/FMODPG/Build/Desktop/Master.strings.bank
+  Name: Master.strings
+  StudioPath: bank:/Master.strings
+  lastModified: 638350574356095080
+  FileSizes:
+  - Name: Desktop
+    Value: 982
+  - Name: Mobile
+    Value: 982
   Exists: 1
 --- !u!114 &11400000
 MonoBehaviour:
@@ -53,16 +156,19 @@ MonoBehaviour:
   m_Name: FMODStudioCache
   m_EditorClassIdentifier: 
   EditorBanks:
-  - {fileID: -3556162501810102981}
-  - {fileID: -5964614369774135526}
+  - {fileID: -625123021922913339}
+  - {fileID: 1797049273175031372}
   EditorEvents:
-  - {fileID: 511307718767332369}
+  - {fileID: -6402444900260619163}
+  - {fileID: 2513507581535436594}
+  - {fileID: -8274207355073697879}
+  - {fileID: -1289074139653049163}
   EditorParameters: []
   MasterBanks:
-  - {fileID: -5964614369774135526}
+  - {fileID: 1797049273175031372}
   StringsBanks:
-  - {fileID: -3556162501810102981}
-  cacheTime: 638346193633578411
+  - {fileID: -625123021922913339}
+  cacheTime: 638350574356095080
   cacheVersion: 131608
 --- !u!114 &511307718767332369
 MonoBehaviour:
@@ -91,3 +197,52 @@ MonoBehaviour:
   MinDistance: 1
   MaxDistance: 20
   Length: 355657
+--- !u!114 &1797049273175031372
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
+  m_Name: bank:/Master.bank
+  m_EditorClassIdentifier: 
+  Path: FMOD/FMODPG/Build/Desktop/Master.bank
+  Name: Master
+  StudioPath: bank:/Master
+  lastModified: 638350574356070062
+  FileSizes:
+  - Name: Desktop
+    Value: 4648576
+  - Name: Mobile
+    Value: 9408544
+  Exists: 1
+--- !u!114 &2513507581535436594
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/ArrowHit
+  m_EditorClassIdentifier: 
+  Path: event:/SFX/ArrowHit
+  Guid:
+    Data1: 81842928
+    Data2: 1278101891
+    Data3: -1564767570
+    Data4: 809095446
+  Banks:
+  - {fileID: 1797049273175031372}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 0
