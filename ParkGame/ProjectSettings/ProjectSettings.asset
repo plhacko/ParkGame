@@ -790,6 +790,9 @@ PlayerSettings:
   webGLPowerPreference: 2
   scriptingDefineSymbols:
     Android: UGS_BETA_LOBBY_EVENTS;UGS_LOBBY_EVENTS
+    Server: UGS_BETA_LOBBY_EVENTS;UGS_LOBBY_EVENTS
+    Standalone: UGS_BETA_LOBBY_EVENTS;UGS_LOBBY_EVENTS
+    iPhone: UGS_BETA_LOBBY_EVENTS;UGS_LOBBY_EVENTS
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend: {}
@@ -800,7 +803,7 @@ PlayerSettings:
   suppressCommonWarnings: 1
   allowUnsafeCode: 0
   useDeterministicCompilation: 1
-  selectedPlatform: 2
+  selectedPlatform: 3
   additionalIl2CppArgs: 
   scriptingRuntimeVersion: 1
   gcIncremental: 1

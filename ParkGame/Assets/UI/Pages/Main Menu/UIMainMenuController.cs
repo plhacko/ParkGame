@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine.SceneManagement;
 using Managers;
 using Firebase.Auth;
+using Unity.Services.Authentication;
 
 public class UIMainMenuController : UIPageController
 {
@@ -67,6 +68,7 @@ public class UIMainMenuController : UIPageController
     {
         enableButtons(false);
         FirebaseAuth.DefaultInstance.SignOut();
+        AuthenticationService.Instance.SignOut();
         UIController.Singleton.PopUIPage();
         UIController.Singleton.PushUIPage(welcomePage);
     }

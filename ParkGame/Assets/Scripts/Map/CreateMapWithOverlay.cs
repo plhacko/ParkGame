@@ -90,8 +90,7 @@ public class CreateMapWithOverlay : MonoBehaviour
         fetchedMap = mapDisplayer.transform.gameObject;
 
         BaseMap = Instantiate(mapSprite, transform).GetComponent<MapDisplayer>();
-
-        SessionManager.Singleton.OnMapReceived -= CreateTilemapFromFetchedMap;
+        Debug.Log("Map fetched and created");
     }
 
     public bool IsBaseMapLoaded()

@@ -93,6 +93,7 @@ namespace Managers
 
             UnityServicesInitializeTask = UnityServices.InitializeAsync();
             Singleton = this;
+            DontDestroyOnLoad(gameObject);
         }
 
         private void OnDestroy()
