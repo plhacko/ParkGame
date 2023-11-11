@@ -371,7 +371,6 @@ GameObject:
   m_Component:
   - component: {fileID: 2601613018314090959}
   - component: {fileID: 2176623437854458208}
-  - component: {fileID: 1084521297512012200}
   m_Layer: 0
   m_Name: Map Creator
   m_TagString: Untagged
@@ -395,7 +394,7 @@ Transform:
   - {fileID: 2601613018766432994}
   - {fileID: 5637484406772363878}
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2176623437854458208
 MonoBehaviour:
@@ -410,22 +409,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mapCreator: {fileID: 2601613019065936706}
---- !u!114 &1084521297512012200
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2601613018314090956}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 951099334
-  AlwaysReplicateAsRoot: 0
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
 --- !u!1 &2601613018766432992
 GameObject:
   m_ObjectHideFlags: 0

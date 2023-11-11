@@ -35,6 +35,8 @@ namespace Managers
         public string Name;
         public int MaxPlayers;
         public Dictionary<string, int> Teams;
+        // Translates from Authentication Service Player Id to Persistent Id (Firebase Id)
+        public Dictionary<string, string> PersistentIds;
 
         // Content equality check
         public override bool Equals(object obj)
@@ -46,12 +48,13 @@ namespace Managers
                    MapId == model.MapId &&
                    Name == model.Name &&
                    MaxPlayers == model.MaxPlayers &&
-                   Teams.OrderBy(x => x.Key).SequenceEqual(model.Teams.OrderBy(x => x.Key));
+                   Teams.OrderBy(x => x.Key).SequenceEqual(model.Teams.OrderBy(x => x.Key)) &&
+                   PersistentIds.OrderBy(x => x.Key).SequenceEqual(model.PersistentIds.OrderBy(x => x.Key));
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Id, LobbyCode, HostId, Name, MaxPlayers, Teams);
+            return HashCode.Combine(Id, LobbyCode, HostId, Name, MaxPlayers, Teams, PersistentIds);
         }
     }
     public class LobbyManager : MonoBehaviour
@@ -257,6 +260,14 @@ namespace Managers
                 Data = new()
                 {
                     {
+                        "FirebaseId",
+                        new PlayerDataObject
+                        (
+                            PlayerDataObject.VisibilityOptions.Member,
+                            FirebaseAuth.DefaultInstance.CurrentUser?.UserId ?? "Id not found"
+                        )
+                    },
+                    {
                         "PlayerName",
                         new PlayerDataObject
                         (
@@ -369,8 +380,24 @@ namespace Managers
                 HostId = Lobby.HostId,
                 Name = Lobby.Name,
                 MaxPlayers = Lobby.MaxPlayers,
-                Teams = GetTeams()
+                Teams = GetTeams(),
+                PersistentIds = GetPersistentIds()
             };
+        }
+
+        private Dictionary<string, string> GetPersistentIds()
+        {
+            Dictionary<string, string> persistentIds = new();
+
+            foreach (var player in Lobby.Players)
+            {
+                if (player.Data.ContainsKey("FirebaseId"))
+                {
+                    persistentIds.Add(player.Id, player.Data["FirebaseId"].Value);
+                }
+            }
+
+            return persistentIds;
         }
 
         public Dictionary<string, int> GetTeams()
