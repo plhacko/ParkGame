@@ -33,18 +33,6 @@ namespace UI.Lobby
             
             backButton.onClick.AddListener(Back);  
             startGameButton.onClick.AddListener(StartGame);
-
-    
-            LobbyManager.Singleton.OnLobbyInvalidate += UpdateUI;
-            LobbyManager.Singleton.OnDisconnect += OnDisconnect;
-        }
-
-        private void OnDestroy()
-        {
-            if (LobbyManager.Singleton == null) return;
-
-            LobbyManager.Singleton.OnLobbyInvalidate -= UpdateUI;
-            LobbyManager.Singleton.OnDisconnect -= OnDisconnect;
         }
 
         public override async void OnEnter()
@@ -55,6 +43,9 @@ namespace UI.Lobby
             }
 
             InitializeUIwithMapData(LobbyManager.Singleton.MapData);
+
+            LobbyManager.Singleton.OnLobbyInvalidate += UpdateUI;
+            LobbyManager.Singleton.OnDisconnect += OnDisconnect;
         }
 
         public override void OnExit()
@@ -66,6 +57,9 @@ namespace UI.Lobby
                 Destroy(teamUI.gameObject);
             }
             newTeamUIs.Clear();
+
+            LobbyManager.Singleton.OnLobbyInvalidate -= UpdateUI;
+            LobbyManager.Singleton.OnDisconnect -= OnDisconnect;
         }
 
         private void UpdateUI()
@@ -93,8 +87,7 @@ namespace UI.Lobby
             {
                 var playedId = entry.Key;
                 var player = lobby.Players.Find(x => x.Id == playedId);
-                var teamNumber = entry.Value;
-                
+                var teamNumber = entry.Value; 
                 if (teamNumber != -1)
                 {
                     newTeamUIs[teamNumber].AddPlayerUI(
