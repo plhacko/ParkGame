@@ -18,32 +18,48 @@ using NavMeshSurface = NavMeshPlus.Components.NavMeshSurface;
 [RequireComponent(typeof(Drawable))]
 public class CreateMapWithOverlay : MonoBehaviour
 {
-    public Camera mainCamera;
-    [SerializeField] Sprite mapOverlay;
+    public Camera mainCamera; // for map scale adjustment
+    // Tilemaps
+    [Header("Tilemaps")]
     public Tilemap baseTilemap;
     public Tilemap actionTilemap;
     public Tilemap blockingTilemap;
+    
+    // Tile sprites
+    [Header("Tile Sprites")]
     public TileBase pathTile;
     public TileBase boundsTile;
     public TileBase wallTile;
     public TileBase backgroundTile;
+
+    // Structure tiles (currently unused, replaced by separate GameObject)
+    [Header("Structure tiles (unused now, replaced by prefabs)")]
     public TileBase outpostTile;
     public TileBase victoryPointTile;
     public TileBase castleTile;
+    // Structure prefabs (used instead of tiles)
+    [Header("Structure prefabs")]
+    public GameObject outpostPrefab;
+    public GameObject castlePrefab;
+    public GameObject victoryPointPrefab;
+    // used for storing placed structure counts and positions
+    [Header("Structure counters (For map drawing)")]
     public StructureCounter outposts;
     public StructureCounter victoryPoint;
     public StructureCounter castles;
-    public bool doNotFetch = false;
-    public bool loadFromSessionManager = false;
-    public NavMeshSurface navMesh;
     
+    [Header("Additional settings")]
+    public bool doNotFetch = false; // Do not try to load a map (Debug)
+    public bool loadFromSessionManager = false; // Load saved map from firebase
+    public NavMeshSurface navMesh;  // used for building navMesh on tilemap
+    public GridLayout gridLayout; // used for placing structures correctly based on tilemap coordinates
+    
+    private Sprite mapOverlay;
     private Texture2D drawableTexture;
     private Texture2D resizedDrawableTexture;
     private Sprite drawableSprite;
     private SpriteRenderer drawableSpriteRenderer;
     private GameObject fetchedMap;
-    private String path = Application.dataPath + "/Sprites/Map/customMap.png";
-    
     private Vector3Int topLeftCellPos, bottomRightCellPos; // Used for tilemap recreation
 
     [SerializeField] private GameObject mapSprite;
@@ -53,11 +69,7 @@ public class CreateMapWithOverlay : MonoBehaviour
     void Start()
     {
         drawableSpriteRenderer = GetComponent<SpriteRenderer>();
-        if (mapOverlay){ // Debug feature
-            CreateNewTextureForDrawing();
-            SetMapOverlay(mapOverlay);
-        }
-        else if (loadFromSessionManager)
+        if (loadFromSessionManager)
         {
             // Create map from session manager once its fetched
             SessionManager.Singleton.OnMapReceived += CreateTilemapFromFetchedMap;
@@ -279,7 +291,7 @@ public class CreateMapWithOverlay : MonoBehaviour
             Debug.Log("Could not convert texture to png!");
             return;
         }
-        File.WriteAllBytes(path, pngData);
+        File.WriteAllBytes(Application.dataPath + "/Sprites/Map/customMap.png", pngData);
         Debug.Log("Map saved");
 #else
         Debug.Log("Currently the map can be saved only in the editor");
@@ -337,6 +349,15 @@ public class CreateMapWithOverlay : MonoBehaviour
         // );
     }
 
+    private void SetStructurePrefabs(Dictionary<Vector3Int, GameObject> structuresToAssign)
+    {
+        foreach (var kvp in structuresToAssign)
+        {
+            if (actionTilemap.GetTile(kvp.Key) == boundsTile)
+                throw new ArgumentException("Cannot place structure out of map bounds");
+            Instantiate(kvp.Value, gridLayout.CellToWorld(kvp.Key), Quaternion.identity);
+        }
+    }
     private void SetStructureTiles(Dictionary<Vector3Int, TileBase> structuresToAssign)
     {
         var structureRadius = 2;
@@ -415,26 +436,26 @@ public class CreateMapWithOverlay : MonoBehaviour
         blockingTilemap.FloodFill(
             new Vector3Int(topLeftCellPos.x, topLeftCellPos.y), boundsTile
             );
-        var structuresToAssign = new Dictionary<Vector3Int, TileBase>();
+        var structuresToAssign = new Dictionary<Vector3Int, GameObject>();
         if (structures == null)
         {
             // Also for adjusting uploaded tilemap (Not used for now)
             foreach (var tilePos in outposts.GetPlacedStructurePositions().Item2)
-                structuresToAssign.Add(tilePos, outpostTile);
+                structuresToAssign.Add(tilePos, outpostPrefab);
             foreach (var tilePos in castles.GetPlacedStructurePositions().Item2)
-                structuresToAssign.Add(tilePos, castleTile);
+                structuresToAssign.Add(tilePos, castlePrefab);
             foreach (var tilePos in victoryPoint.GetPlacedStructurePositions().Item2)
-                structuresToAssign.Add(tilePos, victoryPointTile);
+                structuresToAssign.Add(tilePos, victoryPointPrefab);
         }
         else
         {
             // Structures from uploaded map 
             foreach (var tilePos in structures.Outposts)
-                structuresToAssign.Add(new Vector3Int(tilePos.x, tilePos.y, tilePos.z), outpostTile);
+                structuresToAssign.Add(new Vector3Int(tilePos.x, tilePos.y, tilePos.z), outpostPrefab);
             foreach (var tilePos in structures.Castles)
-                structuresToAssign.Add(new Vector3Int(tilePos.x, tilePos.y, tilePos.z), castleTile);
+                structuresToAssign.Add(new Vector3Int(tilePos.x, tilePos.y, tilePos.z), castlePrefab);
             foreach (var tilePos in structures.VictoryPoints)
-                structuresToAssign.Add(new Vector3Int(tilePos.x, tilePos.y, tilePos.z), victoryPointTile);
+                structuresToAssign.Add(new Vector3Int(tilePos.x, tilePos.y, tilePos.z), victoryPointPrefab);
         }
         
         // foreach (var kvp in tilesToAssign)
@@ -442,7 +463,7 @@ public class CreateMapWithOverlay : MonoBehaviour
         //     if (tilemap.GetTile(kvp.Key) == null)
         //         tilemap.SetTile(kvp.Key, kvp.Value);
         // }
-        
-        SetStructureTiles(structuresToAssign);
+        SetStructurePrefabs(structuresToAssign);
+        // SetStructureTiles(structuresToAssign);
     }
 }
