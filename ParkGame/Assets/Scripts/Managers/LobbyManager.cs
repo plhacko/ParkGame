@@ -198,6 +198,7 @@ namespace Managers
         {
             Debug.Log("Kicked from lobby");
 
+            NetworkManager.Singleton.Shutdown();
             OnDisconnect?.Invoke();
             Reset();
         }
@@ -504,15 +505,7 @@ namespace Managers
 
         public async Task<bool> LeaveLobby()
         {
-            bool success = await RemovePlayerFromLobby(PlayerId);
-
-            if (success)
-            {
-                Reset();
-                return true;
-            }
-
-            return false;
+            return await RemovePlayerFromLobby(PlayerId);
         }
 
         private void Reset()
