@@ -1,14 +1,11 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using Unity.Netcode;
 
 public class Castle : NetworkBehaviour {
+    public int Team { get => outpost.Team; set => outpost.Team = value; }
 
-    [SerializeField] NetworkVariable<int> _Team = new(0);
-    public int Team { get => _Team.Value; set => _Team.Value = value; }
-
+    private Outpost outpost;
+    
     private void Start() {
-        Team = GetComponent<Outpost>().Team;
+        outpost = GetComponent<Outpost>();
     }
 }

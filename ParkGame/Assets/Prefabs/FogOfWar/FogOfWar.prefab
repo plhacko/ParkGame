@@ -214,13 +214,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7621d4613fa266440b1f56d3624deb3e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: {fileID: 0}
   fog: {fileID: 862468788484070299}
   revealer: {fileID: 862468788002139224}
   hiddenColor:
     serializedVersion: 2
     rgba: 3355443200
   fogSizeInUnits: 40
-  pixelsPerUnit: 1
-  revealRadius: 4
+  pixelsPerUnit: 2
   edgeWidth: 3
+  debug: 0
+  revealerTargets: []

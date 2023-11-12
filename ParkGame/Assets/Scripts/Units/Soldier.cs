@@ -132,11 +132,17 @@ public class Soldier : NetworkBehaviour, ISoldier
 
         if (newValue == 0) // todo change if is local player's
         {
-            fogOfWar.RegisterAsRevealer(revealer);
+            if (fogOfWar)
+            {
+                fogOfWar.RegisterAsRevealer(revealer);   
+            }
         }
         else
         {
-            changeMaterial.Change();
+            if (fogOfWar)
+            {
+                changeMaterial.Change();
+            }
         }
     }
     public void OnBehaviourChange(SoldierBehaviour previousValue, SoldierBehaviour newValue)

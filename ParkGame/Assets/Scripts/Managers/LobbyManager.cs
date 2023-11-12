@@ -592,6 +592,11 @@ namespace Managers
             return firebaseIdToClientId[clientId];
         }
         
+        public PlayerData GetLocalPlayerData()
+        {
+            return GetPlayerData(NetworkManager.Singleton.LocalClientId);
+        }
+        
         public PlayerData GetPlayerData(ulong clientId)
         {
             var firebaseId = GetFirebaseIdFromClientId(clientId);

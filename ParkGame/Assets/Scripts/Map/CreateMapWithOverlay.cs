@@ -8,6 +8,7 @@ using FreeDraw;
 using Managers;
 using Unity.AI;
 using Unity.AI.Navigation;
+using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
@@ -345,7 +346,10 @@ public class CreateMapWithOverlay : MonoBehaviour
         {
             if (actionTilemap.GetTile(kvp.Key) == boundsTile)
                 throw new ArgumentException("Cannot place structure out of map bounds");
-            Instantiate(kvp.Value, gridLayout.CellToWorld(kvp.Key), Quaternion.identity);
+            var structure = Instantiate(kvp.Value, gridLayout.CellToWorld(kvp.Key), Quaternion.identity);
+            
+            var networkObject = structure.GetComponent<NetworkObject>();
+            networkObject.Spawn();
         }
     }
     private void SetStructureTiles(Dictionary<Vector3Int, TileBase> structuresToAssign)
