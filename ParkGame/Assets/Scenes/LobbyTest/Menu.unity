@@ -1858,6 +1858,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1597371288}
     - target: {fileID: 6179568006192890378, guid: 78db9bdf6f57a3945a43425a6e6f6f81, type: 3}
+      propertyPath: mainMenuPage
+      value: 
+      objectReference: {fileID: 1552875232}
+    - target: {fileID: 6179568006192890378, guid: 78db9bdf6f57a3945a43425a6e6f6f81, type: 3}
       propertyPath: onEnterPressed.m_PersistentCalls.m_Calls.Array.size
       value: 1
       objectReference: {fileID: 0}
