@@ -25,6 +25,7 @@ public class UILoginController : UIPageController
 
     public override async void OnEnter()
     {
+        processing = false;
         loginButton.interactable = false;
 #if UNITY_EDITOR
     if (!ParrelSync.ClonesManager.IsClone())
