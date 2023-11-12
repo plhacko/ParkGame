@@ -30,33 +30,33 @@ namespace Utils
 
         private async void Start()
         {
-            playerManager = FindObjectOfType<PlayerManager>();
-            isDebugging = !OurNetworkManager.Singleton.IsConnectedClient && !OurNetworkManager.Singleton.IsHost;
-            
-            if (isDebugging)
-            {
-                await UnityServices.InitializeAsync();
-                await AuthenticationService.Instance.SignInAnonymouslyAsync();
-
-                for (int i = 0; i < clients.Count; i++)
-                {
-                    var client = clients[i];
-                    byte[] guid = new byte[16];
-                    guid[i] = (byte)(i + 1);
-                    
-                    PlayerData clientPlayerData = new PlayerData
-                    {
-                        Name = client.Name + " " + i,
-                        ID = new Guid(guid),
-                        Team = client.Team
-                    };
-                    SessionManager.Singleton.PlayersData.UpdatePlayerData(clientPlayerData);   
-                }
-            }
-            else
-            {
-                gameObject.SetActive(false);
-            }
+            // playerManager = FindObjectOfType<PlayerManager>();
+            // isDebugging = !OurNetworkManager.Singleton.IsConnectedClient && !OurNetworkManager.Singleton.IsHost;
+            //
+            // if (isDebugging)
+            // {
+            //     await UnityServices.InitializeAsync();
+            //     await AuthenticationService.Instance.SignInAnonymouslyAsync();
+            //
+            //     for (int i = 0; i < clients.Count; i++)
+            //     {
+            //         var client = clients[i];
+            //         byte[] guid = new byte[16];
+            //         guid[i] = (byte)(i + 1);
+            //         
+            //         PlayerData clientPlayerData = new PlayerData
+            //         {
+            //             Name = client.Name + " " + i,
+            //             ID = new Guid(guid),
+            //             Team = client.Team
+            //         };
+            //         SessionManager.Singleton.PlayersData.UpdatePlayerData(clientPlayerData);   
+            //     }
+            // }
+            // else
+            // {
+            //     gameObject.SetActive(false);
+            // }
         }
 
         public void StartServer()
@@ -66,39 +66,39 @@ namespace Utils
 
         public void StartHost()
         {
-            OurNetworkManager.Singleton.SetServerState(ServerState.Debug);
-            SessionManager.Singleton.DownloadMapData(new Guid(mapId));
-            SessionManager.Singleton.OnMapReceived += startHost;
+            // OurNetworkManager.Singleton.SetServerState(ServerState.Debug);
+            // SessionManager.Singleton.DownloadMapData(new Guid(mapId));
+            // SessionManager.Singleton.OnMapReceived += startHost;
         }
 
         private async void startHost(MapData mapData)
         {
-            bool success = await OurNetworkManager.Singleton.HostGame(mapData, clients[0].Name, clients[0].Team, false);
-            
-            if (success)
-            {
-                // SessionManager.Singleton.JoinTeam(clients[0].Team);
-                PlayerPrefs.SetString("DebugRoomCode", SessionManager.Singleton.RoomCode);
-            }
-            else
-            {
-                Debug.Log("Failed to host game");
-            }
-            
-            SessionManager.Singleton.OnMapReceived -= startHost;
-            OurNetworkManager.Singleton.SetServerState(ServerState.Debug);
-            spawnPlayersButton.gameObject.SetActive(true);
+            // bool success = await OurNetworkManager.Singleton.HostGame(mapData, clients[0].Name, clients[0].Team, false);
+            //
+            // if (success)
+            // {
+            //     // SessionManager.Singleton.JoinTeam(clients[0].Team);
+            //     PlayerPrefs.SetString("DebugRoomCode", SessionManager.Singleton.RoomCode);
+            // }
+            // else
+            // {
+            //     Debug.Log("Failed to host game");
+            // }
+            //
+            // SessionManager.Singleton.OnMapReceived -= startHost;
+            // OurNetworkManager.Singleton.SetServerState(ServerState.Debug);
+            // spawnPlayersButton.gameObject.SetActive(true);
         }
 
         public async void StartClient()
         {
-            string joinCode = PlayerPrefs.GetString("DebugRoomCode", "");
-            bool success = await OurNetworkManager.Singleton.JoinGame(joinCode, "DebugClient");
-
-            if (!success)
-            {
-                Debug.Log($"Failed to join game, join code: [{joinCode}]");
-            }
+            // string joinCode = PlayerPrefs.GetString("DebugRoomCode", "");
+            // bool success = await OurNetworkManager.Singleton.JoinGame(joinCode, "DebugClient");
+            //
+            // if (!success)
+            // {
+            //     Debug.Log($"Failed to join game, join code: [{joinCode}]");
+            // }
         }
 
         void StartAllVictoryPoints() {

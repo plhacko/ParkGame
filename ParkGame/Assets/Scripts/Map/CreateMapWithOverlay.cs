@@ -34,7 +34,6 @@ public class CreateMapWithOverlay : MonoBehaviour
     public StructureCounter victoryPoint;
     public StructureCounter castles;
     public bool doNotFetch = false;
-    public bool loadFromSessionManager = false;
     public NavMeshSurface navMesh;
     
     private Texture2D drawableTexture;
@@ -56,14 +55,6 @@ public class CreateMapWithOverlay : MonoBehaviour
         if (mapOverlay){ // Debug feature
             CreateNewTextureForDrawing();
             SetMapOverlay(mapOverlay);
-        }
-        else if (loadFromSessionManager)
-        {
-            // Create map from session manager once its fetched
-            SessionManager.Singleton.OnMapReceived += CreateTilemapFromFetchedMap;
-            
-            // Disable drawable component since it won't be used
-            gameObject.GetComponent<Drawable>().enabled = false;
         }
         else if (!doNotFetch) // Wait until map fetching from MapBox is completed
             StartCoroutine(WaitForValue());
