@@ -463,12 +463,16 @@ MonoBehaviour:
   outpostTile: {fileID: 11400000, guid: c89a61497e5efb141afdfe6813f1c7e6, type: 2}
   victoryPointTile: {fileID: 11400000, guid: dc5b3cbbfb27d9448b13594ba5639140, type: 2}
   castleTile: {fileID: 11400000, guid: dff8c442a05e6bf448e44e48d3b60bcd, type: 2}
+  outpostPrefab: {fileID: 2776846833031490645, guid: 1a614d92eed9bdd48a556d6ecb9ea243, type: 3}
+  castlePrefab: {fileID: 8892233519408517762, guid: 220f99d109c261047a43cef62d96019b, type: 3}
+  victoryPointPrefab: {fileID: 3568922841563786189, guid: e30fceadb5719e04a818bf3bffe261c3, type: 3}
   outposts: {fileID: 0}
   victoryPoint: {fileID: 0}
   castles: {fileID: 0}
   doNotFetch: 0
   loadFromSessionManager: 0
-  navMesh: {fileID: 0}
+  navMesh: {fileID: 6742970777859922634, guid: a83edac981429054c8a9dac7cf70b780, type: 3}
+  gridLayout: {fileID: 2284287230310182246}
   mapSprite: {fileID: 863442115086188281, guid: 53f9e5c24c8a22141afc0ba340f28b3e, type: 3}
 --- !u!212 &2284287231549463749
 SpriteRenderer:
