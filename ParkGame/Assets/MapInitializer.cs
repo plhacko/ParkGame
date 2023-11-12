@@ -1,4 +1,4 @@
-using System.Threading.Tasks;
+using FreeDraw;
 using Managers;
 using UnityEngine;
 
@@ -12,6 +12,8 @@ public class MapInitializer : MonoBehaviour
         {
             return;
         }
+        
+        mapCreator.GetComponent<Drawable>().enabled = false;
         mapCreator.CreateTilemapFromFetchedMap(LobbyManager.Singleton.MapData);
         var baseMap = mapCreator.BaseMap;
         baseMap.OnMapLoaded += () =>
@@ -20,7 +22,4 @@ public class MapInitializer : MonoBehaviour
             mapCreator.FitCameraToMap();
         };  
     }
-
-
-
 }

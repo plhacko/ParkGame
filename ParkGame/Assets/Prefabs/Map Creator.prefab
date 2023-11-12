@@ -112,7 +112,7 @@ TilemapRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 2025221761
-  m_SortingLayer: 1
+  m_SortingLayer: -1
   m_SortingOrder: 2
   m_ChunkSize: {x: 32, y: 32, z: 32}
   m_ChunkCullingBounds: {x: 0, y: 0, z: 0}
@@ -287,7 +287,7 @@ TilemapRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 2025221761
-  m_SortingLayer: 1
+  m_SortingLayer: -1
   m_SortingOrder: 1
   m_ChunkSize: {x: 32, y: 32, z: 32}
   m_ChunkCullingBounds: {x: 0, y: 0, z: 0}
@@ -504,7 +504,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mainCamera: {fileID: 0}
-  mapOverlay: {fileID: 0}
   baseTilemap: {fileID: 2601613019165809592}
   actionTilemap: {fileID: 2702916133622361448}
   blockingTilemap: {fileID: 6294637635209971634}
@@ -515,12 +514,15 @@ MonoBehaviour:
   outpostTile: {fileID: 11400000, guid: c89a61497e5efb141afdfe6813f1c7e6, type: 2}
   victoryPointTile: {fileID: 11400000, guid: dc5b3cbbfb27d9448b13594ba5639140, type: 2}
   castleTile: {fileID: 11400000, guid: dff8c442a05e6bf448e44e48d3b60bcd, type: 2}
+  outpostPrefab: {fileID: 2776846833031490645, guid: 1a614d92eed9bdd48a556d6ecb9ea243, type: 3}
+  castlePrefab: {fileID: 8892233519408517762, guid: 220f99d109c261047a43cef62d96019b, type: 3}
+  victoryPointPrefab: {fileID: 3568922841563786189, guid: e30fceadb5719e04a818bf3bffe261c3, type: 3}
   outposts: {fileID: 0}
   victoryPoint: {fileID: 0}
   castles: {fileID: 0}
   doNotFetch: 1
-  loadFromSessionManager: 0
   navMesh: {fileID: 5050226419086321767}
+  gridLayout: {fileID: 2601613018766432995}
   mapSprite: {fileID: 863442115086188281, guid: 53f9e5c24c8a22141afc0ba340f28b3e, type: 3}
 --- !u!212 &2601613019065936704
 SpriteRenderer:
@@ -747,7 +749,7 @@ TilemapRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 2025221761
-  m_SortingLayer: 1
+  m_SortingLayer: -1
   m_SortingOrder: 0
   m_ChunkSize: {x: 32, y: 32, z: 32}
   m_ChunkCullingBounds: {x: 0, y: 0, z: 0}
