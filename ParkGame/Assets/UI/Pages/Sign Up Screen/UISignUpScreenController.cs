@@ -28,6 +28,11 @@ public class UISignUpScreenController : UIPageController
     public override void OnEnter()
     {
         signUpButton.interactable = false;
+        processing = false;
+        nameInputField.text = "";
+        emailInputField.text = "";
+        passwordInputField.text = "";
+        confirmPasswordInputField.text = "";
     }
 
     public override void OnExit()
