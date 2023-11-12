@@ -912,10 +912,6 @@ PrefabInstance:
       propertyPath: entryMode
       value: 4
       objectReference: {fileID: 0}
-    - target: {fileID: 5897103049968510762, guid: 86bc216476a79ad40b20578ef1f2bf2a, type: 3}
-      propertyPath: ExitOnNextPage
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 6362454706451798539, guid: 86bc216476a79ad40b20578ef1f2bf2a, type: 3}
       propertyPath: m_Name
       value: Prepare Game Menu Screen
