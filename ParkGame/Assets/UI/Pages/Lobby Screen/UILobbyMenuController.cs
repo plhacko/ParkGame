@@ -144,10 +144,11 @@ namespace UI.Lobby
 
         private async void Back()
         {
+            backButton.interactable = false;
             bool success = await LobbyManager.Singleton.LeaveLobby();
-            if (success)
+            if (!success)
             {
-                UIController.Singleton.PopUIPage();
+                backButton.interactable = true;
             }
         }
 
