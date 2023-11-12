@@ -35,6 +35,14 @@ namespace UI.Lobby
             startGameButton.onClick.AddListener(StartGame);
         }
 
+        private void OnDestroy()
+        {
+            if (LobbyManager.Singleton == null) return;
+            
+            LobbyManager.Singleton.OnLobbyInvalidate -= UpdateUI;
+            LobbyManager.Singleton.OnDisconnect -= OnDisconnect;
+        }
+
         public override async void OnEnter()
         {
             if (LobbyManager.Singleton.MapData == null)
