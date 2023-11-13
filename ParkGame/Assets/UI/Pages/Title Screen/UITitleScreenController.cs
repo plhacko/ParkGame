@@ -17,6 +17,7 @@ public class UITitleScreenController : UIPageController
 
     public override void OnEnter()
     {
+        enterButton.interactable = true;
     }
 
     public override void OnExit()
@@ -25,6 +26,7 @@ public class UITitleScreenController : UIPageController
 
     private async void Enter()
     {
+        enterButton.interactable = false;
         await LobbyManager.Singleton.UnityServicesInitializeTask;
 
 #if UNITY_EDITOR
