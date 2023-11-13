@@ -16,9 +16,13 @@ namespace Managers
     {
         [SerializeField] private PlayerController playerControllerPrefab;
 
+        public event Action OnAllPlayersSceneLoaded = null;
+        
         // Only on the host
         // Mapping from player's firebase ID to player controller
         private readonly Dictionary<string, PlayerController> playerControllers = new();
+
+        private int numClientsWithLoadedScene;
 
         private void Awake()
         {
@@ -28,16 +32,37 @@ namespace Managers
             }
         }
 
+        private void OnDestroy()
+        {
+            if (NetworkManager.Singleton)
+            {
+                NetworkManager.Singleton.SceneManager.OnLoadComplete -= sceneLoaded;   
+            }
+        }
+
         private void sceneLoaded(ulong clientId, string sceneName, LoadSceneMode loadSceneMode)
         {
             Debug.Log($"scene {sceneName} loaded for {clientId}");
 
-            if (NetworkManager.Singleton.IsHost)
+            if (!NetworkManager.Singleton.IsHost) return;
+            
+            numClientsWithLoadedScene++;
+            if (numClientsWithLoadedScene == NetworkManager.Singleton.ConnectedClients.Count)
             {
-                spawnPlayer(clientId);
+                Debug.Log("All players scene loaded");
+                OnAllPlayersSceneLoaded.Invoke();
+                spawnPlayers();
             }
         }
-        
+
+        private void spawnPlayers()
+        {
+            foreach (var clientId in NetworkManager.Singleton.ConnectedClients.Keys)
+            {
+                spawnPlayer(clientId);
+            }   
+        }
+
         public PlayerController GetPlayerController(ulong clientId)
         {
             var playerData = LobbyManager.Singleton.GetPlayerData(clientId);

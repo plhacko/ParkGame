@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using Firebase.Auth;
 using Managers;
@@ -29,7 +30,7 @@ namespace Player
         private readonly NetworkVariable<bool> xSpriteFlip = new(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         private readonly NetworkVariable<FixedString64Bytes> _Name = new(new FixedString64Bytes(""));
         private readonly NetworkVariable<FixedString64Bytes> _FirebaseId = new(new FixedString64Bytes(""));
-        private readonly NetworkVariable<int> _Team = new(0);
+        private readonly NetworkVariable<int> _Team = new(-1);
 
         public int Team { get => _Team.Value; set => _Team.Value = value; }
         public string Name { get => _Name.Value.Value; set => _Name.Value = value; }
@@ -47,9 +48,9 @@ namespace Player
             spriteRenderer = GetComponent<SpriteRenderer>();
             networkAnimator = GetComponent<NetworkAnimator>();
             formationScript = GetComponent<Formation>();
-            fogOfWar = FindObjectOfType<FogOfWar>();
             revealer = GetComponent<Revealer>();
             changeMaterial = GetComponent<ChangeMaterial>();
+            fogOfWar = FindObjectOfType<FogOfWar>();
 
             if (IsServer) {
                 Team = initialTeam;
@@ -69,7 +70,7 @@ namespace Player
             {
                 xSpriteFlip.OnValueChanged += onXSpriteFlipChanged;
             }
-            
+
             var localPlayerData = LobbyManager.Singleton.GetLocalPlayerData();
             if (localPlayerData.Team == Team)
             {
@@ -85,7 +86,7 @@ namespace Player
                     changeMaterial.Change();
                 }
             }
-
+            
             formationScript.InitializeFormation(); // build prefab, get position of the commander
             FormationType = Formation.FormationType.Free; // movement without navmesh
         }

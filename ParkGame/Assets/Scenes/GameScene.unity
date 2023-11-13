@@ -341,6 +341,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Map Creator
       objectReference: {fileID: 0}
+    - target: {fileID: 2601613018314090956, guid: e866586d6447f794582fb85dcc7f992b, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2601613018314090959, guid: e866586d6447f794582fb85dcc7f992b, type: 3}
       propertyPath: m_RootOrder
       value: 1
