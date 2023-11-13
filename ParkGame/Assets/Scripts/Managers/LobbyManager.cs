@@ -179,14 +179,17 @@ namespace Managers
             }
         }
 
-        private void OnLobbyChanged(ILobbyChanges changes)
+        private async void OnLobbyChanged(ILobbyChanges changes)
         {
             Debug.Log("Lobby changed");
 
             if (changes.LobbyDeleted)
             {
-                OnDisconnect?.Invoke();
-                Reset();
+                OnKickedFromLobby();
+            }
+            else if (changes.HostId.Changed)
+            {
+                await LeaveLobby();
             }
             else
             {
@@ -198,8 +201,6 @@ namespace Managers
 
         private void OnKickedFromLobby()
         {
-            Debug.Log("Kicked from lobby");
-
             NetworkManager.Singleton.Shutdown();
             OnDisconnect?.Invoke();
             Reset();
