@@ -1,72 +1,94 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Windows.Input;
+using Firebase.Auth;
 using Managers;
+using Unity.Collections;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
-//using static Formation;
 
 namespace Player
 {
     public class PlayerController : NetworkBehaviour, ICommander
     {
         [SerializeField] private float movementSpeed = 1;
+        [SerializeField] private int initialTeam;
+        [SerializeField] private string initialName;
 
         private SpriteRenderer spriteRenderer;
         private NetworkAnimator networkAnimator;
         private Guid ownerPlayerId;
-        private Formation FormationScript;
+        private Formation formationScript;
         private ChangeMaterial changeMaterial;
         private FogOfWar fogOfWar;
         private Revealer revealer;
+        private List<GameObject> units = new();
+        private string firebaseId;
         
         // Replicated variable for sprite orientation
-        private NetworkVariable<bool> xSpriteFlip = new(false,
-            NetworkVariableReadPermission.Everyone,
-            NetworkVariableWritePermission.Owner);
+        private readonly NetworkVariable<bool> xSpriteFlip = new(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+        private readonly NetworkVariable<FixedString64Bytes> _Name = new(new FixedString64Bytes(""));
+        private readonly NetworkVariable<FixedString64Bytes> _FirebaseId = new(new FixedString64Bytes(""));
+        private readonly NetworkVariable<int> _Team = new(-1);
 
-        private static readonly int MovementSpeed = Animator.StringToHash("MovementSpeed");
-
-        public int TeaM;
-        NetworkVariable<int> _Team = new(0);
         public int Team { get => _Team.Value; set => _Team.Value = value; }
-
-        List<GameObject> Units = new();
+        public string Name { get => _Name.Value.Value; set => _Name.Value = value; }
+        public string FirebaseId { get => _FirebaseId.Value.Value; set => _FirebaseId.Value = value; }
 
         public Formation.FormationType FormationType; // todo?
         public Formation.FormationType GetFormation() {
             return FormationType;
         }
+        
+        private static readonly int movementSpeedAnimationHash = Animator.StringToHash("MovementSpeed");
 
         private void initialize()
         {
             spriteRenderer = GetComponent<SpriteRenderer>();
             networkAnimator = GetComponent<NetworkAnimator>();
-            FormationScript = GetComponent<Formation>();
-            fogOfWar = FindObjectOfType<FogOfWar>();
+            formationScript = GetComponent<Formation>();
             revealer = GetComponent<Revealer>();
             changeMaterial = GetComponent<ChangeMaterial>();
-            
-            if (IsServer) {
-                FormationScript.StartFormation(); // build prefab, get position of the commander
-            }
+            fogOfWar = FindObjectOfType<FogOfWar>();
 
-            FormationType = Formation.FormationType.Free; // movement without navmesh
-            
-            if (!isActualOwner())
-            {
-                xSpriteFlip.OnValueChanged += onXSpriteFlipChanged;
+            if (IsServer) {
+                Team = initialTeam;
+                Name = initialName;
+                FirebaseId = firebaseId;
             }
             
+            Debug.Log($"init player {Name} in {Team} with {FirebaseId}, is owner: {isActualOwner()}");
             if (isActualOwner())
             {
-                fogOfWar.RegisterAsRevealer(revealer);
+                if (Camera.main != null)
+                {
+                    Camera.main.gameObject.transform.SetParent(transform);
+                }
             }
             else
             {
-                changeMaterial.Change();
+                xSpriteFlip.OnValueChanged += onXSpriteFlipChanged;
             }
+
+            var localPlayerData = LobbyManager.Singleton.GetLocalPlayerData();
+            if (localPlayerData.Team == Team)
+            {
+                if (fogOfWar)
+                {
+                    fogOfWar.RegisterAsRevealer(revealer);
+                }
+            }
+            else
+            {
+                if (fogOfWar)
+                {
+                    changeMaterial.Change();
+                }
+            }
+            
+            formationScript.InitializeFormation(); // build prefab, get position of the commander
+            FormationType = Formation.FormationType.Free; // movement without navmesh
         }
 
         public override void OnNetworkSpawn()
@@ -134,14 +156,14 @@ namespace Player
                     case Formation.FormationType.Circle:
                     case Formation.FormationType.Free:
                         FormationType = Formation.FormationType.Box;
-                        FormationScript.ResetFormation();
+                        formationScript.ResetFormation();
                         // notify soldiers
                         NotifySoldiersServerRpc();
                         break;
 
                     case Formation.FormationType.Box:
                         FormationType = Formation.FormationType.Free;
-                        FormationScript.ResetFormation();
+                        formationScript.ResetFormation();
                         // notify soldiers
                         NotifySoldiersServerRpc();
                         break;
@@ -155,24 +177,24 @@ namespace Player
         [ServerRpc]
         public void NotifySoldiersServerRpc() {
 
-            Debug.Log("number of Units: " + Units.Count);
-            foreach (GameObject go in Units) {
+            Debug.Log("number of Units: " + units.Count);
+            foreach (GameObject go in units) {
                 if (go.TryGetComponent<ISoldier>(out ISoldier soldier)) {
                     switch (FormationType) {
                         case Formation.FormationType.Free:
                             Debug.Log("notify soldiers. C is OFF");
-                            soldier.NavMeshFormationSwitch(false, SoldierBehaviour.Idle, FormationScript, FormationType);
-                            FormationScript.ResetFormation();
+                            soldier.NavMeshFormationSwitch(false, SoldierBehaviour.Idle, formationScript, FormationType);
+                            formationScript.ResetFormation();
                             break;
                         case Formation.FormationType.Circle:
                             Debug.Log("notify them. C is ON");
-                            soldier.NavMeshFormationSwitch(false, SoldierBehaviour.Idle, FormationScript, FormationType);
-                            soldier.NavMeshFormationSwitch(true, SoldierBehaviour.Formation, FormationScript, FormationType);
+                            soldier.NavMeshFormationSwitch(false, SoldierBehaviour.Idle, formationScript, FormationType);
+                            soldier.NavMeshFormationSwitch(true, SoldierBehaviour.Formation, formationScript, FormationType);
                             break;
                         case Formation.FormationType.Box:
                             Debug.Log("notify them. R is ON");
-                            soldier.NavMeshFormationSwitch(false, SoldierBehaviour.Idle, FormationScript, FormationType);
-                            soldier.NavMeshFormationSwitch(true, SoldierBehaviour.Formation, FormationScript, FormationType);
+                            soldier.NavMeshFormationSwitch(false, SoldierBehaviour.Idle, formationScript, FormationType);
+                            soldier.NavMeshFormationSwitch(true, SoldierBehaviour.Formation, formationScript, FormationType);
                             break;
                         default: 
                             break;
@@ -192,7 +214,7 @@ namespace Player
                 //FormationScript.ListFormationPositions();
             }
             
-            networkAnimator.Animator.SetFloat(MovementSpeed, movement.magnitude);
+            networkAnimator.Animator.SetFloat(movementSpeedAnimationHash, movement.magnitude);
 
             if (input.magnitude < Mathf.Epsilon) return;
 
@@ -211,38 +233,24 @@ namespace Player
         // the ownership is automatically transferred to the host.
         private bool isActualOwner()
         {
-            return SessionManager.Singleton.LocalPlayerId == ownerPlayerId && IsOwner;
+            return FirebaseId == FirebaseAuth.DefaultInstance.CurrentUser.UserId;
         }
 
-        [ClientRpc]
-        public void InitializePlayerIdClientRpc(SerializedGuid serializedGuid, ClientRpcParams clientRpcParams = default)
+        public void InitializePlayer(PlayerData clientData)
         {
-            if (IsHost) return;
-            
-            InitializePlayerId(serializedGuid.Value);
+            initialTeam = clientData.Team;
+            initialName = clientData.Name;
+            firebaseId = clientData.FirebaseId;
         }
-        
-        public void InitializePlayerId(Guid playerId)
-        {
-            ownerPlayerId = playerId;
 
-            var playerData = SessionManager.Singleton.PlayersData.GetPlayerData(ownerPlayerId);
-            
-            if (playerData != null)
-            {
-                Team = playerData.Value.Team;
-                TeaM = Team; // tmp 
-            }
-        }
-        
-        void ICommander.ReportFollowing(GameObject go) => Units.Add(go);
-        void ICommander.ReportUnfollowing(GameObject go) => Units.Remove(go);
+        void ICommander.ReportFollowing(GameObject go) => units.Add(go);
+        void ICommander.ReportUnfollowing(GameObject go) => units.Remove(go);
 
         // commands to the units
         [ServerRpc]
         public void CommandMovementServerRpc()
         {
-            foreach (GameObject go in Units)
+            foreach (GameObject go in units)
             {
                 if (go.TryGetComponent<ISoldier>(out ISoldier soldier))
                 { soldier.SoldierBehaviour = SoldierBehaviour.Move; }
@@ -251,7 +259,7 @@ namespace Player
         [ServerRpc]
         public void CommandIdleServerRpc()
         {
-            foreach (GameObject go in Units)
+            foreach (GameObject go in units)
             {
                 if (go.TryGetComponent<ISoldier>(out ISoldier soldier))
                 { soldier.SoldierBehaviour = SoldierBehaviour.Idle; }
@@ -260,7 +268,7 @@ namespace Player
         [ServerRpc]
         public void CommandAttackServerRpc()
         {
-            foreach (GameObject go in Units)
+            foreach (GameObject go in units)
             {
                 if (go.TryGetComponent<ISoldier>(out ISoldier soldier))
                 { soldier.SoldierBehaviour = SoldierBehaviour.Attack; }

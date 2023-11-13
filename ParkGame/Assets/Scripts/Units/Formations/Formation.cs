@@ -5,13 +5,12 @@ using UnityEngine;
 using Unity.Netcode;
 using Player;
 
-public class Formation : NetworkBehaviour {
-//public class Formation : MonoBehaviour {
+public class Formation : MonoBehaviour {
     public enum FormationType { Circle, Box, Free };
-
+    
     // tmp counter
     float ccc;
-
+    
     public class PositionPair {
         public PositionPair(GameObject i1, bool i2 = false) { gobject = i1; occupated = i2; }
 
@@ -22,7 +21,7 @@ public class Formation : NetworkBehaviour {
     [SerializeField] GameObject PositionPrefab;
     public List<GameObject> soldiers = new List<GameObject>();
 
-    private int Team;
+    private int team => playerController.Team;
 
     // circle formation - positions for soldiers
     public List<GameObject> FormationCircle = new List<GameObject>();
@@ -31,26 +30,11 @@ public class Formation : NetworkBehaviour {
     public GameObject BoxRoot;
     public List<GameObject> FormationBox = new List<GameObject>(); // are in hierarchy under BoxRoot
 
-    [ClientRpc]
-    void UnparentFormationClientRpc() {
-        var p = gameObject.transform.position;
-        BoxRoot.transform.SetParent(null, true);
-        BoxRoot.transform.position = new Vector3(p.x - 2, p.y, p.z);
-        BoxRoot.transform.rotation = Quaternion.Euler(new Vector3(0, 0, 90));
-        Hide(BoxRoot);
-    }
+    private PlayerController playerController;
 
-    public void StartFormation() {
-        UnparentFormationClientRpc();
-        Team = gameObject.GetComponent<PlayerController>().Team;
-    }
-
-    // disable renderer of object
-    public void Hide(GameObject go, bool hide=true) {
-        var sr = go.GetComponent<SpriteRenderer>();
-        var mr = go.GetComponent<MeshRenderer>();
-        if (sr) { sr.enabled = !hide; }
-        if (mr) { mr.enabled = !hide; }
+    private void Awake()
+    {
+        playerController = GetComponent<PlayerController>();
     }
 
     private void Update() {
@@ -67,6 +51,26 @@ public class Formation : NetworkBehaviour {
         if (Input.GetKeyDown(KeyCode.Space)) {
             Add1PositionToBoxFormation();
         }
+    }
+    
+    void UnparentFormation() {
+        var p = gameObject.transform.position;
+        BoxRoot.transform.SetParent(null, true);
+        BoxRoot.transform.position = new Vector3(p.x - 2, p.y, p.z);
+        BoxRoot.transform.rotation = Quaternion.Euler(new Vector3(0, 0, 90));
+        Hide(BoxRoot);
+    }
+
+    public void InitializeFormation() {
+        UnparentFormation();
+    }
+
+    // disable renderer of object
+    public void Hide(GameObject go, bool hide=true) {
+        var sr = go.GetComponent<SpriteRenderer>();
+        var mr = go.GetComponent<MeshRenderer>();
+        if (sr) { sr.enabled = !hide; }
+        if (mr) { mr.enabled = !hide; }
     }
 
     // add position mesh for soldier at commander
@@ -85,7 +89,7 @@ public class Formation : NetworkBehaviour {
         var soldiers = FindObjectsOfType<Soldier>();
         List<GameObject> myTeamSoldiers = new List<GameObject>();
         foreach (var s in soldiers) {
-            if (s.Team == Team) {
+            if (s.Team == team) {
                 myTeamSoldiers.Add(s.gameObject);
                 // maybe not comparing transforms
                 if (s.GetCommanderWhomIFollow() == gameObject.transform) {
@@ -312,6 +316,5 @@ public class Formation : NetworkBehaviour {
             FitBoxFormation();
         }
     }
-
-    }
+}
 

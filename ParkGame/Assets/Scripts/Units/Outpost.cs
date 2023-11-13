@@ -25,7 +25,7 @@ public class Outpost : NetworkBehaviour, ICommander
     NetworkVariable<float> _Timer = new(0.0f);
     public float Timer { get => _Timer.Value; private set => _Timer.Value = value; }
 
-    [SerializeField] NetworkVariable<int> _Team = new(0);
+    [SerializeField] NetworkVariable<int> _Team = new(-1);
     public int Team { get => _Team.Value; set => _Team.Value = value; }
 
     private UnitType outpostUnitType;
@@ -35,40 +35,63 @@ public class Outpost : NetworkBehaviour, ICommander
     private FogOfWar fogOfWar;
     private Revealer revealer;
     private ChangeMaterial changeMaterial;
-    
-    //private void Start()
-    private void Awake()
+
+    public override void OnNetworkSpawn()
     {
-        Team = InitialTeam;
-        //OutpostSpawnerChanger = transform.Find("IconToggler").GetComponent<ToggleSpawnedUnitScript>();
+        base.OnNetworkSpawn();
+        initialize();
+    }
+
+    private void initialize()
+    {
         playerManager = FindObjectOfType<PlayerManager>();
         fogOfWar = FindObjectOfType<FogOfWar>();
         revealer = GetComponent<Revealer>();
         changeMaterial = GetComponent<ChangeMaterial>();
-        
         sr = GetComponent<SpriteRenderer>();
 
         if (InitOutpostUnitType == UnitType.Archer)
         {
             counter = 1;
         }
-
         sr.sprite = ChangeSpawnType(counter);
         
-        if (InitialTeam == 0) // todo change if is local player's
+        _Team.OnValueChanged += onTeamChanged;
+
+        if (IsServer)
         {
-            fogOfWar.RegisterAsRevealer(revealer);
+            Team = InitialTeam;   
         }
         else
         {
-            changeMaterial.Change();
+            onTeamChanged(-1, Team);
+        }
+    }
+
+    private void onTeamChanged(int previousTeam, int newTeam)
+    {
+        var playerData = LobbyManager.Singleton.GetLocalPlayerData();
+        Debug.Log($"onTeamChanged on outpost, new team: {newTeam} for {gameObject.name}, (local player's team is: {playerData.Team})");
+        if (playerData.Team == newTeam)
+        {
+            if (fogOfWar)
+            {
+                fogOfWar.RegisterAsRevealer(revealer);   
+            }
+        }
+        else
+        {
+            if (fogOfWar)
+            {
+                changeMaterial.Change();   
+            }
         }
     }
 
     void Update()
     {
         // updating only on server
-        if (!IsServer)
+        if (!IsServer || Team == -1)
         { return; }
 
         if (Units.Count >= MaxUnits)

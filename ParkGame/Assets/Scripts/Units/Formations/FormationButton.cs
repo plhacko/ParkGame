@@ -21,23 +21,21 @@ public class FormationButton : NetworkBehaviour
 
     [ServerRpc(RequireOwnership = false)]
     void RequestChangeOfFormationServerRpc(ulong clientID, KeyCode key) {
-        PlayerController playerControler = playerManager.GetPlayerController(clientID);
-
-        playerControler = playerManager.GetPlayerController(clientID);
-        if (playerControler != null) {
-            playerControler.FormatSoldiersServerRpc(key);
+        PlayerController playerController = playerManager.GetPlayerController(clientID);
+        
+        if (playerController != null) {
+            playerController.FormatSoldiersServerRpc(key);
         }
     }
 
     [ServerRpc(RequireOwnership = false)]
     void RequestChangeOfSoldierCommandServerRpc(ulong clientID, KeyCode key) {
-        PlayerController playerControler = playerManager.GetPlayerController(clientID);
+        PlayerController playerController = playerManager.GetPlayerController(clientID);
 
-        playerControler = playerManager.GetPlayerController(clientID);
-        if (playerControler != null) {
-            if (key == KeyCode.I) { playerControler.CommandMovementServerRpc(); }
-            if (key == KeyCode.O) { playerControler.CommandIdleServerRpc(); }
-            if (key == KeyCode.P) { playerControler.CommandAttackServerRpc(); }
+        if (playerController != null) {
+            if (key == KeyCode.I) { playerController.CommandMovementServerRpc(); }
+            if (key == KeyCode.O) { playerController.CommandIdleServerRpc(); }
+            if (key == KeyCode.P) { playerController.CommandAttackServerRpc(); }
         }
     }
 

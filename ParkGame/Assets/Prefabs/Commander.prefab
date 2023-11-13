@@ -101,6 +101,7 @@ GameObject:
   - component: {fileID: 7324999011249965989}
   - component: {fileID: 5273693025397408535}
   - component: {fileID: 6203544456224426788}
+  - component: {fileID: 5581282412466025598}
   - component: {fileID: 2618451931460631288}
   - component: {fileID: 815355168430835910}
   - component: {fileID: 5797210111028997412}
@@ -183,7 +184,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   movementSpeed: 1
-  TeaM: 0
+  initialTeam: 0
+  initialName: 
   FormationType: 0
 --- !u!212 &4847180919347885991
 SpriteRenderer:
@@ -323,6 +325,18 @@ CircleCollider2D:
   m_Offset: {x: -0.04, y: -0.59}
   serializedVersion: 2
   m_Radius: 0.2
+--- !u!114 &5581282412466025598
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8693786845917539996}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80d7c879794dfda4687da0e400131852, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!50 &2618451931460631288
 Rigidbody2D:
   serializedVersion: 4

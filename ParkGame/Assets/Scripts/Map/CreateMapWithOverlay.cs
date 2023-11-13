@@ -8,6 +8,7 @@ using FreeDraw;
 using Managers;
 using Unity.AI;
 using Unity.AI.Navigation;
+using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
@@ -50,7 +51,6 @@ public class CreateMapWithOverlay : MonoBehaviour
     
     [Header("Additional settings")]
     public bool doNotFetch = false; // Do not try to load a map (Debug)
-    public bool loadFromSessionManager = false; // Load saved map from firebase
     public NavMeshSurface navMesh;  // used for building navMesh on tilemap
     public GridLayout gridLayout; // used for placing structures correctly based on tilemap coordinates
     
@@ -69,17 +69,8 @@ public class CreateMapWithOverlay : MonoBehaviour
     void Start()
     {
         drawableSpriteRenderer = GetComponent<SpriteRenderer>();
-        if (loadFromSessionManager)
-        {
-            // Create map from session manager once its fetched
-            SessionManager.Singleton.OnMapReceived += CreateTilemapFromFetchedMap;
-            
-            // Disable drawable component since it won't be used
-            gameObject.GetComponent<Drawable>().enabled = false;
-        }
-        else if (!doNotFetch) // Wait until map fetching from MapBox is completed
+        if (!doNotFetch) // Wait until map fetching from MapBox is completed
             StartCoroutine(WaitForValue());
-        
     }
 
     public void CreateTilemapFromFetchedMap(MapData mapData)
@@ -184,7 +175,7 @@ public class CreateMapWithOverlay : MonoBehaviour
     {
         return fetchedMap;
     }
-
+    
     public void FitCameraToMap()
     {
         // Calculate the size of the object based on its distance from the camera and its local scale
@@ -208,7 +199,6 @@ public class CreateMapWithOverlay : MonoBehaviour
         // gameObject.transform.localScale *= scaleFactor;
         // fetchedMap.transform.localScale *= scaleFactor;
         mainCamera.orthographicSize /= scaleFactor;
-        
     }   
     
     private void FitCamera()
@@ -351,11 +341,18 @@ public class CreateMapWithOverlay : MonoBehaviour
 
     private void SetStructurePrefabs(Dictionary<Vector3Int, GameObject> structuresToAssign)
     {
-        foreach (var kvp in structuresToAssign)
+        if (NetworkManager.Singleton.IsServer)
         {
-            if (actionTilemap.GetTile(kvp.Key) == boundsTile)
-                throw new ArgumentException("Cannot place structure out of map bounds");
-            Instantiate(kvp.Value, gridLayout.CellToWorld(kvp.Key), Quaternion.identity);
+            foreach (var kvp in structuresToAssign)
+            {
+                if (actionTilemap.GetTile(kvp.Key) == boundsTile)
+                    throw new ArgumentException("Cannot place structure out of map bounds");
+                
+                var structure = Instantiate(kvp.Value, gridLayout.CellToWorld(kvp.Key), Quaternion.identity);
+                
+                var networkObject = structure.GetComponent<NetworkObject>();
+                networkObject.Spawn();
+            }
         }
     }
     private void SetStructureTiles(Dictionary<Vector3Int, TileBase> structuresToAssign)

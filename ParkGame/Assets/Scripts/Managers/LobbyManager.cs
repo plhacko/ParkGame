@@ -26,6 +26,20 @@ using Unity.Netcode;
 
 namespace Managers
 {
+    public struct PlayerData
+    {
+        public readonly int Team;
+        public readonly string FirebaseId;
+        public readonly string Name;
+
+        public PlayerData(string firebaseId, string name, int team)
+        {
+            FirebaseId = firebaseId;
+            Name = name;
+            Team = team;
+        }
+    }
+    
     public struct LobbyModel 
     {
         public string Id;
@@ -76,7 +90,7 @@ namespace Managers
         public Action OnDisconnect;
      
         public bool IsHost { get { return Lobby != null && Lobby.HostId == AuthenticationService.Instance.PlayerId; } }
-
+        
         public Task UnityServicesInitializeTask { get; private set; }
 
         private ILobbyEvents events;
@@ -85,6 +99,8 @@ namespace Managers
 
         private string relayJoinCode = "";
         [SerializeField] private string GameScene = "GameScene";
+        
+        private Dictionary<ulong, string> firebaseIdToClientId = new();
 
         private void Awake()
         {
@@ -97,6 +113,11 @@ namespace Managers
             UnityServicesInitializeTask = UnityServices.InitializeAsync();
             Singleton = this;
             DontDestroyOnLoad(gameObject);
+        }
+
+        private void Start()
+        {
+            NetworkManager.Singleton.ConnectionApprovalCallback = onConnectionApproval;
         }
 
         private void OnDestroy()
@@ -244,6 +265,8 @@ namespace Managers
                     new RelayServerData (joinAllocation, "dtls")
                 );
 
+                var firebaseId = System.Text.Encoding.ASCII.GetBytes(FirebaseAuth.DefaultInstance.CurrentUser.UserId);
+                NetworkManager.Singleton.NetworkConfig.ConnectionData = firebaseId;
                 NetworkManager.Singleton.StartClient();
 
                 Lobby = await Lobbies.Instance.UpdatePlayerAsync(Lobby.Id, AuthenticationService.Instance.PlayerId, new UpdatePlayerOptions
@@ -494,6 +517,7 @@ namespace Managers
             Lobby = null;
             LobbyModel = new LobbyModel();
             mapData = null;
+            firebaseIdToClientId = new Dictionary<ulong, string>();
             StopAllCoroutines();
         }
 
@@ -542,6 +566,74 @@ namespace Managers
         public void StartGame()
         {
             NetworkManager.Singleton.SceneManager.LoadScene(GameScene, LoadSceneMode.Single);
+        }
+        
+        public string GetFirebaseIdFromClientId(ulong clientId)
+        {
+            return firebaseIdToClientId[clientId];
+        }
+        
+        public PlayerData GetLocalPlayerData()
+        {
+            return GetPlayerData(FirebaseAuth.DefaultInstance.CurrentUser.UserId);
+        }
+
+        public PlayerData GetPlayerData(string firebaseId)
+        {
+            var player = _lobby.Players.Find(player =>
+            {
+                var data = player.Data;
+                string currentFirebaseId = data["FirebaseId"].Value;
+                return currentFirebaseId.Equals(firebaseId);
+            });
+
+            PlayerData playerData = new PlayerData(player.Data["FirebaseId"].Value, player.Data["PlayerName"].Value, int.Parse(player.Data["TeamNumber"].Value));
+            return playerData;
+        }
+        
+        public PlayerData GetPlayerData(ulong clientId)
+        {
+            var firebaseId = GetFirebaseIdFromClientId(clientId);
+            return GetPlayerData(firebaseId);
+        }
+
+        private void onConnectionApproval(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
+        {
+            // // Debug - just approve anything
+            // if (serverState == ServerState.Debug)
+            // {
+            //     response.Approved = true;
+            //     return;
+            // }
+
+            var clientId = request.ClientNetworkId;
+            var firebaseId = System.Text.Encoding.ASCII.GetString(request.Payload);
+            
+            // We don't want to create a player object immediately 
+            response.CreatePlayerObject = false;
+
+            // Host started hosting, initialize host and approve ourselves            
+            if(clientId == NetworkManager.Singleton.LocalClientId)
+            {
+                firebaseIdToClientId.Add(clientId, FirebaseAuth.DefaultInstance.CurrentUser.UserId);
+                response.Approved = true;
+                return;
+            }
+            
+            if (firebaseIdToClientId.ContainsValue(firebaseId))
+            {
+                response.Approved = false;
+                return;
+            }
+            
+            firebaseIdToClientId.Add(clientId, firebaseId);
+            response.Approved = true;
+        }
+        
+        // just for network helper ui
+        public void DebugSetMapData(MapData mapData)
+        {
+            this.mapData = mapData;
         }
     }
 }

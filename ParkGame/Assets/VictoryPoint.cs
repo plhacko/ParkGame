@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 
@@ -17,7 +15,6 @@ public class VictoryPoint : NetworkBehaviour
     //[Tooltip("How many times will the VP open during the game.")]
     //[SerializeField] int numberOfOpenings;
 
-    public bool spawned;
     public bool isOpen;
 
     private SpriteRenderer spriteRendrr;
@@ -44,10 +41,6 @@ public class VictoryPoint : NetworkBehaviour
         CloseVP();
     }
 
-    public void SetStartTime() {
-        spawned = true;
-    }
-    
     public void ConquerThisVP() {
         Debug.Log("CONQUER THIS vp");
         timeSinceLastConquest = 0;
@@ -56,16 +49,10 @@ public class VictoryPoint : NetworkBehaviour
 
     void Update()
     {
-        if (spawned) {
-            //timeSinceSpawn += Time.deltaTime;
-            timeSinceLastConquest += Time.deltaTime;
-        }
+        timeSinceLastConquest += Time.deltaTime;
         // first opening
         if (timeSinceLastConquest >= firstOpeningTime) { 
             OpenVP();
         }
-
-
-        
     }
 }

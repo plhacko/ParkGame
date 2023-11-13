@@ -42,6 +42,8 @@ public class FogOfWar : MonoBehaviour
         revealerTexture.filterMode = FilterMode.Point;
         revealerTexture.Apply();
         revealer.sprite = Sprite.Create(revealerTexture, new Rect(0, 0, textureSize, textureSize), new Vector2(0.5f, 0.5f), pixelsPerUnit);
+        
+        Debug.Log("fog of war initialized");
     }
 
     private void OnDestroy()
@@ -52,6 +54,7 @@ public class FogOfWar : MonoBehaviour
 
     public void RegisterAsRevealer(Revealer target)
     {
+        Debug.Log(target.gameObject.name + " registered as revealer");
         revealerTargets.Add(target);
     }
     

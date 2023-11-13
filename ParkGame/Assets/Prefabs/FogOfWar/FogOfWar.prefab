@@ -156,7 +156,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 100
   m_Sprite: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -200,7 +200,7 @@ Transform:
   - {fileID: 862468788484070300}
   - {fileID: 862468788002139225}
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &862468789255997007
 MonoBehaviour:
@@ -214,13 +214,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7621d4613fa266440b1f56d3624deb3e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: {fileID: 0}
   fog: {fileID: 862468788484070299}
   revealer: {fileID: 862468788002139224}
   hiddenColor:
     serializedVersion: 2
     rgba: 3355443200
   fogSizeInUnits: 40
-  pixelsPerUnit: 1
-  revealRadius: 4
+  pixelsPerUnit: 2
   edgeWidth: 3
+  debug: 0
+  revealerTargets: []
