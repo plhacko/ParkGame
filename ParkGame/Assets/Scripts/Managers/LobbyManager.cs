@@ -594,7 +594,7 @@ namespace Managers
         
         public PlayerData GetLocalPlayerData()
         {
-            return GetPlayerData(NetworkManager.Singleton.LocalClientId);
+            return GetPlayerData(FirebaseAuth.DefaultInstance.CurrentUser.UserId);
         }
 
         public PlayerData GetPlayerData(string firebaseId)

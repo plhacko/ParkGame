@@ -27,9 +27,9 @@ namespace Player
         
         // Replicated variable for sprite orientation
         private readonly NetworkVariable<bool> xSpriteFlip = new(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-        private readonly NetworkVariable<FixedString64Bytes> _Name = new(new FixedString64Bytes(""), NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-        private readonly NetworkVariable<FixedString64Bytes> _FirebaseId = new(new FixedString64Bytes(""), NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-        private readonly NetworkVariable<int> _Team = new(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+        private readonly NetworkVariable<FixedString64Bytes> _Name = new(new FixedString64Bytes(""));
+        private readonly NetworkVariable<FixedString64Bytes> _FirebaseId = new(new FixedString64Bytes(""));
+        private readonly NetworkVariable<int> _Team = new(0);
 
         public int Team { get => _Team.Value; set => _Team.Value = value; }
         public string Name { get => _Name.Value.Value; set => _Name.Value = value; }
@@ -54,23 +54,19 @@ namespace Player
 
         private void initialize()
         {
-            formationScript.InitializeFormation(); // build prefab, get position of the commander
-            FormationType = Formation.FormationType.Free; // movement without navmesh
-        }
-
-        private void initializePlayer(PlayerData clientData)
-        {
-            Team = clientData.Team;
-            Name = clientData.Name;
-            FirebaseId = clientData.FirebaseId;
+            if (IsServer) {
+                Team = initialTeam;
+                Name = initialName;
+                FirebaseId = firebaseId;
+            }
             
             if (isActualOwner())
             {
                 if (Camera.main != null)
                 {
                     Camera.main.gameObject.transform.SetParent(transform);
-                }
-
+                }   
+                
                 if (fogOfWar)
                 {
                     fogOfWar.RegisterAsRevealer(revealer);
@@ -85,8 +81,11 @@ namespace Player
 
                 xSpriteFlip.OnValueChanged += onXSpriteFlipChanged;
             }
+
+            formationScript.InitializeFormation(); // build prefab, get position of the commander
+            FormationType = Formation.FormationType.Free; // movement without navmesh
         }
-        
+
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
@@ -95,6 +94,7 @@ namespace Player
 
         private void Update()
         {
+            fixDuplicateCameras();
             if (!isActualOwner()) return;
             if (!Application.isFocused) return;
 
@@ -232,6 +232,13 @@ namespace Player
             return FirebaseId == FirebaseAuth.DefaultInstance.CurrentUser.UserId;
         }
 
+        public void InitializePlayer(PlayerData clientData)
+        {
+            initialTeam = clientData.Team;
+            initialName = clientData.Name;
+            firebaseId = clientData.FirebaseId;
+        }
+
         void ICommander.ReportFollowing(GameObject go) => units.Add(go);
         void ICommander.ReportUnfollowing(GameObject go) => units.Remove(go);
 
@@ -263,12 +270,27 @@ namespace Player
                 { soldier.SoldierBehaviour = SoldierBehaviour.Attack; }
             }
         }
-
-        [ClientRpc]
-        public void InitializePlayerClientRpc(FixedString64Bytes firebaseId, ClientRpcParams clientRpcParams = default)
+        
+        // I have no idea why this is needed to do, but it is
+        // If you parent the camera in initialize on client it duplicates itself
+        // I tested that if you wait for a couple of seconds and then parent it, it doesn't duplicate
+        // So I'm just doing this hack
+        bool hasFixedDuplicateCameras = false;
+        private void fixDuplicateCameras()
         {
-            var playerData = LobbyManager.Singleton.GetPlayerData(firebaseId.Value);
-            initializePlayer(playerData);
+            if(IsHost || hasFixedDuplicateCameras || !isActualOwner()) return;
+            
+            var cameras = FindObjectsOfType<Camera>();
+            if (cameras.Length <= 1) return;
+            
+            foreach (var cam in cameras)
+            {
+                if (cam.transform.parent != transform)
+                {
+                    hasFixedDuplicateCameras = true;
+                    Destroy(cam.gameObject);
+                }
+            }
         }
     }
 }
