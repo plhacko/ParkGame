@@ -14,6 +14,7 @@ public class UIPrepareGameMenuController : UIPageController
     {
         backButton.onClick.AddListener(Back);
         createButton.onClick.AddListener(Create);
+        setInteractable(false);
     }
 
     private void Update()

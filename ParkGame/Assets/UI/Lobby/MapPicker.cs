@@ -262,12 +262,14 @@ public class MapPicker : MonoBehaviour
     public void DeleteMaps()
     {
         currentMapIndex = -1;
-        mapDatas.Clear();
+        mapDatas = new();
         gpsTexturesInit = false;
         drawTexturesInit = false;
         drawnTexture.texture = null;
         gpsTexture.texture = null;
         drawnTexture.color = Color.clear;
         gpsTexture.color = Color.clear;
+        nextMapButton.interactable = false;
+        previousMapButton.interactable = false;
     }
 }
