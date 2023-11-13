@@ -8,6 +8,7 @@ public class UIPrepareGameMenuController : UIPageController
     [SerializeField] private MapPicker mapPicker;
     [SerializeField] private Button createButton;
     [SerializeField] private UIPage lobbyPage;
+    [SerializeField] private UIPage mainMenuPage;
     private bool processing = false;
    
     void Start()
@@ -36,7 +37,7 @@ public class UIPrepareGameMenuController : UIPageController
 
     private void Back()
     {
-        UIController.Singleton.PopUIPage();
+        UIController.Singleton.PushUIPage(mainMenuPage);
     }
 
     private void setInteractable(bool interactable)

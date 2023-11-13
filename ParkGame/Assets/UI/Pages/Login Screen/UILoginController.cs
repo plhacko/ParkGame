@@ -13,6 +13,7 @@ public class UILoginController : UIPageController
     [SerializeField] private TMP_InputField passwordInputField;
     [SerializeField] private Button loginButton;
     [SerializeField] private UIPage mainMenuPage;
+    [SerializeField] private UIPage welcomePage;
     private bool processing = false;
     private ColorBlock defaultColors;
 
@@ -23,7 +24,7 @@ public class UILoginController : UIPageController
         backButton.onClick.AddListener(Back);
     }
 
-    public override async void OnEnter()
+    public override void OnEnter()
     {
         processing = false;
         loginButton.interactable = false;
@@ -100,7 +101,7 @@ public class UILoginController : UIPageController
 
     private void Back()
     {
-        UIController.Singleton.PopUIPage();
+        UIController.Singleton.PushUIPage(welcomePage);
     }
 
     private void Update()

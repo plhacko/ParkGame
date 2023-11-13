@@ -288,6 +288,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 227110831}
     - target: {fileID: 8042626504332369433, guid: 6d66a41064472fe4388f6aa04f5846f6, type: 3}
+      propertyPath: welcomePage
+      value: 
+      objectReference: {fileID: 1597371288}
+    - target: {fileID: 8042626504332369433, guid: 6d66a41064472fe4388f6aa04f5846f6, type: 3}
       propertyPath: mainMenuPage
       value: 
       objectReference: {fileID: 1552875232}
@@ -440,6 +444,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8168517477153083002, guid: 16dd6de0ad411d544ba523c2ff189fd2, type: 3}
+      propertyPath: welcomePage
+      value: 
+      objectReference: {fileID: 1597371288}
     - target: {fileID: 8168517477153083002, guid: 16dd6de0ad411d544ba523c2ff189fd2, type: 3}
       propertyPath: mainMenuPage
       value: 
@@ -620,6 +628,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   initialPage: {fileID: 1058658632}
   firstFocusItem: {fileID: 0}
+  PageStackNames: []
 --- !u!1001 &547213648
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -716,6 +725,10 @@ PrefabInstance:
       propertyPath: lobbyPage
       value: 
       objectReference: {fileID: 1625839850}
+    - target: {fileID: 2743409682758637164, guid: 86bc216476a79ad40b20578ef1f2bf2a, type: 3}
+      propertyPath: mainMenuPage
+      value: 
+      objectReference: {fileID: 1552875232}
     - target: {fileID: 2743409682758637164, guid: 86bc216476a79ad40b20578ef1f2bf2a, type: 3}
       propertyPath: onCreateGame.m_PersistentCalls.m_Calls.Array.size
       value: 1
@@ -1580,7 +1593,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7888895157239260194, guid: 8a470efe2e66477429ad01189b03d26a, type: 3}
       propertyPath: ExitOnNextPage
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8033941375352513380, guid: 8a470efe2e66477429ad01189b03d26a, type: 3}
       propertyPath: m_AnchorMax.y
@@ -1940,6 +1953,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2483579972529308819, guid: 7fb96de73383a7541ae7aa63fb6a76c5, type: 3}
+      propertyPath: mainMenuPage
+      value: 
+      objectReference: {fileID: 1552875232}
     - target: {fileID: 2483579972529308819, guid: 7fb96de73383a7541ae7aa63fb6a76c5, type: 3}
       propertyPath: onGoBack.m_PersistentCalls.m_Calls.Array.size
       value: 1

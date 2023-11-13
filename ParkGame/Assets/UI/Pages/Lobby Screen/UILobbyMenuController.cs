@@ -22,6 +22,7 @@ namespace UI.Lobby
         [SerializeField] private RawImage drawnTexture;
         [SerializeField] private RawImage gpsTexture;
         [SerializeField] private RectTransform teamsParent;
+        [SerializeField] private UIPage mainMenuPage;
 
         private List<UILobbyTeam> newTeamUIs = new ();
 
@@ -157,7 +158,7 @@ namespace UI.Lobby
 
         private void OnDisconnect()
         {
-            UIController.Singleton.PopUIPage();
+            UIController.Singleton.PushUIPage(mainMenuPage);
         }
     }
 }

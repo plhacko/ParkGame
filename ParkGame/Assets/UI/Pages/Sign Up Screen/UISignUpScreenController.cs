@@ -14,6 +14,7 @@ public class UISignUpScreenController : UIPageController
     [SerializeField] private Button signUpButton;
     [SerializeField] private UIPage mainMenuPage;
     [SerializeField] private UIPage loginPage;
+    [SerializeField] private UIPage welcomePage;
 
     private bool processing = false;
     private ColorBlock defaultColors; 
@@ -113,7 +114,7 @@ public class UISignUpScreenController : UIPageController
 
     private void Back()
     {
-        UIController.Singleton.PopUIPage();
+        UIController.Singleton.PushUIPage(welcomePage);
     }
 
     void Update()

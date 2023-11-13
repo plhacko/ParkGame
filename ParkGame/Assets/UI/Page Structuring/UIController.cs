@@ -17,7 +17,9 @@ public class UIController : MonoBehaviour
     private Canvas canvas;
 
     private Stack<UIPage> pageStack = new Stack<UIPage>();
-
+#if UNITY_EDITOR
+    public List<string> PageStackNames = new List<string>();
+#endif
     private void Awake()
     {
         if (Singleton != null)
@@ -56,30 +58,37 @@ public class UIController : MonoBehaviour
             if (currentPage.ExitOnNextPage)
             {
                 currentPage.Exit(false);
+                pageStack.Pop();
+#if UNITY_EDITOR
+                PageStackNames.Remove(currentPage.name);
+#endif
             }
         }
 
         pageStack.Push(page);
+#if UNITY_EDITOR
+        PageStackNames.Add(page.name);
+#endif
     }
 
     public void PopUIPage()
     {
-        if (pageStack.Count > 1)
+        if (pageStack.Count < 1)
         {
-            UIPage currentPage = pageStack.Pop();
-            currentPage.Exit(true);
-
-            UIPage newPage = pageStack.Peek();
-            
-            if (newPage.ExitOnNextPage)
-            {
-                newPage.Enter(false);
-            }
-            
+            Debug.LogError("Cannot pop empty page stack");
+            return;
         }
-        else 
-        {
-            Debug.LogError("Cannot pop the last page");
+
+        UIPage currentPage = pageStack.Pop();
+#if UNITY_EDITOR
+        PageStackNames.Remove(currentPage.name);
+#endif
+        currentPage.Exit(true);
+
+        if (pageStack.Count > 0)
+        {        
+            UIPage newPage = pageStack.Peek();
+            newPage.Enter(false);
         }
     }
 }
