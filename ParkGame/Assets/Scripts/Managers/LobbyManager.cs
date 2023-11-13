@@ -122,7 +122,6 @@ namespace Managers
                 float heartbeatTimerMax = 15f;
                 heartbeatTimer = heartbeatTimerMax;
 
-                Debug.Log("Heartbeat");
                 await LobbyService.Instance.SendHeartbeatPingAsync(Lobby.Id);
             }
         }
@@ -160,13 +159,16 @@ namespace Managers
 
                 PlayerPrefs.SetString("DebugRoomCode", Lobby.LobbyCode);
 
-                Debug.Log("Lobby created with ID: " + Lobby.Id + " and code: " + Lobby.LobbyCode);
-
                 NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(
                     new RelayServerData (allocation, "dtls")
                 );
 
                 NetworkManager.Singleton.StartHost();
+
+                Lobby = await Lobbies.Instance.UpdatePlayerAsync(Lobby.Id, AuthenticationService.Instance.PlayerId, new UpdatePlayerOptions
+                {
+                    AllocationId = allocation.AllocationId.ToString(),
+                });
 
                 return true;
             } 
@@ -235,8 +237,6 @@ namespace Managers
 
                 events = await LobbyService.Instance.SubscribeToLobbyEventsAsync(Lobby.Id, callbacks);
 
-                Debug.Log("Lobby joined with ID: " + Lobby.Id + " and code: " + Lobby.LobbyCode);
-
                 var relayJoinCode = Lobby.Data["RelayJoinCode"].Value;
                 var joinAllocation = await JoinRelay(relayJoinCode);
                 NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(
@@ -244,6 +244,11 @@ namespace Managers
                 );
 
                 NetworkManager.Singleton.StartClient();
+
+                Lobby = await Lobbies.Instance.UpdatePlayerAsync(Lobby.Id, AuthenticationService.Instance.PlayerId, new UpdatePlayerOptions
+                {
+                    AllocationId = joinAllocation.AllocationId.ToString(),
+                });
 
                 return true;
             }
