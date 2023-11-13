@@ -9,7 +9,7 @@ public class MapInitializer : MonoBehaviour
 
     private PlayerManager playerManager;
     
-    void Start()
+    void Awake()
     {
         if (mapCreator == null || LobbyManager.Singleton == null || LobbyManager.Singleton.MapData == null)
         {

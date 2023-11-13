@@ -50,7 +50,7 @@ namespace Managers
             if (numClientsWithLoadedScene == NetworkManager.Singleton.ConnectedClients.Count)
             {
                 Debug.Log("All players scene loaded");
-                OnAllPlayersSceneLoaded.Invoke();
+                OnAllPlayersSceneLoaded?.Invoke();
                 spawnPlayers();
             }
         }
