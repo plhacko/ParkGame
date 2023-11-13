@@ -146,11 +146,8 @@ namespace UI.Lobby
         private async void Back()
         {
             backButton.interactable = false;
-            bool success = await LobbyManager.Singleton.LeaveLobby();
-            if (!success)
-            {
-                backButton.interactable = true;
-            }
+            await LobbyManager.Singleton.LeaveLobby();
+            backButton.interactable = true;
         }
 
         private void StartGame()
