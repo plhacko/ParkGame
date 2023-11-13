@@ -62,11 +62,16 @@ public class Outpost : NetworkBehaviour, ICommander
         {
             Team = InitialTeam;   
         }
+        else
+        {
+            onTeamChanged(-1, Team);
+        }
     }
 
     private void onTeamChanged(int previousTeam, int newTeam)
     {
         var playerData = LobbyManager.Singleton.GetLocalPlayerData();
+        Debug.Log($"onTeamChanged on outpost, new team: {newTeam} for {gameObject.name}, (local player's team is: {playerData.Team})");
         if (playerData.Team == newTeam)
         {
             if (fogOfWar)
