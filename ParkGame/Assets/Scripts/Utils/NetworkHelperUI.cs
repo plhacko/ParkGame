@@ -14,6 +14,7 @@ using Unity.Services.Core;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace Utils
@@ -24,6 +25,8 @@ namespace Utils
         public int Team;
         public string Email;
         public string Password;
+        
+        [HideInInspector] public Button Button;
     }
     
     /*
@@ -36,37 +39,42 @@ namespace Utils
         [SerializeField] private string mapId;
         [SerializeField] private Button startButton;
         [SerializeField] private Button hostButton; 
-        [SerializeField] private Button clientButton;
+        [SerializeField] private Button clientButtonPrefab;
+        [SerializeField] private Transform clientButtonParent;
         [SerializeField] private TextMeshProUGUI readyText;
         [SerializeField] private PlayerDataDebug host;
-        [SerializeField] private PlayerDataDebug client;
-        private bool isDebugging;
+        [SerializeField] private PlayerDataDebug[] clients;
 
         private event Action<MapData> OnMapReceived = null;
         private MapData mapData;
         
         private async void Start()
         {
-            clientButton.interactable = false;
-            clientButton.onClick.AddListener(() =>
+            foreach (var client in clients)
             {
-                clientButton.interactable = false;
-                hostButton.interactable = false;
-                startClient();
-            });
-            
+                client.Button = Instantiate(clientButtonPrefab, clientButtonParent);
+                client.Button.interactable = false;
+                client.Button.GetComponentInChildren<TextMeshProUGUI>().text = $"team: {client.Team}, {client.Email}";
+                client.Button.onClick.AddListener(() =>
+                {
+                    setClientButtonsInteractable(false);
+                    hostButton.interactable = false;
+                    startClient(client);
+                });
+            }
+
             hostButton.interactable = false;
             hostButton.onClick.AddListener(() =>
             {
                 hostButton.interactable = false;
-                clientButton.interactable = false;
+                setClientButtonsInteractable(false);
                 startHost();
             });
             
             startButton.interactable = false; 
             startButton.onClick.AddListener(() =>
             {
-                clientButton.interactable = false;
+                setClientButtonsInteractable(false);
                 hostButton.interactable = false;
                 startButton.interactable = false;
                 startGame();
@@ -88,11 +96,10 @@ namespace Utils
             }
 #endif
             await AuthenticationService.Instance.SignInAnonymouslyAsync();
-            
             await downloadMapData(new Guid(mapId));
 
             hostButton.interactable = true;
-            clientButton.interactable = true;
+            setClientButtonsInteractable(true);
         }
 
         private void startGame()
@@ -125,7 +132,7 @@ namespace Utils
             readyText.text = "Host initialized";
         }
 
-        private async void startClient()
+        private async void startClient(PlayerDataDebug client)
         {
             await login(client.Email, client.Password);
             
@@ -239,6 +246,14 @@ namespace Utils
                     Debug.LogFormat("User signed in successfully: {0} ({1})", task.Result.User.DisplayName, task.Result.User.UserId);
                 }
             );
+        }
+
+        private void setClientButtonsInteractable(bool interactable)
+        {
+            foreach (var client in clients)
+            {
+                client.Button.interactable = interactable;
+            }
         }
     }
 }

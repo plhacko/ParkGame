@@ -63,8 +63,16 @@ namespace Player
                 if (Camera.main != null)
                 {
                     Camera.main.gameObject.transform.SetParent(transform);
-                }   
-                
+                }
+            }
+            else
+            {
+                xSpriteFlip.OnValueChanged += onXSpriteFlipChanged;
+            }
+            
+            var localPlayerData = LobbyManager.Singleton.GetLocalPlayerData();
+            if (localPlayerData.Team == Team)
+            {
                 if (fogOfWar)
                 {
                     fogOfWar.RegisterAsRevealer(revealer);
@@ -76,8 +84,6 @@ namespace Player
                 {
                     changeMaterial.Change();
                 }
-
-                xSpriteFlip.OnValueChanged += onXSpriteFlipChanged;
             }
 
             formationScript.InitializeFormation(); // build prefab, get position of the commander
