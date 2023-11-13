@@ -65,11 +65,11 @@ public class PlayerPointerPlacer : MonoBehaviour
 
         if (!mapDisplayer.IsMapLoaded())
         {
-            Debug.Log("Map is not loaded");
+            // Debug.Log("Map is not loaded");
             return;
         }
       
-// Get the sprite renderer component
+        // Get the sprite renderer component
         SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
 
         // Get the sprite texture

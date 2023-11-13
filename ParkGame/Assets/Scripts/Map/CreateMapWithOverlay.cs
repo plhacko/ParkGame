@@ -342,14 +342,18 @@ public class CreateMapWithOverlay : MonoBehaviour
 
     private void SetStructurePrefabs(Dictionary<Vector3Int, GameObject> structuresToAssign)
     {
-        foreach (var kvp in structuresToAssign)
+        if (NetworkManager.Singleton.IsServer)
         {
-            if (actionTilemap.GetTile(kvp.Key) == boundsTile)
-                throw new ArgumentException("Cannot place structure out of map bounds");
-            var structure = Instantiate(kvp.Value, gridLayout.CellToWorld(kvp.Key), Quaternion.identity);
-            
-            var networkObject = structure.GetComponent<NetworkObject>();
-            networkObject.Spawn();
+            foreach (var kvp in structuresToAssign)
+            {
+                if (actionTilemap.GetTile(kvp.Key) == boundsTile)
+                    throw new ArgumentException("Cannot place structure out of map bounds");
+                
+                var structure = Instantiate(kvp.Value, gridLayout.CellToWorld(kvp.Key), Quaternion.identity);
+                
+                var networkObject = structure.GetComponent<NetworkObject>();
+                networkObject.Spawn();
+            }
         }
     }
     private void SetStructureTiles(Dictionary<Vector3Int, TileBase> structuresToAssign)

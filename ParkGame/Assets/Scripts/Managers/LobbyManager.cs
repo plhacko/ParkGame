@@ -596,10 +596,9 @@ namespace Managers
         {
             return GetPlayerData(NetworkManager.Singleton.LocalClientId);
         }
-        
-        public PlayerData GetPlayerData(ulong clientId)
+
+        public PlayerData GetPlayerData(string firebaseId)
         {
-            var firebaseId = GetFirebaseIdFromClientId(clientId);
             var player = _lobby.Players.Find(player =>
             {
                 var data = player.Data;
@@ -609,6 +608,12 @@ namespace Managers
 
             PlayerData playerData = new PlayerData(player.Data["FirebaseId"].Value, player.Data["PlayerName"].Value, int.Parse(player.Data["TeamNumber"].Value));
             return playerData;
+        }
+        
+        public PlayerData GetPlayerData(ulong clientId)
+        {
+            var firebaseId = GetFirebaseIdFromClientId(clientId);
+            return GetPlayerData(firebaseId);
         }
 
         private void onConnectionApproval(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
@@ -642,6 +647,12 @@ namespace Managers
             
             firebaseIdToClientId.Add(clientId, firebaseId);
             response.Approved = true;
+        }
+        
+        // just for network helper ui
+        public void DebugSetMapData(MapData mapData)
+        {
+            this.mapData = mapData;
         }
     }
 }

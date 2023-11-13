@@ -1,13 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Windows.Input;
 using Firebase.Auth;
 using Managers;
 using Unity.Collections;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
-//using static Formation;
 
 namespace Player
 {
@@ -29,9 +27,9 @@ namespace Player
         
         // Replicated variable for sprite orientation
         private readonly NetworkVariable<bool> xSpriteFlip = new(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-        private readonly NetworkVariable<FixedString64Bytes> _Name = new(new FixedString64Bytes(""));
-        private readonly NetworkVariable<FixedString64Bytes> _FirebaseId = new(new FixedString64Bytes(""));
-        private readonly NetworkVariable<int> _Team = new(0);
+        private readonly NetworkVariable<FixedString64Bytes> _Name = new(new FixedString64Bytes(""), NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+        private readonly NetworkVariable<FixedString64Bytes> _FirebaseId = new(new FixedString64Bytes(""), NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+        private readonly NetworkVariable<int> _Team = new(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
         public int Team { get => _Team.Value; set => _Team.Value = value; }
         public string Name { get => _Name.Value.Value; set => _Name.Value = value; }
@@ -56,21 +54,16 @@ namespace Player
 
         private void initialize()
         {
-            _FirebaseId.OnValueChanged += onFirebaseIdSet;
-            
-            if (IsServer) {
-                Team = initialTeam;
-                Name = initialName;
-                FirebaseId = firebaseId;
-            }
-            
             formationScript.InitializeFormation(); // build prefab, get position of the commander
-
             FormationType = Formation.FormationType.Free; // movement without navmesh
         }
 
-        private void onFirebaseIdSet(FixedString64Bytes previousValue, FixedString64Bytes newValue)
+        private void initializePlayer(PlayerData clientData)
         {
+            Team = clientData.Team;
+            Name = clientData.Name;
+            FirebaseId = clientData.FirebaseId;
+            
             if (isActualOwner())
             {
                 if (Camera.main != null)
@@ -93,7 +86,7 @@ namespace Player
                 xSpriteFlip.OnValueChanged += onXSpriteFlipChanged;
             }
         }
-
+        
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
@@ -239,13 +232,6 @@ namespace Player
             return FirebaseId == FirebaseAuth.DefaultInstance.CurrentUser.UserId;
         }
 
-        public void InitializePlayer(PlayerData clientData)
-        {
-            initialTeam = clientData.Team;
-            initialName = clientData.Name;
-            firebaseId = clientData.FirebaseId;
-        }
-
         void ICommander.ReportFollowing(GameObject go) => units.Add(go);
         void ICommander.ReportUnfollowing(GameObject go) => units.Remove(go);
 
@@ -276,6 +262,13 @@ namespace Player
                 if (go.TryGetComponent<ISoldier>(out ISoldier soldier))
                 { soldier.SoldierBehaviour = SoldierBehaviour.Attack; }
             }
+        }
+
+        [ClientRpc]
+        public void InitializePlayerClientRpc(FixedString64Bytes firebaseId, ClientRpcParams clientRpcParams = default)
+        {
+            var playerData = LobbyManager.Singleton.GetPlayerData(firebaseId.Value);
+            initializePlayer(playerData);
         }
     }
 }

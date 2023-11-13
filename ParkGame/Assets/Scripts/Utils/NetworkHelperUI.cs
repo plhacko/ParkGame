@@ -1,10 +1,19 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using Firebase;
+using Firebase.Auth;
+using Firebase.Database;
+using Firebase.Storage;
 using Managers;
+using TMPro;
 using Unity.Netcode;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
 using UnityEngine;
+using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace Utils
@@ -13,7 +22,8 @@ namespace Utils
     public class PlayerDataDebug
     {
         public int Team;
-        public string Name;
+        public string Email;
+        public string Password;
     }
     
     /*
@@ -22,97 +32,213 @@ namespace Utils
      */
     public class NetworkHelperUI : MonoBehaviour
     {
+        [SerializeField] private string GameSceneName;
         [SerializeField] private string mapId;
-        [SerializeField] private List<PlayerDataDebug> clients = new();
-        [SerializeField] private Button spawnPlayersButton; 
-        private PlayerManager playerManager;
+        [SerializeField] private Button startButton;
+        [SerializeField] private Button hostButton; 
+        [SerializeField] private Button clientButton;
+        [SerializeField] private TextMeshProUGUI readyText;
+        [SerializeField] private PlayerDataDebug host;
+        [SerializeField] private PlayerDataDebug client;
         private bool isDebugging;
 
+        private event Action<MapData> OnMapReceived = null;
+        private MapData mapData;
+        
         private async void Start()
         {
-            // playerManager = FindObjectOfType<PlayerManager>();
-            // isDebugging = !OurNetworkManager.Singleton.IsConnectedClient && !OurNetworkManager.Singleton.IsHost;
-            //
-            // if (isDebugging)
-            // {
-            //     await UnityServices.InitializeAsync();
-            //     await AuthenticationService.Instance.SignInAnonymouslyAsync();
-            //
-            //     for (int i = 0; i < clients.Count; i++)
-            //     {
-            //         var client = clients[i];
-            //         byte[] guid = new byte[16];
-            //         guid[i] = (byte)(i + 1);
-            //         
-            //         PlayerData clientPlayerData = new PlayerData
-            //         {
-            //             Name = client.Name + " " + i,
-            //             ID = new Guid(guid),
-            //             Team = client.Team
-            //         };
-            //         SessionManager.Singleton.PlayersData.UpdatePlayerData(clientPlayerData);   
-            //     }
-            // }
-            // else
-            // {
-            //     gameObject.SetActive(false);
-            // }
-        }
+            clientButton.interactable = false;
+            clientButton.onClick.AddListener(() =>
+            {
+                clientButton.interactable = false;
+                hostButton.interactable = false;
+                startClient();
+            });
+            
+            hostButton.interactable = false;
+            hostButton.onClick.AddListener(() =>
+            {
+                hostButton.interactable = false;
+                clientButton.interactable = false;
+                startHost();
+            });
+            
+            startButton.interactable = false; 
+            startButton.onClick.AddListener(() =>
+            {
+                clientButton.interactable = false;
+                hostButton.interactable = false;
+                startButton.interactable = false;
+                startGame();
+            });
 
-        public void StartServer()
-        {
-            NetworkManager.Singleton.StartServer();
-        }
-
-        public void StartHost()
-        {
-            // OurNetworkManager.Singleton.SetServerState(ServerState.Debug);
-            // SessionManager.Singleton.DownloadMapData(new Guid(mapId));
-            // SessionManager.Singleton.OnMapReceived += startHost;
-        }
-
-        private async void startHost(MapData mapData)
-        {
-            // bool success = await OurNetworkManager.Singleton.HostGame(mapData, clients[0].Name, clients[0].Team, false);
-            //
-            // if (success)
-            // {
-            //     // SessionManager.Singleton.JoinTeam(clients[0].Team);
-            //     PlayerPrefs.SetString("DebugRoomCode", SessionManager.Singleton.RoomCode);
-            // }
-            // else
-            // {
-            //     Debug.Log("Failed to host game");
-            // }
-            //
-            // SessionManager.Singleton.OnMapReceived -= startHost;
-            // OurNetworkManager.Singleton.SetServerState(ServerState.Debug);
-            // spawnPlayersButton.gameObject.SetActive(true);
-        }
-
-        public async void StartClient()
-        {
-            // string joinCode = PlayerPrefs.GetString("DebugRoomCode", "");
-            // bool success = await OurNetworkManager.Singleton.JoinGame(joinCode, "DebugClient");
-            //
-            // if (!success)
-            // {
-            //     Debug.Log($"Failed to join game, join code: [{joinCode}]");
-            // }
-        }
-
-        void StartAllVictoryPoints() {
-            var vps = FindObjectsOfType<VictoryPoint>();
-            foreach (VictoryPoint vp in vps) {
-                vp.SetStartTime();
+            OnMapReceived += (mapData) =>
+            {
+                Debug.Log("map data received");
+                this.mapData = mapData;
+            };
+         
+            await UnityServices.InitializeAsync();
+            
+#if UNITY_EDITOR
+            if (ParrelSync.ClonesManager.IsClone())
+            {
+                string customArgument = ParrelSync.ClonesManager.GetArgument();
+                AuthenticationService.Instance.SwitchProfile($"Clone_{customArgument}_Profile");
             }
+#endif
+            await AuthenticationService.Instance.SignInAnonymouslyAsync();
+            
+            await downloadMapData(new Guid(mapId));
+
+            hostButton.interactable = true;
+            clientButton.interactable = true;
         }
 
-        public void SpawnPlayers()
+        private void startGame()
         {
-            playerManager.DebugSpawnPlayers();
-            // start victory points
-            StartAllVictoryPoints();
+            NetworkManager.Singleton.SceneManager.LoadScene(GameSceneName, LoadSceneMode.Single);
+        }
+
+        private async void startHost()
+        {
+            await login(host.Email, host.Password);
+            
+            bool lobbyCreated = await LobbyManager.Singleton.CreateLobbyForMap(mapData);
+            if (lobbyCreated)
+            {
+                PlayerPrefs.SetString("DebugRoomCode", LobbyManager.Singleton.Lobby.LobbyCode);
+                Debug.Log($"Host initialized, code: {LobbyManager.Singleton.Lobby.LobbyCode} email: {host.Email}");
+                startButton.interactable = true;
+            }
+            else
+            {
+                Debug.LogError("Host initialization failed idk why");   
+            }
+            
+            bool joinedTeam = await LobbyManager.Singleton.JoinTeam(host.Team);
+            if (!joinedTeam)
+            {
+                Debug.LogError($"Failed to join team {host.Team}");
+            }
+            
+            readyText.text = "Host initialized";
+        }
+
+        private async void startClient()
+        {
+            await login(client.Email, client.Password);
+            
+            string joinCode = PlayerPrefs.GetString("DebugRoomCode", "");
+            LobbyManager.Singleton.DebugSetMapData(mapData);
+
+            bool joined = await LobbyManager.Singleton.JoinLobbyByCode(joinCode);
+            if (joined)
+            {
+                Debug.Log($"Client initialized email: {client.Email}");
+            }
+            else
+            {
+                Debug.LogError($"Failed to join game, join code: [{joinCode}], you probably need to wait longer for the host to initialize properly");
+            }
+
+            bool joinedTeam = await LobbyManager.Singleton.JoinTeam(client.Team);
+            if (!joinedTeam)
+            {
+                Debug.LogError($"Failed to join team {client.Team}");
+            }
+            
+            readyText.text = "Client initialized";
+        }
+        
+        private async Task downloadMapData(Guid mapId)
+        {
+            await FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task =>
+            {
+                if (task.Exception != null)
+                {
+                    Debug.LogError($"Failed to intialize Firebase with {task.Exception}");
+                    return;
+                }
+                   
+#if UNITY_EDITOR // Unity sometimes crashes when Firebase Persistence is Enabled and two editors use it 
+                // FirebaseStorage.DefaultInstance.SetPersistenceEnabled(false);
+                FirebaseDatabase.DefaultInstance.SetPersistenceEnabled(false);
+#endif
+                Debug.Log(task.Status);
+            });
+
+            var storageReference = FirebaseStorage.DefaultInstance.RootReference;
+            var databaseReference = FirebaseDatabase.DefaultInstance.RootReference;
+        
+            DataSnapshot dataSnapshot = await databaseReference.Child(FirebaseConstants.MAP_DATA_FOLDER).Child(mapId.ToString()).GetValueAsync();
+            MapMetaData mapMetaData = JsonUtility.FromJson<MapMetaData>(dataSnapshot.GetRawJsonValue());
+
+            var imageReference = storageReference.Child($"{FirebaseConstants.MAP_IMAGES_FOLDER}/{mapMetaData.MapId}.png");
+
+            var imageBytes = await imageReference.GetBytesAsync(FirebaseConstants.MAX_MAP_SIZE);
+            Texture2D texture = new Texture2D(mapMetaData.Width, mapMetaData.Height); 
+            texture.LoadImage(imageBytes);
+           
+            var map = new MapData
+            {
+                MetaData = mapMetaData,
+                DrawnTexture = texture
+            };
+
+            StartCoroutine(gpsTextureRequest(map));
+        }
+        
+        IEnumerator gpsTextureRequest(MapData mapData)
+        {
+            UnityWebRequest request = UnityWebRequestTexture.GetTexture(mapData.MetaData.MapQuery);
+            yield return request.SendWebRequest();
+
+            if (request.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogWarning("API Request error: " + request.error);
+            }
+            else
+            {
+                Texture2D texture = DownloadHandlerTexture.GetContent(request);
+                mapData.GPSTexture = texture;
+            }
+            
+            OnMapReceived?.Invoke(mapData);
+        }
+
+        private async Task login(string email, string password)
+        {
+            var auth = FirebaseAuth.DefaultInstance;
+            await auth.SignInWithEmailAndPasswordAsync(email, password).ContinueWith(
+                task => 
+                {
+                    if (task.IsCanceled)
+                    {
+                        Debug.LogError("SignInWithEmailAndPasswordAsync was canceled.");
+                        return;
+                    }
+
+                    if (task.IsFaulted)
+                    {
+                        AggregateException ex = task.Exception;
+                    
+                        if (ex != null) {
+                            foreach (Exception e in ex.InnerExceptions) {
+                                if (e is FirebaseException fbEx)
+                                {
+                                    Debug.LogError("Encountered a FirebaseException:" + fbEx.Message);
+                                }
+                            }
+                        }
+
+                        Debug.LogError("SignInWithEmailAndPasswordAsync encountered an error: " + task.Exception);
+                        return;
+                    }
+
+                    Debug.LogFormat("User signed in successfully: {0} ({1})", task.Result.User.DisplayName, task.Result.User.UserId);
+                }
+            );
         }
     }
 }

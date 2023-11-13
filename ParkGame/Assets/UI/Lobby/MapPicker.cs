@@ -191,10 +191,7 @@ public class MapPicker : MonoBehaviour
             Debug.Log(task.Status);
         });
 
-
-        
         DataSnapshot dataSnapshot = await databaseReference.Child(FirebaseConstants.MAP_DATA_FOLDER).GetValueAsync();
-        
         foreach (var mapDataDataSnapshot in dataSnapshot.Children)
         {
             MapMetaData mapMetaData = JsonUtility.FromJson<MapMetaData>(mapDataDataSnapshot.GetRawJsonValue());
