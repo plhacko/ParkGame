@@ -255,4 +255,16 @@ public class MapPicker : MonoBehaviour
     {
         return currentMapIndex != -1;
     }
+
+    public void DeleteMaps()
+    {
+        currentMapIndex = -1;
+        mapDatas.Clear();
+        gpsTexturesInit = false;
+        drawTexturesInit = false;
+        drawnTexture.texture = null;
+        gpsTexture.texture = null;
+        drawnTexture.color = Color.clear;
+        gpsTexture.color = Color.clear;
+    }
 }

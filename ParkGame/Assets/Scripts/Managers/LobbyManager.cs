@@ -143,7 +143,6 @@ namespace Managers
                 float heartbeatTimerMax = 15f;
                 heartbeatTimer = heartbeatTimerMax;
 
-                Debug.Log("Heartbeat");
                 await LobbyService.Instance.SendHeartbeatPingAsync(Lobby.Id);
             }
         }
@@ -181,13 +180,16 @@ namespace Managers
 
                 PlayerPrefs.SetString("DebugRoomCode", Lobby.LobbyCode);
 
-                Debug.Log("Lobby created with ID: " + Lobby.Id + " and code: " + Lobby.LobbyCode);
-
                 NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(
                     new RelayServerData (allocation, "dtls")
                 );
 
                 NetworkManager.Singleton.StartHost();
+
+                Lobby = await Lobbies.Instance.UpdatePlayerAsync(Lobby.Id, AuthenticationService.Instance.PlayerId, new UpdatePlayerOptions
+                {
+                    AllocationId = allocation.AllocationId.ToString(),
+                });
 
                 return true;
             } 
@@ -198,14 +200,17 @@ namespace Managers
             }
         }
 
-        private void OnLobbyChanged(ILobbyChanges changes)
+        private async void OnLobbyChanged(ILobbyChanges changes)
         {
             Debug.Log("Lobby changed");
 
             if (changes.LobbyDeleted)
             {
-                OnDisconnect?.Invoke();
-                Reset();
+                OnKickedFromLobby();
+            }
+            else if (changes.HostId.Changed)
+            {
+                await LeaveLobby();
             }
             else
             {
@@ -217,11 +222,9 @@ namespace Managers
 
         private void OnKickedFromLobby()
         {
-            Debug.Log("Kicked from lobby");
-
             NetworkManager.Singleton.Shutdown();
-            OnDisconnect?.Invoke();
             Reset();
+            OnDisconnect?.Invoke();
         }
 
         private void OnLobbyEventConnectionStateChanged(LobbyEventConnectionState state)
@@ -256,8 +259,6 @@ namespace Managers
 
                 events = await LobbyService.Instance.SubscribeToLobbyEventsAsync(Lobby.Id, callbacks);
 
-                Debug.Log("Lobby joined with ID: " + Lobby.Id + " and code: " + Lobby.LobbyCode);
-
                 var relayJoinCode = Lobby.Data["RelayJoinCode"].Value;
                 var joinAllocation = await JoinRelay(relayJoinCode);
                 NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(
@@ -267,6 +268,11 @@ namespace Managers
                 var firebaseId = System.Text.Encoding.ASCII.GetBytes(FirebaseAuth.DefaultInstance.CurrentUser.UserId);
                 NetworkManager.Singleton.NetworkConfig.ConnectionData = firebaseId;
                 NetworkManager.Singleton.StartClient();
+
+                Lobby = await Lobbies.Instance.UpdatePlayerAsync(Lobby.Id, AuthenticationService.Instance.PlayerId, new UpdatePlayerOptions
+                {
+                    AllocationId = joinAllocation.AllocationId.ToString(),
+                });
 
                 return true;
             }
@@ -357,32 +363,6 @@ namespace Managers
                 Lobby = await Lobbies.Instance.UpdatePlayerAsync(Lobby.Id, AuthenticationService.Instance.PlayerId, updatePlayerOptions);
                 
                 Debug.Log("Player " + AuthenticationService.Instance.PlayerId + " joined team " + teamNumber);
-
-                return true;
-            }
-            catch (Exception e)
-            {
-                Debug.LogError("Failed to join team: " + e.Message);
-
-                return false;
-            }
-        }
-
-        public async Task<bool> ChangeTeamForPlayer(string playerId, int teamNumber)
-        {
-            try 
-            {
-                var player = Lobby.Players.Find(x => x.Id == playerId);
-                player.Data["TeamNumber"].Value = teamNumber.ToString();
-
-                UpdatePlayerOptions updatePlayerOptions = new()
-                {
-                    Data = player.Data,
-                };
-
-                await Lobbies.Instance.UpdatePlayerAsync(Lobby.Id, playerId, updatePlayerOptions);
-
-                Debug.Log("Player " + playerId + " joined team " + teamNumber);
 
                 return true;
             }
@@ -543,7 +523,8 @@ namespace Managers
 
         private async Task<Allocation> CreateRelayAllocation()
         {
-            try {
+            try
+            {
                 Allocation allocation = await RelayService.Instance.CreateAllocationAsync(MapData.MetaData.NumTeams * 4 - 1);
                 return allocation;
             }
