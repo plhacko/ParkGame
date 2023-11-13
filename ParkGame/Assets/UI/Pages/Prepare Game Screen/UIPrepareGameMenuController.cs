@@ -30,6 +30,7 @@ public class UIPrepareGameMenuController : UIPageController
 
     public override void OnExit()
     {
+        mapPicker.DeleteMaps();
     }
 
     private void Back()

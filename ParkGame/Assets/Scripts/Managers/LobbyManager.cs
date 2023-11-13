@@ -202,8 +202,8 @@ namespace Managers
         private void OnKickedFromLobby()
         {
             NetworkManager.Singleton.Shutdown();
-            OnDisconnect?.Invoke();
             Reset();
+            OnDisconnect?.Invoke();
         }
 
         private void OnLobbyEventConnectionStateChanged(LobbyEventConnectionState state)
@@ -340,32 +340,6 @@ namespace Managers
                 Lobby = await Lobbies.Instance.UpdatePlayerAsync(Lobby.Id, AuthenticationService.Instance.PlayerId, updatePlayerOptions);
                 
                 Debug.Log("Player " + AuthenticationService.Instance.PlayerId + " joined team " + teamNumber);
-
-                return true;
-            }
-            catch (Exception e)
-            {
-                Debug.LogError("Failed to join team: " + e.Message);
-
-                return false;
-            }
-        }
-
-        public async Task<bool> ChangeTeamForPlayer(string playerId, int teamNumber)
-        {
-            try 
-            {
-                var player = Lobby.Players.Find(x => x.Id == playerId);
-                player.Data["TeamNumber"].Value = teamNumber.ToString();
-
-                UpdatePlayerOptions updatePlayerOptions = new()
-                {
-                    Data = player.Data,
-                };
-
-                await Lobbies.Instance.UpdatePlayerAsync(Lobby.Id, playerId, updatePlayerOptions);
-
-                Debug.Log("Player " + playerId + " joined team " + teamNumber);
 
                 return true;
             }
@@ -525,7 +499,8 @@ namespace Managers
 
         private async Task<Allocation> CreateRelayAllocation()
         {
-            try {
+            try
+            {
                 Allocation allocation = await RelayService.Instance.CreateAllocationAsync(MapData.MetaData.NumTeams * 4 - 1);
                 return allocation;
             }
