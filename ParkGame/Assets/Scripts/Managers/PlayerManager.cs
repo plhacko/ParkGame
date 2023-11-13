@@ -1,7 +1,9 @@
+using System;
 using System.Collections.Generic;
 using Player;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Managers
 {
@@ -10,42 +12,43 @@ namespace Managers
      * It keeps track of which player controllers belongs to a given player ID.
      * It also spawns players.
      */
-    public class PlayerManager : NetworkBehaviour
+    public class PlayerManager : MonoBehaviour
     {
         [SerializeField] private PlayerController playerControllerPrefab;
 
         // Only on the host
         // Mapping from player's firebase ID to player controller
         private readonly Dictionary<string, PlayerController> playerControllers = new();
-        
-        public override void OnNetworkSpawn()
-        {
-            base.OnNetworkSpawn();
 
-            if (IsHost)
+        private void Awake()
+        {
+            if(NetworkManager.Singleton != null)
             {
-                spawnPlayers();   
+                NetworkManager.Singleton.SceneManager.OnLoadComplete += sceneLoaded;
             }
         }
 
+        private void sceneLoaded(ulong clientId, string sceneName, LoadSceneMode loadSceneMode)
+        {
+            Debug.Log($"scene {sceneName} loaded for {clientId}");
+
+            if (NetworkManager.Singleton.IsHost)
+            {
+                spawnPlayer(clientId);
+            }
+        }
+        
         public PlayerController GetPlayerController(ulong clientId)
         {
             var playerData = LobbyManager.Singleton.GetPlayerData(clientId);
             return playerControllers[playerData.FirebaseId];
         }
 
-        private void spawnPlayers()
-        {
-            foreach (var clientId in NetworkManager.Singleton.ConnectedClients.Keys)
-            {
-                spawnPlayer(clientId);
-            }
-        }
-
         private void spawnPlayer(ulong clientId)
         {
             PlayerData clientData = LobbyManager.Singleton.GetPlayerData(clientId);
             
+            Debug.Log($"Spawning player name: {clientData.Name} team: {clientData.Team} id: {clientData.FirebaseId}");
             PlayerController playerController = Instantiate(playerControllerPrefab);
             playerController.InitializePlayer(clientData);
             

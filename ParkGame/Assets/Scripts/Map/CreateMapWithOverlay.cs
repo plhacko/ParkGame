@@ -176,7 +176,7 @@ public class CreateMapWithOverlay : MonoBehaviour
         return fetchedMap;
     }
     
-    public void FitCameraToMap(Camera cam)
+    public void FitCameraToMap()
     {
         // Calculate the size of the object based on its distance from the camera and its local scale
         Vector3 mapBounds = BaseMap.GetComponent<SpriteRenderer>().bounds.size;
@@ -184,8 +184,8 @@ public class CreateMapWithOverlay : MonoBehaviour
         float objectHeight = mapBounds.y;
 
         // Calculate the desired height and width of the object in the camera's view
-        float frustumHeight = 2.0f * cam.orthographicSize;
-        float frustumWidth = frustumHeight * cam.aspect;
+        float frustumHeight = 2.0f * mainCamera.orthographicSize;
+        float frustumWidth = frustumHeight * mainCamera.aspect;
 
         // Calculate the scale factor to fit the object to the camera view
         float scaleFactorHeight = frustumHeight / objectHeight;
@@ -198,7 +198,7 @@ public class CreateMapWithOverlay : MonoBehaviour
 
         // gameObject.transform.localScale *= scaleFactor;
         // fetchedMap.transform.localScale *= scaleFactor;
-        cam.orthographicSize /= scaleFactor;
+        mainCamera.orthographicSize /= scaleFactor;
     }   
     
     private void FitCamera()

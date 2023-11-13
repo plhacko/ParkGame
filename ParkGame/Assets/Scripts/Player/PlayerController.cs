@@ -42,7 +42,7 @@ namespace Player
         
         private static readonly int movementSpeedAnimationHash = Animator.StringToHash("MovementSpeed");
 
-        private void Awake()
+        private void initialize()
         {
             spriteRenderer = GetComponent<SpriteRenderer>();
             networkAnimator = GetComponent<NetworkAnimator>();
@@ -50,16 +50,14 @@ namespace Player
             fogOfWar = FindObjectOfType<FogOfWar>();
             revealer = GetComponent<Revealer>();
             changeMaterial = GetComponent<ChangeMaterial>();
-        }
 
-        private void initialize()
-        {
             if (IsServer) {
                 Team = initialTeam;
                 Name = initialName;
                 FirebaseId = firebaseId;
             }
             
+            Debug.Log($"init player {Name} in {Team} with {FirebaseId}, is owner: {isActualOwner()}");
             if (isActualOwner())
             {
                 if (Camera.main != null)
@@ -94,7 +92,6 @@ namespace Player
 
         private void Update()
         {
-            fixDuplicateCameras();
             if (!isActualOwner()) return;
             if (!Application.isFocused) return;
 
@@ -268,28 +265,6 @@ namespace Player
             {
                 if (go.TryGetComponent<ISoldier>(out ISoldier soldier))
                 { soldier.SoldierBehaviour = SoldierBehaviour.Attack; }
-            }
-        }
-        
-        // I have no idea why this is needed to do, but it is
-        // If you parent the camera in initialize on client it duplicates itself
-        // I tested that if you wait for a couple of seconds and then parent it, it doesn't duplicate
-        // So I'm just doing this hack
-        bool hasFixedDuplicateCameras = false;
-        private void fixDuplicateCameras()
-        {
-            if(IsHost || hasFixedDuplicateCameras || !isActualOwner()) return;
-            
-            var cameras = FindObjectsOfType<Camera>();
-            if (cameras.Length <= 1) return;
-            
-            foreach (var cam in cameras)
-            {
-                if (cam.transform.parent != transform)
-                {
-                    hasFixedDuplicateCameras = true;
-                    Destroy(cam.gameObject);
-                }
             }
         }
     }
