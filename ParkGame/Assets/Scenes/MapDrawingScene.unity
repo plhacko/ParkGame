@@ -846,6 +846,10 @@ PrefabInstance:
       propertyPath: maxStructures
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 2678169573675221651, guid: 9b0f03f019cad2447961d5e762ced7f8, type: 3}
+      propertyPath: structureType
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2678169573904503376, guid: 9b0f03f019cad2447961d5e762ced7f8, type: 3}
       propertyPath: canvas
       value: 
@@ -6787,6 +6791,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1617858403}
     - target: {fileID: 2284287231549463751, guid: 86450f17eacf8c249988f9842f104e45, type: 3}
+      propertyPath: doNotFetch
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2284287231549463751, guid: 86450f17eacf8c249988f9842f104e45, type: 3}
       propertyPath: mainCamera
       value: 
       objectReference: {fileID: 1155738818}
@@ -6906,6 +6914,10 @@ PrefabInstance:
     - target: {fileID: 2678169573675221651, guid: 9b0f03f019cad2447961d5e762ced7f8, type: 3}
       propertyPath: itemName
       value: Outposts
+      objectReference: {fileID: 0}
+    - target: {fileID: 2678169573675221651, guid: 9b0f03f019cad2447961d5e762ced7f8, type: 3}
+      propertyPath: structureType
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2678169573904503376, guid: 9b0f03f019cad2447961d5e762ced7f8, type: 3}
       propertyPath: canvas

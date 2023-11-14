@@ -8,6 +8,7 @@ using Player;
 public class Outpost : NetworkBehaviour, ICommander
 {
     [SerializeField] int InitialTeam;
+    [SerializeField] bool IsCastle = false; 
     [SerializeField] int MaxUnits = 3; // in total
     [SerializeField] float SpawnTime = 4; // 4s
     [SerializeField] GameObject UnitPrefab;
@@ -126,6 +127,12 @@ public class Outpost : NetworkBehaviour, ICommander
         unit.GetComponent<NetworkObject>().Spawn();
         unit.GetComponent<ISoldier>().Team = Team;
         unit.GetComponent<ISoldier>().SetCommanderToFollow(transform);
+    }
+
+    public void SetCastle(int team)
+    {
+        IsCastle = true;
+        InitialTeam = team;
     }
 
     void ICommander.ReportFollowing(GameObject go)
