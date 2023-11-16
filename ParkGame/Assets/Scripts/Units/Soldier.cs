@@ -40,11 +40,6 @@ public class Soldier : NetworkBehaviour, ISoldier
     [SerializeField] UnitType UnitType;
     [SerializeField] float DeathFadeTime = 2f;
     
-    [SerializeField] bool initTeamDebug = false; // DEBUG // TODO: rm
-    [SerializeField] int initTeam = 0; // DEBUG // TODO: rm
-    [SerializeField] Transform debugCommander; // DEBUG // TODO: rm
-
-    //[SerializeField] float ClosestEnemyDEBUG; // DEBUG // TODO: rm
     public float ClosestEnemyDEBUG; // DEBUG // TODO: rm
 
     private NetworkVariable<int> _HP = new();
@@ -97,12 +92,6 @@ public class Soldier : NetworkBehaviour, ISoldier
         _Team.OnValueChanged += OnTeamChanged;
         _SoldierBehaviour.OnValueChanged += OnBehaviourChange;
 
-        if (initTeamDebug && IsServer)
-        {
-            Team = initTeam;
-        }
-        
-        OnTeamChanged(-1, Team);
         OnBehaviourChange(0, SoldierBehaviour);
         SpriteRenderer.flipX = XSpriteFlip.Value;
 
@@ -130,7 +119,8 @@ public class Soldier : NetworkBehaviour, ISoldier
         else if (newValue == 1) { sr.color = Color.yellow; }
         else { sr.color = Color.grey; }
 
-        if (newValue == 0) // todo change if is local player's
+        var localPlayerData = LobbyManager.Singleton.GetLocalPlayerData();
+        if (localPlayerData.Team == newValue)
         {
             if (fogOfWar)
             {
