@@ -109,7 +109,7 @@ public class StructureCounter : MonoBehaviour
             // Reindex remaining team labels on screen
             for (int idx = 0; idx < currentStructures.Count; idx++)
             {
-                currentStructures[idx].GetComponentInChildren<TextMeshProUGUI>().text = $"TEAM {idx}";
+                currentStructures[idx].GetComponentInChildren<TextMeshProUGUI>().text = $"TEAM {idx + 1}";
             }
         }
     }
