@@ -13,15 +13,15 @@ using static Formation;
 using DG.Tweening;
 using System.Linq;
 
-public enum UnitType
-{
-    Pawn,
-    Archer,
-    // Horseman
-};
 
 public class Soldier : NetworkBehaviour, ISoldier
 {
+    public enum UnitType {
+        Pawn,
+        Archer,
+        Horseman
+    };
+
     // game logic
     private Transform CommanderToFollow = null;
     [Header("initial values")]
@@ -37,7 +37,7 @@ public class Soldier : NetworkBehaviour, ISoldier
     [SerializeField] float MaxAttackRange = 0.4f; // for pawn: 0.4
     [SerializeField] float Attackcooldown = 1.0f;
     [SerializeField] int Damage = 1;
-    [SerializeField] UnitType UnitType;
+    [SerializeField] UnitType TypeOfUnit;
     [SerializeField] float DeathFadeTime = 2f;
     
     public float ClosestEnemyDEBUG; // DEBUG // TODO: rm
@@ -277,15 +277,19 @@ public class Soldier : NetworkBehaviour, ISoldier
             FormationType = formationType;
             switch (FormationType) {
                 case FormationType.Circle:
-                    ObjectToFollowInFormation = FormationFromFollowedCommander.GetFormation(gameObject, FormationType.Circle); 
+                    ObjectToFollowInFormation = FormationFromFollowedCommander.GetPositionInFormation(gameObject, FormationType.Circle); 
                     break;
                 case FormationType.Box:
-                    ObjectToFollowInFormation = FormationFromFollowedCommander.GetFormation(gameObject, FormationType.Box);
+                    ObjectToFollowInFormation = FormationFromFollowedCommander.GetPositionInFormation(gameObject, FormationType.Box); 
                     break;
                 default:
                     break;
             }
         }
+    }
+
+    public UnitType GetUnitType() {
+        return TypeOfUnit;
     }
 
     private void FollowObjectWithAnimation(Transform toFollow) {
@@ -355,10 +359,10 @@ public class Soldier : NetworkBehaviour, ISoldier
 
                 Networkanimator.SetTrigger("Attack");
                 
-                if (UnitType == UnitType.Pawn) {
+                if (TypeOfUnit == UnitType.Pawn) {
                     enemyT.GetComponent<ISoldier>()?.TakeDamage(Damage);
                 }
-                if (UnitType == UnitType.Archer) {
+                if (TypeOfUnit == UnitType.Archer) {
                     SpriteRenderer.flipX = (enemyT.position.x - transform.position.x < 0);
                     XSpriteFlip.Value = SpriteRenderer.flipX;
                     shooting.Shoot(enemyT, Damage, XSpriteFlip.Value);
@@ -435,7 +439,7 @@ public class Soldier : NetworkBehaviour, ISoldier
             CommanderToFollow = commanderToFollow;
             CommanderToFollow?.GetComponent<ICommander>().ReportFollowing(gameObject);
 
-            FormationType = CommanderToFollow.GetComponent<ICommander>().GetFormation();
+            FormationType = CommanderToFollow.GetComponent<ICommander>().GetFormation(); // get type of formation
             FormationFromFollowedCommander = CommanderToFollow.GetComponent<Formation>();
             
             if (FormationType == FormationType.Box || FormationType == FormationType.Circle) {

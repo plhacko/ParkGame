@@ -17,7 +17,7 @@ public class Outpost : NetworkBehaviour, ICommander
     [SerializeField] Sprite PawnIcon;
     [SerializeField] Sprite ArcherIcon;
     [SerializeField] Sprite HorsemanIcon;
-    [SerializeField] private UnitType InitOutpostUnitType;
+    [SerializeField] private Soldier.UnitType InitOutpostUnitType;
 
     //[SerializeField] GameObject HorsemanPrefab; // todo
     List<GameObject> Units = new List<GameObject>();
@@ -29,7 +29,7 @@ public class Outpost : NetworkBehaviour, ICommander
     [SerializeField] NetworkVariable<int> _Team = new(-1);
     public int Team { get => _Team.Value; set => _Team.Value = value; }
 
-    private UnitType outpostUnitType;
+    private Soldier.UnitType outpostUnitType;
     private SpriteRenderer sr;
     private int counter;
     private PlayerManager playerManager;
@@ -51,7 +51,7 @@ public class Outpost : NetworkBehaviour, ICommander
         changeMaterial = GetComponent<ChangeMaterial>();
         sr = GetComponent<SpriteRenderer>();
 
-        if (InitOutpostUnitType == UnitType.Archer)
+        if (InitOutpostUnitType == Soldier.UnitType.Archer)
         {
             counter = 1;
         }
@@ -109,7 +109,7 @@ public class Outpost : NetworkBehaviour, ICommander
 
     GameObject SpawnWhichUnit() {
         switch (outpostUnitType) {
-            case UnitType.Archer:
+            case Soldier.UnitType.Archer:
                 return ArcherPrefab;
             default:
                 return UnitPrefab;
@@ -159,13 +159,13 @@ public class Outpost : NetworkBehaviour, ICommander
     Sprite ChangeSpawnType(int n) {
         switch (n) {
             case 1:
-                outpostUnitType = UnitType.Archer;
+                outpostUnitType = Soldier.UnitType.Archer;
                 return ArcherIcon;
             //case 2:
             //    OutpostUnitType = UnitType.Horseman;
             //    return Instantiate(HorsemanIcon);
             default:
-                outpostUnitType = UnitType.Pawn;
+                outpostUnitType = Soldier.UnitType.Pawn;
                 return PawnIcon;
         }
     }
@@ -183,15 +183,17 @@ public class Outpost : NetworkBehaviour, ICommander
         if (playerController != null && playerController.Team == Team) {
             Debug.Log("ZMEN IKONU!");
             counter++;
-            int numOfUnitTypes = Enum.GetNames(typeof(UnitType)).Length;
+            int numOfUnitTypes = Enum.GetNames(typeof(Soldier.UnitType)).Length;
             ChangeIconClientRpc(counter % numOfUnitTypes);
         }
     }
 
     void OnMouseDown() {
+        /*
         Debug.Log("ICON CLICKED");
 
         ulong clientID = NetworkManager.Singleton.LocalClientId;
         RequestChangingSpawnTypeServerRpc(clientID);
+        */
     }
 }

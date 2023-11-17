@@ -136,6 +136,7 @@ namespace Player
                     case Formation.FormationType.Box:
                     case Formation.FormationType.Free:
                         FormationType = Formation.FormationType.Circle;
+                        formationScript.ResetFormation();
                         // notify soldiers
                         NotifySoldiersServerRpc();
                         break;

@@ -260,7 +260,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   InitialHP: 4
-  MovementSpeed: 0.7
+  MovementSpeed: 1
   InnerDistanceFromCommander: 1
   OuterDistanceFromCommander: 2
   DefendDistanceFromCommander: 3
@@ -269,7 +269,7 @@ MonoBehaviour:
   MaxAttackRange: 5
   Attackcooldown: 3.2
   Damage: 1
-  UnitType: 1
+  TypeOfUnit: 1
   DeathFadeTime: 2
   initTeamDebug: 0
   initTeam: 0
@@ -392,7 +392,7 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.16
-  m_Speed: 0.7
+  m_Speed: 1
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120

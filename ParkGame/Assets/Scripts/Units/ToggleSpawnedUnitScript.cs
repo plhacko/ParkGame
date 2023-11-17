@@ -12,14 +12,14 @@ public class ToggleSpawnedUnitScript : NetworkBehaviour {
     [SerializeField] Sprite HorsemanIcon;
     private SpriteRenderer sr;
     private int counter;
-    public UnitType OutpostUnitType;
+    public Soldier.UnitType OutpostUnitType;
     private PlayerManager playerManager;
     private int Team; 
 
     private void Start() {
         playerManager = FindObjectOfType<PlayerManager>();
 
-        OutpostUnitType = UnitType.Pawn;
+        OutpostUnitType = Soldier.UnitType.Pawn;
         sr = GetComponent<SpriteRenderer>();
         sr.sprite = GetIcon(0);
         Team = gameObject.GetComponentInParent<Outpost>().Team;
@@ -28,13 +28,13 @@ public class ToggleSpawnedUnitScript : NetworkBehaviour {
     Sprite GetIcon(int n) {
         switch (n) {
             case 1:
-                OutpostUnitType = UnitType.Archer;
+                OutpostUnitType = Soldier.UnitType.Archer;
                 return Instantiate(ArcherIcon);
             //case 2:
             //    OutpostUnitType = UnitType.Horseman;
             //    return Instantiate(HorsemanIcon);
             default:
-                OutpostUnitType = UnitType.Pawn;
+                OutpostUnitType = Soldier.UnitType.Pawn;
                 return Instantiate(PawnIcon);
         }
     }
