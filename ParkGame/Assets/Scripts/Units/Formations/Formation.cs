@@ -172,7 +172,7 @@ public class Formation : NetworkBehaviour {
 
     public void RemoveFromFormation(GameObject soldier, GameObject position, FormationType shape = FormationType.Circle) {
         Soldier.UnitType unitType = soldier.GetComponent<Soldier>().GetUnitType();
-        var positionList = FormationCircle; // old
+        var positionList = FormationCircle; // now not used list
         if (shape == FormationType.Box) { positionList = FormationBox; }
         else {
             if (unitType == Soldier.UnitType.Pawn) {
@@ -191,11 +191,11 @@ public class Formation : NetworkBehaviour {
                     pos.isAssigned = false;
                     positionList.Remove(item);
                     Destroy(position);
-                    FitFormation(shape);
                     return;
                 }
             }
         }
+        
     }
 
     Soldier.UnitType AddSoldierByType(GameObject sol) {
@@ -221,21 +221,20 @@ public class Formation : NetworkBehaviour {
         soldiers.Add(soldier);
         Soldier.UnitType unitType = AddSoldierByType(soldier);
 
-        ListFormationPositions(shape);
-
-
         if (shape == FormationType.Box) { 
-            return GetPositionInBox(shape); 
+            return GetPositionInBox(); 
         }
         // circular formation: archers in smaller circle, swordmen in bigger circle
-        return GetPositionInCircle(unitType, shape);
+        return GetPositionInCircle(unitType);
     }
 
     // add parameter for formation type
-    public GameObject GetPositionInBox(FormationType shape = FormationType.Circle) {
-        var positionList = FormationCircle;
-        if (shape == FormationType.Box) { positionList = FormationBox; } 
-        
+    public GameObject GetPositionInBox() {
+        var positionList = FormationBox;
+        if (FormationBox.Count < soldiers.Count) {
+            Add1PositionToBoxFormation();
+        }
+
         foreach (var go in positionList) { 
             var pos = go.GetComponent<PositionDescriptor>();
             if (pos.isAssigned) { continue; }
@@ -246,9 +245,8 @@ public class Formation : NetworkBehaviour {
     }
 
     // add one position to circle formation: inner or outer circle
-    public GameObject GetPositionInCircle(Soldier.UnitType unitType, FormationType shape = FormationType.Circle) {        
+    public GameObject GetPositionInCircle(Soldier.UnitType unitType) {        
         var positionList = FormationCircleOuter;
-
         var soldierList = soldiersSwordmen;
         if (unitType == Soldier.UnitType.Archer) {
             positionList = FormationCircleInner;
@@ -257,7 +255,7 @@ public class Formation : NetworkBehaviour {
 
         var positions = ListCircularPositionsByUnitType(unitType);
 
-        if (shape == FormationType.Circle && soldierList.Count > positionList.Count) {
+        if (soldierList.Count > positionList.Count) {
             Add1PositionToCircularFormation(positions[positions.Count - 1], positionList);
         }
 
@@ -289,21 +287,9 @@ public class Formation : NetworkBehaviour {
         }
     }
 
-    void FitFormation(FormationType shape) {
-        switch (shape) {
-            case FormationType.Circle:
-                FitCircularFormation();
-                break;
-            case FormationType.Box:
-                //FitBoxFormation();  // not really necessary
-                break;
-            default:
-                break;
-        }
-    }
-
-    void AdjustFormation(List<GameObject> formationList, List<Vector3> positions) {
+    List<GameObject> AdjustFormation(List<GameObject> formationList, List<Vector3> positions) {
         int j = 0;
+        Debug.Log("adjust formation!!!!!");
         for (int i = 0; i < formationList.Count; i++) {
            // var a = formationList[i].transform.localPosition;
             var a = formationList[i].transform.position;
@@ -318,17 +304,7 @@ public class Formation : NetworkBehaviour {
                 j++;
             }
         }
-    }
-
-    void FitBoxFormation() {
-        // fill in gaps by reasigning soldiers
-        var positions = ListBoxPositions();
-        AdjustFormation(FormationBox, positions);  
-    }
-
-    void FitCircularFormation() {
-        var positions = ListCircularPositions();
-        AdjustFormation(FormationCircle, positions);
+        return formationList;
     }
 
     public List<Vector3> ListBoxPositions() {
@@ -365,7 +341,6 @@ public class Formation : NetworkBehaviour {
         float alpha = 2 * Mathf.PI / soldiers.Count;
 
         int counter = 0;
-        float inc = 0.1f;
 
         List<Vector3> positions = new List<Vector3>();
         for (int i = 0; i < soldiers.Count; i++) {
@@ -383,9 +358,11 @@ public class Formation : NetworkBehaviour {
     public List<Vector3> ListCircularPositionsByUnitType(Soldier.UnitType unitType) {
         var listOfSoldiers = soldiersSwordmen;
         float radius = 1.6f;
+        float j = 0;
         if (unitType == Soldier.UnitType.Archer) {
             listOfSoldiers = soldiersArchers;
             radius = 0.8f;
+            j = 0.5f;
         }
 
         if (listOfSoldiers.Count < 1) { return null; }
@@ -394,8 +371,8 @@ public class Formation : NetworkBehaviour {
 
         List<Vector3> positions = new List<Vector3>();
         for (int i = 0; i < listOfSoldiers.Count; i++) {
-            float x = transform.position.x - radius * Mathf.Cos(i * alpha);
-            float y = transform.position.y - radius * Mathf.Sin(i * alpha);
+            float x = transform.position.x - radius * Mathf.Cos(i * alpha + j);
+            float y = transform.position.y - radius * Mathf.Sin(i * alpha + j);
             Vector3 vec = new Vector3(x, y, 0);
             positions.Add(vec);
         }
@@ -403,56 +380,5 @@ public class Formation : NetworkBehaviour {
         return positions;
     }
 
-
-    void CreateTwoRings() {
-        int archersCount = 6;
-        int pawnsCount = 6;
-
-        float radius = 1f;
-        float alpha = 2 * Mathf.PI / archersCount;
-
-        for (int i = 0; i < archersCount; i++) {
-            float x = transform.position.x - radius * Mathf.Cos(i * alpha);
-            float y = transform.position.y - radius * Mathf.Sin(i * alpha);
-            Vector3 vec = new Vector3(x, y, 0);
-            AddSphere(vec, 0.2f, "InnerCirclePos", this.gameObject);
-        }
-
-        radius = 2f;
-        alpha = 2 * Mathf.PI / pawnsCount;
-
-        for (int i = 0; i < pawnsCount; i++) {
-            float x = transform.position.x - radius * Mathf.Cos(i * alpha + 0.5f);
-            float y = transform.position.y - radius * Mathf.Sin(i * alpha + 0.5f);
-            Vector3 vec = new Vector3(x, y, 0);
-            AddSphere(vec, 0.2f, "OuterCirclePos", this.gameObject);
-
-        }
-    }
-
-
-    // list positions and add new gameobject for the position if needed
-    // then adjust the position objects (now only for circle)
-    public void ListFormationPositions(FormationType shape = FormationType.Circle) {
-        // draw positions for following soldiers
-        if (shape == FormationType.Circle) {
-            var positions = ListCircularPositions();
-
-            // add sphere on the last position of the recomputed circle formation
-            if (FormationCircle.Count < positions.Count) {
-            //    Add1PositionToCircularFormation(positions[positions.Count - 1], FormationCircle);
-            }
-
-            // recount positions, ajdust the number of followers changed
-            FitCircularFormation();
-        }
-        if (shape == FormationType.Box) {
-            if (FormationBox.Count < soldiers.Count) {
-                Add1PositionToBoxFormation();
-            }
-            //FitBoxFormation(); //  not really necessary
-        }
-    }
-
-    }
+}
 
