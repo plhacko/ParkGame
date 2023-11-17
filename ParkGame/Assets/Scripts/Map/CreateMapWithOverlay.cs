@@ -341,6 +341,7 @@ public class CreateMapWithOverlay : MonoBehaviour
 
     private void SetStructurePrefabs(Dictionary<Vector3Int, GameObject> structuresToAssign)
     {
+        var castleTeamID = 0;
         if (NetworkManager.Singleton.IsServer)
         {
             foreach (var kvp in structuresToAssign)
@@ -349,7 +350,11 @@ public class CreateMapWithOverlay : MonoBehaviour
                     throw new ArgumentException("Cannot place structure out of map bounds");
                 
                 var structure = Instantiate(kvp.Value, gridLayout.CellToWorld(kvp.Key), Quaternion.identity);
-                
+                if (kvp.Value == castlePrefab)
+                {
+                    structure.GetComponent<Outpost>().SetCastle(castleTeamID);
+                    castleTeamID++;
+                }
                 var networkObject = structure.GetComponent<NetworkObject>();
                 networkObject.Spawn();
             }

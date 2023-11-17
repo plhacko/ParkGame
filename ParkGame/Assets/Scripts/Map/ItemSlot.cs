@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using FreeDraw;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Tilemaps;
@@ -49,6 +50,11 @@ public class ItemSlot : MonoBehaviour, IDropHandler, IPointerDownHandler
         dragAndDrop.mapDrawable = mapDrawable;
         dragAndDrop.TilemapProperty = tilemap;
         dragAndDrop.mainCamera = mainCamera;
+        if (counter.structureType == StructureCounter.StructureType.Castle)
+        {
+            var teamLabel = $"TEAM {(counter.GetIndexOfStructure(newStructure) + 1).ToString()}";
+            newStructure.GetComponentInChildren<TextMeshProUGUI>().text = teamLabel;
+        }
     }
     public void OnPointerDown(PointerEventData eventData)
     {

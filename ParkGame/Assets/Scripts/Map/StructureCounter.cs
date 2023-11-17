@@ -1,13 +1,20 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
 public class StructureCounter : MonoBehaviour
 {
-    public string itemName;
+    public enum StructureType
+	{
+		Castle,
+		VictoryPoint,
+		Outpost
+	}
+    public StructureType structureType;
     // Start is called before the first frame update
     
     public int maxStructures = 3;
@@ -45,6 +52,11 @@ public class StructureCounter : MonoBehaviour
         }
         return new Tuple<string, List<Vector3Int>>(structureName, structureCellPositions);
     }
+
+    public int GetIndexOfStructure(GameObject structure)
+    {
+        return currentStructures.IndexOf(structure);
+    }
     
     /**
      * Place structures from loaded map for additional adjustments
@@ -54,7 +66,7 @@ public class StructureCounter : MonoBehaviour
     {
         if (positions.Length > maxStructureCount)
             throw new InvalidOperationException("Cannot add more structures than specified maxItems");
-        itemName = structureName;
+        structureType = (StructureType) Enum.Parse(typeof(StructureType), structureName, true);
         maxStructures = maxStructureCount;
         var itemSlot = GetComponentInChildren<ItemSlot>();
         var gridLayout = tilemap.GetComponentInParent<GridLayout>();
@@ -72,7 +84,7 @@ public class StructureCounter : MonoBehaviour
      */
     public Tuple<string, List<GameObject>> GetStructures()
     {
-        return new Tuple<string, List<GameObject>>(itemName, currentStructures);
+        return new Tuple<string, List<GameObject>>(nameof(structureType), currentStructures);
     }
     
     public bool AllStructuresPlaced()
@@ -85,12 +97,20 @@ public class StructureCounter : MonoBehaviour
         if (currentStructures.Count < maxStructures)
             currentStructures.Add(structure);
         else
-            throw new InvalidOperationException($"Cannot add more {itemName}, limit is {maxStructures}");
+            throw new InvalidOperationException($"Cannot add more {nameof(structureType)}, limit is {maxStructures}");
     }
     
     public void RemoveMapStructure(GameObject structure)
     {
         if (!currentStructures.Remove(structure))
             throw new InvalidOperationException("Structure not found");
+        if (structureType == StructureType.Castle)
+        {
+            // Reindex remaining team labels on screen
+            for (int idx = 0; idx < currentStructures.Count; idx++)
+            {
+                currentStructures[idx].GetComponentInChildren<TextMeshProUGUI>().text = $"TEAM {idx}";
+            }
+        }
     }
 }
