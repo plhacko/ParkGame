@@ -15,5 +15,7 @@ public class ShootScript : NetworkBehaviour
         var arrow = Instantiate(ArrowPrefab, new Vector3(p0.x + xOffset, p0.y - 0.175f, p0.z), Quaternion.Euler(0, 0, Mathf.Atan2(toTarget.y, toTarget.x) * Mathf.Rad2Deg));
         arrow.GetComponent<NetworkObject>().Spawn();
         arrow.GetComponent<Arrow>().Initialize(target, damage);
+        AudioManager.Instance.PlayOneShot(FMODEvents.Instance.ArrowHitSFX, transform.position);
+
     }
 }

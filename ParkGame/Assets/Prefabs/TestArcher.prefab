@@ -271,9 +271,6 @@ MonoBehaviour:
   Damage: 1
   TypeOfUnit: 1
   DeathFadeTime: 2
-  initTeamDebug: 0
-  initTeam: 0
-  debugCommander: {fileID: 0}
   ClosestEnemyDEBUG: 0
   TeaM: 0
   Behaviour: 0
@@ -392,7 +389,7 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.16
-  m_Speed: 1
+  m_Speed: 2
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120

@@ -1306,6 +1306,20 @@ MonoBehaviour:
       Data3: -1047650172
       Data4: 679949240
     Path: event:/Music/wow
+  <ButtonClickedSFX>k__BackingField:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
+  <ButtonToggleSFX>k__BackingField:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
   <SwordHitSFX>k__BackingField:
     Guid:
       Data1: 1200299268
@@ -1315,11 +1329,25 @@ MonoBehaviour:
     Path: event:/SFX/SwordHit
   <ArrowHitSFX>k__BackingField:
     Guid:
-      Data1: 81842928
-      Data2: 1278101891
-      Data3: -1564767570
-      Data4: 809095446
-    Path: event:/SFX/ArrowHit
+      Data1: -2000762997
+      Data2: 1188203862
+      Data3: -1162553450
+      Data4: 1799356684
+    Path: event:/SFX/ArrowDraw
+  <SoldierDeath>k__BackingField:
+    Guid:
+      Data1: -1775617997
+      Data2: 1254594677
+      Data3: 419760273
+      Data4: 1827231568
+    Path: event:/SFX/SoldierDeath
+  <FallbackHorn>k__BackingField:
+    Guid:
+      Data1: 997301190
+      Data2: 1149020011
+      Data3: 26843550
+      Data4: -480043980
+    Path: event:/SFX/FallbackCommand
 --- !u!1 &1773343384
 GameObject:
   m_ObjectHideFlags: 0

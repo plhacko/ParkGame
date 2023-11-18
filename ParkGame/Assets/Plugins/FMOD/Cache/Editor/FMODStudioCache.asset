@@ -1,5 +1,32 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-6514527848689808105
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/SoldierDeath
+  m_EditorClassIdentifier: 
+  Path: event:/SFX/SoldierDeath
+  Guid:
+    Data1: -1775617997
+    Data2: 1254594677
+    Data3: 419760273
+    Data4: 1827231568
+  Banks:
+  - {fileID: 1797049273175031372}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 0
 --- !u!114 &-5964614369774135526
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -67,6 +94,33 @@ MonoBehaviour:
   - Name: Desktop
     Value: 774
   Exists: 1
+--- !u!114 &-1963542693998233341
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/SoldierDeath
+  m_EditorClassIdentifier: 
+  Path: event:/SFX/SoldierDeath
+  Guid:
+    Data1: -1775617997
+    Data2: 1254594677
+    Data3: 419760273
+    Data4: 1827231568
+  Banks:
+  - {fileID: 1797049273175031372}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 0
 --- !u!114 &-625123021922913339
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -82,12 +136,12 @@ MonoBehaviour:
   Path: FMOD/FMODPG/Build/Desktop/Master.strings.bank
   Name: Master.strings
   StudioPath: bank:/Master.strings
-  lastModified: 638358715740519026
+  lastModified: 638359015588271967
   FileSizes:
   - Name: Desktop
-    Value: 1014
+    Value: 1114
   - Name: Mobile
-    Value: 1014
+    Value: 1114
   Exists: 1
 --- !u!114 &11400000
 MonoBehaviour:
@@ -109,12 +163,14 @@ MonoBehaviour:
   - {fileID: 148854621716206022}
   - {fileID: 2226807692485312142}
   - {fileID: -4056372991934410267}
+  - {fileID: -6514527848689808105}
+  - {fileID: 4599465800357812260}
   EditorParameters: []
   MasterBanks:
   - {fileID: 1797049273175031372}
   StringsBanks:
   - {fileID: -625123021922913339}
-  cacheTime: 638358715740519026
+  cacheTime: 638359015588271967
   cacheVersion: 131608
 --- !u!114 &148854621716206022
 MonoBehaviour:
@@ -212,10 +268,10 @@ MonoBehaviour:
   Path: FMOD/FMODPG/Build/Desktop/Master.bank
   Name: Master
   StudioPath: bank:/Master
-  lastModified: 638358715740498974
+  lastModified: 638359015588241968
   FileSizes:
   - Name: Desktop
-    Value: 4649152
+    Value: 4722464
   - Name: Mobile
     Value: 9408544
   Exists: 1
@@ -246,3 +302,57 @@ MonoBehaviour:
   MinDistance: 1
   MaxDistance: 20
   Length: 355657
+--- !u!114 &3467618114881467273
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/FallbackCommand
+  m_EditorClassIdentifier: 
+  Path: event:/SFX/FallbackCommand
+  Guid:
+    Data1: 997301190
+    Data2: 1149020011
+    Data3: 26843550
+    Data4: -480043980
+  Banks:
+  - {fileID: 1797049273175031372}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 0
+--- !u!114 &4599465800357812260
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/FallbackCommand
+  m_EditorClassIdentifier: 
+  Path: event:/SFX/FallbackCommand
+  Guid:
+    Data1: 997301190
+    Data2: 1149020011
+    Data3: 26843550
+    Data4: -480043980
+  Banks:
+  - {fileID: 1797049273175031372}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 0

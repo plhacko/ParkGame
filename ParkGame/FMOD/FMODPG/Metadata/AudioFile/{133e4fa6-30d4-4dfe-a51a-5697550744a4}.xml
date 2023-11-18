@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.02.00">
+	<object class="AudioFile" id="{133e4fa6-30d4-4dfe-a51a-5697550744a4}">
+		<property name="assetPath">
+			<value>deathCing2.1.wav</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>44.0999985</value>
+		</property>
+		<property name="channelCount">
+			<value>2</value>
+		</property>
+		<property name="length">
+			<value>0.21369614512471655</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{22dfc8df-6bfe-47ac-92e5-f41f1fd0472d}</destination>
+		</relationship>
+	</object>
+</objects>

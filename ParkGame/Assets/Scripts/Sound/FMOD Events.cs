@@ -13,6 +13,8 @@ public class FMODEvents : MonoBehaviour
 
     [field: SerializeField] public EventReference SwordHitSFX { get; private set; }
     [field: SerializeField] public EventReference ArrowHitSFX { get; private set; }
+    [field: SerializeField] public EventReference SoldierDeath { get; private set; }
+    [field: SerializeField] public EventReference FallbackHorn { get; private set; }
 
 
     public static FMODEvents Instance { get; private set; }

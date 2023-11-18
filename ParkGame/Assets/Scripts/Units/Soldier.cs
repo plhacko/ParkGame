@@ -359,13 +359,12 @@ public class Soldier : NetworkBehaviour, ISoldier
                 Networkanimator.Animator.SetFloat(AnimatorMovementSpeedHash, 0.0f); //("MovementSpeed", 0);
 
                 Networkanimator.SetTrigger("Attack");
-
-                // sound effect
-                AudioManager.Instance.PlayOneShot(FMODEvents.Instance.SwordHitSFX, transform.position);
-
                 
                 if (TypeOfUnit == UnitType.Pawn) {
                     enemyT.GetComponent<ISoldier>()?.TakeDamage(Damage);
+                    // sound effect
+                    AudioManager.Instance.PlayOneShot(FMODEvents.Instance.SwordHitSFX, transform.position);
+
                 }
                 if (TypeOfUnit == UnitType.Archer) {
                     SpriteRenderer.flipX = (enemyT.position.x - transform.position.x < 0);
@@ -485,6 +484,9 @@ public class Soldier : NetworkBehaviour, ISoldier
         SoldierBehaviour = SoldierBehaviour.Death;
         CommanderToFollow?.GetComponent<ICommander>()?.ReportUnfollowing(gameObject);
         Networkanimator.SetTrigger("Die");
+        
+        AudioManager.Instance.PlayOneShot(FMODEvents.Instance.SoldierDeath, transform.position);
+
         handleDeath();
         handleDeathClientRpc();
     }

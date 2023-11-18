@@ -12,7 +12,7 @@ namespace Player
 {
     public class PlayerController : NetworkBehaviour, ICommander
     {
-        [SerializeField] private float movementSpeed = 1;
+        [SerializeField] private float movementSpeed = 2;
         [SerializeField] private int initialTeam;
         [SerializeField] private string initialName;
 
@@ -251,6 +251,9 @@ namespace Player
         [ServerRpc]
         public void CommandMovementServerRpc()
         {
+            // fallback command
+            AudioManager.Instance.PlayOneShot(FMODEvents.Instance.FallbackHorn, transform.position);
+
             foreach (GameObject go in units)
             {
                 if (go.TryGetComponent<ISoldier>(out ISoldier soldier))

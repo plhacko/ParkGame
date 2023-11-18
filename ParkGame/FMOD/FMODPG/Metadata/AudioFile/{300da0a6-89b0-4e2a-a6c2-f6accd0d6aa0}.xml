@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.02.00">
+	<object class="AudioFile" id="{300da0a6-89b0-4e2a-a6c2-f6accd0d6aa0}">
+		<property name="assetPath">
+			<value>deathClap.wav</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>44.0999985</value>
+		</property>
+		<property name="channelCount">
+			<value>2</value>
+		</property>
+		<property name="length">
+			<value>0.27990929705215417</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{22dfc8df-6bfe-47ac-92e5-f41f1fd0472d}</destination>
+		</relationship>
+	</object>
+</objects>
