@@ -12,6 +12,7 @@ using UnityEngine.AI;
 using static Formation;
 using DG.Tweening;
 using System.Linq;
+using FMODUnity;
 
 
 public class Soldier : NetworkBehaviour, ISoldier
@@ -358,6 +359,10 @@ public class Soldier : NetworkBehaviour, ISoldier
                 Networkanimator.Animator.SetFloat(AnimatorMovementSpeedHash, 0.0f); //("MovementSpeed", 0);
 
                 Networkanimator.SetTrigger("Attack");
+
+                // sound effect
+                AudioManager.Instance.PlayOneShot(FMODEvents.Instance.SwordHitSFX, transform.position);
+
                 
                 if (TypeOfUnit == UnitType.Pawn) {
                     enemyT.GetComponent<ISoldier>()?.TakeDamage(Damage);
