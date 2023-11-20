@@ -15,7 +15,6 @@ public class MenuInitialPageSetter : MonoBehaviour
     {
         UIPage page;
         
-        Debug.Log(ServicesManager.Instance.AreInitializedUnityServices());
         if (!ServicesManager.Instance.AreInitializedUnityServices() || !ServicesManager.Instance.IsSignedToUnityAuth())
         {
             page = titlePage;
