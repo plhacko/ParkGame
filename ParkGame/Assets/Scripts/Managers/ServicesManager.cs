@@ -26,8 +26,7 @@ public class ServicesManager : MonoBehaviour
 {
     public static ServicesManager Instance;
 
-    private ServiceType state = ServiceType.None;
-    public ServiceType State => state;
+    public ServiceType State = ServiceType.None;
 
     private void Awake()
     {
@@ -45,22 +44,22 @@ public class ServicesManager : MonoBehaviour
 
     private async void Initialize()
     {
-        state = ServiceType.None;
+        State = ServiceType.None;
 
         await InitializeUnityServices();     
 
         if (IsSignedToFirebase())
-            state |= ServiceType.FirebaseAuth;
+            State |= ServiceType.FirebaseAuth;
         if (AreInitializedUnityServices())
-            state |= ServiceType.UnityServices;
+            State |= ServiceType.UnityServices;
         if (IsSignedToUnityAuth())
-            state |= ServiceType.UnityAuth;
+            State |= ServiceType.UnityAuth;
     }
 
     private async Task InitializeUnityServices()
     {
         await UnityServices.InitializeAsync();
-        state |= ServiceType.UnityServices;
+        State |= ServiceType.UnityServices;
     }
 
     public bool AreInitializedUnityServices()
@@ -110,7 +109,7 @@ public class ServicesManager : MonoBehaviour
             return FirebaseAuthServiceError.FailedToLoginUser;
         }
 
-        state |= ServiceType.FirebaseAuth;
+        State |= ServiceType.FirebaseAuth;
         return FirebaseAuthServiceError.None;
     }
 
@@ -179,7 +178,7 @@ public class ServicesManager : MonoBehaviour
             return FirebaseAuthServiceError.FailedToLoginUser;
         }
 
-        state |= ServiceType.FirebaseAuth;
+        State |= ServiceType.FirebaseAuth;
         return FirebaseAuthServiceError.None;
     }
 
@@ -190,7 +189,7 @@ public class ServicesManager : MonoBehaviour
 
     public async Task SignUpAndLogInToUnityAuth()
     {
-        if (state < ServiceType.UnityServices)
+        if (State < ServiceType.UnityServices)
             throw new System.Exception("Unity Services are not initialized");
 
 #if UNITY_EDITOR
@@ -201,7 +200,7 @@ public class ServicesManager : MonoBehaviour
         }
 #endif
         await AuthenticationService.Instance.SignInAnonymouslyAsync();
-        state |= ServiceType.UnityAuth;
+        State |= ServiceType.UnityAuth;
     }
 
     public bool IsSignedToUnityAuth()
@@ -211,13 +210,13 @@ public class ServicesManager : MonoBehaviour
 
     public void SignOutFromFirebase()
     {
-        state = ServiceType.All ^ ServiceType.FirebaseAuth;
+        State = ServiceType.All ^ ServiceType.FirebaseAuth;
         FirebaseAuth.DefaultInstance.SignOut();
     }
 
     public void SignOutFromUnityAuth()
     {
-        state = ServiceType.All ^ ServiceType.UnityAuth;
+        State = ServiceType.All ^ ServiceType.UnityAuth;
         AuthenticationService.Instance.SignOut();
     }
 
