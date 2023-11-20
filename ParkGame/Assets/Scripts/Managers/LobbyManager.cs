@@ -91,8 +91,6 @@ namespace Managers
      
         public bool IsHost { get { return Lobby != null && Lobby.HostId == AuthenticationService.Instance.PlayerId; } }
         
-        public Task UnityServicesInitializeTask { get; private set; }
-
         private ILobbyEvents events;
 
         private float heartbeatTimer;
@@ -110,7 +108,6 @@ namespace Managers
                 return;
             }
 
-            UnityServicesInitializeTask = UnityServices.InitializeAsync();
             Singleton = this;
             DontDestroyOnLoad(gameObject);
         }

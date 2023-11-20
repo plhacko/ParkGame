@@ -34,6 +34,10 @@ public class UISignUpScreenController : UIPageController
         emailInputField.text = "";
         passwordInputField.text = "";
         confirmPasswordInputField.text = "";
+        nameInputField.colors = defaultColors;
+        emailInputField.colors = defaultColors;
+        passwordInputField.colors = defaultColors;
+        confirmPasswordInputField.colors = defaultColors;
     }
 
     public override void OnExit()
@@ -44,72 +48,31 @@ public class UISignUpScreenController : UIPageController
     {
         processing = true;
 
-        // Register user 
-        AuthResult result = null;
-        var auth = FirebaseAuth.DefaultInstance;
-        await auth.CreateUserWithEmailAndPasswordAsync(emailInputField.text, passwordInputField.text).ContinueWith(
-            task => 
-            {
-                if (task.IsCanceled) {
-                    Debug.LogError("CreateUserWithEmailAndPasswordAsync was canceled.");
-                    processing = false;
-                    return;
-                }
-                if (task.IsFaulted) {
-                    Debug.LogError("CreateUserWithEmailAndPasswordAsync encountered an error: " + task.Exception);
-                    processing = false;
-                    return;
-                }
-                
-                result = task.Result;
-                Debug.LogFormat("Firebase user created successfully: {0} ({1})", result.User.DisplayName, result.User.UserId);
-            }
-        );
+        var result = await ServicesManager.Instance.SignUpAndLoginToFirebase(emailInputField.text, passwordInputField.text, nameInputField.text);
         
-        // Login user
-        if (result != null)
+        if (result == ServicesManager.FirebaseAuthServiceError.FailedToCreateUser)
         {
-
-#if UNITY_EDITOR
-        if (ParrelSync.ClonesManager.IsClone())
+            // TODO: Show error message
+            var colors = defaultColors;
+            colors.normalColor = new Color(1, 0.7f, 0.7f);
+            nameInputField.colors = colors;
+            emailInputField.colors = colors;
+            passwordInputField.colors = colors;
+            confirmPasswordInputField.colors = colors;
+            processing = false;
+            return;
+        }
+        else if (result == ServicesManager.FirebaseAuthServiceError.FailedToLoginUser)
         {
-            string customArgument = ParrelSync.ClonesManager.GetArgument();
-            AuthenticationService.Instance.SwitchProfile($"Clone_{customArgument}_Profile");
+            // TODO: Show error message
+            UIController.Singleton.PushUIPage(loginPage);
+            processing = false;
+            return;
         }
-#endif
-        await AuthenticationService.Instance.SignInAnonymouslyAsync();
-
-            var userProfile = new UserProfile();
-            userProfile.DisplayName = nameInputField.text;
-            await result.User.UpdateUserProfileAsync(userProfile);
-
-            AuthResult loginResult = null;
-            await auth.SignInWithEmailAndPasswordAsync(emailInputField.text, passwordInputField.text).ContinueWith(
-                task => 
-                {
-                    if (task.IsCanceled) {
-                        Debug.LogError("SignInWithEmailAndPasswordAsync was canceled.");
-                        return;
-                    }
-                    if (task.IsFaulted) {
-                        Debug.LogError("SignInWithEmailAndPasswordAsync encountered an error: " + task.Exception);
-                        return;
-                    }
-
-                    loginResult = task.Result;
-                    Debug.LogFormat("User signed in successfully: {0} ({1})", result.User.DisplayName, result.User.UserId);
-                }
-            );
-
-            if (loginResult != null)
-            {
-                UIController.Singleton.PushUIPage(mainMenuPage);
-            }
-            else
-            {
-                UIController.Singleton.PushUIPage(loginPage);
-            }
-        }
+        
+        UIController.Singleton.PushUIPage(mainMenuPage);
+        
+        processing = false;
     }
 
     private void Back()
