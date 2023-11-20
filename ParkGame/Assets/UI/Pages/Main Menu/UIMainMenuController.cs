@@ -75,7 +75,7 @@ public class UIMainMenuController : UIPageController
     private void SignOut()
     {
         enableButtons(false);
-        ServicesManager.Instance.SignOutFromAll();
+        ServicesManager.Instance.SignOutFromFirebase();
         UIController.Singleton.PopUIPage();
         UIController.Singleton.PushUIPage(welcomePage);
     }

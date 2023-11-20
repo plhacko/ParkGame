@@ -14,13 +14,11 @@ public class MenuInitialPageSetter : MonoBehaviour
     void Start()
     {
         UIPage page;
-        if (ServicesManager.Instance.State < ServiceType.UnityServices)
+        
+        Debug.Log(ServicesManager.Instance.AreInitializedUnityServices());
+        if (!ServicesManager.Instance.AreInitializedUnityServices() || !ServicesManager.Instance.IsSignedToUnityAuth())
         {
-            page = titlePage;   
-        }
-        else if (ServicesManager.Instance.State < ServiceType.UnityAuth)
-        {
-            page = welcomePage;
+            page = titlePage;
         }
         else
         {
