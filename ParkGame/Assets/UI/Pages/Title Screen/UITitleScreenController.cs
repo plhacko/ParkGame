@@ -27,31 +27,20 @@ public class UITitleScreenController : UIPageController
     private async void Enter()
     {
         enterButton.interactable = false;
-        await LobbyManager.Singleton.UnityServicesInitializeTask;
 
-#if UNITY_EDITOR
-    if (!ParrelSync.ClonesManager.IsClone())
-    {
-        if (FirebaseAuth.DefaultInstance.CurrentUser != null)
+        await ServicesManager.Instance.SignUpAndLogInToUnityAuth();
+
+        if (ServicesManager.Instance.IsSignedToFirebase())
         {
-            await AuthenticationService.Instance.SignInAnonymouslyAsync();
-
             Debug.Log("User already logged in as " + FirebaseAuth.DefaultInstance.CurrentUser.DisplayName);
             UIController.Singleton.PushUIPage(mainMenuPage);
             return;
         }
-    }  
-#else
-        if (FirebaseAuth.DefaultInstance.CurrentUser != null)
+        else
         {
-            await AuthenticationService.Instance.SignInAnonymouslyAsync();
-
-            Debug.Log("User already logged in as " + FirebaseAuth.DefaultInstance.CurrentUser.DisplayName);
-            UIController.Singleton.PushUIPage(mainMenuPage);
-            return;
+            UIController.Singleton.PushUIPage(welcomePage);
         }
-#endif
 
-        UIController.Singleton.PushUIPage(welcomePage);
+        enterButton.interactable = true;
     }
 }
