@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -13,6 +14,7 @@ public class UIInGameScreenController : UIPageController
     [SerializeField] private Button action1;
     [SerializeField] private Button action2;
     [SerializeField] private Button action3;
+    [SerializeField] private RectTransform formationMask;
     [SerializeField] private RectTransform formationButtonParent;
     [SerializeField] private Button formationButton1;
     [SerializeField] private Button formationButton2;
@@ -37,7 +39,9 @@ public class UIInGameScreenController : UIPageController
 
     private void FormationClose()
     {
-        formationButtonParent.gameObject.SetActive(false);
+        var targetDelta = new Vector2(0, formationMask.sizeDelta.y);
+
+        formationMask.DOSizeDelta(targetDelta, .25f).OnComplete(() => action3.interactable = true);
     }
 
     private void Formation3()
@@ -57,7 +61,11 @@ public class UIInGameScreenController : UIPageController
 
     private void Action3()
     {
-        formationButtonParent.gameObject.SetActive(true);
+        action3.interactable = false;
+
+        var targetDelta = new Vector2(formationButtonParent.sizeDelta.x, formationMask.sizeDelta.y);
+
+        formationMask.DOSizeDelta(targetDelta, .25f);
     }
 
     private void Action2()
