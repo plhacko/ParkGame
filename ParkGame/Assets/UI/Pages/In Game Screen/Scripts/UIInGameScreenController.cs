@@ -46,17 +46,14 @@ public class UIInGameScreenController : UIPageController
 
     private void Formation3()
     {
-        throw new NotImplementedException();
     }
 
     private void Formation2()
     {
-        throw new NotImplementedException();
     }
 
     private void Formation1()
     {
-        throw new NotImplementedException();
     }
 
     private void Action3()
@@ -70,27 +67,22 @@ public class UIInGameScreenController : UIPageController
 
     private void Action2()
     {
-        throw new NotImplementedException();
     }
 
     private void Action1()
     {
-        throw new NotImplementedException();
     }
 
     private void CameraResize()
     {
-        throw new NotImplementedException();
     }
 
     private void Follow()
     {
-        throw new NotImplementedException();
     }
 
     private void Map()
     {
-        throw new NotImplementedException();
     }
 
     private void Options()
