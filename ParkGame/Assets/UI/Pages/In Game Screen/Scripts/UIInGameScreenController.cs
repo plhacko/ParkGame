@@ -13,6 +13,11 @@ public class UIInGameScreenController : UIPageController
     [SerializeField] private Button action1;
     [SerializeField] private Button action2;
     [SerializeField] private Button action3;
+    [SerializeField] private RectTransform formationButtonParent;
+    [SerializeField] private Button formationButton1;
+    [SerializeField] private Button formationButton2;
+    [SerializeField] private Button formationButton3;
+    [SerializeField] private Button formationButtonClose;
     [SerializeField] private UIPage optionsPage;
 
     private void Awake()
@@ -24,11 +29,35 @@ public class UIInGameScreenController : UIPageController
         action1.onClick.AddListener(Action1);
         action2.onClick.AddListener(Action2);
         action3.onClick.AddListener(Action3);
+        formationButton1.onClick.AddListener(Formation1);
+        formationButton2.onClick.AddListener(Formation2);
+        formationButton3.onClick.AddListener(Formation3);
+        formationButtonClose.onClick.AddListener(FormationClose);
+    }
+
+    private void FormationClose()
+    {
+        formationButtonParent.gameObject.SetActive(false);
+    }
+
+    private void Formation3()
+    {
+        throw new NotImplementedException();
+    }
+
+    private void Formation2()
+    {
+        throw new NotImplementedException();
+    }
+
+    private void Formation1()
+    {
+        throw new NotImplementedException();
     }
 
     private void Action3()
     {
-        throw new NotImplementedException();
+        formationButtonParent.gameObject.SetActive(true);
     }
 
     private void Action2()
