@@ -21,6 +21,7 @@ public class Formation : MonoBehaviour {
     
     public List<GameObject> soldiersSwordmen = new List<GameObject>();
     public List<GameObject> soldiersArchers = new List<GameObject>();
+    public List<GameObject> soldiersMolemen = new List<GameObject>();
 
     private int team => playerController.Team;
 
@@ -146,6 +147,18 @@ public class Formation : MonoBehaviour {
         formDescr.NumberOfPositions++;
     }
 
+    void Add1PositionOnTheSide() {
+        var formDescr = BoxRoot.GetComponent<FormationDescriptor>(); // 
+        int c = formDescr.NumberOfPositions; // add definition to the horse places? how to deal with moles???
+        float inc = formDescr.Increment;
+        var pos = formDescr.StartingPosition;
+        Vector3 position = pos + new Vector3(-(c % 3) * inc, -c / 3 * inc, 0);
+
+        var sphere = AddSphere(position, 0.2f, "BoxPos", BoxRoot);
+        FormationBox.Add(sphere);
+        formDescr.NumberOfPositions++;
+    }
+
     // rotate the box formation according to the commander's direction of movement
     void RotateBoxFormation() {
         if (!BoxRoot) { return; }
@@ -217,7 +230,9 @@ public class Formation : MonoBehaviour {
             case Soldier.UnitType.Archer:
                 soldiersArchers.Add(sol);
                 return Soldier.UnitType.Archer;
-            
+            case Soldier.UnitType.Horseman:
+                soldiersMolemen.Add(sol);
+                return Soldier.UnitType.Horseman;
             default:
                 break;
             
@@ -232,18 +247,24 @@ public class Formation : MonoBehaviour {
         Soldier.UnitType unitType = AddSoldierByType(soldier);
 
         if (shape == FormationType.Box) { 
-            return GetPositionInBox(); 
+            return GetPositionInBox(unitType); 
         }
         // circular formation: archers in smaller circle, swordmen in bigger circle
         return GetPositionInCircle(unitType);
     }
 
     // add parameter for formation type
-    public GameObject GetPositionInBox() {
+    public GameObject GetPositionInBox(Soldier.UnitType unitType) {
         var positionList = FormationBox;
-        if (FormationBox.Count < soldiers.Count) {
+        //if (FormationBox.Count < soldiers.Count) {
+        if (unitType != Soldier.UnitType.Horseman && FormationBox.Count < soldiersArchers.Count + soldiersSwordmen.Count) {
             Add1PositionToBoxFormation();
+        } 
+        if (unitType == Soldier.UnitType.Horseman) {
+            // ?
+            // position on the sides?
         }
+       
 
         foreach (var go in positionList) { 
             var pos = go.GetComponent<PositionDescriptor>();
