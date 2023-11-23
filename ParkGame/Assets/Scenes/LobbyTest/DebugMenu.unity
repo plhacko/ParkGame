@@ -1628,6 +1628,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: TestMoleman
       objectReference: {fileID: 0}
+    - target: {fileID: 3419075874295322595, guid: 8cfe5a199b3c20445bc24ab6439cf170, type: 3}
+      propertyPath: InnerDistanceFromCommander
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5486291451144485761, guid: 8cfe5a199b3c20445bc24ab6439cf170, type: 3}
+      propertyPath: m_AgentTypeID
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7878914504924443972, guid: 8cfe5a199b3c20445bc24ab6439cf170, type: 3}
       propertyPath: GlobalObjectIdHash
       value: 2092493739

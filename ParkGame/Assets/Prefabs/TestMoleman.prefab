@@ -24,7 +24,7 @@ GameObject:
   - component: {fileID: 33701960129267172}
   - component: {fileID: 3447098350190856005}
   m_Layer: 8
-  m_Name: TestMoleman Variant
+  m_Name: TestMoleman
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -37,9 +37,9 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5515698993845621550}
-  m_LocalRotation: {x: 0, y: 0, z: -0.7128772, w: 0.70128894}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -14.217195, y: -2.7118924, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.5, y: 0.8, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1257647479157674165}
@@ -47,7 +47,7 @@ Transform:
   - {fileID: 5590678979433490970}
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -90.939}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &685696255189976721
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -149,13 +149,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   InitialHP: 8
-  MovementSpeed: 5
-  InnerDistanceFromCommander: 3
-  OuterDistanceFromCommander: 6
-  DefendDistanceFromCommander: 3
-  AttackDistanceFromCommander: 8
-  MinAttackRange: 3
-  MaxAttackRange: 6
+  MovementSpeed: 3.5
+  InnerDistanceFromCommander: 1.5
+  OuterDistanceFromCommander: 3
+  DefendDistanceFromCommander: 3.1
+  AttackDistanceFromCommander: 6
+  MinAttackRange: 1
+  MaxAttackRange: 1.2
   Attackcooldown: 4
   Damage: 3
   TypeOfUnit: 2
@@ -267,7 +267,7 @@ CircleCollider2D:
   m_UsedByComposite: 0
   m_Offset: {x: -0.05, y: -0.6}
   serializedVersion: 2
-  m_Radius: 0.2
+  m_Radius: 0.35
 --- !u!195 &5486291451144485761
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -277,19 +277,19 @@ NavMeshAgent:
   m_GameObject: {fileID: 5515698993845621550}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 0.16
-  m_Speed: 5
+  m_Radius: 0.3
+  m_Speed: 3.5
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120
   m_StoppingDistance: 0
   m_AutoTraverseOffMeshLink: 1
-  m_AutoBraking: 1
+  m_AutoBraking: 0
   m_AutoRepath: 1
-  m_Height: 0.2
+  m_Height: 0.35
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
-  m_ObstacleAvoidanceType: 4
+  m_ObstacleAvoidanceType: 3
 --- !u!114 &3713162510152829337
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -516,7 +516,7 @@ Transform:
   m_GameObject: {fileID: 8148001999902843248}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -0.068, y: -0.624, z: 0}
-  m_LocalScale: {x: 0.6323733, y: 0.3173, z: 1}
+  m_LocalScale: {x: 0.37942398, y: 0.3173, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 725677828416431633}
