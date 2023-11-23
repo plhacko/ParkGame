@@ -8,8 +8,16 @@ using UnityEngine.Tilemaps;
 
 public class GameManager : NetworkBehaviour 
 {
-    [SerializeField] private GameObject mapCreator;
+    [SerializeField] private MapInitializer mapCreator;
+    private GameObject GPSMap;
+    private GameObject GridMap;
     [SerializeField] private PlayerManager playerManager;
+    
+    private void Start()
+    {
+        GPSMap = mapCreator.GPSMap;
+        GridMap = mapCreator.GridMap;
+    }
 
     [ServerRpc(RequireOwnership = false)]
     void RequestChangeOfFormationServerRpc(ulong clientID, KeyCode key) {
@@ -68,8 +76,7 @@ public class GameManager : NetworkBehaviour
 
     public void Hide()
     {
-        var grid = mapCreator.transform.GetComponentInChildren<Grid>().transform;
-        foreach (Transform child in grid)
+        foreach (Transform child in GridMap.transform)
         {
             child.gameObject.GetComponent<TilemapRenderer>().enabled = false;
         }
@@ -77,8 +84,7 @@ public class GameManager : NetworkBehaviour
 
     public void Show()
     {
-        var grid = mapCreator.transform.GetComponentInChildren<Grid>().transform;
-        foreach (Transform child in grid)
+        foreach (Transform child in GridMap.transform)
         {
             child.gameObject.GetComponent<TilemapRenderer>().enabled = true;
         }
