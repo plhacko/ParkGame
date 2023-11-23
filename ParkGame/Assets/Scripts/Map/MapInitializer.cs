@@ -6,6 +6,7 @@ using UnityEngine;
 public class MapInitializer : MonoBehaviour
 {
     [SerializeField] private CreateMapWithOverlay mapCreator;
+    public GameObject mapSprite { get; private set; } = null; 
 
     private PlayerManager playerManager;
     
@@ -40,12 +41,6 @@ public class MapInitializer : MonoBehaviour
     {
         mapCreator.GetComponent<Drawable>().enabled = false;
         mapCreator.CreateTilemapFromFetchedMap(LobbyManager.Singleton.MapData);
-        
-        var baseMap = mapCreator.BaseMap;
-        baseMap.OnMapLoaded += () =>
-        {
-            Debug.Log("Map loaded");
-            mapCreator.FitCameraToMap();
-        };  
+        mapCreator.FitCameraToMap();
     }
 }

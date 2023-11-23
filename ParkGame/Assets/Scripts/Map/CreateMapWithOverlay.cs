@@ -80,19 +80,13 @@ public class CreateMapWithOverlay : MonoBehaviour
         CreateTilemapFromTexture(fromUploadedTexture: true, structures: mapData.MetaData.Structures);
         navMesh.BuildNavMesh();
 
-        var dimensions = ExtractDimensionsFromUrl(mapData.MetaData.MapQuery);
-        var boundingBox = ExtractBoundingBoxFromUrl(mapData.MetaData.MapQuery);
-
         var mapDisplayer = mapSprite.GetComponent<MapDisplayer>();
-        mapDisplayer.Width = (int) dimensions.x;
-        mapDisplayer.Height = (int) dimensions.y;
-        mapDisplayer.MinLongitude = boundingBox.x;
-        mapDisplayer.MinLatitude = boundingBox.y;
-        mapDisplayer.MaxLongitude = boundingBox.z;
-        mapDisplayer.MaxLatitude = boundingBox.w;
-        fetchedMap = mapDisplayer.transform.gameObject;
+        mapDisplayer.mapData = mapData;
+        mapDisplayer.Initiator = MapDisplayer.MapInitiator.MapData;
 
+        fetchedMap = mapDisplayer.transform.gameObject;
         BaseMap = Instantiate(mapSprite, transform).GetComponent<MapDisplayer>();
+        
         Debug.Log("Map fetched and created");
     }
 
@@ -101,48 +95,7 @@ public class CreateMapWithOverlay : MonoBehaviour
         return BaseMap.IsMapLoaded();
     }
 
-    public Vector2 ExtractDimensionsFromUrl(string url)
-    {
-        // Define the regex pattern to match the dimensions
-        string pattern = @"/(\d+)x(\d+)@";
-
-        // Use regex to find a match in the URL
-        Match match = Regex.Match(url, pattern);
-
-        // If a match was found, extract the dimensions and return them as a Vector2
-        if (match.Success)
-        {
-            float width = float.Parse(match.Groups[1].Value);
-            float height = float.Parse(match.Groups[2].Value);
-
-            return new Vector2(width, height);
-        }
-
-        // If no match was found, return a default Vector2
-        return new Vector2();
-    }
-
-    public Vector4 ExtractBoundingBoxFromUrl(string url)
-    {
-        // Define the regex pattern to match the bounding box coordinates
-        string bboxPattern = @"\[(-?\d+.\d+),(-?\d+.\d+),(-?\d+.\d+),(-?\d+.\d+)\]";
-
-        Match match = Regex.Match(url, bboxPattern);
-
-        // If a match was found, extract the coordinates and return them as a Vector4
-        if (match.Success)
-        {
-            float minLon = float.Parse(match.Groups[1].Value, CultureInfo.InvariantCulture);
-            float minLat = float.Parse(match.Groups[2].Value, CultureInfo.InvariantCulture);
-            float maxLon = float.Parse(match.Groups[3].Value, CultureInfo.InvariantCulture);
-            float maxLat = float.Parse(match.Groups[4].Value, CultureInfo.InvariantCulture);
-
-            return new Vector4(minLon, minLat, maxLon, maxLat);
-        }
-
-        // If no match was found, return a default Vector4
-        return new Vector4();
-    }
+    
     
     private IEnumerator WaitForValue()
     {
