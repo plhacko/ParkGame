@@ -8,33 +8,54 @@ using UnityEngine.UI;
 public class UIInGameScreenController : UIPageController
 {
     [SerializeField] private Button optionsButton;
-    [SerializeField] private Button mapButton;
+    [SerializeField] private ToggleButton mapButton;
     [SerializeField] private Button followButton;
     [SerializeField] private Button cameraButton;
     [SerializeField] private Button action1;
-    [SerializeField] private Button action2;
+    [SerializeField] private ToggleButton action2;
     [SerializeField] private Button action3;
     [SerializeField] private RectTransform formationMask;
     [SerializeField] private RectTransform formationButtonParent;
     [SerializeField] private Button formationButton1;
     [SerializeField] private Button formationButton2;
-    [SerializeField] private Button formationButton3;
     [SerializeField] private Button formationButtonClose;
     [SerializeField] private UIPage optionsPage;
+    [SerializeField] private GameManager gameManager;
 
     private void Awake()
     {
         optionsButton.onClick.AddListener(Options);
-        mapButton.onClick.AddListener(Map);
-        followButton.onClick.AddListener(Follow);
+        mapButton.AddListener(ShowTilemap);
+        mapButton.AddListener(HideTilemap);
+        followButton.onClick.AddListener(CameraFollow);
         cameraButton.onClick.AddListener(CameraResize);
         action1.onClick.AddListener(Action1);
-        action2.onClick.AddListener(Action2);
+        action2.AddListener(Move);
+        action2.AddListener(Idle);
         action3.onClick.AddListener(Action3);
         formationButton1.onClick.AddListener(Formation1);
         formationButton2.onClick.AddListener(Formation2);
-        formationButton3.onClick.AddListener(Formation3);
         formationButtonClose.onClick.AddListener(FormationClose);
+    }
+
+    private void Idle()
+    {
+        gameManager.CommandIdle();
+    }
+
+    private void Move()
+    {
+        gameManager.CommandMove();
+    }
+
+    private void HideTilemap()
+    {
+        gameManager.Hide();        
+    }
+
+    private void ShowTilemap()
+    {
+        gameManager.Show();
     }
 
     private void FormationClose()
@@ -44,16 +65,14 @@ public class UIInGameScreenController : UIPageController
         formationMask.DOSizeDelta(targetDelta, .25f).OnComplete(() => action3.interactable = true);
     }
 
-    private void Formation3()
-    {
-    }
-
     private void Formation2()
     {
+        gameManager.FormationBox();
     }
 
     private void Formation1()
     {
+        gameManager.FormationCircle();
     }
 
     private void Action3()
@@ -65,23 +84,16 @@ public class UIInGameScreenController : UIPageController
         formationMask.DOSizeDelta(targetDelta, .25f);
     }
 
-    private void Action2()
-    {
-    }
-
     private void Action1()
     {
+        gameManager.CommandAttack();
     }
 
     private void CameraResize()
     {
     }
 
-    private void Follow()
-    {
-    }
-
-    private void Map()
+    private void CameraFollow()
     {
     }
 

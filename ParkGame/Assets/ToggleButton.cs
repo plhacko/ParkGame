@@ -7,22 +7,26 @@ using UnityEngine.UI;
 public class ToggleButton : MonoBehaviour
 {
     private Button button;
-    [SerializeField] private uint States = 2;
-    private uint CurrentState = 0;
-    [SerializeField] private List<UnityEvent> Events;
+    private uint MaxStates;
+    public uint CurrentState { get; private set; } = 0;
+    private List<UnityAction> onClicks = new List<UnityAction>();
     void Start()
     {
         button = GetComponent<Button>();       
-        if (States != Events.Count) {
-            Debug.LogError("States and Events must be the same length");
-        }
+        MaxStates = (uint)onClicks.Count;
         button.onClick.AddListener(OnClick);
-        button.GetComponentInChildren<TMPro.TextMeshProUGUI>().text = CurrentState.ToString();
+        var nextState = (CurrentState + 1) % MaxStates;
+        button.GetComponentInChildren<TMPro.TextMeshProUGUI>().text = nextState.ToString();
     }
     
     void OnClick() {
-        CurrentState = (CurrentState + 1) % States;
-        button.GetComponentInChildren<TMPro.TextMeshProUGUI>().text = CurrentState.ToString();
-        Events[(int)CurrentState].Invoke();
+        CurrentState = (CurrentState + 1) % MaxStates;
+        var nextState = (CurrentState + 1) % MaxStates;
+        button.GetComponentInChildren<TMPro.TextMeshProUGUI>().text = nextState.ToString();
+        onClicks[(int)CurrentState].Invoke();
+    }
+
+    public void AddListener(UnityAction onClick) {
+        onClicks.Add(onClick);
     }
 }
