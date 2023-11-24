@@ -254,10 +254,10 @@ namespace Player
 
         void ICommander.ReportFollowing(NetworkObjectReference networkObjectReference)
         {
-            if (IsHost)
-            {
-                addToUnitsClientRpc(networkObjectReference);
-            }
+            if (!IsServer)
+            { throw new Exception($"only on server can adding units to commander be done: {gameObject.name}"); }
+            
+            addToUnitsClientRpc(networkObjectReference);
         }
         
         [ClientRpc]
@@ -268,10 +268,10 @@ namespace Player
 
         void ICommander.ReportUnfollowing(NetworkObjectReference networkObjectReference)
         {
-            if (IsHost)
-            {
-                removeFromUnitsClientRpc(networkObjectReference);
-            }
+            if (!IsServer)
+            { throw new Exception($"only on server can removing units from commander be done: {gameObject.name}"); }
+            
+            removeFromUnitsClientRpc(networkObjectReference);
         }
         
         [ClientRpc]
