@@ -15,7 +15,7 @@ namespace FreeDraw
         // PEN COLOUR
         public static Color Pen_Colour = Color.red;     // Change these to change the default drawing settings
         // PEN WIDTH (actually, it's a radius, in pixels)
-        public static int Pen_Width = 15;
+        public static int Pen_Width = 5;
 
 
         public delegate void Brush_Function(Vector2 world_position);
@@ -289,7 +289,7 @@ namespace FreeDraw
 
         
 
-        public void SetDrawableSprite(Sprite sprite)
+        public void SetDrawableSprite(Sprite sprite, int scaleRation)
         {
             if (!sprite)
             {
@@ -304,6 +304,7 @@ namespace FreeDraw
             // Scale 2D box collider according to new texture size
             var spriteRenderer = GetComponent<SpriteRenderer>();
             spriteRenderer.sprite = sprite;
+            spriteRenderer.transform.localScale *= scaleRation;
             GetComponent<BoxCollider2D>().size = new Vector2(
                 spriteRenderer.bounds.size.x * transform.localScale.x,
                 spriteRenderer.bounds.size.y * transform.localScale.y
@@ -325,7 +326,7 @@ namespace FreeDraw
             // DEFAULT BRUSH SET HERE
             current_brush = PenBrush;
             
-            SetDrawableSprite(this.GetComponent<SpriteRenderer>().sprite);
+            // SetDrawableSprite(this.GetComponent<SpriteRenderer>().sprite);
             
         }
     }

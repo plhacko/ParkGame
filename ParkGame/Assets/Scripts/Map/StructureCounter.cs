@@ -36,6 +36,11 @@ public class StructureCounter : MonoBehaviour
         maxStructures = newStructureCount;
     }
 
+    public int GetStructureCount()
+    {
+        return currentStructures.Count;
+    }
+
     /**
      * Get cell positions in tilemap of concrete structure type
      * @returns tuple of name and list of cell positions  

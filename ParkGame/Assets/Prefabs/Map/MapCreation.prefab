@@ -113,7 +113,7 @@ TilemapRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 2025221761
-  m_SortingLayer: 2
+  m_SortingLayer: -1
   m_SortingOrder: 1
   m_ChunkSize: {x: 32, y: 32, z: 32}
   m_ChunkCullingBounds: {x: 0, y: 0, z: 0}
@@ -378,7 +378,7 @@ TilemapRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 2025221761
-  m_SortingLayer: 2
+  m_SortingLayer: -1
   m_SortingOrder: 0
   m_ChunkSize: {x: 32, y: 32, z: 32}
   m_ChunkCullingBounds: {x: 0, y: 0, z: 0}
@@ -452,7 +452,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mainCamera: {fileID: 0}
-  mapOverlay: {fileID: 0}
   baseTilemap: {fileID: 2284287231515126845}
   actionTilemap: {fileID: 2173846108126059245}
   blockingTilemap: {fileID: 7850523980954693687}
@@ -470,7 +469,6 @@ MonoBehaviour:
   victoryPoint: {fileID: 0}
   castles: {fileID: 0}
   doNotFetch: 0
-  loadFromSessionManager: 0
   navMesh: {fileID: 6742970777859922634, guid: a83edac981429054c8a9dac7cf70b780, type: 3}
   gridLayout: {fileID: 2284287230310182246}
   mapSprite: {fileID: 863442115086188281, guid: 53f9e5c24c8a22141afc0ba340f28b3e, type: 3}
@@ -700,7 +698,7 @@ TilemapRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 2025221761
-  m_SortingLayer: 2
+  m_SortingLayer: -1
   m_SortingOrder: 2
   m_ChunkSize: {x: 32, y: 32, z: 32}
   m_ChunkCullingBounds: {x: 0, y: 0, z: 0}
