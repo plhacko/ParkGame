@@ -23,7 +23,7 @@ namespace Player
         private ChangeMaterial changeMaterial;
         private FogOfWar fogOfWar;
         private Revealer revealer;
-        private List<GameObject> units = new();
+        private List<NetworkObjectReference> units = new();
         private string firebaseId;
         
         // Replicated variable for sprite orientation
@@ -99,6 +99,14 @@ namespace Player
 
         private void Update()
         {
+            if (isActualOwner())
+            {
+                foreach (GameObject unit in units)
+                {
+                    Debug.Log(unit.GetComponent<Soldier>().HP);
+                }
+            }
+            
             if (!isActualOwner()) return;
             if (!Application.isFocused) return;
 
@@ -244,9 +252,34 @@ namespace Player
             firebaseId = clientData.FirebaseId;
         }
 
-        void ICommander.ReportFollowing(GameObject go) => units.Add(go);
-        void ICommander.ReportUnfollowing(GameObject go) => units.Remove(go);
+        void ICommander.ReportFollowing(NetworkObjectReference networkObjectReference)
+        {
+            if (IsHost)
+            {
+                addToUnitsClientRpc(networkObjectReference);
+            }
+        }
+        
+        [ClientRpc]
+        private void addToUnitsClientRpc(NetworkObjectReference networkObjectReference)
+        {
+            units.Add(networkObjectReference);
+        }
 
+        void ICommander.ReportUnfollowing(NetworkObjectReference networkObjectReference)
+        {
+            if (IsHost)
+            {
+                removeFromUnitsClientRpc(networkObjectReference);
+            }
+        }
+        
+        [ClientRpc]
+        private void removeFromUnitsClientRpc(NetworkObjectReference networkObjectReference)
+        {
+            units.Remove(networkObjectReference);
+        }
+        
         // commands to the units
         [ServerRpc]
         public void CommandMovementServerRpc()
@@ -257,6 +290,7 @@ namespace Player
                 { soldier.SoldierBehaviour = SoldierBehaviour.Move; }
             }
         }
+        
         [ServerRpc]
         public void CommandIdleServerRpc()
         {
@@ -266,6 +300,7 @@ namespace Player
                 { soldier.SoldierBehaviour = SoldierBehaviour.Idle; }
             }
         }
+        
         [ServerRpc]
         public void CommandAttackServerRpc()
         {

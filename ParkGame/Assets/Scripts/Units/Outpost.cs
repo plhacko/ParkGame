@@ -20,7 +20,7 @@ public class Outpost : NetworkBehaviour, ICommander
     [SerializeField] private Soldier.UnitType InitOutpostUnitType;
 
     //[SerializeField] GameObject HorsemanPrefab; // todo
-    List<GameObject> Units = new List<GameObject>();
+    List<NetworkObjectReference> Units = new List<NetworkObjectReference>();
     //ToggleSpawnedUnitScript OutpostSpawnerChanger;
 
     NetworkVariable<float> _Timer = new(0.0f);
@@ -135,20 +135,20 @@ public class Outpost : NetworkBehaviour, ICommander
         InitialTeam = team;
     }
 
-    void ICommander.ReportFollowing(GameObject go)
+    void ICommander.ReportFollowing(NetworkObjectReference networkObjectReference)
     {
         if (!IsServer)
         { throw new Exception($"only on server can adding units to outpost be reported\n outpost: {gameObject.name}"); }
 
-        Units.Add(go);
+        Units.Add(networkObjectReference);
     }
 
-    void ICommander.ReportUnfollowing(GameObject go)
+    void ICommander.ReportUnfollowing(NetworkObjectReference networkObjectReference)
     {
         if (!IsServer)
         { throw new Exception($"only on server can removing units to outpost be reported\n outpost: {gameObject.name}"); }
 
-        Units.Remove(go);
+        Units.Remove(networkObjectReference);
     }
 
     public Formation.FormationType GetFormation() {
