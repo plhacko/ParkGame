@@ -7,9 +7,7 @@ public class FogOfWar : MonoBehaviour
     [SerializeField] private SpriteRenderer revealerSpriteRenderer;
     [SerializeField] private int pixelsPerUnit = 1;
     [SerializeField] private int width;
-    [SerializeField] private int radius;
     [SerializeField] private int radiusEdge;
-    [SerializeField] private Transform target;
     [SerializeField] private Color hiddenColor;
     
     private static readonly int RevealersPositions = Shader.PropertyToID("_RevealersPositions");
@@ -33,8 +31,8 @@ public class FogOfWar : MonoBehaviour
 
     void Update()
     {
-        var radii = new float[revealerTargets.Count];
-        var positions = new Vector4[revealerTargets.Count];
+        var radii = new float[512];
+        var positions = new Vector4[512];
         
         for (int i = 0; i < revealerTargets.Count; i++)
         {

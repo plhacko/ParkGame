@@ -99,14 +99,6 @@ namespace Player
 
         private void Update()
         {
-            if (isActualOwner())
-            {
-                foreach (GameObject unit in units)
-                {
-                    Debug.Log(unit.GetComponent<Soldier>().HP);
-                }
-            }
-            
             if (!isActualOwner()) return;
             if (!Application.isFocused) return;
 

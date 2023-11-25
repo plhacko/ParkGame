@@ -320,6 +320,10 @@ PrefabInstance:
       propertyPath: debug
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 862468789255997007, guid: 9bb05d8030a6a9e478fe2be15321e107, type: 3}
+      propertyPath: revealerTargets.Array.size
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
