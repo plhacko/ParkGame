@@ -6,8 +6,19 @@ Shader "Unlit/Revealer"
     }
     SubShader
     {
-        Tags { "RenderType"="Opaque" }
-        LOD 100
+        Tags 
+        { 
+            "Queue"="Transparent"
+            "IgnoreProjector"="True"
+            "RenderType"="Transparent"
+            "PreviewType"="Plane"
+            "CanUseSpriteAtlas"="True"
+        }
+        
+        Cull Off
+        Lighting Off
+        ZWrite Off
+        Blend One OneMinusSrcAlpha
 
         Stencil
         {
@@ -61,26 +72,18 @@ Shader "Unlit/Revealer"
             {
                 const fixed2 uv = floor((i.uv - 0.5f) * _Width * _PixelsPerUnit + 0.5f);
 
-                const int radius = _RevealersRadii[0];
-                const fixed2 position = _RevealersPositions[0].xy * _PixelsPerUnit;
+                fixed minDist = 100000000;
+                for (int j = 0; j < _RevealersCount; j++)
+                {
+                    const int radius = _RevealersRadii[j];
+                    const fixed2 position = _RevealersPositions[j].xy * _PixelsPerUnit;
                 
-                const fixed dist = max(0, distance(position, uv) - radius);
-                const float distanceFraction = dist / _RadiusEdge;
-                
-                clip(1 - distanceFraction);
+                    minDist = min(minDist, distance(position, uv) - radius);
+                }
+                    
+                clip(1 - minDist / _RadiusEdge);
                 
                 return fixed4(0, 0, 0, 0);
-                
-                // for (int j = 0; j < _RevealersCount; j++)
-                // {
-                //     float4 pos = _RevealersPositions[j];
-                //     float dist = length(pos.xy - i.uv);
-                //     // float alpha = saturate(1.0 - dist / pos.w);
-                //     col.rgb = dist;
-                //     // col.a = lerp(col.a, 0, alpha);
-                // }
-                //
-                // return col;
             }
             ENDCG
         }

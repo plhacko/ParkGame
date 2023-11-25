@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Revealer : MonoBehaviour
 {
-    public int radius = 3;
+    public int Radius = 3;
     
     private void OnDestroy()
     {

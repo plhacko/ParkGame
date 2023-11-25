@@ -68,12 +68,16 @@ Shader "Unlit/FogOfWar"
             {
                 const fixed2 uv = floor((i.uv - 0.5f) * _Width * _PixelsPerUnit + 0.5f);
 
-                const int radius = _RevealersRadii[0];
-                const fixed2 position = _RevealersPositions[0].xy * _PixelsPerUnit;
+                fixed minDist = 100000000;
+                for (int j = 0; j < _RevealersCount; j++)
+                {
+                    const int radius = _RevealersRadii[j];
+                    const fixed2 position = _RevealersPositions[j].xy * _PixelsPerUnit;
+
+                    minDist = min(minDist, distance(position, uv) - radius);
+                }
                 
-                const fixed dist = max(0, distance(position, uv) - radius);
-                
-                return lerp(fixed4(0, 0, 0, 0), _HiddenColor, saturate(dist / _RadiusEdge));
+                return lerp(fixed4(0, 0, 0, 0), _HiddenColor, saturate(minDist / _RadiusEdge));
             }
             ENDCG
         }
