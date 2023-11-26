@@ -13,10 +13,12 @@ public class UploadMapDialog : MonoBehaviour
     [SerializeField] private Button goBackButton;
     [SerializeField] private TextMeshProUGUI statusText;
     [SerializeField] private GameObject root;
-    [SerializeField] private UIPage mainMenu; 
+    [SerializeField] private UIPage mainMenu;
+    [SerializeField] private Button saveMapButton;
     private void Awake()
     {
         root.SetActive(false);
+        saveMapButton.interactable = false;
         returnToMenuButton.gameObject.SetActive(false);
         uploadButton.interactable = true;
         statusText.text = "";
@@ -56,5 +58,12 @@ public class UploadMapDialog : MonoBehaviour
             statusText.text = "";
             root.SetActive(false);
         });
+
+        mapWithOverlay.OnMapValidated += SetSaveMapButtonState;
+    }
+
+    private void SetSaveMapButtonState(bool active)
+    {
+        saveMapButton.interactable = active;
     }
 }

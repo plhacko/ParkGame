@@ -105,10 +105,10 @@ public class StructureCounter : MonoBehaviour
             throw new InvalidOperationException($"Cannot add more {nameof(structureType)}, limit is {maxStructures}");
     }
     
-    public void RemoveMapStructure(GameObject structure)
+    public bool RemoveMapStructure(GameObject structure)
     {
         if (!currentStructures.Remove(structure))
-            throw new InvalidOperationException("Structure not found");
+            return false;
         if (structureType == StructureType.Castle)
         {
             // Reindex remaining team labels on screen
@@ -117,5 +117,7 @@ public class StructureCounter : MonoBehaviour
                 currentStructures[idx].GetComponentInChildren<TextMeshProUGUI>().text = $"TEAM {idx + 1}";
             }
         }
+
+        return true;
     }
 }

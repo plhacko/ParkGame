@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
+using DG.Tweening;
 using FreeDraw;
 using Managers;
 using Unity.AI;
@@ -53,8 +54,12 @@ public class CreateMapWithOverlay : MonoBehaviour
     public bool doNotFetch = false; // Do not try to load a map (Debug)
     public NavMeshSurface navMesh;  // used for building navMesh on tilemap
     public GridLayout gridLayout; // used for placing structures correctly based on tilemap coordinates
+
+    public Action<bool> OnMapValidated;
+    public Action<List<string>> OnMapCreationErrors;
     
     private Sprite mapOverlay;
+    public Drawable mapDrawable;
     private Texture2D drawableTexture;
     private Texture2D resizedDrawableTexture;
     private Sprite drawableSprite;
@@ -70,6 +75,7 @@ public class CreateMapWithOverlay : MonoBehaviour
     void Start()
     {
         drawableSpriteRenderer = GetComponent<SpriteRenderer>();
+        mapDrawable = GetComponent<Drawable>();
         if (!doNotFetch) // Wait until map fetching from MapBox is completed
             StartCoroutine(WaitForValue());
     }
@@ -244,7 +250,7 @@ public class CreateMapWithOverlay : MonoBehaviour
         );
         drawableSprite.name = "DrawableSprite";
         // set the newly created sprite to the drawable script
-        GetComponent<Drawable>().SetDrawableSprite(drawableSprite, scaleRation);
+        mapDrawable.SetDrawableSprite(drawableSprite, scaleRation);
     }
     
     /// <summary>
@@ -323,9 +329,15 @@ public class CreateMapWithOverlay : MonoBehaviour
     public void ToggleDrawable()
     {
         if (drawableSpriteRenderer.color.a != 1)
+        {
             drawableSpriteRenderer.color = Color.white;
+            mapDrawable.SetDrawableState(drawingLocked: false);
+        }
         else
-            drawableSpriteRenderer.color = new Color(1, 1, 1, 0.1f);
+        {
+            drawableSpriteRenderer.color = new Color(1, 1, 1, 0.2f);
+            mapDrawable.SetDrawableState(drawingLocked: true);
+        }
     }
 
     private void ToggleTilemap(bool visible)
@@ -353,7 +365,7 @@ public class CreateMapWithOverlay : MonoBehaviour
 
     private double Dist2DSquared(Vector3Int a, Vector3Int b)
     {
-        return Math.Pow(a.x-b.x,2)+Math.Pow(b.x-b.y,2);
+        return Math.Pow(a.x-b.x,2)+Math.Pow(a.y-b.y,2);
     }
     
     private void CheckStructureDistances(
@@ -427,15 +439,16 @@ public class CreateMapWithOverlay : MonoBehaviour
         CreateTilemapFromTexture(false, null);
         if (errorMessages.Count != 0)
         {
-            foreach (var errorMessage in errorMessages)
-            {
-                Debug.LogError(errorMessage);
-            }
-
-            ToggleTilemap(false);
+            // foreach (var errorMessage in errorMessages)
+            // {
+            //     Debug.LogError(errorMessage);
+            // }
+            ToggleTilemap(false);  // Hide tilemap
+            OnMapCreationErrors.Invoke(errorMessages);
             return;
         }
         ToggleTilemap(true);
+        OnMapValidated.Invoke(true); // Enable SaveMap button
     }
     /**
      * Creates tilemap from drawn texture by scaling texture to low resolution and assigning tiles by according colors
@@ -443,6 +456,7 @@ public class CreateMapWithOverlay : MonoBehaviour
     private void CreateTilemapFromTexture(bool fromUploadedTexture = false, MapStructures structures = null)
     {
         errorMessages = new List<string>();
+        OnMapValidated.Invoke(false); // Disable Save map button, reenabled after valid map creation
         ClearTilemap();
 
         if (!fromUploadedTexture)

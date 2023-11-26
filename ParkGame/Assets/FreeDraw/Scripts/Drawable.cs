@@ -42,8 +42,22 @@ namespace FreeDraw
         Color32[] cur_colors;
         bool mouse_was_previously_held_down = false;
         bool no_drawing_on_current_drag = false;
+        private bool placing_structure = false;
+        private bool drawing_locked = false;
 
+        public void SetDrawableState(bool? placingStructure = null, bool? drawingLocked = null)
+        {
+            if (placingStructure.HasValue)
+                placing_structure = placingStructure.Value;
+            if (drawingLocked.HasValue)
+                drawing_locked = drawingLocked.Value;
+            drawable.enabled = !(placing_structure || drawing_locked);
+        }
 
+        public bool IsDrawingEnabled()
+        {
+            return !(placing_structure || drawing_locked);
+        }
 
 //////////////////////////////////////////////////////////////////////////////
 // BRUSH TYPES. Implement your own here
@@ -140,6 +154,8 @@ namespace FreeDraw
         {
             // Is the user holding down the left mouse button?
             bool mouse_held_down = Input.GetMouseButton(0);
+            if (EventSystem.current.IsPointerOverGameObject())
+                return;
             if (mouse_held_down && !no_drawing_on_current_drag)
             {
                 // Convert mouse coordinates to world coordinates
