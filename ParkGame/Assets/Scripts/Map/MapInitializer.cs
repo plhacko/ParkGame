@@ -18,6 +18,7 @@ public class MapInitializer : MonoBehaviour
             return;
         }
 
+        mapCreator.GetComponent<Drawable>().enabled = false;
         playerManager = FindObjectOfType<PlayerManager>();
         
         if (NetworkManager.Singleton.IsHost)
@@ -40,7 +41,6 @@ public class MapInitializer : MonoBehaviour
 
     private void loadMap()
     {
-        mapCreator.GetComponent<Drawable>().enabled = false;
         mapCreator.CreateTilemapFromFetchedMap(LobbyManager.Singleton.MapData);
         GPSMap = mapCreator.BaseMap.gameObject;
         GridMap = GetComponentInChildren<Grid>().gameObject;
