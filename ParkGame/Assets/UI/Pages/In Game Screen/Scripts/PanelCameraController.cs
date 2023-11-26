@@ -26,10 +26,6 @@ public class PanelCameraController : MonoBehaviour, IBeginDragHandler, IDragHand
     {
         // Scroll wheel zoom in/out
         float scroll = Input.GetAxis("Mouse ScrollWheel");
-        if (scroll != 0.0f)
-        {
-            mainCamera.orthographicSize = Mathf.Clamp(mainCamera.orthographicSize - scroll * zoomSpeed, minSize, maxSize);
-        }
 
         if (isDragging)
         {
@@ -39,6 +35,25 @@ public class PanelCameraController : MonoBehaviour, IBeginDragHandler, IDragHand
             Vector3 delta = lastDragPosition.Value - currentDragPosition;
             mainCamera.transform.Translate(delta);
             lastDragPosition = currentDragPosition;
+        }
+        else if (isZooming || scroll != 0.0f)
+        {
+            float delta = scroll;
+            if (Input.touchCount >= 2)
+            {
+                Touch touchZero = Input.GetTouch(0);
+                Touch touchOne = Input.GetTouch(1);
+
+                Vector2 touchZeroPrevPos = touchZero.position - touchZero.deltaPosition;
+                Vector2 touchOnePrevPos = touchOne.position - touchOne.deltaPosition;
+
+                float prevMagnitude = (touchZeroPrevPos - touchOnePrevPos).magnitude;
+                float currentMagnitude = (touchZero.position - touchOne.position).magnitude;
+
+                delta = currentMagnitude - prevMagnitude;
+            }
+
+            mainCamera.orthographicSize = Mathf.Clamp(mainCamera.orthographicSize - delta * zoomSpeed, minSize, maxSize);
         }
     }
 
@@ -51,7 +66,7 @@ public class PanelCameraController : MonoBehaviour, IBeginDragHandler, IDragHand
         }
 
         // Check if only one finger is used or if the user is using the mouse
-        if (!OneMouseTouch())
+        if (Input.touchCount != 1 && !Input.GetMouseButton(0))
         {
             return;
         }
@@ -66,10 +81,9 @@ public class PanelCameraController : MonoBehaviour, IBeginDragHandler, IDragHand
             return;
         }
 
-        Vector3 currentDragPosition = mainCamera.ScreenToWorldPoint(eventData.position);
-
         if (!isDragging)
         {
+            Vector3 currentDragPosition = mainCamera.ScreenToWorldPoint(eventData.position);
             isDragging = Vector3.Distance(currentDragPosition, lastDragPosition.Value) > minDragDistance && !isZooming;
         }
     }
@@ -89,16 +103,17 @@ public class PanelCameraController : MonoBehaviour, IBeginDragHandler, IDragHand
 
         if (Input.touchCount == 2 && !isDragging)
         {
+            isZooming = true;
         }
     }
 
     public void OnPointerUp(PointerEventData eventData)
     {
         Debug.Log("Pointer up");
-    }
 
-    private bool OneMouseTouch()
-    {
-        return Input.touchCount == 1 || Input.GetMouseButton(0);
+        if (isZooming)
+        {
+            isZooming = Input.touchCount >= 2;
+        }
     }
 }
