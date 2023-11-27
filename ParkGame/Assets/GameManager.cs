@@ -15,8 +15,8 @@ public class GameManager : NetworkBehaviour
     
     private void Start()
     {
-        GPSMap = mapCreator.GPSMap;
-        GridMap = mapCreator.GridMap;
+        GPSMap = MapInitializer.GPSMap;
+        GridMap = MapInitializer.GridMap;
     }
 
     [ServerRpc(RequireOwnership = false)]

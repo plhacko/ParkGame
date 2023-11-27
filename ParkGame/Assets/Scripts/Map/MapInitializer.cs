@@ -6,8 +6,8 @@ using UnityEngine;
 public class MapInitializer : MonoBehaviour
 {
     [SerializeField] private CreateMapWithOverlay mapCreator;
-    public GameObject GPSMap { get; private set; } = null;
-    public GameObject GridMap { get; private set; } = null;
+    public static GameObject GPSMap { get; private set; } = null;
+    public static GameObject GridMap { get; private set; } = null;
 
     private PlayerManager playerManager;
     
