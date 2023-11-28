@@ -37,10 +37,10 @@ RectTransform:
   m_Father: {fileID: 1908676049448138166}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 236.37111, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 135.00093, y: -630.92773}
+  m_SizeDelta: {x: 0, y: 236.37111}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5107083923522459102
 CanvasRenderer:
@@ -204,7 +204,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Button
+  m_text: Options
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -972,7 +972,7 @@ GameObject:
   - component: {fileID: 506987109615007727}
   - component: {fileID: 5124212864152968519}
   m_Layer: 5
-  m_Name: Button - Action1
+  m_Name: Button - Attack
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -994,10 +994,10 @@ RectTransform:
   m_Father: {fileID: 1908676049448138166}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 236.37111, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 135.00093, y: -138.18555}
+  m_SizeDelta: {x: 0, y: 236.37111}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2400699861192010781
 CanvasRenderer:
@@ -1649,6 +1649,7 @@ GameObject:
   - component: {fileID: 3773382949695015484}
   - component: {fileID: 3275738103275912472}
   - component: {fileID: 6882205930316462002}
+  - component: {fileID: 7885143359048722918}
   m_Layer: 5
   m_Name: Button - Options
   m_TagString: Untagged
@@ -1759,6 +1760,18 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!225 &7885143359048722918
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1717373647934564889}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 1
 --- !u!1 &1911864236584716716
 GameObject:
   m_ObjectHideFlags: 0
@@ -2762,7 +2775,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Button
+  m_text: Camera
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -3042,7 +3055,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2e9f10f5cf31bf4389537496865bd30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minDragDistance: 1
 --- !u!1 &4569698745514028750
 GameObject:
   m_ObjectHideFlags: 0
@@ -3454,8 +3466,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   optionsButton: {fileID: 6882205930316462002}
   mapButton: {fileID: 4819664359783265664}
-  followButton: {fileID: 2877550331400661768}
-  cameraButton: {fileID: 7305281009455065625}
+  lockUIButton: {fileID: 3397289903911989494}
+  cameraButton: {fileID: 757592626180927467}
   action1: {fileID: 506987109615007727}
   action2: {fileID: 4532654445798674577}
   action3: {fileID: 8519923484337579704}
@@ -3743,7 +3755,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Button
+  m_text: Attack
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -3824,6 +3836,7 @@ GameObject:
   - component: {fileID: 3542901006888468851}
   - component: {fileID: 6241237260304418019}
   - component: {fileID: 7305281009455065625}
+  - component: {fileID: 757592626180927467}
   m_Layer: 5
   m_Name: Button - Camera
   m_TagString: Untagged
@@ -3934,6 +3947,18 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &757592626180927467
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5772970660515634737}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a5fc1c169ad1844abc7ed5369076f40, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &5811868791219960935
 GameObject:
   m_ObjectHideFlags: 0
@@ -4743,8 +4768,10 @@ GameObject:
   - component: {fileID: 6358537420951024886}
   - component: {fileID: 5669647121385087984}
   - component: {fileID: 2877550331400661768}
+  - component: {fileID: 3397289903911989494}
+  - component: {fileID: 5652123348409879614}
   m_Layer: 5
-  m_Name: Button - Follow
+  m_Name: Button - Lock
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4853,6 +4880,30 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &3397289903911989494
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6658884615342023514}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a5fc1c169ad1844abc7ed5369076f40, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!225 &5652123348409879614
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6658884615342023514}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 1
 --- !u!1 &6771909151958027012
 GameObject:
   m_ObjectHideFlags: 0
@@ -5832,10 +5883,10 @@ RectTransform:
   m_Father: {fileID: 1908676049448138166}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 236.37111, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 135.00093, y: -384.55664}
+  m_SizeDelta: {x: 0, y: 236.37111}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3428997745924922124
 CanvasRenderer:
@@ -6158,7 +6209,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Button
+  m_text: Lock
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}

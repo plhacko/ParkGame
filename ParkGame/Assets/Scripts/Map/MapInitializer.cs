@@ -3,11 +3,13 @@ using Managers;
 using Unity.Netcode;
 using UnityEngine;
 
-public class MapInitializer : MonoBehaviour
+public class Map : MonoBehaviour
 {
     [SerializeField] private CreateMapWithOverlay mapCreator;
+    public static CreateMapWithOverlay MapCreator => MapCreator;
     public static GameObject GPSMap { get; private set; } = null;
     public static GameObject GridMap { get; private set; } = null;
+    public static Bounds MapBounds { get; private set; } = new Bounds();
 
     private PlayerManager playerManager;
     
@@ -44,6 +46,6 @@ public class MapInitializer : MonoBehaviour
         mapCreator.CreateTilemapFromFetchedMap(LobbyManager.Singleton.MapData);
         GPSMap = mapCreator.BaseMap.gameObject;
         GridMap = GetComponentInChildren<Grid>().gameObject;
-        mapCreator.FitCameraToMap();
+        MapBounds = GPSMap.GetComponent<SpriteRenderer>().bounds;
     }
 }

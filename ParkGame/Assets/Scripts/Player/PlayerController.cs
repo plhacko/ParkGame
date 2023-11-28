@@ -61,10 +61,10 @@ namespace Player
             Debug.Log($"init player {Name} in {Team} with {FirebaseId}, is owner: {isActualOwner()}");
             if (isActualOwner())
             {
-                if (Camera.main != null)
-                {
-                    Camera.main.gameObject.transform.SetParent(transform);
-                }
+                // if (Camera.main != null)
+                // {
+                //     Camera.main.gameObject.transform.SetParent(transform);
+                // }
             }
             else
             {

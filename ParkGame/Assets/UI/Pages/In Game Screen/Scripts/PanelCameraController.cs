@@ -9,26 +9,14 @@ using UnityEngine.EventSystems;
 
 public class PanelCameraController : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerDownHandler, IPointerUpHandler
 {
-    private SpriteRenderer GPSMap = null;
-    private Bounds mapBounds;
     private Camera mainCamera;
     private Vector3? startDragPosition;
     private bool isDragging = false;
     private bool isZooming = false;
-
-    private float maxSize;
-    private const float minSize = 0.5f;
-    private const float zoomSpeed = 0.01f;
+    private const float zoomSpeed = 5f;
     private void Start()
     {
         mainCamera = Camera.main;
-        maxSize = mainCamera.orthographicSize;
-        if (MapInitializer.GPSMap == null || MapInitializer.GPSMap.GetComponent<SpriteRenderer>() == null)
-        {
-            return;
-        }
-        GPSMap = MapInitializer.GPSMap.GetComponent<SpriteRenderer>();
-        mapBounds = GPSMap.bounds;
     }
 
     private void Update()
@@ -42,14 +30,8 @@ public class PanelCameraController : MonoBehaviour, IBeginDragHandler, IDragHand
             Vector3 currentDragPosition = mainCamera.ScreenToWorldPoint(input);
             Vector3 direction = startDragPosition.Value - currentDragPosition;
 
-            // Check if the camera is within the map bounds
-            Vector3 newPosition = mainCamera.transform.position + direction;
-            if (GPSMap != null)
-            {
-                newPosition.x = Mathf.Clamp(newPosition.x, mapBounds.min.x, mapBounds.max.x);
-                newPosition.y = Mathf.Clamp(newPosition.y, mapBounds.min.y, mapBounds.max.y);
-            }
-            mainCamera.transform.position = newPosition;
+            GameManager.Instance.Drag(direction);
+            
         }
         else if (isZooming || scroll != 0.0f)
         {
@@ -59,18 +41,22 @@ public class PanelCameraController : MonoBehaviour, IBeginDragHandler, IDragHand
                 Touch touchZero = Input.GetTouch(0);
                 Touch touchOne = Input.GetTouch(1);
 
+                Vector2 touchZeroPos = mainCamera.ScreenToViewportPoint(touchZero.position);
+                Vector2 touchOnePos = mainCamera.ScreenToViewportPoint(touchOne.position);
+
                 Vector2 touchZeroPrevPos = touchZero.position - touchZero.deltaPosition;
                 Vector2 touchOnePrevPos = touchOne.position - touchOne.deltaPosition;
 
+                touchZeroPrevPos = mainCamera.ScreenToViewportPoint(touchZeroPrevPos);
+                touchOnePrevPos = mainCamera.ScreenToViewportPoint(touchOnePrevPos);
+
                 float prevMagnitude = (touchZeroPrevPos - touchOnePrevPos).magnitude;
-                float currentMagnitude = (touchZero.position - touchOne.position).magnitude;
+                float currentMagnitude = (touchZeroPos - touchOnePos).magnitude;
 
                 delta = currentMagnitude - prevMagnitude;
-                // Zoom speed is too fast when using two fingers
-                delta *= zoomSpeed;
             }
 
-            mainCamera.orthographicSize = Mathf.Clamp(mainCamera.orthographicSize - delta, minSize, maxSize);
+            GameManager.Instance.Zoom(delta * zoomSpeed);
         }
     }
 
