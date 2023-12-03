@@ -35,6 +35,7 @@ public class Soldier : NetworkBehaviour, ISoldier
     [SerializeField] int Damage = 1;
     [SerializeField] UnitType TypeOfUnit;
     [SerializeField] float DeathFadeTime = 2f;
+    [SerializeField] private GameObject revealer;
     
     public float ClosestEnemyDEBUG; // DEBUG // TODO: rm
 
@@ -69,21 +70,17 @@ public class Soldier : NetworkBehaviour, ISoldier
     
     private ShootScript shooting;
     private PlayerManager playerManager;
-    private FogOfWar fogOfWar;
     private ChangeMaterial changeMaterial;
-    private Revealer revealer;
 
     private void Initialize()
     {
         playerManager = FindObjectOfType<PlayerManager>();
-        fogOfWar = FindObjectOfType<FogOfWar>();
         EnemyObserver = GetComponentInChildren<EnemyObserver>();
         SpriteRenderer = GetComponent<SpriteRenderer>();
         Agent = GetComponent<NavMeshAgent>();
         Networkanimator = GetComponent<NetworkAnimator>();
         shooting = GetComponent<ShootScript>();
         changeMaterial = GetComponent<ChangeMaterial>();
-        revealer = GetComponent<Revealer>();
         
         _Team.OnValueChanged += OnTeamChanged;
         _SoldierBehaviour.OnValueChanged += OnBehaviourChange;
@@ -118,17 +115,13 @@ public class Soldier : NetworkBehaviour, ISoldier
         var localPlayerData = LobbyManager.Singleton.GetLocalPlayerData();
         if (localPlayerData.Team == newValue)
         {
-            if (fogOfWar)
-            {
-                fogOfWar.RegisterAsRevealer(revealer);   
-            }
+            revealer.SetActive(true);
+            changeMaterial.Change(false);
         }
         else
         {
-            if (fogOfWar)
-            {
-                changeMaterial.Change();
-            }
+            revealer.SetActive(false);
+            changeMaterial.Change(true);
         }
     }
     public void OnBehaviourChange(SoldierBehaviour previousValue, SoldierBehaviour newValue)

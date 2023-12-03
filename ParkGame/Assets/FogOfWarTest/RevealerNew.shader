@@ -74,7 +74,7 @@ Shader "Unlit/RevealerNew"
                 const fixed2 position = _Position.xy;
 
                 const fixed2 poss = floor(i.wpos * _PixelsPerUnit) / _PixelsPerUnit + 0.5f / _PixelsPerUnit;
-                float dist = distance(position, poss);
+                const float dist = distance(position, poss); // use distance squared to avoid sqrt
 
                 clip(1 - dist / _Radius);
                 

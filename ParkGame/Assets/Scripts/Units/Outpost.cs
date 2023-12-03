@@ -18,6 +18,7 @@ public class Outpost : NetworkBehaviour, ICommander
     [SerializeField] Sprite ArcherIcon;
     [SerializeField] Sprite HorsemanIcon;
     [SerializeField] private Soldier.UnitType InitOutpostUnitType;
+    [SerializeField] private GameObject revealer;
 
     //[SerializeField] GameObject HorsemanPrefab; // todo
     List<NetworkObjectReference> Units = new List<NetworkObjectReference>();
@@ -33,8 +34,6 @@ public class Outpost : NetworkBehaviour, ICommander
     private SpriteRenderer sr;
     private int counter;
     private PlayerManager playerManager;
-    private FogOfWar fogOfWar;
-    private Revealer revealer;
     private ChangeMaterial changeMaterial;
 
     public override void OnNetworkSpawn()
@@ -46,8 +45,6 @@ public class Outpost : NetworkBehaviour, ICommander
     private void initialize()
     {
         playerManager = FindObjectOfType<PlayerManager>();
-        fogOfWar = FindObjectOfType<FogOfWar>();
-        revealer = GetComponent<Revealer>();
         changeMaterial = GetComponent<ChangeMaterial>();
         sr = GetComponent<SpriteRenderer>();
 
@@ -59,6 +56,7 @@ public class Outpost : NetworkBehaviour, ICommander
         
         _Team.OnValueChanged += onTeamChanged;
 
+        Debug.Log(revealer);
         if (IsServer)
         {
             Team = InitialTeam;   
@@ -75,17 +73,13 @@ public class Outpost : NetworkBehaviour, ICommander
         Debug.Log($"onTeamChanged on outpost, new team: {newTeam} for {gameObject.name}, (local player's team is: {playerData.Team})");
         if (playerData.Team == newTeam)
         {
-            if (fogOfWar)
-            {
-                fogOfWar.RegisterAsRevealer(revealer);   
-            }
+            revealer.gameObject.SetActive(true);
+            changeMaterial.Change(false);
         }
         else
         {
-            if (fogOfWar)
-            {
-                changeMaterial.Change();   
-            }
+            revealer.gameObject.SetActive(false);
+            changeMaterial.Change(true);
         }
     }
 

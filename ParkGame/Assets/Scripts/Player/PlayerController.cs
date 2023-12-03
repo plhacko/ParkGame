@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using Firebase.Auth;
 using Managers;
@@ -15,14 +14,13 @@ namespace Player
         [SerializeField] private float movementSpeed = 1;
         [SerializeField] private int initialTeam;
         [SerializeField] private string initialName;
+        [SerializeField] private GameObject revealer;
 
         private SpriteRenderer spriteRenderer;
         private NetworkAnimator networkAnimator;
         private Guid ownerPlayerId;
         private Formation formationScript;
         private ChangeMaterial changeMaterial;
-        private FogOfWar fogOfWar;
-        private Revealer revealer;
         private List<NetworkObjectReference> units = new();
         private string firebaseId;
         
@@ -48,9 +46,7 @@ namespace Player
             spriteRenderer = GetComponent<SpriteRenderer>();
             networkAnimator = GetComponent<NetworkAnimator>();
             formationScript = GetComponent<Formation>();
-            revealer = GetComponent<Revealer>();
             changeMaterial = GetComponent<ChangeMaterial>();
-            fogOfWar = FindObjectOfType<FogOfWar>();
 
             if (IsServer) {
                 Team = initialTeam;
@@ -74,17 +70,13 @@ namespace Player
             var localPlayerData = LobbyManager.Singleton.GetLocalPlayerData();
             if (localPlayerData.Team == Team)
             {
-                if (fogOfWar)
-                {
-                    fogOfWar.RegisterAsRevealer(revealer);
-                }
+                revealer.SetActive(true);
+                changeMaterial.Change(false);
             }
             else
             {
-                if (fogOfWar)
-                {
-                    changeMaterial.Change();
-                }
+                revealer.gameObject.SetActive(false);
+                changeMaterial.Change(true);
             }
             
             formationScript.InitializeFormation(); // build prefab, get position of the commander
