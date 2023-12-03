@@ -44,6 +44,7 @@ Shader "Unlit/RevealerNew"
             struct v2f
             {
                 float2 uv : TEXCOORD0;
+			    float2 wpos : TEXCOORD1;
                 UNITY_FOG_COORDS(1)
                 float4 vertex : SV_POSITION;
             };
@@ -54,12 +55,15 @@ Shader "Unlit/RevealerNew"
             fixed4 _Color;
             int _PixelsPerUnit;
             int _Width;
-            int _RadiusEdge;
+
+            fixed4 _Position;
+            int _Radius;
             
             v2f vert (appdata v)
             {
                 v2f o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
+                o.wpos = mul(unity_ObjectToWorld, v.vertex).xy; 
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
                 UNITY_TRANSFER_FOG(o,o.vertex);
                 return o;
@@ -67,7 +71,14 @@ Shader "Unlit/RevealerNew"
 
             fixed4 frag (v2f i) : SV_Target
             {
-                return fixed4(1, 1, 1, 1);
+                const fixed2 position = _Position.xy;
+
+                const fixed2 poss = floor(i.wpos * _PixelsPerUnit) / _PixelsPerUnit + 0.5f / _PixelsPerUnit;
+                float dist = distance(position, poss);
+
+                clip(1 - dist / _Radius);
+                
+                return 0;
             }
             ENDCG
         }
