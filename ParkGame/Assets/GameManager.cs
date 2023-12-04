@@ -30,6 +30,30 @@ public class GameManager : NetworkBehaviour
         {
             Camera.main.orthographicSize = Camera.main.MaxOrthographicSizeFor(Map.MapBounds);
         }
+
+        StartCoroutine(FollowGPSPointer());
+    }
+
+    IEnumerator FollowGPSPointer()
+    {
+        while (true)
+        {
+            Debug.Log("FollowGPSPointer");
+            if (Map.GPSMap != null)
+            {
+                Debug.Log("ClientID: " + NetworkManager.Singleton.LocalClientId);
+                var clientID = NetworkManager.Singleton.LocalClientId;
+                PlayerController playerController = playerManager.GetPlayerController(clientID);
+                if (playerController != null)
+                {
+                    Debug.Log("PlayerController: " + playerController);
+                    var newPosition = PlayerPointerPlacer.PinPosition;
+                    Debug.Log("newPosition: " + newPosition);
+                    playerController.MoveTowards(newPosition);
+                }
+            }
+            yield return new WaitForSeconds(0.5f);
+        }
     }
 
     private void Update()
