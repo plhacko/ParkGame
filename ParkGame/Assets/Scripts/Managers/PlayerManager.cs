@@ -15,7 +15,8 @@ namespace Managers
     public class PlayerManager : MonoBehaviour
     {
         [SerializeField] private PlayerController playerControllerPrefab;
-
+        private PlayerController localPlayerController;
+        
         public event Action OnAllPlayersSceneLoaded = null;
         
         // Only on the host
@@ -84,5 +85,12 @@ namespace Managers
 
             playerControllers.Add(clientData.FirebaseId, playerController);
         }
+
+        public void SetLocalPlayerController(PlayerController playerController)
+        {
+            this.localPlayerController = playerController;
+        }
+
+        public PlayerController GetLocalPlayerController() => localPlayerController;
     }
 }

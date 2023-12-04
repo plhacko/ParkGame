@@ -1,13 +1,11 @@
 using System.Collections;
-using System.Collections.Generic;
 using Managers;
 using Player;
 using Unity.Netcode;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public class GameManager : NetworkBehaviour 
+public class GameManager : MonoBehaviour 
 {
     public static GameManager Instance { get; private set; }
     [SerializeField] private PlayerManager playerManager;
@@ -42,8 +40,7 @@ public class GameManager : NetworkBehaviour
             if (Map.GPSMap != null)
             {
                 Debug.Log("ClientID: " + NetworkManager.Singleton.LocalClientId);
-                var clientID = NetworkManager.Singleton.LocalClientId;
-                PlayerController playerController = playerManager.GetPlayerController(clientID);
+                PlayerController playerController = playerManager.GetLocalPlayerController();
                 if (playerController != null)
                 {
                     Debug.Log("PlayerController: " + playerController);
@@ -60,8 +57,7 @@ public class GameManager : NetworkBehaviour
     {
         if (followCommander)
         {
-            var clientID = NetworkManager.Singleton.LocalClientId;
-            PlayerController playerController = playerManager.GetPlayerController(clientID);
+            PlayerController playerController = playerManager.GetLocalPlayerController();
             if (playerController != null)
             {
                 Camera.main.PointTo(playerController.transform.position);
@@ -69,19 +65,9 @@ public class GameManager : NetworkBehaviour
         }
     }
 
-    [ServerRpc(RequireOwnership = false)]
-    void RequestChangeOfFormationServerRpc(ulong clientID, KeyCode key) {
-        PlayerController playerController = playerManager.GetPlayerController(clientID);
+    void Movement(KeyCode key) {
+        PlayerController playerController = playerManager.GetLocalPlayerController();
         
-        if (playerController != null) {
-            playerController.FormatSoldiersServerRpc(key);
-        }
-    }
-
-    [ServerRpc(RequireOwnership = false)]
-    void RequestChangeOfSoldierCommandServerRpc(ulong clientID, KeyCode key) {
-        PlayerController playerController = playerManager.GetPlayerController(clientID);
-
         if (playerController != null) {
             if (key == KeyCode.I) { playerController.CommandMovementServerRpc(); }
             if (key == KeyCode.O) { playerController.CommandIdleServerRpc(); }
@@ -89,14 +75,12 @@ public class GameManager : NetworkBehaviour
         }
     }
 
-    void Movement(KeyCode key) {
-        ulong clientID = NetworkManager.Singleton.LocalClientId;
-        RequestChangeOfSoldierCommandServerRpc(clientID, key);
-    }
-
     void Formation(KeyCode key) {
-        ulong clientID = NetworkManager.Singleton.LocalClientId;
-        RequestChangeOfFormationServerRpc(clientID, key);
+        PlayerController playerController = playerManager.GetLocalPlayerController();
+        
+        if (playerController != null) {
+            playerController.FormatSoldiersServerRpc(key);
+        }
     }
 
     public void FormationBox()

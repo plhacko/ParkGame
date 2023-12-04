@@ -16,7 +16,8 @@ namespace Player
         [SerializeField] private int initialTeam;
         [SerializeField] private string initialName;
         [SerializeField] private GameObject revealer;
-
+        
+        private PlayerManager playerManager;
         private SpriteRenderer spriteRenderer;
         private NetworkAnimator networkAnimator;
         private Guid ownerPlayerId;
@@ -51,6 +52,7 @@ namespace Player
             formationScript = GetComponent<Formation>();
             changeMaterial = GetComponent<ChangeMaterial>();
             Agent = GetComponent<NavMeshAgent>();
+            playerManager = FindObjectOfType<PlayerManager>();
 
             if (IsServer) {
                 Team = initialTeam;
@@ -65,6 +67,7 @@ namespace Player
                 // {
                 //     Camera.main.gameObject.transform.SetParent(transform);
                 // }
+                playerManager.SetLocalPlayerController(this);
             }
             else
             {

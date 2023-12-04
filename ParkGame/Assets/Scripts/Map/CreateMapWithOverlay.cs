@@ -1,23 +1,17 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
-using System.Text.RegularExpressions;
 using FreeDraw;
-using Managers;
-using Unity.AI;
-using Unity.AI.Navigation;
 using Unity.Netcode;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.AI;
 using UnityEngine.Tilemaps;
 using UnityEngine.Windows;
+using Input = UnityEngine.Input;
 using NavMeshSurface = NavMeshPlus.Components.NavMeshSurface;
 
 [RequireComponent(typeof(Drawable))]
-public class CreateMapWithOverlay : MonoBehaviour
+public class CreateMapWithOverlay : NetworkBehaviour
 {
     public Camera mainCamera; // for map scale adjustment
     // Tilemaps
@@ -73,12 +67,24 @@ public class CreateMapWithOverlay : MonoBehaviour
             StartCoroutine(WaitForValue());
     }
 
+    // private void Update()
+    // {
+    //     if(Input.GetKeyDown(KeyCode.L))
+    //     {
+    //         navMesh.BuildNavMesh();
+    //     }
+    // }
+
     public void CreateTilemapFromFetchedMap(MapData mapData)
     {
         SetLowResTextureForTilemapCreation(mapData.DrawnTexture);
         SetTilemapBounds(mapData.MetaData.TopLeftTileIdx, mapData.MetaData.BottomRightTileIdx);
         CreateTilemapFromTexture(fromUploadedTexture: true, structures: mapData.MetaData.Structures);
-        navMesh.BuildNavMesh();
+
+        if (IsServer)
+        {
+            requestBuildNavmeshClientRpc();   
+        }
 
         var mapDisplayer = mapSprite.GetComponent<MapDisplayer>();
         mapDisplayer.mapData = mapData;
@@ -90,12 +96,15 @@ public class CreateMapWithOverlay : MonoBehaviour
         Debug.Log("Map fetched and created");
     }
 
+    [ClientRpc]
+    private void requestBuildNavmeshClientRpc() {
+        navMesh.BuildNavMesh();
+    }
+    
     public bool IsBaseMapLoaded()
     {
         return BaseMap.IsMapLoaded();
     }
-
-    
     
     private IEnumerator WaitForValue()
     {
