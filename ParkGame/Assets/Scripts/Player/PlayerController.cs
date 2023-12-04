@@ -6,6 +6,7 @@ using Unity.Collections;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace Player
 {
@@ -41,12 +42,15 @@ namespace Player
         
         private static readonly int movementSpeedAnimationHash = Animator.StringToHash("MovementSpeed");
 
+        private NavMeshAgent Agent;
+
         private void initialize()
         {
             spriteRenderer = GetComponent<SpriteRenderer>();
             networkAnimator = GetComponent<NetworkAnimator>();
             formationScript = GetComponent<Formation>();
             changeMaterial = GetComponent<ChangeMaterial>();
+            Agent = GetComponent<NavMeshAgent>();
 
             if (IsServer) {
                 Team = initialTeam;
@@ -57,10 +61,10 @@ namespace Player
             Debug.Log($"init player {Name} in {Team} with {FirebaseId}, is owner: {isActualOwner()}");
             if (isActualOwner())
             {
-                if (Camera.main != null)
-                {
-                    Camera.main.gameObject.transform.SetParent(transform);
-                }
+                // if (Camera.main != null)
+                // {
+                //     Camera.main.gameObject.transform.SetParent(transform);
+                // }
             }
             else
             {
@@ -94,7 +98,7 @@ namespace Player
             if (!isActualOwner()) return;
             if (!Application.isFocused) return;
 
-            move();
+            // move();
 
             if (Input.GetKeyDown(KeyCode.I))
             { CommandMovementServerRpc(); }
@@ -194,6 +198,23 @@ namespace Player
                     }
                 }
             }
+        }
+
+        public void MoveTowards(Vector3 position)
+        {
+            Agent.SetDestination(position);
+            Vector2 direction = position - transform.position;
+            if (direction.magnitude > 0.1f)
+            {
+                networkAnimator.Animator.SetFloat(movementSpeedAnimationHash, 1);
+            }
+            else
+            {
+                networkAnimator.Animator.SetFloat(movementSpeedAnimationHash, 0);
+            }
+
+            spriteRenderer.flipX = direction.x < 0;
+            xSpriteFlip.Value = spriteRenderer.flipX;
         }
 
         private void move()
