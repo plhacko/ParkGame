@@ -2,6 +2,7 @@ Shader "Unlit/FogOfWar"
 {
     Properties
     {
+        _Color("Color", Color) = (0, 0, 0, 0.8)
         _MainTex ("Texture", 2D) = "white" {}
     }
     SubShader
@@ -19,14 +20,18 @@ Shader "Unlit/FogOfWar"
         Lighting Off
         ZWrite Off
         Blend One OneMinusSrcAlpha
+
+        Stencil
+        {
+            Ref 1
+            Comp NotEqual
+        }
         
         Pass
         {
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
-            // make fog work
-            #pragma multi_compile_fog
 
             #include "UnityCG.cginc"
 
@@ -45,15 +50,7 @@ Shader "Unlit/FogOfWar"
 
             sampler2D _MainTex;
             float4 _MainTex_ST;
-            
-            fixed4 _HiddenColor;
-            
-            float4 _RevealersPositions[512];
-            float _RevealersRadii[512];
-            int _RevealersCount;
-            int _PixelsPerUnit;
-            int _Width;
-            int _RadiusEdge;
+            fixed4 _Color;
             
             v2f vert (appdata v)
             {
@@ -66,18 +63,7 @@ Shader "Unlit/FogOfWar"
 
             fixed4 frag (v2f i) : SV_Target
             {
-                const fixed2 uv = floor((i.uv - 0.5f) * _Width * _PixelsPerUnit + 0.5f);
-
-                fixed minDist = 100000000;
-                for (int j = 0; j < _RevealersCount; j++)
-                {
-                    const int radius = _RevealersRadii[j];
-                    const fixed2 position = _RevealersPositions[j].xy * _PixelsPerUnit;
-
-                    minDist = min(minDist, distance(position, uv) - radius);
-                }
-                
-                return lerp(fixed4(0, 0, 0, 0), _HiddenColor, saturate(minDist / _RadiusEdge));
+                return _Color;
             }
             ENDCG
         }

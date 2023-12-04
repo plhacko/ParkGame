@@ -94,7 +94,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5967492788199539584}
   - component: {fileID: 2004642035813931577}
-  - component: {fileID: 8958516495268142779}
+  - component: {fileID: 689803441644788758}
   m_Layer: 0
   m_Name: Revealer
   m_TagString: Untagged
@@ -169,7 +169,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &8958516495268142779
+--- !u!114 &689803441644788758
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -181,7 +181,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 03de352f8b805c64ab5985a699950e6d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spriteRenderer: {fileID: 2004642035813931577}
   pixelsPerUnit: 2
   radius: 6
 --- !u!1 &8693786845917539996

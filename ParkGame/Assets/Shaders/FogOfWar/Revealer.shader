@@ -44,6 +44,7 @@ Shader "Unlit/Revealer"
             struct v2f
             {
                 float2 uv : TEXCOORD0;
+			    float2 wpos : TEXCOORD1;
                 UNITY_FOG_COORDS(1)
                 float4 vertex : SV_POSITION;
             };
@@ -52,17 +53,17 @@ Shader "Unlit/Revealer"
             float4 _MainTex_ST;
             
             fixed4 _Color;
-            float4 _RevealersPositions[512];
-            float _RevealersRadii[512];
-            int _RevealersCount;
             int _PixelsPerUnit;
             int _Width;
-            int _RadiusEdge;
+
+            fixed4 _Position;
+            int _Radius;
             
             v2f vert (appdata v)
             {
                 v2f o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
+                o.wpos = mul(unity_ObjectToWorld, v.vertex).xy; 
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
                 UNITY_TRANSFER_FOG(o,o.vertex);
                 return o;
@@ -70,20 +71,15 @@ Shader "Unlit/Revealer"
 
             fixed4 frag (v2f i) : SV_Target
             {
-                const fixed2 uv = floor((i.uv - 0.5f) * _Width * _PixelsPerUnit + 0.5f);
+                const fixed2 position = _Position.xy;
 
-                fixed minDist = 100000000;
-                for (int j = 0; j < _RevealersCount; j++)
-                {
-                    const int radius = _RevealersRadii[j];
-                    const fixed2 position = _RevealersPositions[j].xy * _PixelsPerUnit;
+                const fixed2 poss = floor(i.wpos * _PixelsPerUnit) / _PixelsPerUnit + 0.5f / _PixelsPerUnit;
+                const fixed2 toPos = poss - position;
+                const float distSq = dot(toPos, toPos);
+
+                clip(1 - distSq / (_Radius * _Radius));
                 
-                    minDist = min(minDist, distance(position, uv) - radius);
-                }
-                    
-                clip(1 - minDist / _RadiusEdge);
-                
-                return fixed4(0, 0, 0, 0);
+                return 0;
             }
             ENDCG
         }
