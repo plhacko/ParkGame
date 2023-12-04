@@ -184,7 +184,7 @@ public static class CameraExtensions
 
     public static void ZoomTo(this Camera camera, float size)
     {
-        var min = 0;
+        var min = 0.5f;
         var max = Map.GPSMap != null ? Camera.main.MaxOrthographicSizeFor(Map.MapBounds) : float.MaxValue;
 
          Camera.main.orthographicSize = Mathf.Clamp(size, min, max);
