@@ -9,7 +9,7 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
     [SerializeField] private PlayerManager playerManager;
-    private bool followCommander = false;
+    public bool FollowCommander { get; private set;} = false;
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -24,11 +24,6 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        if (Map.GPSMap != null)
-        {
-            Camera.main.orthographicSize = Camera.main.MaxOrthographicSizeFor(Map.MapBounds);
-        }
-
         StartCoroutine(FollowGPSPointer());
     }
 
@@ -55,7 +50,7 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
-        if (followCommander)
+        if (FollowCommander)
         {
             PlayerController playerController = playerManager.GetLocalPlayerController();
             if (playerController != null)
@@ -126,8 +121,8 @@ public class GameManager : MonoBehaviour
 
     public void CameraFollowCommander()
     {
-        followCommander = true;
-        Camera.main.ZoomTo(3);
+        FollowCommander = true;
+        Camera.main.ZoomTo(4);
     }
 
     public void ShowFullMap()
@@ -137,7 +132,7 @@ public class GameManager : MonoBehaviour
 
     public void Drag(Vector3 direction)
     {
-        followCommander = false;
+        FollowCommander = false;
         Camera.main.PointTo(Camera.main.transform.position + direction);
     }
 
