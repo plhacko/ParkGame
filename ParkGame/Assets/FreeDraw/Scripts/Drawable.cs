@@ -15,7 +15,7 @@ namespace FreeDraw
         // PEN COLOUR
         public static Color Pen_Colour = Color.red;     // Change these to change the default drawing settings
         // PEN WIDTH (actually, it's a radius, in pixels)
-        public static int Pen_Width = 15;
+        public static int Pen_Width = 5;
 
 
         public delegate void Brush_Function(Vector2 world_position);
@@ -42,8 +42,22 @@ namespace FreeDraw
         Color32[] cur_colors;
         bool mouse_was_previously_held_down = false;
         bool no_drawing_on_current_drag = false;
+        private bool placing_structure = false;
+        private bool drawing_locked = false;
 
+        public void SetDrawableState(bool? placingStructure = null, bool? drawingLocked = null)
+        {
+            if (placingStructure.HasValue)
+                placing_structure = placingStructure.Value;
+            if (drawingLocked.HasValue)
+                drawing_locked = drawingLocked.Value;
+            drawable.enabled = !(placing_structure || drawing_locked);
+        }
 
+        public bool IsDrawingEnabled()
+        {
+            return !(placing_structure || drawing_locked);
+        }
 
 //////////////////////////////////////////////////////////////////////////////
 // BRUSH TYPES. Implement your own here
@@ -140,6 +154,8 @@ namespace FreeDraw
         {
             // Is the user holding down the left mouse button?
             bool mouse_held_down = Input.GetMouseButton(0);
+            if (EventSystem.current.IsPointerOverGameObject())
+                return;
             if (mouse_held_down && !no_drawing_on_current_drag)
             {
                 // Convert mouse coordinates to world coordinates
@@ -289,7 +305,7 @@ namespace FreeDraw
 
         
 
-        public void SetDrawableSprite(Sprite sprite)
+        public void SetDrawableSprite(Sprite sprite, int scaleRation)
         {
             if (!sprite)
             {
@@ -304,6 +320,7 @@ namespace FreeDraw
             // Scale 2D box collider according to new texture size
             var spriteRenderer = GetComponent<SpriteRenderer>();
             spriteRenderer.sprite = sprite;
+            spriteRenderer.transform.localScale *= scaleRation;
             GetComponent<BoxCollider2D>().size = new Vector2(
                 spriteRenderer.bounds.size.x * transform.localScale.x,
                 spriteRenderer.bounds.size.y * transform.localScale.y
@@ -325,7 +342,7 @@ namespace FreeDraw
             // DEFAULT BRUSH SET HERE
             current_brush = PenBrush;
             
-            SetDrawableSprite(this.GetComponent<SpriteRenderer>().sprite);
+            // SetDrawableSprite(this.GetComponent<SpriteRenderer>().sprite);
             
         }
     }

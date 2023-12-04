@@ -47,14 +47,19 @@ public class CreateMapWithOverlay : NetworkBehaviour
     public bool doNotFetch = false; // Do not try to load a map (Debug)
     public NavMeshSurface navMesh;  // used for building navMesh on tilemap
     public GridLayout gridLayout; // used for placing structures correctly based on tilemap coordinates
+
+    public Action<bool> OnMapValidated;
+    public Action<List<string>> OnMapCreationErrors;
     
     private Sprite mapOverlay;
+    public Drawable mapDrawable;
     private Texture2D drawableTexture;
     private Texture2D resizedDrawableTexture;
     private Sprite drawableSprite;
     private SpriteRenderer drawableSpriteRenderer;
     private GameObject fetchedMap;
     private Vector3Int topLeftCellPos, bottomRightCellPos; // Used for tilemap recreation
+    private List<string> errorMessages = new List<string>();
 
     [SerializeField] private GameObject mapSprite;
     public MapDisplayer BaseMap {get; private set;}
@@ -63,17 +68,10 @@ public class CreateMapWithOverlay : NetworkBehaviour
     void Start()
     {
         drawableSpriteRenderer = GetComponent<SpriteRenderer>();
+        mapDrawable = GetComponent<Drawable>();
         if (!doNotFetch) // Wait until map fetching from MapBox is completed
             StartCoroutine(WaitForValue());
     }
-
-    // private void Update()
-    // {
-    //     if(Input.GetKeyDown(KeyCode.L))
-    //     {
-    //         navMesh.BuildNavMesh();
-    //     }
-    // }
 
     public void CreateTilemapFromFetchedMap(MapData mapData)
     {
@@ -95,12 +93,13 @@ public class CreateMapWithOverlay : NetworkBehaviour
         
         Debug.Log("Map fetched and created");
     }
-
+    
     [ClientRpc]
-    private void requestBuildNavmeshClientRpc() {
+    private void requestBuildNavmeshClientRpc()
+    {
         navMesh.BuildNavMesh();
     }
-    
+
     public bool IsBaseMapLoaded()
     {
         return BaseMap.IsMapLoaded();
@@ -194,7 +193,8 @@ public class CreateMapWithOverlay : NetworkBehaviour
     private void CreateNewTextureForDrawing()
     {
         // create new texture and sprite where to draw based on resolution of map snippet
-        drawableTexture = new Texture2D(mapOverlay.texture.width, mapOverlay.texture.height);
+        int scaleRation = 4;
+        drawableTexture = new Texture2D(mapOverlay.texture.width / scaleRation, mapOverlay.texture.height / scaleRation);
         drawableTexture.name = "DrawableTexture";
         drawableTexture.Apply();
         drawableSprite = Sprite.Create(
@@ -204,7 +204,7 @@ public class CreateMapWithOverlay : NetworkBehaviour
         );
         drawableSprite.name = "DrawableSprite";
         // set the newly created sprite to the drawable script
-        GetComponent<Drawable>().SetDrawableSprite(drawableSprite);
+        mapDrawable.SetDrawableSprite(drawableSprite, scaleRation);
     }
     
     /// <summary>
@@ -282,7 +282,23 @@ public class CreateMapWithOverlay : NetworkBehaviour
     
     public void ToggleDrawable()
     {
-        drawableSpriteRenderer.enabled = !drawableSpriteRenderer.enabled;
+        if (drawableSpriteRenderer.color.a != 1)
+        {
+            drawableSpriteRenderer.color = Color.white;
+            mapDrawable.SetDrawableState(drawingLocked: false);
+        }
+        else
+        {
+            drawableSpriteRenderer.color = new Color(1, 1, 1, 0.2f);
+            mapDrawable.SetDrawableState(drawingLocked: true);
+        }
+    }
+
+    private void ToggleTilemap(bool visible)
+    {
+        blockingTilemap.GetComponent<TilemapRenderer>().enabled = visible;
+        actionTilemap.GetComponent<TilemapRenderer>().enabled = visible;
+        baseTilemap.GetComponent<TilemapRenderer>().enabled = visible;
     }
 
     /**
@@ -301,16 +317,44 @@ public class CreateMapWithOverlay : NetworkBehaviour
         // );
     }
 
+    private double Dist2DSquared(Vector3Int a, Vector3Int b)
+    {
+        return Math.Pow(a.x-b.x,2)+Math.Pow(a.y-b.y,2);
+    }
+    
+    private void CheckStructureDistances(
+        Dictionary<Vector3Int, GameObject> structuresToAssign
+    )
+    {
+        const int distSquaredThreshold = 5 * 5;
+        for (int i = 0; i < structuresToAssign.Count; ++i)
+        {
+            for (int j = i + 1; j < structuresToAssign.Count; ++j)
+            {
+                var distSquared = Dist2DSquared(
+                    structuresToAssign.ElementAt(i).Key, structuresToAssign.ElementAt(j).Key
+                );
+                if (distSquared < distSquaredThreshold)
+                {
+                    errorMessages.Add(
+                        $"Distance between structures is too small " +
+                        $"({structuresToAssign.ElementAt(i).Value.name} and {structuresToAssign.ElementAt(j).Value.name})"
+                    );
+                }
+            }
+        }
+    }
     private void SetStructurePrefabs(Dictionary<Vector3Int, GameObject> structuresToAssign)
     {
+        CheckStructureDistances(structuresToAssign);
         var castleTeamID = 0;
+
         if (NetworkManager.Singleton.IsServer)
         {
             foreach (var kvp in structuresToAssign)
             {
-                if (actionTilemap.GetTile(kvp.Key) == boundsTile)
-                    throw new ArgumentException("Cannot place structure out of map bounds");
-                
+                if (blockingTilemap.GetTile(kvp.Key) == boundsTile)
+                    errorMessages.Add("Cannot place structure out of map bounds");
                 var structure = Instantiate(kvp.Value, gridLayout.CellToWorld(kvp.Key), Quaternion.identity);
                 if (kvp.Value == castlePrefab)
                 {
@@ -322,7 +366,7 @@ public class CreateMapWithOverlay : NetworkBehaviour
             }
         }
     }
-    private void SetStructureTiles(Dictionary<Vector3Int, TileBase> structuresToAssign)
+    private void SetStructureTiles(Dictionary<Vector3Int, TileBase> structuresToAssign,List<string> errorMessages)
     {
         var structureRadius = 2;
         foreach (var kvp in structuresToAssign)
@@ -342,17 +386,32 @@ public class CreateMapWithOverlay : NetworkBehaviour
     }
 
     /**
-     * Helper funtion for creating tilemap without parameters so it can be set in button OnClick section
+     * Helper function for creating tilemap without parameters so it can be set in button OnClick section
      */
     public void ProcessTilemap()
     {
         CreateTilemapFromTexture(false, null);
+        if (errorMessages.Count != 0)
+        {
+            // foreach (var errorMessage in errorMessages)
+            // {
+            //     Debug.LogError(errorMessage);
+            // }
+            ToggleTilemap(false);  // Hide tilemap
+            OnMapCreationErrors.Invoke(errorMessages);
+            return;
+        }
+        ToggleTilemap(true);
+        OnMapValidated.Invoke(true); // Enable SaveMap button
     }
     /**
      * Creates tilemap from drawn texture by scaling texture to low resolution and assigning tiles by according colors
      */
     private void CreateTilemapFromTexture(bool fromUploadedTexture = false, MapStructures structures = null)
     {
+        errorMessages = new List<string>();
+        if (!fromUploadedTexture)
+            OnMapValidated.Invoke(false); // Disable Save map button, reenabled after valid map creation
         ClearTilemap();
 
         if (!fromUploadedTexture)
@@ -361,6 +420,12 @@ public class CreateMapWithOverlay : NetworkBehaviour
             var worldMat = transform.localToWorldMatrix;
             topLeftCellPos = baseTilemap.WorldToCell(worldMat * spriteRectVertices[0]);
             bottomRightCellPos = baseTilemap.WorldToCell(worldMat * spriteRectVertices[1]);
+        }
+
+        if (topLeftCellPos == bottomRightCellPos)
+        {
+            errorMessages.Add("Draw your map first");
+            return;
         }
         // Put tile to the opposite corners to set correct tilemap bounds so fill works correctly,
         // tilemap API doesnt do this automatically...
@@ -400,28 +465,53 @@ public class CreateMapWithOverlay : NetworkBehaviour
         blockingTilemap.FloodFill(
             new Vector3Int(topLeftCellPos.x, topLeftCellPos.y), boundsTile
             );
+        // TODO check that whole map is not red
+        if (blockingTilemap.GetTilesBlock(blockingTilemap.cellBounds).All(tile => tile == boundsTile))
+        {
+            errorMessages.Add("Bounds (Red color) must be enclosed area");
+            return;
+        }
         var structuresToAssign = new Dictionary<Vector3Int, GameObject>();
-        if (structures == null)
+        try
         {
-            // Also for adjusting uploaded tilemap (Not used for now)
-            foreach (var tilePos in outposts.GetPlacedStructurePositions().Item2)
-                structuresToAssign.Add(tilePos, outpostPrefab);
-            foreach (var tilePos in castles.GetPlacedStructurePositions().Item2)
-                structuresToAssign.Add(tilePos, castlePrefab);
-            foreach (var tilePos in victoryPoint.GetPlacedStructurePositions().Item2)
-                structuresToAssign.Add(tilePos, victoryPointPrefab);
+            if (structures == null)
+            {
+                if (castles.GetStructureCount() < 2)
+                {
+                    errorMessages.Add("Place at least 2 castles to the map.");
+                    return;
+                }
+
+                if (victoryPoint.GetStructureCount() == 0)
+                {
+                    errorMessages.Add("Add victory point to the map");
+                    return;
+                }
+                // Also for adjusting uploaded tilemap (Not used for now)
+                foreach (var tilePos in outposts.GetPlacedStructurePositions().Item2)
+                    structuresToAssign.Add(tilePos, outpostPrefab);
+                foreach (var tilePos in castles.GetPlacedStructurePositions().Item2)
+                    structuresToAssign.Add(tilePos, castlePrefab);
+                foreach (var tilePos in victoryPoint.GetPlacedStructurePositions().Item2)
+                    structuresToAssign.Add(tilePos, victoryPointPrefab);
+            }
+            else
+            {
+                // Structures from uploaded map 
+                foreach (var tilePos in structures.Outposts)
+                    structuresToAssign.Add(new Vector3Int(tilePos.x, tilePos.y, tilePos.z), outpostPrefab);
+                foreach (var tilePos in structures.Castles)
+                    structuresToAssign.Add(new Vector3Int(tilePos.x, tilePos.y, tilePos.z), castlePrefab);
+                foreach (var tilePos in structures.VictoryPoints)
+                    structuresToAssign.Add(new Vector3Int(tilePos.x, tilePos.y, tilePos.z), victoryPointPrefab);
+            }
         }
-        else
+        catch(ArgumentException)
         {
-            // Structures from uploaded map 
-            foreach (var tilePos in structures.Outposts)
-                structuresToAssign.Add(new Vector3Int(tilePos.x, tilePos.y, tilePos.z), outpostPrefab);
-            foreach (var tilePos in structures.Castles)
-                structuresToAssign.Add(new Vector3Int(tilePos.x, tilePos.y, tilePos.z), castlePrefab);
-            foreach (var tilePos in structures.VictoryPoints)
-                structuresToAssign.Add(new Vector3Int(tilePos.x, tilePos.y, tilePos.z), victoryPointPrefab);
+            errorMessages.Add("Structures are overlapping");
+            return;
         }
-        
+
         // foreach (var kvp in tilesToAssign)
         // {
         //     if (tilemap.GetTile(kvp.Key) == null)

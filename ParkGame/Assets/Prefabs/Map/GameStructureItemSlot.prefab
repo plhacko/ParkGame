@@ -50,8 +50,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e22924596563c1449082dbb11af321b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itemName: 
+  structureType: 0
   maxStructures: 3
+  tilemap: {fileID: 0}
 --- !u!1 &2678169573904503407
 GameObject:
   m_ObjectHideFlags: 0
@@ -108,6 +109,7 @@ MonoBehaviour:
   mapDrawable: {fileID: 0}
   tilemap: {fileID: 0}
   mainCamera: {fileID: 0}
+  trashSprite: {fileID: 21300000, guid: 626b9cddb29049e4cac50cd87b419945, type: 3}
 --- !u!222 &2678169573904503381
 CanvasRenderer:
   m_ObjectHideFlags: 0

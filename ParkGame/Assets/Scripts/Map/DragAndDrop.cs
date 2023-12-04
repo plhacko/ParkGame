@@ -54,12 +54,14 @@ using FreeDraw;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Tilemaps;
+using UnityEngine.UI;
 
 public class DragAndDrop : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBeginDragHandler, IEndDragHandler, IDragHandler
 {
     [SerializeField] private Canvas canvas;
     public Drawable mapDrawable;
-    public Camera mainCamera;
+    public ItemSlot itemSlot;
+    
     [SerializeField]
     private Tilemap tilemap;
     public Tilemap TilemapProperty
@@ -72,7 +74,7 @@ public class DragAndDrop : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         }
     }
     private Vector2 gridCellSize;
-
+    private Camera mainCamera;
 
     private GameObject draggedItem;
     private CanvasGroup canvasGroup;
@@ -82,6 +84,8 @@ public class DragAndDrop : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         rectTransform = GetComponent<RectTransform>();
         canvasGroup = GetComponent<CanvasGroup>();
         canvas = GetComponentInParent<Canvas>();
+        mainCamera = Camera.main;
+        
         if (tilemap)
             SetGridCellSize(tilemap);
     }
@@ -96,7 +100,7 @@ public class DragAndDrop : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     {
         return rectTransform.anchoredPosition;
     }
-    
+
     public void OnBeginDrag(PointerEventData eventData)
     {
         InDragAction(true);
@@ -140,15 +144,17 @@ public class DragAndDrop : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     {
         if (inDrag)
         {
+            itemSlot.ChangeSprite(trashIcon: true);
             if (mapDrawable)
-                mapDrawable.enabled = false;
+                mapDrawable.SetDrawableState(placingStructure: true);
             canvasGroup.blocksRaycasts = false;
             canvasGroup.alpha = 0.7f;
         }
         else
         {
+            itemSlot.ChangeSprite(trashIcon: false);
             if (mapDrawable)
-                mapDrawable.enabled = true;
+                mapDrawable.SetDrawableState(placingStructure: false);
             canvasGroup.blocksRaycasts = true;
             canvasGroup.alpha = 1.0f;
         }
