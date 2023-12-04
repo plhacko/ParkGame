@@ -203,7 +203,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   animationDuration: 1
-  ExitOnNextPage: 0
+  ExitOnNextPage: 1
   EntryClip: {fileID: 0}
   ExitClip: {fileID: 0}
   entryMode: 0
@@ -222,9 +222,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   signUpButton: {fileID: 8611022592213171514}
   loginButton: {fileID: 8611022593106091118}
+  mainMenuPage: {fileID: 0}
   loginPage: {fileID: 0}
   signUpPage: {fileID: 0}
-  mainMenuPage: {fileID: 0}
 --- !u!1 &8611022592213171516
 GameObject:
   m_ObjectHideFlags: 0

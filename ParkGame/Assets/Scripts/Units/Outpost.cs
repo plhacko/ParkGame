@@ -18,9 +18,10 @@ public class Outpost : NetworkBehaviour, ICommander
     [SerializeField] Sprite ArcherIcon;
     [SerializeField] Sprite HorsemanIcon;
     [SerializeField] private Soldier.UnitType InitOutpostUnitType;
+    [SerializeField] private GameObject revealer;
 
     //[SerializeField] GameObject HorsemanPrefab; // todo
-    List<GameObject> Units = new List<GameObject>();
+    List<NetworkObjectReference> Units = new List<NetworkObjectReference>();
     //ToggleSpawnedUnitScript OutpostSpawnerChanger;
 
     NetworkVariable<float> _Timer = new(0.0f);
@@ -33,8 +34,6 @@ public class Outpost : NetworkBehaviour, ICommander
     private SpriteRenderer sr;
     private int counter;
     private PlayerManager playerManager;
-    private FogOfWar fogOfWar;
-    private Revealer revealer;
     private ChangeMaterial changeMaterial;
 
     public override void OnNetworkSpawn()
@@ -46,8 +45,6 @@ public class Outpost : NetworkBehaviour, ICommander
     private void initialize()
     {
         playerManager = FindObjectOfType<PlayerManager>();
-        fogOfWar = FindObjectOfType<FogOfWar>();
-        revealer = GetComponent<Revealer>();
         changeMaterial = GetComponent<ChangeMaterial>();
         sr = GetComponent<SpriteRenderer>();
 
@@ -59,6 +56,7 @@ public class Outpost : NetworkBehaviour, ICommander
         
         _Team.OnValueChanged += onTeamChanged;
 
+        Debug.Log(revealer);
         if (IsServer)
         {
             Team = InitialTeam;   
@@ -75,17 +73,13 @@ public class Outpost : NetworkBehaviour, ICommander
         Debug.Log($"onTeamChanged on outpost, new team: {newTeam} for {gameObject.name}, (local player's team is: {playerData.Team})");
         if (playerData.Team == newTeam)
         {
-            if (fogOfWar)
-            {
-                fogOfWar.RegisterAsRevealer(revealer);   
-            }
+            revealer.gameObject.SetActive(true);
+            changeMaterial.Change(false);
         }
         else
         {
-            if (fogOfWar)
-            {
-                changeMaterial.Change();   
-            }
+            revealer.gameObject.SetActive(false);
+            changeMaterial.Change(true);
         }
     }
 
@@ -135,20 +129,20 @@ public class Outpost : NetworkBehaviour, ICommander
         InitialTeam = team;
     }
 
-    void ICommander.ReportFollowing(GameObject go)
+    void ICommander.ReportFollowing(NetworkObjectReference networkObjectReference)
     {
         if (!IsServer)
         { throw new Exception($"only on server can adding units to outpost be reported\n outpost: {gameObject.name}"); }
 
-        Units.Add(go);
+        Units.Add(networkObjectReference);
     }
 
-    void ICommander.ReportUnfollowing(GameObject go)
+    void ICommander.ReportUnfollowing(NetworkObjectReference networkObjectReference)
     {
         if (!IsServer)
         { throw new Exception($"only on server can removing units to outpost be reported\n outpost: {gameObject.name}"); }
 
-        Units.Remove(go);
+        Units.Remove(networkObjectReference);
     }
 
     public Formation.FormationType GetFormation() {

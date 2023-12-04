@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using Firebase.Auth;
 using Managers;
@@ -7,6 +6,7 @@ using Unity.Collections;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace Player
 {
@@ -15,15 +15,14 @@ namespace Player
         [SerializeField] private float movementSpeed = 1;
         [SerializeField] private int initialTeam;
         [SerializeField] private string initialName;
+        [SerializeField] private GameObject revealer;
 
         private SpriteRenderer spriteRenderer;
         private NetworkAnimator networkAnimator;
         private Guid ownerPlayerId;
         private Formation formationScript;
         private ChangeMaterial changeMaterial;
-        private FogOfWar fogOfWar;
-        private Revealer revealer;
-        private List<GameObject> units = new();
+        private List<NetworkObjectReference> units = new();
         private string firebaseId;
         
         // Replicated variable for sprite orientation
@@ -43,14 +42,15 @@ namespace Player
         
         private static readonly int movementSpeedAnimationHash = Animator.StringToHash("MovementSpeed");
 
+        private NavMeshAgent Agent;
+
         private void initialize()
         {
             spriteRenderer = GetComponent<SpriteRenderer>();
             networkAnimator = GetComponent<NetworkAnimator>();
             formationScript = GetComponent<Formation>();
-            revealer = GetComponent<Revealer>();
             changeMaterial = GetComponent<ChangeMaterial>();
-            fogOfWar = FindObjectOfType<FogOfWar>();
+            Agent = GetComponent<NavMeshAgent>();
 
             if (IsServer) {
                 Team = initialTeam;
@@ -61,10 +61,10 @@ namespace Player
             Debug.Log($"init player {Name} in {Team} with {FirebaseId}, is owner: {isActualOwner()}");
             if (isActualOwner())
             {
-                if (Camera.main != null)
-                {
-                    Camera.main.gameObject.transform.SetParent(transform);
-                }
+                // if (Camera.main != null)
+                // {
+                //     Camera.main.gameObject.transform.SetParent(transform);
+                // }
             }
             else
             {
@@ -74,17 +74,13 @@ namespace Player
             var localPlayerData = LobbyManager.Singleton.GetLocalPlayerData();
             if (localPlayerData.Team == Team)
             {
-                if (fogOfWar)
-                {
-                    fogOfWar.RegisterAsRevealer(revealer);
-                }
+                revealer.SetActive(true);
+                changeMaterial.Change(false);
             }
             else
             {
-                if (fogOfWar)
-                {
-                    changeMaterial.Change();
-                }
+                revealer.gameObject.SetActive(false);
+                changeMaterial.Change(true);
             }
             
             formationScript.InitializeFormation(); // build prefab, get position of the commander
@@ -102,7 +98,7 @@ namespace Player
             if (!isActualOwner()) return;
             if (!Application.isFocused) return;
 
-            move();
+            // move();
 
             if (Input.GetKeyDown(KeyCode.I))
             { CommandMovementServerRpc(); }
@@ -204,6 +200,23 @@ namespace Player
             }
         }
 
+        public void MoveTowards(Vector3 position)
+        {
+            Agent.SetDestination(position);
+            Vector2 direction = position - transform.position;
+            if (direction.magnitude > 0.1f)
+            {
+                networkAnimator.Animator.SetFloat(movementSpeedAnimationHash, 1);
+            }
+            else
+            {
+                networkAnimator.Animator.SetFloat(movementSpeedAnimationHash, 0);
+            }
+
+            spriteRenderer.flipX = direction.x < 0;
+            xSpriteFlip.Value = spriteRenderer.flipX;
+        }
+
         private void move()
         {
             Vector2 input = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
@@ -244,9 +257,34 @@ namespace Player
             firebaseId = clientData.FirebaseId;
         }
 
-        void ICommander.ReportFollowing(GameObject go) => units.Add(go);
-        void ICommander.ReportUnfollowing(GameObject go) => units.Remove(go);
+        void ICommander.ReportFollowing(NetworkObjectReference networkObjectReference)
+        {
+            if (!IsServer)
+            { throw new Exception($"only on server can adding units to commander be done: {gameObject.name}"); }
+            
+            addToUnitsClientRpc(networkObjectReference);
+        }
+        
+        [ClientRpc]
+        private void addToUnitsClientRpc(NetworkObjectReference networkObjectReference)
+        {
+            units.Add(networkObjectReference);
+        }
 
+        void ICommander.ReportUnfollowing(NetworkObjectReference networkObjectReference)
+        {
+            if (!IsServer)
+            { throw new Exception($"only on server can removing units from commander be done: {gameObject.name}"); }
+            
+            removeFromUnitsClientRpc(networkObjectReference);
+        }
+        
+        [ClientRpc]
+        private void removeFromUnitsClientRpc(NetworkObjectReference networkObjectReference)
+        {
+            units.Remove(networkObjectReference);
+        }
+        
         // commands to the units
         [ServerRpc]
         public void CommandMovementServerRpc()
@@ -257,6 +295,7 @@ namespace Player
                 { soldier.SoldierBehaviour = SoldierBehaviour.Move; }
             }
         }
+        
         [ServerRpc]
         public void CommandIdleServerRpc()
         {
@@ -266,6 +305,7 @@ namespace Player
                 { soldier.SoldierBehaviour = SoldierBehaviour.Idle; }
             }
         }
+        
         [ServerRpc]
         public void CommandAttackServerRpc()
         {

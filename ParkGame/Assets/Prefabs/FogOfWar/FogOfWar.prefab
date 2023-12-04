@@ -52,7 +52,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f7206b6b133ad4e42a7e46a48114abc2, type: 2}
+  - {fileID: 2100000, guid: cf3818e00934c6647836dfea917f395f, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -72,8 +72,8 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: -10
-  m_Sprite: {fileID: -2413806693520163455, guid: 5a046c0f9c5e91945a5cae58973daa2a, type: 3}
+  m_SortingOrder: -100
+  m_Sprite: {fileID: 21300000, guid: 7d10d1aad0bc6154b92327c1c04cd1e0, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -136,7 +136,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 3ca1bfac1d734f84cb32c48059e6b8f3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -157,7 +157,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 100
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 21300000, guid: 7d10d1aad0bc6154b92327c1c04cd1e0, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -165,7 +165,7 @@ SpriteRenderer:
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 0
+  m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1 &862468789255997006
@@ -214,13 +214,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7621d4613fa266440b1f56d3624deb3e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fog: {fileID: 862468788484070299}
-  revealer: {fileID: 862468788002139224}
-  hiddenColor:
-    serializedVersion: 2
-    rgba: 3355443200
-  fogSizeInUnits: 40
+  fogOfWarSpriteRenderer: {fileID: 862468788484070299}
+  revealerSpriteRenderer: {fileID: 862468788002139224}
   pixelsPerUnit: 2
-  edgeWidth: 3
-  debug: 0
+  width: 100
+  radius: 3
+  radiusEdge: 3
+  target: {fileID: 0}
+  hiddenColor: {r: 0, g: 0, b: 0, a: 0.8862745}
   revealerTargets: []

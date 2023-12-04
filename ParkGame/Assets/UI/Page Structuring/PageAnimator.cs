@@ -25,10 +25,9 @@ public class PageAnimator
         switch (entryMode)
         {
             case PageEntryMode.None:
-                canvasGroup.alpha = 0f;
-                break;
             case PageEntryMode.Fade:
                 canvasGroup.alpha = 0f;
+                canvasGroup.blocksRaycasts = false;
                 break;
             case PageEntryMode.SlideLeft:
                 rectTransform.anchoredPosition = new Vector2(canvasSize.x, 0f);

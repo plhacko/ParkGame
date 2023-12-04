@@ -2,8 +2,10 @@ using UnityEngine;
 
 public class PlayerPointerPlacer : MonoBehaviour
 {
-    public GameObject pin;
+    public GameObject Pin;
+    public static Vector3 PinPosition = Vector3.zero;
     public GameObject accuracyCircle;
+    public float debugMovementSpeed = 5.0f;
 
     private Coordinate pinPosition = new Coordinate()
     {
@@ -38,6 +40,16 @@ public class PlayerPointerPlacer : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
+
+    #if UNITY_EDITOR
+        // Movement for debugging in Unity Editor
+        // Using W, A, S, D or arrow keys
+        var movement = new Vector3(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"), 0.0f);
+        if (movement != Vector3.zero)
+        {
+            Pin.transform.position += movement * debugMovementSpeed * Time.deltaTime;
+        }
+    #else
         // Check if GPS data is available
         if (!GPSLocator.instance.IsLocationServiceEnabled())
         {
@@ -53,11 +65,14 @@ public class PlayerPointerPlacer : MonoBehaviour
         pinPosition.lat = GPSLocator.instance.Lattitude;
 
         SetPin();
+    #endif
+
+        PinPosition = Pin.transform.position;
     }
 
     void SetPin()
     {
-        if (pin == null)
+        if (Pin == null)
         {
             Debug.LogError("Pin Prefab is null");
             return;
@@ -102,7 +117,8 @@ public class PlayerPointerPlacer : MonoBehaviour
         Vector3 worldPosition = new Vector3(worldX, worldY, transform.position.z);
 
         // Do something with the world position
-        pin.transform.position = worldPosition;
+        PinPosition = worldPosition;
+        Pin.transform.position = worldPosition;
         accuracyCircle.transform.position = worldPosition;
         var scale = mapDisplayer.GetMapScale();
         float accuracyRadius = (float)(GPSLocator.instance.HorizontalAccuracy * scale * 2);

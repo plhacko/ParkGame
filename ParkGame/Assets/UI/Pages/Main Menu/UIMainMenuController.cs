@@ -12,10 +12,12 @@ public class UIMainMenuController : UIPageController
     [SerializeField] private Button hostButton;
     [SerializeField] private TMP_InputField joinCodeInputField;
     [SerializeField] private Button joinButton;
+    [SerializeField] private Button aboutButton;
     [SerializeField] private Button signOutButton;
     [SerializeField] private UIPage welcomePage;
     [SerializeField] private UIPage lobbyPage;
     [SerializeField] private UIPage prepareGamePage;
+    [SerializeField] private UIPage aboutPage;
     [SerializeField] private string createMapMenuSceneName; 
     
     
@@ -24,6 +26,7 @@ public class UIMainMenuController : UIPageController
         createMapButton.onClick.AddListener(Create);
         hostButton.onClick.AddListener(Host);
         joinButton.onClick.AddListener(Join);
+        aboutButton.onClick.AddListener(About);
         signOutButton.onClick.AddListener(SignOut);
 
         // TODO remove this
@@ -64,11 +67,15 @@ public class UIMainMenuController : UIPageController
         enableButtons(true);
     }
 
+    private void About()
+    {
+        UIController.Singleton.PushUIPage(aboutPage);
+    }
+
     private void SignOut()
     {
         enableButtons(false);
-        FirebaseAuth.DefaultInstance.SignOut();
-        AuthenticationService.Instance.SignOut();
+        ServicesManager.Instance.SignOutFromFirebase();
         UIController.Singleton.PopUIPage();
         UIController.Singleton.PushUIPage(welcomePage);
     }

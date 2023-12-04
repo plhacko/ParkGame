@@ -7,6 +7,8 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
 using Unity.VisualScripting;
+using System.Text.RegularExpressions;
+using System.Xml.Serialization;
 
 [System.Serializable]
 public class MapboxAccesToken
@@ -14,6 +16,7 @@ public class MapboxAccesToken
     public string AccessToken;
 }
 
+[RequireComponent(typeof(SpriteRenderer))]
 public class MapDisplayer : MonoBehaviour
 {
     [Header("Request info")]
@@ -22,7 +25,10 @@ public class MapDisplayer : MonoBehaviour
     public enum MapboxRequestType { Center, BoundingBox };
     public string urlProperty;
     private Coroutine runningRequest;
-
+    
+    public enum MapInitiator { Query, MapData }
+    public MapInitiator Initiator = MapInitiator.Query;
+    public MapData mapData = null;
     [Header("Style")]
     public MapboxStyle Style = MapboxStyle.Streets;
     public enum MapboxStyle
@@ -86,7 +92,72 @@ public class MapDisplayer : MonoBehaviour
                 accessToken = mapboxData.AccessToken;
         }
         
-        InitiateMapRequest();
+        if (Initiator == MapInitiator.Query)
+            InitiateMapRequest();
+        else
+            InitiateMapFromMapData();
+    }
+
+    public Vector2 ExtractDimensionsFromUrl(string url)
+    {
+        // Define the regex pattern to match the dimensions
+        string pattern = @"/(\d+)x(\d+)@";
+
+        // Use regex to find a match in the URL
+        Match match = Regex.Match(url, pattern);
+
+        // If a match was found, extract the dimensions and return them as a Vector2
+        if (match.Success)
+        {
+            float width = float.Parse(match.Groups[1].Value);
+            float height = float.Parse(match.Groups[2].Value);
+
+            return new Vector2(width, height);
+        }
+
+        // If no match was found, return a default Vector2
+        return new Vector2();
+    }
+
+    public Vector4 ExtractBoundingBoxFromUrl(string url)
+    {
+        // Define the regex pattern to match the bounding box coordinates
+        string bboxPattern = @"\[(-?\d+.\d+),(-?\d+.\d+),(-?\d+.\d+),(-?\d+.\d+)\]";
+
+        Match match = Regex.Match(url, bboxPattern);
+
+        // If a match was found, extract the coordinates and return them as a Vector4
+        if (match.Success)
+        {
+            float minLon = float.Parse(match.Groups[1].Value, CultureInfo.InvariantCulture);
+            float minLat = float.Parse(match.Groups[2].Value, CultureInfo.InvariantCulture);
+            float maxLon = float.Parse(match.Groups[3].Value, CultureInfo.InvariantCulture);
+            float maxLat = float.Parse(match.Groups[4].Value, CultureInfo.InvariantCulture);
+
+            return new Vector4(minLon, minLat, maxLon, maxLat);
+        }
+
+        // If no match was found, return a default Vector4
+        return new Vector4();
+    }
+
+    private void InitiateMapFromMapData()
+    {
+        var dimensions = ExtractDimensionsFromUrl(mapData.MetaData.MapQuery);
+        var boundingBox = ExtractBoundingBoxFromUrl(mapData.MetaData.MapQuery);
+
+        Width = (int) dimensions.x;
+        Height = (int) dimensions.y;
+        MinLongitude = boundingBox.x;
+        MinLatitude = boundingBox.y;
+        MaxLongitude = boundingBox.z;
+        MaxLatitude = boundingBox.w;
+
+        var sr = GetComponent<SpriteRenderer>();
+        sr.sprite = Sprite.Create(mapData.GPSTexture, new Rect(0, 0, mapData.GPSTexture.width, mapData.GPSTexture.height), new Vector2(0.5f, 0.5f));
+
+        mapLoaded = true;
+        OnMapLoaded?.Invoke();
     }
 
     private void OnEnable()

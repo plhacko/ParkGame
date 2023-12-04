@@ -10,8 +10,7 @@ using UnityEngine.EventSystems;
 public class UIController : MonoBehaviour
 {
     public static UIController Singleton { get; private set; }
-    [SerializeField]
-    private UIPage initialPage;
+    public UIPage initialPage;
     [SerializeField]
     private GameObject firstFocusItem;
     private Canvas canvas;

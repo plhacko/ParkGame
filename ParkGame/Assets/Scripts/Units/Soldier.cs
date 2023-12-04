@@ -1,18 +1,13 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using Managers;
 using System;
-using System.Windows.Input;
 using Player;
 using UnityEngine.AI;
 using static Formation;
 using DG.Tweening;
-using System.Linq;
-using FMODUnity;
 
 
 public class Soldier : NetworkBehaviour, ISoldier
@@ -40,6 +35,7 @@ public class Soldier : NetworkBehaviour, ISoldier
     [SerializeField] int Damage = 1;
     [SerializeField] UnitType TypeOfUnit;
     [SerializeField] float DeathFadeTime = 2f;
+    [SerializeField] private GameObject revealer;
     
     public float ClosestEnemyDEBUG; // DEBUG // TODO: rm
 
@@ -74,21 +70,17 @@ public class Soldier : NetworkBehaviour, ISoldier
     
     private ShootScript shooting;
     private PlayerManager playerManager;
-    private FogOfWar fogOfWar;
     private ChangeMaterial changeMaterial;
-    private Revealer revealer;
-    
+
     private void Initialize()
     {
         playerManager = FindObjectOfType<PlayerManager>();
-        fogOfWar = FindObjectOfType<FogOfWar>();
         EnemyObserver = GetComponentInChildren<EnemyObserver>();
         SpriteRenderer = GetComponent<SpriteRenderer>();
         Agent = GetComponent<NavMeshAgent>();
         Networkanimator = GetComponent<NetworkAnimator>();
         shooting = GetComponent<ShootScript>();
         changeMaterial = GetComponent<ChangeMaterial>();
-        revealer = GetComponent<Revealer>();
         
         _Team.OnValueChanged += OnTeamChanged;
         _SoldierBehaviour.OnValueChanged += OnBehaviourChange;
@@ -123,17 +115,13 @@ public class Soldier : NetworkBehaviour, ISoldier
         var localPlayerData = LobbyManager.Singleton.GetLocalPlayerData();
         if (localPlayerData.Team == newValue)
         {
-            if (fogOfWar)
-            {
-                fogOfWar.RegisterAsRevealer(revealer);   
-            }
+            revealer.SetActive(true);
+            changeMaterial.Change(false);
         }
         else
         {
-            if (fogOfWar)
-            {
-                changeMaterial.Change();
-            }
+            revealer.SetActive(false);
+            changeMaterial.Change(true);
         }
     }
     public void OnBehaviourChange(SoldierBehaviour previousValue, SoldierBehaviour newValue)
@@ -186,10 +174,8 @@ public class Soldier : NetworkBehaviour, ISoldier
         // check for a Commander
         if (CommanderToFollow == null)
         {
-            //    CommanderToFollow = debugCommander; // DEBUG // TODO: rm
-            CommanderToFollow = ClosestOutpost();
             return;
-        } // TODO: add function, that finds the nearest frienly outpost
+        }
 
         // death timer
         //if (TimeUntilDestroyed > 0 || HP == 0) {
@@ -362,7 +348,6 @@ public class Soldier : NetworkBehaviour, ISoldier
 
                 // sound effect
                 AudioManager.Instance.PlayOneShot(FMODEvents.Instance.SwordHitSFX, transform.position);
-
                 
                 if (TypeOfUnit == UnitType.Pawn) {
                     enemyT.GetComponent<ISoldier>()?.TakeDamage(Damage);
@@ -425,10 +410,23 @@ public class Soldier : NetworkBehaviour, ISoldier
         PlayerController playerController = playerManager.GetPlayerController(clientID);
         if (playerController != null && playerController.Team == Team)
         {
-            SetCommanderToFollow(playerController.gameObject.transform);
-        //    if (SoldierBehaviour == SoldierBehaviour.Idle) {
-        //        SoldierBehaviour = SoldierBehaviour.Move;
-        //    }
+            if (playerController.gameObject.transform != CommanderToFollow)
+            {
+                SetCommanderToFollow(playerController.gameObject.transform);
+                FormationType = CommanderToFollow.GetComponent<ICommander>().GetFormation(); // get type of formation
+                FormationFromFollowedCommander = CommanderToFollow.GetComponent<Formation>();
+            
+                if (FormationType == FormationType.Box || FormationType == FormationType.Circle) {
+                    SoldierBehaviour = SoldierBehaviour.Formation;
+                    NavMeshFormationSwitch(true, SoldierBehaviour.Formation, FormationFromFollowedCommander, FormationType);
+                }
+            }
+            else
+            {
+                var closestOutpost = ClosestOutpost();
+                SetCommanderToFollow(closestOutpost);
+                NavMeshFormationSwitch(false, SoldierBehaviour.Idle, FormationFromFollowedCommander, FormationType.Free);
+            }
         }
     }
 
@@ -443,23 +441,6 @@ public class Soldier : NetworkBehaviour, ISoldier
             CommanderToFollow?.GetComponent<ICommander>().ReportUnfollowing(gameObject);
             CommanderToFollow = commanderToFollow;
             CommanderToFollow?.GetComponent<ICommander>().ReportFollowing(gameObject);
-
-            FormationType = CommanderToFollow.GetComponent<ICommander>().GetFormation(); // get type of formation
-            FormationFromFollowedCommander = CommanderToFollow.GetComponent<Formation>();
-            
-            if (FormationType == FormationType.Box || FormationType == FormationType.Circle) {
-                SoldierBehaviour = SoldierBehaviour.Formation;
-                NavMeshFormationSwitch(true, SoldierBehaviour.Formation, FormationFromFollowedCommander, FormationType);
-            }
-
-
-        } else // if already following, unfollow
-        {
-            CommanderToFollow?.GetComponent<ICommander>().ReportUnfollowing(gameObject);
-            CommanderToFollow = null;
-
-            NavMeshFormationSwitch(false, SoldierBehaviour.Idle, FormationFromFollowedCommander, FormationType.Free);
-
         }
     }
     
@@ -483,6 +464,7 @@ public class Soldier : NetworkBehaviour, ISoldier
     {
         HP = 0;
         SoldierBehaviour = SoldierBehaviour.Death;
+        Debug.Log("die ");
         CommanderToFollow?.GetComponent<ICommander>()?.ReportUnfollowing(gameObject);
         Networkanimator.SetTrigger("Die");
         handleDeath();

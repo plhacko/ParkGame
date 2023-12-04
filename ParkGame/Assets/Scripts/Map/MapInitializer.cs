@@ -3,9 +3,13 @@ using Managers;
 using Unity.Netcode;
 using UnityEngine;
 
-public class MapInitializer : MonoBehaviour
+public class Map : MonoBehaviour
 {
     [SerializeField] private CreateMapWithOverlay mapCreator;
+    public static CreateMapWithOverlay MapCreator => MapCreator;
+    public static GameObject GPSMap { get; private set; } = null;
+    public static GameObject GridMap { get; private set; } = null;
+    public static Bounds MapBounds { get; private set; } = new Bounds();
 
     private PlayerManager playerManager;
     
@@ -16,6 +20,7 @@ public class MapInitializer : MonoBehaviour
             return;
         }
 
+        mapCreator.GetComponent<Drawable>().enabled = false;
         playerManager = FindObjectOfType<PlayerManager>();
         
         if (NetworkManager.Singleton.IsHost)
@@ -38,14 +43,9 @@ public class MapInitializer : MonoBehaviour
 
     private void loadMap()
     {
-        mapCreator.GetComponent<Drawable>().enabled = false;
         mapCreator.CreateTilemapFromFetchedMap(LobbyManager.Singleton.MapData);
-        
-        var baseMap = mapCreator.BaseMap;
-        baseMap.OnMapLoaded += () =>
-        {
-            Debug.Log("Map loaded");
-            mapCreator.FitCameraToMap();
-        };  
+        GPSMap = mapCreator.BaseMap.gameObject;
+        GridMap = GetComponentInChildren<Grid>().gameObject;
+        MapBounds = GPSMap.GetComponent<SpriteRenderer>().bounds;
     }
 }
