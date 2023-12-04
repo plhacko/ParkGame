@@ -45,7 +45,6 @@ public class Soldier : NetworkBehaviour, ISoldier
 
     private NetworkVariable<int> _HP = new();
     public int HP { get => _HP.Value; set => _HP.Value = value; }
-    public int TeaM;
     private NetworkVariable<int> _Team = new(-1);
     public int Team { get => _Team.Value; set => _Team.Value = value; }
     private NetworkVariable<SoldierBehaviour> _SoldierBehaviour = new();
@@ -113,7 +112,6 @@ public class Soldier : NetworkBehaviour, ISoldier
     
     private void OnTeamChanged(int previousValue, int newValue) //DEBUG (just tem membership visualization) // TODO: rm
     {
-        TeaM = newValue; // tmp
         SpriteRenderer sr = transform.Find("Circle")?.GetComponent<SpriteRenderer>();
         if (sr == null) { return; }
         if (newValue == 0) { sr.color = Color.blue; }
@@ -200,7 +198,12 @@ public class Soldier : NetworkBehaviour, ISoldier
         // attack timer
         if (AttackTimer <= Attackcooldown)
         { AttackTimer += Time.deltaTime; }
-        
+
+        // temporary
+        if (TypeOfUnit == UnitType.Horseman) {
+            Agent.speed = 1f;
+        }
+
         // soldier behaviour
         switch (SoldierBehaviour)
         {
@@ -255,6 +258,9 @@ public class Soldier : NetworkBehaviour, ISoldier
         // { AttackEnemyIfInRAnge(enemyT); }
 
         //  moves to the inner circle around the commander
+
+        
+
         if (Vector3.Distance(CommanderToFollow.position, transform.position) > InnerDistanceFromCommander)
         { MoveTowardsEntity(CommanderToFollow); }
         else
@@ -360,16 +366,16 @@ public class Soldier : NetworkBehaviour, ISoldier
 
                 Networkanimator.SetTrigger("Attack");
 
-                // sound effect
-                AudioManager.Instance.PlayOneShot(FMODEvents.Instance.SwordHitSFX, transform.position);
-
                 
-                if (TypeOfUnit == UnitType.Pawn) {
+                if (TypeOfUnit == UnitType.Pawn || TypeOfUnit == UnitType.Horseman) {
+                    AudioManager.Instance.PlayOneShot(FMODEvents.Instance.SwordHitSFX, transform.position);
                     enemyT.GetComponent<ISoldier>()?.TakeDamage(Damage);
+                
                 }
                 if (TypeOfUnit == UnitType.Archer) {
                     SpriteRenderer.flipX = (enemyT.position.x - transform.position.x < 0);
                     XSpriteFlip.Value = SpriteRenderer.flipX;
+                    Debug.Log("shoot");
                     shooting.Shoot(enemyT, Damage, XSpriteFlip.Value);
                 }
             }
@@ -380,6 +386,10 @@ public class Soldier : NetworkBehaviour, ISoldier
 
     private void MoveTowardsEntity(Transform entityT)
     {
+        if (TypeOfUnit == UnitType.Horseman) {
+            Agent.speed = 3.5f;
+        }
+
         // archers, don't go closer! you'd just die 
         if (Vector3.Distance(entityT.position, transform.position) < MinAttackRange) {
             SoldierBehaviour = SoldierBehaviour.Idle;

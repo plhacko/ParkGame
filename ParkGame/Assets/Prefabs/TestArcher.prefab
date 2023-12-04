@@ -266,16 +266,12 @@ MonoBehaviour:
   DefendDistanceFromCommander: 3
   AttackDistanceFromCommander: 6
   MinAttackRange: 2
-  MaxAttackRange: 5
-  Attackcooldown: 3.2
-  Damage: 1
+  MaxAttackRange: 7
+  Attackcooldown: 1.2
+  Damage: 2
   TypeOfUnit: 1
   DeathFadeTime: 2
-  initTeamDebug: 0
-  initTeam: 0
-  debugCommander: {fileID: 0}
   ClosestEnemyDEBUG: 0
-  TeaM: 0
   Behaviour: 0
   BehaviourChangedEvent:
     m_PersistentCalls:
@@ -342,7 +338,7 @@ Rigidbody2D:
     m_Bits: 256
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 640
+    m_Bits: 512
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
