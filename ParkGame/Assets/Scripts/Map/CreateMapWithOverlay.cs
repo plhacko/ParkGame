@@ -456,7 +456,8 @@ public class CreateMapWithOverlay : MonoBehaviour
     private void CreateTilemapFromTexture(bool fromUploadedTexture = false, MapStructures structures = null)
     {
         errorMessages = new List<string>();
-        OnMapValidated.Invoke(false); // Disable Save map button, reenabled after valid map creation
+        if (!fromUploadedTexture)
+            OnMapValidated.Invoke(false); // Disable Save map button, reenabled after valid map creation
         ClearTilemap();
 
         if (!fromUploadedTexture)
