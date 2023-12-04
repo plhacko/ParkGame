@@ -17,7 +17,7 @@ GameObject:
   - component: {fileID: 598515008}
   - component: {fileID: 598515007}
   - component: {fileID: 6348730249214992367}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Outpost
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -13,10 +13,9 @@ GameObject:
   - component: {fileID: 8892233519408517772}
   - component: {fileID: 8892233519408517769}
   - component: {fileID: 8892233519408517774}
-  - component: {fileID: 2058168539780700965}
   - component: {fileID: -5638008865318778227}
   - component: {fileID: 8736546441281468508}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Castle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -51,10 +50,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   InitialTeam: -1
+  IsCastle: 0
   MaxUnits: 6
   SpawnTime: 2.5
   UnitPrefab: {fileID: 2149011059489662585, guid: 767d4c3ee472ffe4ea667aae7025b849, type: 3}
   ArcherPrefab: {fileID: 0}
+  HorsemanPrefab: {fileID: 0}
   PawnIcon: {fileID: 21300000, guid: 1787590b164c3d14392ce6bdc77a4d97, type: 3}
   ArcherIcon: {fileID: 0}
   HorsemanIcon: {fileID: 0}
@@ -155,18 +156,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &2058168539780700965
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8892233519408517762}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 78127569a85b58e40ada40257560cb2b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &-5638008865318778227
 MonoBehaviour:
   m_ObjectHideFlags: 0
