@@ -49,10 +49,9 @@ public class GameManager : MonoBehaviour
     {
         if (FollowCommander) // follow pin instead?
         {
-            PlayerController playerController = playerManager.GetLocalPlayerController();
-            if (playerController != null && !playerController.IsLocked)
+            if (Map.GPSMap != null)
             {
-                Camera.main.PointTo(playerController.transform.position);
+                Camera.main.PointTo(PlayerPointerPlacer.PinPosition);
             }
         }
     }
