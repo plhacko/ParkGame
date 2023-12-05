@@ -183,6 +183,7 @@ public class Formation : MonoBehaviour {
         soldiers.Clear();
         soldiersArchers.Clear();
         soldiersSwordmen.Clear();
+        soldiersMolemen.Clear();
 
         FormationCircle.Clear();
         FormationCircleInner.Clear();
