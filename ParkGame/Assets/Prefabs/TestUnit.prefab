@@ -279,13 +279,12 @@ MonoBehaviour:
   DefendDistanceFromCommander: 3
   AttackDistanceFromCommander: 6
   MinAttackRange: 0
-  MaxAttackRange: 0.4
+  MaxAttackRange: 0.67
   Attackcooldown: 1
   Damage: 1
   TypeOfUnit: 0
   DeathFadeTime: 2
   ClosestEnemyDEBUG: 0
-  TeaM: 0
   Behaviour: 0
   BehaviourChangedEvent:
     m_PersistentCalls:
@@ -295,6 +294,9 @@ MonoBehaviour:
   FormationFromFollowedCommander: {fileID: 0}
   ObjectToFollowInFormation: {fileID: 0}
   FormationType: 0
+  midPointPositionForHorseman: {x: 0, y: 0, z: 0}
+  midPointReached: 0
+  targetedEnemy: {fileID: 0}
 --- !u!70 &8848524197970868838
 CapsuleCollider2D:
   m_ObjectHideFlags: 0

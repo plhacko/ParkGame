@@ -150,18 +150,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   InitialHP: 8
   MovementSpeed: 3.5
-  InnerDistanceFromCommander: 1.5
+  InnerDistanceFromCommander: 1
   OuterDistanceFromCommander: 3
-  DefendDistanceFromCommander: 3.1
-  AttackDistanceFromCommander: 6
-  MinAttackRange: 1
-  MaxAttackRange: 1.2
-  Attackcooldown: 4
+  DefendDistanceFromCommander: 4
+  AttackDistanceFromCommander: 8
+  MinAttackRange: 0.12
+  MaxAttackRange: 1.1
+  Attackcooldown: 2
   Damage: 3
   TypeOfUnit: 2
   DeathFadeTime: 2
   ClosestEnemyDEBUG: 0
-  TeaM: 0
   Behaviour: 0
   BehaviourChangedEvent:
     m_PersistentCalls:
@@ -171,6 +170,9 @@ MonoBehaviour:
   FormationFromFollowedCommander: {fileID: 0}
   ObjectToFollowInFormation: {fileID: 0}
   FormationType: 0
+  midPointPositionForHorseman: {x: 0, y: 0, z: 0}
+  midPointReached: 0
+  targetedEnemy: {fileID: 0}
 --- !u!70 &3140456785125691185
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -448,7 +450,7 @@ CircleCollider2D:
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
-  m_Radius: 3
+  m_Radius: 4.2
 --- !u!50 &5861823242978903205
 Rigidbody2D:
   serializedVersion: 4
