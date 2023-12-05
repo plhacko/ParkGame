@@ -20,6 +20,8 @@ public class UIInGameScreenController : UIPageController
     [SerializeField] private Button formationButton1;
     [SerializeField] private Button formationButton2;
     [SerializeField] private Button formationButtonClose;
+    [SerializeField] private UIUnitListController unitsList;
+    [SerializeField] private RectTransform buildingsList;
     [SerializeField] private UIPage optionsPage;
     [SerializeField] private GameManager gameManager;
 
@@ -123,6 +125,16 @@ public class UIInGameScreenController : UIPageController
     {
         UIController.Singleton.PushUIPage(optionsPage);
     }
+
+    public void AddUnit(Soldier unit)
+    {
+        unitsList.AddUnit(unit);
+    }
+
+    public void RemoveUnit(Soldier unit)
+    {
+        unitsList.RemoveUnit(unit);
+    }   
 
     public override void OnEnter()
     {

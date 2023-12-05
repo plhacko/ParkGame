@@ -49,6 +49,8 @@ namespace Player
         private static readonly int movementSpeedAnimationHash = Animator.StringToHash("MovementSpeed");
         private NavMeshAgent Agent;
 
+        private UIInGameScreenController uiInGameScreenController;
+
         private void initialize()
         {
             spriteRenderer = GetComponent<SpriteRenderer>();
@@ -57,6 +59,7 @@ namespace Player
             changeMaterial = GetComponent<ChangeMaterial>();
             Agent = GetComponent<NavMeshAgent>();
             playerManager = FindObjectOfType<PlayerManager>();
+            uiInGameScreenController = UIController.Singleton.GetComponentInChildren<UIInGameScreenController>();
 
             if (IsServer) {
                 Team = initialTeam;
@@ -285,6 +288,20 @@ namespace Player
         private void addToUnitsClientRpc(NetworkObjectReference networkObjectReference)
         {
             units.Add(networkObjectReference);
+            if (!networkObjectReference.TryGet(out var networkObject, NetworkManager.Singleton))
+            {
+                Debug.LogWarning($"could not get network object from reference");
+                return;
+            }
+
+            if (!networkObject.TryGetComponent<Soldier>(out var soldier))
+            {
+                Debug.LogWarning($"could not get soldier from network object");
+                return;
+            }
+            
+            Debug.LogWarning($"added unit to commander: {gameObject}");
+            uiInGameScreenController.AddUnit(soldier);
         }
 
         void ICommander.ReportUnfollowing(NetworkObjectReference networkObjectReference)
@@ -299,6 +316,20 @@ namespace Player
         private void removeFromUnitsClientRpc(NetworkObjectReference networkObjectReference)
         {
             units.Remove(networkObjectReference);
+            if (!networkObjectReference.TryGet(out var networkObject, NetworkManager.Singleton))
+            {
+                Debug.LogWarning($"could not get network object from reference");
+                return;
+            }
+
+            if (!networkObject.TryGetComponent<Soldier>(out var soldier))
+            {
+                Debug.LogWarning($"could not get soldier from network object");
+                return;
+            }
+
+            Debug.LogWarning($"removed unit from commander: {gameObject}");
+            uiInGameScreenController.RemoveUnit(soldier);
         }
         
         // commands to the units

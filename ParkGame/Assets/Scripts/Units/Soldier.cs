@@ -36,8 +36,11 @@ public class Soldier : NetworkBehaviour, ISoldier
     [SerializeField] UnitType TypeOfUnit;
     [SerializeField] float DeathFadeTime = 2f;
     [SerializeField] private GameObject revealer;
+    public int MaxHP { get => InitialHP; }
     
     public float ClosestEnemyDEBUG; // DEBUG // TODO: rm
+
+    public UnitType Type { get => TypeOfUnit; }
 
     private NetworkVariable<int> _HP = new();
     public int HP { get => _HP.Value; set => _HP.Value = value; }
