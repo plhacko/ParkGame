@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.Events;
 
 public class ConquerModule : NetworkBehaviour, ITeamMember
 {
@@ -23,7 +22,6 @@ public class ConquerModule : NetworkBehaviour, ITeamMember
 
     private IProgressBar ProgressBar = null;
 
-    public UnityAction<int> OnTeamChanged;
     // public UnityAction<float> OnConquerPointsChanged;
 
     private void Start()
@@ -67,7 +65,8 @@ public class ConquerModule : NetworkBehaviour, ITeamMember
         // note - this happens only if there no visible friendly or other units
         if (ConquerPoints > ConquerPointsRequired)
         {
-            Team = ConquererTeam.Value;
+            int team = ConquererTeam.Value;
+            Team = team;
             ConquererTeam = -1;
             ConquerPoints = 0.0f;
 
@@ -75,7 +74,7 @@ public class ConquerModule : NetworkBehaviour, ITeamMember
             VisibleConquerUnits = new List<Transform>();
         
             if (victoryPoint) {
-                victoryPoint.ConquerThisVP();
+                victoryPoint.ConquerThisVP(team);
             }
         }
     }

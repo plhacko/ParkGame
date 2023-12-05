@@ -1,4 +1,3 @@
-using System.Collections;
 using Managers;
 using Unity.Netcode;
 using UnityEngine;
@@ -61,13 +60,13 @@ public class VictoryPoint : NetworkBehaviour
         }
     }
 
-    public void ConquerThisVP() {
-        Debug.Log("CONQUER THIS vp");
+    public void ConquerThisVP(int team) {
         lastConquestTime = Time.time;
 
         if (IsServer)
         {
             CloseVPClientRpc();
+            announcer.AnnounceEventClientRpc($"Victory Point has been captured by team {team + 1}!", 5);
         }
     }
 
@@ -84,7 +83,7 @@ public class VictoryPoint : NetworkBehaviour
         
         if (timeToOpen < 0 && !isOpen) { 
             OpenVPClientRpc();
-            announcer.AnnounceEventClientRpc($"Victory Point has opened!", 5);
+            announcer.AnnounceEventClientRpc("Victory Point has opened!", 5);
         }
     }
 }
