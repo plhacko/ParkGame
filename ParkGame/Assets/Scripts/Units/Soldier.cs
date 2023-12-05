@@ -203,9 +203,8 @@ public class Soldier : NetworkBehaviour, ISoldier
         if (AttackTimer <= Attackcooldown)
         { AttackTimer += Time.deltaTime; }
 
-        // temporary
         if (TypeOfUnit == UnitType.Horseman) {
-            Agent.speed = 1f;
+            Agent.speed = 3.5f;
         }
 
         // soldier behaviour
@@ -335,6 +334,9 @@ public class Soldier : NetworkBehaviour, ISoldier
                 return;
             }
             // Follow commander
+            if (TypeOfUnit == UnitType.Horseman && FormationType == FormationType.Box) {
+                Agent.speed = 1f;
+            }
             FollowObjectWithAnimation(ObjectToFollowInFormation.transform);
         }
     }
@@ -429,11 +431,6 @@ public class Soldier : NetworkBehaviour, ISoldier
             SoldierBehaviour = SoldierBehaviour.Idle;
             return;
         }
-
-        if (TypeOfUnit == UnitType.Horseman) {
-            Agent.speed = 3.5f;
-        }
-
 
         FollowObjectWithAnimation(entityT);
     }

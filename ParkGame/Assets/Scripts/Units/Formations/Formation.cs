@@ -31,6 +31,7 @@ public class Formation : MonoBehaviour {
     public List<GameObject> FormationCircleInner = new List<GameObject>();
     public List<GameObject> FormationCircleOuter = new List<GameObject>();
     public List<GameObject> FormationCircleForHorses = new List<GameObject>();
+    public GameObject HorseRoot;
 
     // box formation
     public GameObject BoxRoot;
@@ -54,22 +55,23 @@ public class Formation : MonoBehaviour {
 
     private void Update() {
         RotateBoxFormation();
+        RotateHorseFormation();
 
         if (Input.GetKeyDown(KeyCode.Space)) {
             Add1PositionToBoxFormation();
         }
     }
     
-    void UnparentFormation() {
-        var p = gameObject.transform.position;
-        BoxRoot.transform.SetParent(null, true);
-        BoxRoot.transform.position = new Vector3(p.x - 2, p.y, p.z);
-        BoxRoot.transform.rotation = Quaternion.Euler(new Vector3(0, 0, 90));
+    void UnparentFormation(GameObject go, Vector3 position) {
+        go.transform.SetParent(null, true);
+        go.transform.position = position;
+        go.transform.rotation = Quaternion.Euler(new Vector3(0, 0, 90));
         Hide(BoxRoot, false);
     }
 
     public void InitializeFormation() {
-        UnparentFormation();
+        Vector3 p = gameObject.transform.position;
+        UnparentFormation(BoxRoot, new Vector3(p.x - 2, p.y, p.z));
     }
 
     // disable renderer of object
@@ -92,8 +94,8 @@ public class Formation : MonoBehaviour {
         return sphere;
     }
 
-    void Add1PositionToCircularFormation(Vector3 pos, List<GameObject> lst) {
-        var sphere = AddSphere(pos, 0.2f, "CirclePos", gameObject);
+    void Add1PositionToCircularFormation(Vector3 pos, List<GameObject> lst, GameObject parent) {
+        var sphere = AddSphere(pos, 0.2f, "CirclePos", parent);
         
         lst.Add(sphere);
     }
@@ -160,6 +162,10 @@ public class Formation : MonoBehaviour {
         var sphere = AddSphere(position, 0.2f, "BoxPosHorse", BoxRoot);
         FormationBoxForHorses.Add(sphere);
         formDescr.NumberOfHorsemenPositions++;
+    }
+
+    void RotateHorseFormation() {
+        HorseRoot.transform.Rotate(0, 0, 0.5f);    
     }
 
     // rotate the box formation according to the commander's direction of movement
@@ -293,18 +299,21 @@ public class Formation : MonoBehaviour {
     public GameObject GetPositionInCircle(Soldier.UnitType unitType) {        
         var positionList = FormationCircleOuter;
         var soldierList = soldiersSwordmen;
+        GameObject parent = gameObject;
+
         if (unitType == Soldier.UnitType.Archer) {
             positionList = FormationCircleInner;
             soldierList = soldiersArchers;
         } else if (unitType == Soldier.UnitType.Horseman) {
             positionList = FormationCircleForHorses;
             soldierList = soldiersMolemen;
+            parent = HorseRoot;
         }
 
         var positions = ListCircularPositionsByUnitType(unitType);
 
         if (soldierList.Count > positionList.Count) {
-            Add1PositionToCircularFormation(positions[positions.Count - 1], positionList);
+            Add1PositionToCircularFormation(positions[positions.Count - 1], positionList, parent);
         }
 
         AdjustFormation(positionList, positions);
@@ -333,11 +342,18 @@ public class Formation : MonoBehaviour {
                 Destroy(child);
             }
         }
+
+        foreach (Transform t in HorseRoot.transform) {
+            GameObject child = t.gameObject;
+            if (child.name == "CirclePos") {
+                Destroy(child);
+            }
+        }
     }
 
     List<GameObject> AdjustFormation(List<GameObject> formationList, List<Vector3> positions) {
         int j = 0;
-        Debug.Log("adjust formation!!!!!");
+        //Debug.Log("adjust formation!!!!!");
         for (int i = 0; i < formationList.Count; i++) {
            // var a = formationList[i].transform.localPosition;
             var a = formationList[i].transform.position;
