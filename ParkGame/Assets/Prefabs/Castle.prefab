@@ -97,7 +97,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 03de352f8b805c64ab5985a699950e6d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spriteRenderer: {fileID: 5766239330762913691}
   pixelsPerUnit: 2
   radius: 6
 --- !u!1 &8892233519408517762
@@ -114,8 +113,6 @@ GameObject:
   - component: {fileID: 8892233519408517769}
   - component: {fileID: 8892233519408517774}
   - component: {fileID: -5638008865318778227}
-  m_Layer: 0
-  - component: {fileID: 8736546441281468508}
   m_Layer: 8
   m_Name: Castle
   m_TagString: Untagged
@@ -151,8 +148,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a6030245d92a7e42ab2c247dc0d696c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  InitialTeam: -1
   IsCastle: 0
+  InitialTeam: -1
   MaxUnits: 6
   SpawnTime: 2.5
   UnitPrefab: {fileID: 2149011059489662585, guid: 767d4c3ee472ffe4ea667aae7025b849, type: 3}

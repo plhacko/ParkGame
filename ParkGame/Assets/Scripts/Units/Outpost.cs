@@ -23,7 +23,6 @@ public class Outpost : NetworkBehaviour, ICommander
     [SerializeField] private Soldier.UnitType InitOutpostUnitType;
     [SerializeField] private GameObject revealer;
 
-    //[SerializeField] GameObject HorsemanPrefab; // todo
     List<NetworkObjectReference> Units = new List<NetworkObjectReference>();
     //ToggleSpawnedUnitScript OutpostSpawnerChanger;
 
@@ -158,9 +157,9 @@ public class Outpost : NetworkBehaviour, ICommander
             case 1:
                 outpostUnitType = Soldier.UnitType.Archer;
                 return ArcherIcon;
-            //case 2:
-            //    OutpostUnitType = UnitType.Horseman;
-            //    return Instantiate(HorsemanIcon);
+            case 2:
+                outpostUnitType = Soldier.UnitType.Horseman;
+                return HorsemanIcon;
             default:
                 outpostUnitType = Soldier.UnitType.Pawn;
                 return PawnIcon;
@@ -178,7 +177,7 @@ public class Outpost : NetworkBehaviour, ICommander
         Debug.Log("teams: " + playerController.Team + " outpost from: " + Team);
 
         if (playerController != null && playerController.Team == Team) {
-            Debug.Log("ZMEN IKONU!");
+            Debug.Log("change spawning type");
             counter++;
             int numOfUnitTypes = Enum.GetNames(typeof(Soldier.UnitType)).Length;
             ChangeIconClientRpc(counter % numOfUnitTypes);
@@ -186,11 +185,12 @@ public class Outpost : NetworkBehaviour, ICommander
     }
 
     void OnMouseDown() {
-        /*
-        Debug.Log("ICON CLICKED");
+        if (IsCastle) {
+            return;
+        }
 
         ulong clientID = NetworkManager.Singleton.LocalClientId;
         RequestChangingSpawnTypeServerRpc(clientID);
-        */
+        
     }
 }

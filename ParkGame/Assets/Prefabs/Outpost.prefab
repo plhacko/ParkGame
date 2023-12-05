@@ -16,7 +16,6 @@ GameObject:
   - component: {fileID: -6080753142415193819}
   - component: {fileID: 598515008}
   - component: {fileID: 598515007}
-  - component: {fileID: 6348730249214992367}
   m_Layer: 8
   m_Name: Outpost
   m_TagString: Untagged
@@ -121,8 +120,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a6030245d92a7e42ab2c247dc0d696c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  InitialTeam: -1
   IsCastle: 0
+  InitialTeam: -1
   MaxUnits: 3
   SpawnTime: 4
   UnitPrefab: {fileID: 2149011059489662585, guid: 767d4c3ee472ffe4ea667aae7025b849, type: 3}
@@ -364,7 +363,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 03de352f8b805c64ab5985a699950e6d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spriteRenderer: {fileID: 7515845468646436896}
   pixelsPerUnit: 2
   radius: 6
 --- !u!1001 &5361308661487119236
