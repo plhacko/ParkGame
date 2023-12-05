@@ -10,6 +10,7 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get; private set; }
     [SerializeField] private PlayerManager playerManager;
     public bool FollowCommander { get; private set;} = false;
+    [SerializeField] private float followRefreshRate = 0.5f;
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -31,20 +32,16 @@ public class GameManager : MonoBehaviour
     {
         while (true)
         {
-            Debug.Log("FollowGPSPointer");
             if (Map.GPSMap != null)
             {
-                Debug.Log("ClientID: " + NetworkManager.Singleton.LocalClientId);
                 PlayerController playerController = playerManager.GetLocalPlayerController();
                 if (playerController != null && !playerController.IsLocked)
                 {
-                    Debug.Log("PlayerController: " + playerController);
                     var newPosition = PlayerPointerPlacer.PinPosition;
-                    Debug.Log("newPosition: " + newPosition);
                     playerController.MoveTowards(newPosition);
                 }
             }
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(followRefreshRate);
         }
     }
 
