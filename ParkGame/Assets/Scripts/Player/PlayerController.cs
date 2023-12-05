@@ -288,6 +288,7 @@ namespace Player
         private void addToUnitsClientRpc(NetworkObjectReference networkObjectReference)
         {
             units.Add(networkObjectReference);
+
             if (!networkObjectReference.TryGet(out var networkObject, NetworkManager.Singleton))
             {
                 Debug.LogWarning($"could not get network object from reference");
@@ -299,10 +300,9 @@ namespace Player
                 Debug.LogWarning($"could not get soldier from network object");
                 return;
             }
-            
-            Debug.LogWarning($"added unit to commander: {gameObject}");
-            // TODO add remove action
-            uiInGameScreenController.AddUnit(soldier, soldier.OnMouseDown);
+
+            if (soldier.TransformToFollow == transform)
+                uiInGameScreenController.AddUnit(soldier, soldier.OnMouseDown);
         }
 
         void ICommander.ReportUnfollowing(NetworkObjectReference networkObjectReference)
@@ -329,8 +329,8 @@ namespace Player
                 return;
             }
 
-            Debug.LogWarning($"removed unit from commander: {gameObject}");
-            uiInGameScreenController.RemoveUnit(soldier);
+            if (soldier.TransformToFollow == transform)
+                uiInGameScreenController.RemoveUnit(soldier);
         }
         
         // commands to the units

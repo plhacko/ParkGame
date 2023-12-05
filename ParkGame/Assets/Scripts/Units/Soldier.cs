@@ -20,6 +20,7 @@ public class Soldier : NetworkBehaviour, ISoldier
 
     // game logic
     private Transform CommanderToFollow = null;
+    public Transform TransformToFollow { get => CommanderToFollow; }
     [Header("initial values")]
     [SerializeField] int InitialHP = 3;
     [Header("game logic values")]

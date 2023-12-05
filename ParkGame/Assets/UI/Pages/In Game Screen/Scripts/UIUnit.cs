@@ -24,6 +24,14 @@ public class UIUnit : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             return;
         }
         healthBarSlider.value = ((float)unit.HP) / unit.MaxHP;
+
+        if (pressHoldTimer.ElapsedMilliseconds / 1000f > pressHoldTimeSuccess)
+        {
+            UnityEngine.Debug.Log("Remove unit");
+            removeAction?.Invoke();
+            pressHoldTimer.Reset();
+            pressHoldTimer.Stop();
+        }
     }
 
     public void Initialize(Soldier unit, Action removeAction)
@@ -41,12 +49,6 @@ public class UIUnit : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public void OnPointerUp(PointerEventData eventData)
     {
         pressHoldTimer.Stop();
-        var time = pressHoldTimer.ElapsedMilliseconds / 1000f; 
-        if (time > pressHoldTimeSuccess)
-        {
-            UnityEngine.Debug.Log("Remove unit");
-            removeAction?.Invoke();
-        }
     }
 
     public void OnPointerDown(PointerEventData eventData)
