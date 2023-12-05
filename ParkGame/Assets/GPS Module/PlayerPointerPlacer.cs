@@ -7,6 +7,11 @@ public class PlayerPointerPlacer : MonoBehaviour
     public GameObject accuracyCircle;
     public float debugMovementSpeed = 5.0f;
 
+    [SerializeField] private Color closeColor;
+    [SerializeField] private Color farColor;
+        
+    private SpriteRenderer pinSpriteRenderer;
+    
     private Coordinate pinPosition = new Coordinate()
     {
         lon = 14.311738400810569,
@@ -34,7 +39,7 @@ public class PlayerPointerPlacer : MonoBehaviour
         tl.lat = mapDisplayer.MinLatitude;
         br.lon = mapDisplayer.MinLongitude;
         br.lat = mapDisplayer.MaxLatitude;
-
+        pinSpriteRenderer = Pin.GetComponent<SpriteRenderer>();
     }
 
     // Update is called once per frame
@@ -123,5 +128,10 @@ public class PlayerPointerPlacer : MonoBehaviour
         var scale = mapDisplayer.GetMapScale();
         float accuracyRadius = (float)(GPSLocator.instance.HorizontalAccuracy * scale * 2);
         accuracyCircle.transform.localScale = new Vector3(accuracyRadius, accuracyRadius, accuracyRadius);
+    }
+
+    public void SetReadyColor(bool isReady)
+    {
+        pinSpriteRenderer.color = isReady ? closeColor : farColor;
     }
 }

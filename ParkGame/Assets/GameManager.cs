@@ -41,7 +41,7 @@ public class GameManager : MonoBehaviour
             {
                 Debug.Log("ClientID: " + NetworkManager.Singleton.LocalClientId);
                 PlayerController playerController = playerManager.GetLocalPlayerController();
-                if (playerController != null)
+                if (playerController != null && !playerController.IsLocked)
                 {
                     Debug.Log("PlayerController: " + playerController);
                     var newPosition = PlayerPointerPlacer.PinPosition;
@@ -58,7 +58,7 @@ public class GameManager : MonoBehaviour
         if (followCommander)
         {
             PlayerController playerController = playerManager.GetLocalPlayerController();
-            if (playerController != null)
+            if (playerController != null && !playerController.IsLocked)
             {
                 Camera.main.PointTo(playerController.transform.position);
             }
@@ -68,7 +68,7 @@ public class GameManager : MonoBehaviour
     void Movement(KeyCode key) {
         PlayerController playerController = playerManager.GetLocalPlayerController();
         
-        if (playerController != null) {
+        if (playerController != null && !playerController.IsLocked) {
             if (key == KeyCode.I) { playerController.CommandMovementServerRpc(); }
             if (key == KeyCode.O) { playerController.CommandIdleServerRpc(); }
             if (key == KeyCode.P) { playerController.CommandAttackServerRpc(); }
@@ -78,7 +78,7 @@ public class GameManager : MonoBehaviour
     void Formation(KeyCode key) {
         PlayerController playerController = playerManager.GetLocalPlayerController();
         
-        if (playerController != null) {
+        if (playerController != null && !playerController.IsLocked) {
             playerController.FormatSoldiersServerRpc(key);
         }
     }

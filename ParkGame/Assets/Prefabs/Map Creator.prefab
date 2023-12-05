@@ -469,6 +469,7 @@ GameObject:
   - component: {fileID: 2601613019065936704}
   - component: {fileID: 2601613019065936705}
   - component: {fileID: 2601613019065936765}
+  - component: {fileID: 5599027225933674884}
   m_Layer: 6
   m_Name: Map
   m_TagString: Untagged
@@ -523,6 +524,7 @@ MonoBehaviour:
   doNotFetch: 1
   navMesh: {fileID: 5050226419086321767}
   gridLayout: {fileID: 2601613018766432995}
+  mapDrawable: {fileID: 0}
   mapSprite: {fileID: 863442115086188281, guid: 53f9e5c24c8a22141afc0ba340f28b3e, type: 3}
 --- !u!212 &2601613019065936704
 SpriteRenderer:
@@ -638,6 +640,22 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &5599027225933674884
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2601613019065936711}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 951099334
+  AlwaysReplicateAsRoot: 0
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
 --- !u!1 &2601613019165809599
 GameObject:
   m_ObjectHideFlags: 0
