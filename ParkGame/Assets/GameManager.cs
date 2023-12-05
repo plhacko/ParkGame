@@ -10,6 +10,7 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get; private set; }
     [SerializeField] private PlayerManager playerManager;
     private bool followCommander = false;
+    
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -55,7 +56,7 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
-        if (followCommander)
+        if (followCommander) // follow pin instead?
         {
             PlayerController playerController = playerManager.GetLocalPlayerController();
             if (playerController != null && !playerController.IsLocked)

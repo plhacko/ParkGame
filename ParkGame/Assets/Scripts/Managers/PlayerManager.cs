@@ -13,7 +13,7 @@ namespace Managers
      * It keeps track of which player controllers belongs to a given player ID.
      * It also spawns players.
      */
-    public class PlayerManager : MonoBehaviour
+    public class PlayerManager : NetworkBehaviour
     {
         [SerializeField] private PlayerController playerControllerPrefab;
         [SerializeField] private float MinInitialDistanceFromOutpost = 5f;
@@ -23,6 +23,7 @@ namespace Managers
         private PlayerController localPlayerController;
         
         public event Action OnAllPlayersSceneLoaded = null;
+        public event Action OnAllPlayersReady = null;
         
         // Only on the host
         // Mapping from player's firebase ID to player controller
@@ -73,6 +74,13 @@ namespace Managers
             }
             
             announcer.AnnounceEventClientRpc("Go!", 15);
+            invokeOnAllPlayersReadyClientRpc();
+        }
+        
+        [ClientRpc]
+        private void invokeOnAllPlayersReadyClientRpc()
+        {
+            OnAllPlayersReady?.Invoke();
         }
         
         private bool isCloseToItsCastle(PlayerController controller, Outpost[] outposts)

@@ -188,10 +188,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b0e7804e57645e245b5515b7684d3c1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  firstOpeningTime: 0
-  timeSinceLastConquest: 0
-  spawned: 0
-  isOpen: 0
+  openingTime: 20
+  timeToNotifyPlayersBeforeOpening: 10
 --- !u!1001 &2813316214766183568
 PrefabInstance:
   m_ObjectHideFlags: 0
