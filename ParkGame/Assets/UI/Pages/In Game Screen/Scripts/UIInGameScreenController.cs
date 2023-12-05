@@ -30,8 +30,8 @@ public class UIInGameScreenController : UIPageController
         mapButton.AddListener("Hide", HideTilemap);
         lockUIButton.AddListener("Unlock", UnlockUI);
         lockUIButton.AddListener("Lock", LockUI);
-        cameraButton.AddListener("Zoom Out", ZoomOut);
         cameraButton.AddListener("Zoom In", ZoomIn);
+        cameraButton.AddListener("Zoom Out", ZoomOut);
         action1.onClick.AddListener(Attack);
         action2.AddListener("Move", Move);
         action2.AddListener("Idle", Idle);
@@ -39,6 +39,11 @@ public class UIInGameScreenController : UIPageController
         formationButton1.onClick.AddListener(Formation1);
         formationButton2.onClick.AddListener(Formation2);
         formationButtonClose.onClick.AddListener(FormationClose);
+    }
+
+    private void Start()
+    {
+        GameManager.Instance.CameraFollowCommander();
     }
 
     private void ZoomIn()
@@ -125,5 +130,13 @@ public class UIInGameScreenController : UIPageController
 
     public override void OnExit()
     {
+    }
+
+    void Update()
+    {
+        if (!GameManager.Instance.FollowCommander)
+        {
+            cameraButton.SwitchState("Zoom Out");
+        }
     }
 }

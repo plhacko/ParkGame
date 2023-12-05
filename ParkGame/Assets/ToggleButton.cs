@@ -31,6 +31,17 @@ public class ToggleButton : MonoBehaviour
         states[(int)CurrentState].onClick.Invoke();
     }
 
+    public void SwitchState(string name) {
+        for (int i = 0; i < states.Count; i++) {
+            if (states[i].name == name) {
+                CurrentState = (uint)i;
+                var nextState = (CurrentState + 1) % MaxStates;
+                button.GetComponentInChildren<TMPro.TextMeshProUGUI>().text = states[(int)nextState].name;
+                return;
+            }
+        }
+    }
+
     public void AddListener(string name, UnityAction onClick) {
         states.Add(new State { name = name, onClick = onClick });
     }
