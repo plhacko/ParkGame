@@ -2,9 +2,11 @@ using DG.Tweening;
 using DG.Tweening.Core;
 using DG.Tweening.Plugins.Options;
 using TMPro;
+using Unity.Collections;
+using Unity.Netcode;
 using UnityEngine;
 
-public class Announcer : MonoBehaviour
+public class Announcer : NetworkBehaviour
 {
     [SerializeField] private float fadeOutDuration = 1f;
     
@@ -14,10 +16,9 @@ public class Announcer : MonoBehaviour
     private void Awake()
     {
         text = GetComponent<TextMeshProUGUI>();
-        // AnnounceEvent("The win point will spawn in 30 seconds!");
     }
     
-    public void AnnounceEvent(string message, float duration = 10f)
+    public void AnnounceEvent(string message, float duration = 45f)
     {
         if (colorTween != null && !colorTween.IsComplete())
         {
@@ -27,5 +28,11 @@ public class Announcer : MonoBehaviour
         text.text = message;
         text.color = Color.white;
         colorTween = text.DOColor(Color.clear, fadeOutDuration).SetDelay(duration);
+    }
+
+    [ClientRpc]
+    public void AnnounceEventClientRpc(FixedString512Bytes message, float duration = 45f)
+    {
+        AnnounceEvent(message.Value, duration);
     }
 }

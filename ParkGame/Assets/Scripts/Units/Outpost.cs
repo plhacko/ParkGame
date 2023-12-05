@@ -7,8 +7,9 @@ using Player;
 
 public class Outpost : NetworkBehaviour, ICommander
 {
+    public bool IsCastle = false;
+
     [SerializeField] int InitialTeam;
-    [SerializeField] bool IsCastle = false; 
     [SerializeField] int MaxUnits = 3; // in total
     [SerializeField] float SpawnTime = 4; // 4s
     [SerializeField] GameObject UnitPrefab;

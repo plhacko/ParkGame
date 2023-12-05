@@ -1,3 +1,4 @@
+using System;
 using FreeDraw;
 using Managers;
 using Unity.Netcode;
@@ -12,6 +13,8 @@ public class Map : MonoBehaviour
     public static Bounds MapBounds { get; private set; } = new Bounds();
 
     private PlayerManager playerManager;
+        
+    public event Action OnMapLoaded = null;
     
     void Awake()
     {
@@ -47,5 +50,6 @@ public class Map : MonoBehaviour
         GPSMap = mapCreator.BaseMap.gameObject;
         GridMap = GetComponentInChildren<Grid>().gameObject;
         MapBounds = GPSMap.GetComponent<SpriteRenderer>().bounds;
+        OnMapLoaded?.Invoke();
     }
 }

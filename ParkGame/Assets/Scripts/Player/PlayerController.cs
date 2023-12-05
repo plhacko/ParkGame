@@ -31,10 +31,15 @@ namespace Player
         private readonly NetworkVariable<FixedString64Bytes> _Name = new(new FixedString64Bytes(""));
         private readonly NetworkVariable<FixedString64Bytes> _FirebaseId = new(new FixedString64Bytes(""));
         private readonly NetworkVariable<int> _Team = new(-1);
+        private readonly NetworkVariable<bool> _IsLocked = new(true);
+        private readonly NetworkVariable<Vector3> _PointerPosition = new(Vector3.zero, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
         public int Team { get => _Team.Value; set => _Team.Value = value; }
         public string Name { get => _Name.Value.Value; set => _Name.Value = value; }
         public string FirebaseId { get => _FirebaseId.Value.Value; set => _FirebaseId.Value = value; }
+        public bool IsLocked { get => _IsLocked.Value; set => _IsLocked.Value = value; }
+        
+        public Vector3 PointerPosition { get => _PointerPosition.Value; set => _PointerPosition.Value = value; }
 
         public Formation.FormationType FormationType; // todo?
         public Formation.FormationType GetFormation() {
@@ -42,7 +47,6 @@ namespace Player
         }
         
         private static readonly int movementSpeedAnimationHash = Animator.StringToHash("MovementSpeed");
-
         private NavMeshAgent Agent;
 
         private void initialize()
@@ -73,6 +77,8 @@ namespace Player
             {
                 xSpriteFlip.OnValueChanged += onXSpriteFlipChanged;
             }
+            
+            _IsLocked.OnValueChanged += onIsLockedChanged;
 
             var localPlayerData = LobbyManager.Singleton.GetLocalPlayerData();
             if (localPlayerData.Team == Team)
@@ -90,6 +96,12 @@ namespace Player
             FormationType = Formation.FormationType.Free; // movement without navmesh
         }
 
+        private void onIsLockedChanged(bool previousValue, bool newValue)
+        {
+            PlayerPointerPlacer playerPointerPlacer = FindObjectOfType<PlayerPointerPlacer>();
+            playerPointerPlacer.SetReadyColor(!newValue);
+        }
+
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
@@ -101,6 +113,7 @@ namespace Player
             if (!isActualOwner()) return;
             if (!Application.isFocused) return;
 
+            PointerPosition = PlayerPointerPlacer.PinPosition;
             // move();
 
             if (Input.GetKeyDown(KeyCode.I))
