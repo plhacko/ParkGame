@@ -281,28 +281,21 @@ namespace Player
             if (!IsServer)
             { throw new Exception($"only on server can adding units to commander be done: {gameObject.name}"); }
             
-            addToUnitsClientRpc(networkObjectReference);
+            ClientRpcParams clientRpcParams = new ClientRpcParams
+            {
+                Send = new ClientRpcSendParams
+                {
+                    TargetClientIds = new []{ OwnerClientId }
+                }
+            };
+            
+            addToUnitsClientRpc(networkObjectReference, clientRpcParams);
         }
         
         [ClientRpc]
-        private void addToUnitsClientRpc(NetworkObjectReference networkObjectReference)
+        private void addToUnitsClientRpc(NetworkObjectReference networkObjectReference, ClientRpcParams clientRpcParams = default)
         {
             units.Add(networkObjectReference);
-
-            if (!networkObjectReference.TryGet(out var networkObject, NetworkManager.Singleton))
-            {
-                Debug.LogWarning($"could not get network object from reference");
-                return;
-            }
-
-            if (!networkObject.TryGetComponent<Soldier>(out var soldier))
-            {
-                Debug.LogWarning($"could not get soldier from network object");
-                return;
-            }
-
-            if (soldier.TransformToFollow == transform)
-                uiInGameScreenController.AddUnit(soldier, soldier.OnMouseDown);
         }
 
         void ICommander.ReportUnfollowing(NetworkObjectReference networkObjectReference)
