@@ -1,3 +1,4 @@
+using System.Collections;
 using Managers;
 using Unity.Netcode;
 using UnityEngine;
@@ -83,6 +84,7 @@ public class VictoryPoint : NetworkBehaviour
         
         if (timeToOpen < 0 && !isOpen) { 
             OpenVPClientRpc();
+            announcer.AnnounceEventClientRpc($"Victory Point has opened!", 5);
         }
     }
 }
