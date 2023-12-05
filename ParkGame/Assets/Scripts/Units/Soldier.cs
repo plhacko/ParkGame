@@ -399,7 +399,7 @@ public class Soldier : NetworkBehaviour, ISoldier
         Agent.SetDestination(transform.position + new Vector3(movement.x, movement.y, 0)); 
     }
 
-    void OnMouseDown()
+    public void OnMouseDown()
     {
         Debug.Log("Sprite Clicked");
 

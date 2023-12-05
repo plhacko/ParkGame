@@ -301,7 +301,8 @@ namespace Player
             }
             
             Debug.LogWarning($"added unit to commander: {gameObject}");
-            uiInGameScreenController.AddUnit(soldier);
+            // TODO add remove action
+            uiInGameScreenController.AddUnit(soldier, soldier.OnMouseDown);
         }
 
         void ICommander.ReportUnfollowing(NetworkObjectReference networkObjectReference)
