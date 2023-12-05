@@ -16,7 +16,8 @@ GameObject:
   - component: {fileID: -6080753142415193819}
   - component: {fileID: 598515008}
   - component: {fileID: 598515007}
-  m_Layer: 0
+  - component: {fileID: 6348730249214992367}
+  m_Layer: 8
   m_Name: Outpost
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -126,6 +127,7 @@ MonoBehaviour:
   SpawnTime: 4
   UnitPrefab: {fileID: 2149011059489662585, guid: 767d4c3ee472ffe4ea667aae7025b849, type: 3}
   ArcherPrefab: {fileID: 2149011059489662585, guid: d7dabec280dc4e54d93803fe26a0bb73, type: 3}
+  HorsemanPrefab: {fileID: 5515698993845621550, guid: 8cfe5a199b3c20445bc24ab6439cf170, type: 3}
   PawnIcon: {fileID: 21300000, guid: 8dd81f39bc3e1f6488bf0bddc35fe56c, type: 3}
   ArcherIcon: {fileID: 21300000, guid: 73627ee55b850e542a049677c16184bc, type: 3}
   HorsemanIcon: {fileID: 21300000, guid: 46eddd8d370b3be48b1a9d9c76e98342, type: 3}

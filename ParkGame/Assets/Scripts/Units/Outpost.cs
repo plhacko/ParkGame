@@ -14,6 +14,8 @@ public class Outpost : NetworkBehaviour, ICommander
     [SerializeField] float SpawnTime = 4; // 4s
     [SerializeField] GameObject UnitPrefab;
     [SerializeField] GameObject ArcherPrefab;
+    [SerializeField] GameObject HorsemanPrefab;
+
 
     [SerializeField] Sprite PawnIcon;
     [SerializeField] Sprite ArcherIcon;

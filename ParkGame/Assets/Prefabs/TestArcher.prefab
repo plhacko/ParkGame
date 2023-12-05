@@ -68,7 +68,7 @@ CircleCollider2D:
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
-  m_Radius: 3
+  m_Radius: 5.5
 --- !u!50 &1719890418
 Rigidbody2D:
   serializedVersion: 4
@@ -261,19 +261,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   InitialHP: 4
   MovementSpeed: 1
-  InnerDistanceFromCommander: 1
+  InnerDistanceFromCommander: 0.66
   OuterDistanceFromCommander: 2
   DefendDistanceFromCommander: 3
   AttackDistanceFromCommander: 6
   MinAttackRange: 2
-  MaxAttackRange: 5
-  Attackcooldown: 3.2
-  Damage: 1
+  MaxAttackRange: 7
+  Attackcooldown: 1.2
+  Damage: 2
   TypeOfUnit: 1
   DeathFadeTime: 2
   revealer: {fileID: 7039114770966444783}
   ClosestEnemyDEBUG: 0
-  TeaM: 0
   Behaviour: 0
   BehaviourChangedEvent:
     m_PersistentCalls:
@@ -283,6 +282,9 @@ MonoBehaviour:
   FormationFromFollowedCommander: {fileID: 0}
   ObjectToFollowInFormation: {fileID: 0}
   FormationType: 0
+  midPointPositionForHorseman: {x: 0, y: 0, z: 0}
+  midPointReached: 0
+  targetedEnemy: {fileID: 0}
 --- !u!70 &8848524197970868838
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -340,7 +342,7 @@ Rigidbody2D:
     m_Bits: 256
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 640
+    m_Bits: 512
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
@@ -357,10 +359,10 @@ CircleCollider2D:
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
-    m_Bits: 256
+    m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 256
   m_LayerOverridePriority: 0
   m_ForceSendLayers:
     serializedVersion: 2
@@ -400,7 +402,7 @@ NavMeshAgent:
   m_AutoRepath: 1
   m_Height: 0.2
   m_BaseOffset: 0
-  m_WalkableMask: 4294967295
+  m_WalkableMask: 5
   m_ObstacleAvoidanceType: 4
 --- !u!114 &7124321394914278606
 MonoBehaviour:

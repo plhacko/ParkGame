@@ -1306,6 +1306,20 @@ MonoBehaviour:
       Data3: -1047650172
       Data4: 679949240
     Path: event:/Music/wow
+  <ButtonClickedSFX>k__BackingField:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
+  <ButtonToggleSFX>k__BackingField:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
   <SwordHitSFX>k__BackingField:
     Guid:
       Data1: 1200299268

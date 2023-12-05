@@ -21,6 +21,7 @@ public class Formation : MonoBehaviour {
     
     public List<GameObject> soldiersSwordmen = new List<GameObject>();
     public List<GameObject> soldiersArchers = new List<GameObject>();
+    public List<GameObject> soldiersMolemen = new List<GameObject>();
 
     private int team => playerController.Team;
 
@@ -29,10 +30,13 @@ public class Formation : MonoBehaviour {
     
     public List<GameObject> FormationCircleInner = new List<GameObject>();
     public List<GameObject> FormationCircleOuter = new List<GameObject>();
-    
+    public List<GameObject> FormationCircleForHorses = new List<GameObject>();
+    public GameObject HorseRoot;
+
     // box formation
     public GameObject BoxRoot;
     public List<GameObject> FormationBox = new List<GameObject>(); // are in hierarchy under BoxRoot
+    public List<GameObject> FormationBoxForHorses = new List<GameObject>(); // are in hierarchy under BoxRoot
 
     private PlayerController playerController;
 
@@ -51,22 +55,23 @@ public class Formation : MonoBehaviour {
 
     private void Update() {
         RotateBoxFormation();
+        RotateHorseFormation();
 
         if (Input.GetKeyDown(KeyCode.Space)) {
             Add1PositionToBoxFormation();
         }
     }
     
-    void UnparentFormation() {
-        var p = gameObject.transform.position;
-        BoxRoot.transform.SetParent(null, true);
-        BoxRoot.transform.position = new Vector3(p.x - 2, p.y, p.z);
-        BoxRoot.transform.rotation = Quaternion.Euler(new Vector3(0, 0, 90));
+    void UnparentFormation(GameObject go, Vector3 position) {
+        go.transform.SetParent(null, true);
+        go.transform.position = position;
+        go.transform.rotation = Quaternion.Euler(new Vector3(0, 0, 90));
         Hide(BoxRoot, false);
     }
 
     public void InitializeFormation() {
-        UnparentFormation();
+        Vector3 p = gameObject.transform.position;
+        UnparentFormation(BoxRoot, new Vector3(p.x - 2, p.y, p.z));
     }
 
     // disable renderer of object
@@ -89,8 +94,8 @@ public class Formation : MonoBehaviour {
         return sphere;
     }
 
-    void Add1PositionToCircularFormation(Vector3 pos, List<GameObject> lst) {
-        var sphere = AddSphere(pos, 0.2f, "CirclePos", gameObject);
+    void Add1PositionToCircularFormation(Vector3 pos, List<GameObject> lst, GameObject parent) {
+        var sphere = AddSphere(pos, 0.2f, "CirclePos", parent);
         
         lst.Add(sphere);
     }
@@ -146,6 +151,23 @@ public class Formation : MonoBehaviour {
         formDescr.NumberOfPositions++;
     }
 
+    void Add1PositionOnTheSide() {
+        var formDescr = BoxRoot.GetComponent<FormationDescriptor>(); // 
+        int c = formDescr.NumberOfHorsemenPositions; // add definition to the horse places? how to deal with moles???
+        float horseinc = formDescr.HorseIncrement;
+        var pos = formDescr.StartingPosition;
+        float x = c % 2 == 1 ? -1 : 1;
+        Vector3 position = new Vector3(x * horseinc, -c / 2 * horseinc + pos.y, 0);
+
+        var sphere = AddSphere(position, 0.2f, "BoxPosHorse", BoxRoot);
+        FormationBoxForHorses.Add(sphere);
+        formDescr.NumberOfHorsemenPositions++;
+    }
+
+    void RotateHorseFormation() {
+        HorseRoot.transform.Rotate(0, 0, 0.5f);    
+    }
+
     // rotate the box formation according to the commander's direction of movement
     void RotateBoxFormation() {
         if (!BoxRoot) { return; }
@@ -167,14 +189,18 @@ public class Formation : MonoBehaviour {
         soldiers.Clear();
         soldiersArchers.Clear();
         soldiersSwordmen.Clear();
+        soldiersMolemen.Clear();
 
         FormationCircle.Clear();
         FormationCircleInner.Clear();
         FormationCircleOuter.Clear();
+        FormationCircleForHorses.Clear();
 
         FormationBox.Clear();
+        FormationBoxForHorses.Clear();
         if (BoxRoot) {
             BoxRoot.GetComponent<FormationDescriptor>().NumberOfPositions = 0;
+            BoxRoot.GetComponent<FormationDescriptor>().NumberOfHorsemenPositions = 0;
         }
         RemoveSpheres();
        
@@ -183,12 +209,19 @@ public class Formation : MonoBehaviour {
     public void RemoveFromFormation(GameObject soldier, GameObject position, FormationType shape = FormationType.Circle) {
         Soldier.UnitType unitType = soldier.GetComponent<Soldier>().GetUnitType();
         var positionList = FormationCircle; // now not used list
-        if (shape == FormationType.Box) { positionList = FormationBox; }
-        else {
+        if (shape == FormationType.Box) {
+            if (unitType == Soldier.UnitType.Horseman) {
+                positionList = FormationBoxForHorses;
+            } else {
+                positionList = FormationBox;
+            }
+        } else {
             if (unitType == Soldier.UnitType.Pawn) {
                 positionList = FormationCircleOuter;
-            } else {
+            } else if (unitType == Soldier.UnitType.Archer) {
                 positionList = FormationCircleInner;
+            } else {
+                positionList = FormationCircleForHorses;
             }
         }
 
@@ -217,7 +250,9 @@ public class Formation : MonoBehaviour {
             case Soldier.UnitType.Archer:
                 soldiersArchers.Add(sol);
                 return Soldier.UnitType.Archer;
-            
+            case Soldier.UnitType.Horseman:
+                soldiersMolemen.Add(sol);
+                return Soldier.UnitType.Horseman;
             default:
                 break;
             
@@ -232,18 +267,24 @@ public class Formation : MonoBehaviour {
         Soldier.UnitType unitType = AddSoldierByType(soldier);
 
         if (shape == FormationType.Box) { 
-            return GetPositionInBox(); 
+            return GetPositionInBox(unitType); 
         }
         // circular formation: archers in smaller circle, swordmen in bigger circle
         return GetPositionInCircle(unitType);
     }
 
     // add parameter for formation type
-    public GameObject GetPositionInBox() {
+    public GameObject GetPositionInBox(Soldier.UnitType unitType) {
         var positionList = FormationBox;
-        if (FormationBox.Count < soldiers.Count) {
+        //if (FormationBox.Count < soldiers.Count) {
+        if (unitType != Soldier.UnitType.Horseman && FormationBox.Count < soldiersArchers.Count + soldiersSwordmen.Count) {
             Add1PositionToBoxFormation();
+        } 
+        if (unitType == Soldier.UnitType.Horseman) {
+            Add1PositionOnTheSide();
+            positionList = FormationBoxForHorses;
         }
+       
 
         foreach (var go in positionList) { 
             var pos = go.GetComponent<PositionDescriptor>();
@@ -258,15 +299,21 @@ public class Formation : MonoBehaviour {
     public GameObject GetPositionInCircle(Soldier.UnitType unitType) {        
         var positionList = FormationCircleOuter;
         var soldierList = soldiersSwordmen;
+        GameObject parent = gameObject;
+
         if (unitType == Soldier.UnitType.Archer) {
             positionList = FormationCircleInner;
             soldierList = soldiersArchers;
+        } else if (unitType == Soldier.UnitType.Horseman) {
+            positionList = FormationCircleForHorses;
+            soldierList = soldiersMolemen;
+            parent = HorseRoot;
         }
 
         var positions = ListCircularPositionsByUnitType(unitType);
 
         if (soldierList.Count > positionList.Count) {
-            Add1PositionToCircularFormation(positions[positions.Count - 1], positionList);
+            Add1PositionToCircularFormation(positions[positions.Count - 1], positionList, parent);
         }
 
         AdjustFormation(positionList, positions);
@@ -291,7 +338,14 @@ public class Formation : MonoBehaviour {
 
         foreach (Transform t in BoxRoot.transform) {
             GameObject child = t.gameObject;
-            if (child.name == "BoxPos") {
+            if (child.name == "BoxPos" || child.name == "BoxPosHorse") {
+                Destroy(child);
+            }
+        }
+
+        foreach (Transform t in HorseRoot.transform) {
+            GameObject child = t.gameObject;
+            if (child.name == "CirclePos") {
                 Destroy(child);
             }
         }
@@ -299,7 +353,7 @@ public class Formation : MonoBehaviour {
 
     List<GameObject> AdjustFormation(List<GameObject> formationList, List<Vector3> positions) {
         int j = 0;
-        Debug.Log("adjust formation!!!!!");
+        //Debug.Log("adjust formation!!!!!");
         for (int i = 0; i < formationList.Count; i++) {
            // var a = formationList[i].transform.localPosition;
             var a = formationList[i].transform.position;
@@ -373,6 +427,9 @@ public class Formation : MonoBehaviour {
             listOfSoldiers = soldiersArchers;
             radius = 0.8f;
             j = 0.5f;
+        } else if (unitType == Soldier.UnitType.Horseman) {
+            listOfSoldiers = soldiersMolemen;
+            radius = 2.5f;
         }
 
         if (listOfSoldiers.Count < 1) { return null; }
