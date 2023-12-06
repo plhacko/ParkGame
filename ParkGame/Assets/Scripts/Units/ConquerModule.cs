@@ -77,6 +77,8 @@ public class ConquerModule : NetworkBehaviour
 
     void OnCollisionEnter2D(Collision2D collision)
     {
+        if (!NetworkManager.Singleton.IsServer) { return; }
+
         if (collision.gameObject.TryGetComponent<ITeamMember>(out ITeamMember tm))
         {
             if (tm.Team == ConquererTeam)
@@ -102,12 +104,20 @@ public class ConquerModule : NetworkBehaviour
 
     void OnCollisionExit2D(Collision2D collision)
     {
+        if (!NetworkManager.Singleton.IsServer) { return; }
+        
         if (collision.gameObject.TryGetComponent<ITeamMember>(out ITeamMember tm))
         {
             if (tm.Team == ConquererTeam)
             { VisibleConquerUnits.Remove(collision.transform); }
             else
             { VisibleOtherUnits.Remove(collision.transform); }
+        }
+
+        if (VisibleOtherUnits.Count == 0)
+        {
+            conquerable.OnStoppedConquering(ConquererTeam.Value);
+            ConquererTeam = -1;
         }
     }
 }

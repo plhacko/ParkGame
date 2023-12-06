@@ -354,7 +354,7 @@ public class Soldier : NetworkBehaviour, ISoldier
                 AudioManager.Instance.PlayOneShot(FMODEvents.Instance.SwordHitSFX, transform.position);
                 
                 if (TypeOfUnit == UnitType.Pawn) {
-                    enemyT.GetComponent<ISoldier>()?.TakeDamage(Damage);
+                    // enemyT.GetComponent<ISoldier>()?.TakeDamage(Damage); // todo uncomment back!!
                 }
                 if (TypeOfUnit == UnitType.Archer) {
                     SpriteRenderer.flipX = (enemyT.position.x - transform.position.x < 0);

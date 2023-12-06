@@ -8,8 +8,6 @@ using Player;
 
 public class Outpost : NetworkBehaviour, ICommander, IConquerable
 {
-    public bool IsCastle = false;
-
     [SerializeField] int InitialTeam;
     [SerializeField] int MaxUnits = 3; // in total
     [SerializeField] float SpawnTime = 4; // 4s
@@ -32,7 +30,11 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
 
     [SerializeField] NetworkVariable<int> _Team = new(-1);
     public int Team { get => _Team.Value; set => _Team.Value = value; }
-
+    
+    public bool IsCastle { get => _IsCastle.Value; private set => _IsCastle.Value = value; }
+    
+    [SerializeField] NetworkVariable<bool> _IsCastle = new();
+    
     private Soldier.UnitType outpostUnitType;
     private SpriteRenderer sr;
     private int counter;
@@ -200,27 +202,59 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
 
     public void OnStartedConquering(int team)
     {
+        onStartedConqueringClientRpc(team);
+        
+        NamedColor c = colorSettings.Colors[team];
+        announcer.AnnounceEventClientRpc($"Outpost is being captured by team {c.Name}!", 5);
+        if(Team != -1 && Team != team)
+        {
+            var teamMembers = playerManager.GetAllMembersOfTeam(Team);
+            foreach (var teamMember in teamMembers)
+            {
+                ClientRpcParams clientRpcParams = new ClientRpcParams
+                {
+                    Send = new ClientRpcSendParams
+                    {
+                        TargetClientIds = new []{ teamMember.OwnerClientId }
+                    }
+                };
+                announcer.AnnounceEventClientRpc($"Your outpost is being captured by team {c.Name}!", 5, clientRpcParams);
+            }
+        }
+    }
+    
+    [ClientRpc]
+    private void onStartedConqueringClientRpc(int team, ClientRpcParams clientRpcParams = default)
+    {
         NamedColor c = colorSettings.Colors[team];
         c.Color.a = 0.8f;
         sr.color = c.Color;
-
-        if (IsServer)
-        {
-            announcer.AnnounceEventClientRpc($"Outpost is being captured by team {c.Name}!", 5);
-        }
     }
 
     public void OnConquered(int team)
     {
         Team = team;
-        
-        if (IsServer)
-        {
-            NamedColor c = colorSettings.Colors[team];
-            announcer.AnnounceEventClientRpc($"Outpost has been captured by team {c.Name}!", 5);
-        }
+        NamedColor c = colorSettings.Colors[team];
+        announcer.AnnounceEventClientRpc($"Outpost has been captured by team {c.Name}!", 5);
     }
 
+    public void OnStoppedConquering(int team)
+    {
+        onStoppedConqueringClientRpc(team);
+    }
+    
+    [ClientRpc]
+    private void onStoppedConqueringClientRpc(int team, ClientRpcParams clientRpcParams = default)
+    {
+        if(Team == -1)
+        {
+            sr.color = Color.white;
+            return;
+        }
+        
+        sr.color = colorSettings.Colors[Team].Color;
+    }
+    
     public int GetTeam()
     {
         return Team;

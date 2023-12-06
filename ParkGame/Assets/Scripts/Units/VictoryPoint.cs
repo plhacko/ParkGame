@@ -75,26 +75,36 @@ public class VictoryPoint : NetworkBehaviour, IConquerable
 
     public void OnStartedConquering(int team)
     {
+        onStartedConqueringClientRpc(team);
+        NamedColor c = colorSettings.Colors[team];
+        announcer.AnnounceEventClientRpc($"Victory Point is being captured by team {c.Name}!", 5);
+    }
+    
+    [ClientRpc]
+    private void onStartedConqueringClientRpc(int team, ClientRpcParams clientRpcParams = default)
+    {
         NamedColor c = colorSettings.Colors[team];
         c.Color.a = 0.8f;
         spriteRenderer.color = c.Color;
-        
-        if (IsServer)
-        {
-            announcer.AnnounceEventClientRpc($"Victory Point is being captured by team {c.Name}!", 5);
-        }
     }
 
     public void OnConquered(int team)
     {
         lastConquestTime = Time.time;
-
-        if (IsServer)
-        {
-            CloseVPClientRpc();        
-            NamedColor c = colorSettings.Colors[team];
-            announcer.AnnounceEventClientRpc($"Victory Point has been captured by team {c.Name}!", 5);
-        }
+        CloseVPClientRpc();        
+        NamedColor c = colorSettings.Colors[team];
+        announcer.AnnounceEventClientRpc($"Victory Point has been captured by team {c.Name}!", 5);
+    }
+    
+    public void OnStoppedConquering(int team)
+    {
+        onStoppedConqueringClientRpc(team);
+    }
+    
+    [ClientRpc]
+    private void onStoppedConqueringClientRpc(int team, ClientRpcParams clientRpcParams = default)
+    {
+        spriteRenderer.color = Color.white;
     }
 
     public int GetTeam()
