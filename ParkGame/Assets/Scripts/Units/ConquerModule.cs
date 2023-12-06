@@ -1,15 +1,16 @@
 using System.Collections.Generic;
+using NavMeshPlus.Extensions.Units;
 using Unity.Netcode;
 using UnityEngine;
 
-public class ConquerModule : NetworkBehaviour, ITeamMember
+public class ConquerModule : NetworkBehaviour
 {
-    public int Team // used as a wrapper around the parent object Team
-    {
-        get => TeamMember != null ? TeamMember.Team : -1;
-        set { if (TeamMember != null) { TeamMember.Team = value; } }
-    }
-    [SerializeField] ITeamMember TeamMember = null;
+    // public int Team // used as a wrapper around the parent object Team
+    // {
+    //     get => TeamMember != null ? TeamMember.Team : -1;
+    //     set { if (TeamMember != null) { TeamMember.Team = value; } }
+    // }
+    [SerializeField] IConquerable conquerable = null;
     [SerializeField] int? ConquererTeam = null;
     [SerializeField] NetworkVariable<float> _ConquerPoints = new();
     [SerializeField] float ConquerPointsRequired = 50.0f;
@@ -27,7 +28,7 @@ public class ConquerModule : NetworkBehaviour, ITeamMember
     private void Start()
     {
         // initialize the team member (the object we will be setting Team)
-        TeamMember = transform.parent?.GetComponent<ITeamMember>();
+        conquerable = transform.parent.GetComponent<IConquerable>();
         // progress bar
         ProgressBar = GetComponentInChildren<IProgressBar>();
         if (ProgressBar != null)
@@ -65,17 +66,12 @@ public class ConquerModule : NetworkBehaviour, ITeamMember
         // note - this happens only if there no visible friendly or other units
         if (ConquerPoints > ConquerPointsRequired)
         {
-            int team = ConquererTeam.Value;
-            Team = team;
+            conquerable.OnConquered(ConquererTeam.Value);
             ConquererTeam = -1;
             ConquerPoints = 0.0f;
 
             VisibleOtherUnits = VisibleConquerUnits;
             VisibleConquerUnits = new List<Transform>();
-        
-            if (victoryPoint) {
-                victoryPoint.ConquerThisVP(team);
-            }
         }
     }
 
@@ -88,9 +84,11 @@ public class ConquerModule : NetworkBehaviour, ITeamMember
                 if (!VisibleConquerUnits.Contains(collision.transform))
                 { VisibleConquerUnits.Add(collision.transform); }
             }
-            else if (tm.Team != Team && VisibleConquerUnits.Count == 0)
+            else if (tm.Team != conquerable.GetTeam() && VisibleConquerUnits.Count == 0)
             {
                 ConquererTeam = tm.Team;
+                conquerable.OnStartedConquering(tm.Team);
+                
                 if (!VisibleConquerUnits.Contains(collision.transform))
                 { VisibleConquerUnits.Add(collision.transform); }
             }

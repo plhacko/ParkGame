@@ -1,11 +1,12 @@
 using Managers;
 using System;
 using System.Collections.Generic;
+using NavMeshPlus.Extensions.Units;
 using Unity.Netcode;
 using UnityEngine;
 using Player;
 
-public class Outpost : NetworkBehaviour, ICommander
+public class Outpost : NetworkBehaviour, ICommander, IConquerable
 {
     public bool IsCastle = false;
 
@@ -20,6 +21,7 @@ public class Outpost : NetworkBehaviour, ICommander
     [SerializeField] Sprite HorsemanIcon;
     [SerializeField] private Soldier.UnitType InitOutpostUnitType;
     [SerializeField] private GameObject revealer;
+    [SerializeField] ColorSettings colorSettings;
 
     //[SerializeField] GameObject HorsemanPrefab; // todo
     List<NetworkObjectReference> Units = new List<NetworkObjectReference>();
@@ -36,6 +38,7 @@ public class Outpost : NetworkBehaviour, ICommander
     private int counter;
     private PlayerManager playerManager;
     private ChangeMaterial changeMaterial;
+    private Announcer announcer;
 
     public override void OnNetworkSpawn()
     {
@@ -46,6 +49,7 @@ public class Outpost : NetworkBehaviour, ICommander
     private void initialize()
     {
         playerManager = FindObjectOfType<PlayerManager>();
+        announcer = FindObjectOfType<Announcer>();
         changeMaterial = GetComponent<ChangeMaterial>();
         sr = GetComponent<SpriteRenderer>();
 
@@ -57,7 +61,6 @@ public class Outpost : NetworkBehaviour, ICommander
         
         _Team.OnValueChanged += onTeamChanged;
 
-        Debug.Log(revealer);
         if (IsServer)
         {
             Team = InitialTeam;   
@@ -82,6 +85,9 @@ public class Outpost : NetworkBehaviour, ICommander
             revealer.gameObject.SetActive(false);
             changeMaterial.Change(true);
         }
+        
+        if(newTeam == -1) return;
+        sr.color = colorSettings.Colors[newTeam].Color;
     }
 
     void Update()
@@ -190,5 +196,33 @@ public class Outpost : NetworkBehaviour, ICommander
         ulong clientID = NetworkManager.Singleton.LocalClientId;
         RequestChangingSpawnTypeServerRpc(clientID);
         */
+    }
+
+    public void OnStartedConquering(int team)
+    {
+        NamedColor c = colorSettings.Colors[team];
+        c.Color.a = 0.8f;
+        sr.color = c.Color;
+
+        if (IsServer)
+        {
+            announcer.AnnounceEventClientRpc($"Outpost is being captured by team {c.Name}!", 5);
+        }
+    }
+
+    public void OnConquered(int team)
+    {
+        Team = team;
+        
+        if (IsServer)
+        {
+            NamedColor c = colorSettings.Colors[team];
+            announcer.AnnounceEventClientRpc($"Outpost has been captured by team {c.Name}!", 5);
+        }
+    }
+
+    public int GetTeam()
+    {
+        return Team;
     }
 }

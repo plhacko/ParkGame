@@ -1,31 +1,27 @@
 using Managers;
+using NavMeshPlus.Extensions.Units;
 using Unity.Netcode;
 using UnityEngine;
 
-public class VictoryPoint : NetworkBehaviour
+public class VictoryPoint : NetworkBehaviour, IConquerable
 {
-
-    //public float timeSinceSpawn;
-    // seconds after spawn till opening, and also time since the last conquest till opening
     [Tooltip("Seconds since spawn to first opening of this Victory Point.")]
-    [SerializeField] float openingTime;  // and delta since conquering
-    [SerializeField] float timeToNotifyPlayersBeforeOpening;  // and delta since conquering
+    [SerializeField] float openingTime;
+    [SerializeField] float timeToNotifyPlayersBeforeOpening;
+    [SerializeField] ColorSettings colorSettings;
     
-    private float lastConquestTime; // and now also since spawning
+    private float lastConquestTime;
     private bool isOpen;
     private bool isNotified;
         
-    private SpriteRenderer spriteRendrr;
+    private SpriteRenderer spriteRenderer;
     private GameObject conquerModuleObject;
     private PlayerManager playerManager;
     private Announcer announcer;
-    
-    // maybe: add some random range for the delta time
-    // maybe?: add some time after the conquest
 
     [ClientRpc]    
     void CloseVPClientRpc() {
-        spriteRendrr.color = new Color(0.8f, 0.8f, 0.8f, 0.2f);
+        spriteRenderer.color = new Color(0.8f, 0.8f, 0.8f, 0.2f);
         isOpen = false;
         conquerModuleObject.SetActive(false);
         isNotified = false;
@@ -33,7 +29,7 @@ public class VictoryPoint : NetworkBehaviour
 
     [ClientRpc]
     void OpenVPClientRpc() {
-        spriteRendrr.color = new Color(1, 1, 1, 1);
+        spriteRenderer.color = new Color(1, 1, 1, 1);
         isOpen = true;
         conquerModuleObject.SetActive(true);
     }
@@ -41,7 +37,7 @@ public class VictoryPoint : NetworkBehaviour
     private void Awake()
     {
         conquerModuleObject = GetComponentInChildren<ConquerModule>().gameObject;
-        spriteRendrr = GetComponent<SpriteRenderer>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
         lastConquestTime = float.MaxValue;
         announcer = FindObjectOfType<Announcer>();
         playerManager = FindObjectOfType<PlayerManager>();
@@ -60,16 +56,6 @@ public class VictoryPoint : NetworkBehaviour
         }
     }
 
-    public void ConquerThisVP(int team) {
-        lastConquestTime = Time.time;
-
-        if (IsServer)
-        {
-            CloseVPClientRpc();
-            announcer.AnnounceEventClientRpc($"Victory Point has been captured by team {team + 1}!", 5);
-        }
-    }
-
     void Update()
     {
         if(!NetworkManager.Singleton.IsServer || lastConquestTime == float.MaxValue) return;        
@@ -85,5 +71,34 @@ public class VictoryPoint : NetworkBehaviour
             OpenVPClientRpc();
             announcer.AnnounceEventClientRpc("Victory Point has opened!", 5);
         }
+    }
+
+    public void OnStartedConquering(int team)
+    {
+        NamedColor c = colorSettings.Colors[team];
+        c.Color.a = 0.8f;
+        spriteRenderer.color = c.Color;
+        
+        if (IsServer)
+        {
+            announcer.AnnounceEventClientRpc($"Victory Point is being captured by team {c.Name}!", 5);
+        }
+    }
+
+    public void OnConquered(int team)
+    {
+        lastConquestTime = Time.time;
+
+        if (IsServer)
+        {
+            CloseVPClientRpc();        
+            NamedColor c = colorSettings.Colors[team];
+            announcer.AnnounceEventClientRpc($"Victory Point has been captured by team {c.Name}!", 5);
+        }
+    }
+
+    public int GetTeam()
+    {
+        return -1;
     }
 }
