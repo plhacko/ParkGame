@@ -37,6 +37,8 @@ public class Soldier : NetworkBehaviour, ISoldier
     [SerializeField] UnitType TypeOfUnit;
     [SerializeField] float DeathFadeTime = 2f;
     [SerializeField] private GameObject revealer;
+    [SerializeField] ColorSettings colorSettings;
+    
     public int MaxHP { get => InitialHP; }
     
     public float ClosestEnemyDEBUG; // DEBUG // TODO: rm
@@ -111,10 +113,10 @@ public class Soldier : NetworkBehaviour, ISoldier
     {
         TeaM = newValue; // tmp
         SpriteRenderer sr = transform.Find("Circle")?.GetComponent<SpriteRenderer>();
-        if (sr == null) { return; }
-        if (newValue == 0) { sr.color = Color.blue; }
-        else if (newValue == 1) { sr.color = Color.yellow; }
-        else { sr.color = Color.grey; }
+        if (sr != null && newValue != -1)
+        {
+            sr.color = colorSettings.Colors[newValue].Color;
+        }
 
         var localPlayerData = LobbyManager.Singleton.GetLocalPlayerData();
         if (localPlayerData.Team == newValue)

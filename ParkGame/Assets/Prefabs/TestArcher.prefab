@@ -272,6 +272,7 @@ MonoBehaviour:
   TypeOfUnit: 1
   DeathFadeTime: 2
   revealer: {fileID: 7039114770966444783}
+  colorSettings: {fileID: 11400000, guid: 540e0efb517eb1d4f8598ecd8326dff1, type: 2}
   ClosestEnemyDEBUG: 0
   TeaM: 0
   Behaviour: 0
@@ -782,6 +783,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 03de352f8b805c64ab5985a699950e6d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spriteRenderer: {fileID: 6114318807474539385}
   pixelsPerUnit: 2
   radius: 4
