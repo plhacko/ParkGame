@@ -245,15 +245,6 @@ public class Soldier : NetworkBehaviour, ISoldier
 
     private void MovementBehaviour()
     {
-        // TODO: think if make sense or rm
-        // Transform enemyT = EnemyObserver.GetClosestEnemy();
-        // if (enemyT != null)
-        // { AttackEnemyIfInRAnge(enemyT); }
-
-        //  moves to the inner circle around the commander
-
-        
-
         if (Vector3.Distance(CommanderToFollow.position, transform.position) > InnerDistanceFromCommander)
         { MoveTowardsEntity(CommanderToFollow); }
         else
@@ -400,6 +391,7 @@ public class Soldier : NetworkBehaviour, ISoldier
         return false;
     }
 
+    // idea for horseman
     private void GetMidPoint() {
         if (!targetedEnemy) {
             return;

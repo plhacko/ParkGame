@@ -28,6 +28,11 @@ public class ConquerModule : NetworkBehaviour, ITeamMember
 
     private void Start()
     {
+        // Require component in this gameobject or its parent
+        if (gameObject.GetComponentInParent<Rigidbody2D>() == null && gameObject.GetComponent<Rigidbody2D>() == null) {
+            Debug.LogError("Rigidbody2D is missing from the object and its parent.");
+        }
+
         // initialize the team member (the object we will be setting Team)
         TeamMember = transform.parent?.GetComponent<ITeamMember>();
         // progress bar

@@ -22,9 +22,9 @@ public class Outpost : NetworkBehaviour, ICommander
     [SerializeField] Sprite HorsemanIcon;
     [SerializeField] private Soldier.UnitType InitOutpostUnitType;
     [SerializeField] private GameObject revealer;
+    [SerializeField] private Collider2D switchCollider;
 
     List<NetworkObjectReference> Units = new List<NetworkObjectReference>();
-    //ToggleSpawnedUnitScript OutpostSpawnerChanger;
 
     NetworkVariable<float> _Timer = new(0.0f);
     public float Timer { get => _Timer.Value; private set => _Timer.Value = value; }
@@ -107,6 +107,8 @@ public class Outpost : NetworkBehaviour, ICommander
         switch (outpostUnitType) {
             case Soldier.UnitType.Archer:
                 return ArcherPrefab;
+            case Soldier.UnitType.Horseman:
+                return HorsemanPrefab;
             default:
                 return UnitPrefab;
         }
@@ -184,7 +186,7 @@ public class Outpost : NetworkBehaviour, ICommander
         }
     }
 
-    void OnMouseDown() {
+     void OnMouseDown() {
         if (IsCastle) {
             return;
         }

@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: -6080753142415193819}
   - component: {fileID: 598515008}
   - component: {fileID: 598515007}
+  - component: {fileID: 5313421381117267381}
   m_Layer: 8
   m_Name: Outpost
   m_TagString: Untagged
@@ -132,6 +133,7 @@ MonoBehaviour:
   HorsemanIcon: {fileID: 21300000, guid: 46eddd8d370b3be48b1a9d9c76e98342, type: 3}
   InitOutpostUnitType: 0
   revealer: {fileID: 7172483008333775361}
+  switchCollider: {fileID: 0}
   _Team:
     m_InternalValue: 0
 --- !u!61 &1737851833670286082
@@ -141,7 +143,7 @@ BoxCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2776846833031490645}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Density: 1
   m_Material: {fileID: 0}
   m_IncludeLayers:
@@ -221,13 +223,13 @@ BoxCollider2D:
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
-  m_LayerOverridePriority: 0
+  m_LayerOverridePriority: 10
   m_ForceSendLayers:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 0
   m_ForceReceiveLayers:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 0
   m_ContactCaptureLayers:
     serializedVersion: 2
     m_Bits: 4294967295
@@ -266,6 +268,33 @@ MonoBehaviour:
   shader2: {fileID: 10753, guid: 0000000000000000f000000000000000, type: 0}
   excludeObjects:
   - {fileID: 7172483008333775361}
+--- !u!50 &5313421381117267381
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2776846833031490645}
+  m_BodyType: 1
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDrag: 0
+  m_AngularDrag: 0.05
+  m_GravityScale: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0
 --- !u!1 &7172483008333775361
 GameObject:
   m_ObjectHideFlags: 0
@@ -453,6 +482,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4388496590651871191, guid: 48861cb72fa4179449fc8af1f8a0fc93, type: 3}
+      propertyPath: m_IsTrigger
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4388496590651871191, guid: 48861cb72fa4179449fc8af1f8a0fc93, type: 3}
+      propertyPath: m_ExcludeLayers.m_Bits
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4388496590651871191, guid: 48861cb72fa4179449fc8af1f8a0fc93, type: 3}
+      propertyPath: m_IncludeLayers.m_Bits
+      value: 4294967295
+      objectReference: {fileID: 0}
     - target: {fileID: 5057229964963574410, guid: 48861cb72fa4179449fc8af1f8a0fc93, type: 3}
       propertyPath: m_SortingOrder
       value: 1
@@ -465,7 +506,8 @@ PrefabInstance:
       propertyPath: m_SortingOrder
       value: 1
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 4388496590651871190, guid: 48861cb72fa4179449fc8af1f8a0fc93, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
