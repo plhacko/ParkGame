@@ -79,6 +79,19 @@ public class Outpost : NetworkBehaviour, ICommander
     {
         var playerData = LobbyManager.Singleton.GetLocalPlayerData();
         Debug.Log($"onTeamChanged on outpost, new team: {newTeam} for {gameObject.name}, (local player's team is: {playerData.Team})");
+
+        var previousPlayers = playerManager.GetPlayersWithTeam(previousTeam);
+        foreach (var player in previousPlayers)
+        {
+            player.RemoveOutpost(this);
+        }
+
+        var teamPlayers = playerManager.GetPlayersWithTeam(newTeam);
+        foreach (var player in teamPlayers)
+        {
+            player.AddOutpost(this);
+        }
+
         if (playerData.Team == newTeam)
         {
             revealer.gameObject.SetActive(true);

@@ -24,6 +24,7 @@ namespace Player
         private Formation formationScript;
         private ChangeMaterial changeMaterial;
         private List<NetworkObjectReference> units = new();
+        private List<GameObject> outposts = new();
         private string firebaseId;
         
         // Replicated variable for sprite orientation
@@ -293,6 +294,21 @@ namespace Player
         private void addToUnitsClientRpc(NetworkObjectReference networkObjectReference, ClientRpcParams clientRpcParams = default)
         {
             units.Add(networkObjectReference);
+
+            if (!networkObjectReference.TryGet(out var networkObject, NetworkManager.Singleton))
+            {
+                Debug.LogWarning($"could not get network object from reference");
+                return;
+            }
+
+            if (!networkObject.TryGetComponent<Soldier>(out var soldier))
+            {
+                Debug.LogWarning($"could not get soldier from network object");
+                return;
+            }
+
+            if (soldier.TransformToFollow == transform)
+                uiInGameScreenController.AddUnit(soldier, soldier.OnMouseDown);
         }
 
         void ICommander.ReportUnfollowing(NetworkObjectReference networkObjectReference)
@@ -352,6 +368,20 @@ namespace Player
                 if (go.TryGetComponent<ISoldier>(out ISoldier soldier))
                 { soldier.SoldierBehaviour = SoldierBehaviour.Attack; }
             }
+        }
+
+        public void AddOutpost(Outpost outpost)
+        {
+            Debug.Log($"adding outpost {outpost.gameObject.name} to player {Name}");
+            outposts.Add(outpost.gameObject);
+            uiInGameScreenController.AddOutpost(outpost);
+        }
+
+        public void RemoveOutpost(Outpost outpost)
+        {
+            Debug.Log($"removing outpost {outpost.gameObject.name} from player {Name}");
+            outposts.Remove(outpost.gameObject);
+            uiInGameScreenController.RemoveOutpost(outpost);
         }
     }
 }
