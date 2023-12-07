@@ -79,6 +79,8 @@ public class Soldier : NetworkBehaviour, ISoldier
     private PlayerManager playerManager;
     private ChangeMaterial changeMaterial;
 
+    public Action OnDeath;
+
     private void Initialize()
     {
         playerManager = FindObjectOfType<PlayerManager>();
@@ -528,6 +530,7 @@ public class Soldier : NetworkBehaviour, ISoldier
 
         if (IsServer)
         {
+            OnDeath?.Invoke();
             Destroy(gameObject, DeathFadeTime);   
         }
     }
