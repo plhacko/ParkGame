@@ -82,12 +82,20 @@ public class Outpost : NetworkBehaviour, ICommander
 
         if (playerData.Team == previousTeam)
         {
-            playerManager.GetLocalPlayerController().RemoveOutpost(this);  
+            var playerController = playerManager.GetLocalPlayerController();
+            if (playerController != null)
+            {
+                playerController.RemoveOutpost(this);
+            }
         }
 
         if (playerData.Team == newTeam)
         {
-            playerManager.GetLocalPlayerController().AddOutpost(this);
+            var playerController = playerManager.GetLocalPlayerController();
+            if (playerController != null)
+            {
+                playerController.AddOutpost(this);
+            }
         }
 
         if (playerData.Team == newTeam)

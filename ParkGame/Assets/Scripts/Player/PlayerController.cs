@@ -24,7 +24,6 @@ namespace Player
         private Formation formationScript;
         private ChangeMaterial changeMaterial;
         private List<NetworkObjectReference> units = new();
-        private List<GameObject> outposts = new();
         private string firebaseId;
         
         // Replicated variable for sprite orientation
@@ -372,15 +371,11 @@ namespace Player
 
         public void AddOutpost(Outpost outpost)
         {
-            Debug.Log($"adding outpost {outpost.gameObject.name} to player {Name}");
-            outposts.Add(outpost.gameObject);
             uiInGameScreenController.AddOutpost(outpost);
         }
 
         public void RemoveOutpost(Outpost outpost)
         {
-            Debug.Log($"removing outpost {outpost.gameObject.name} from player {Name}");
-            outposts.Remove(outpost.gameObject);
             uiInGameScreenController.RemoveOutpost(outpost);
         }
     }
