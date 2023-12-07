@@ -307,7 +307,9 @@ namespace Player
             }
 
             if (isActualOwner())
-                uiInGameScreenController.AddUnit(soldier, soldier.OnMouseDown);
+                uiInGameScreenController.AddUnit(soldier,
+                () => soldier.RequestChangingCommanderToFollowServerRpc(NetworkManager.Singleton.LocalClientId)
+            );
         }
 
         void ICommander.ReportUnfollowing(NetworkObjectReference networkObjectReference)
