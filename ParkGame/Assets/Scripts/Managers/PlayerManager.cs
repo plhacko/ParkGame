@@ -179,19 +179,5 @@ namespace Managers
         }
 
         public PlayerController GetLocalPlayerController() => localPlayerController;
-
-        public List<PlayerController> GetPlayersWithTeam(int team)
-        {
-            List<PlayerController> players = new List<PlayerController>();
-            foreach (var (_, controller) in playerControllers)
-            {
-                if (controller.Team == team)
-                {
-                    players.Add(controller);
-                }
-            }
-
-            return players;
-        }
     }
 }
