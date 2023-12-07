@@ -39,10 +39,12 @@ public class Outpost : NetworkBehaviour, ICommander
     public int Team { get => _Team.Value; set => _Team.Value = value; }
 
     private Soldier.UnitType outpostUnitType;
+    public Soldier.UnitType OutpostUnitType { get => outpostUnitType; }
     private SpriteRenderer sr;
     private int counter;
     private PlayerManager playerManager;
     private ChangeMaterial changeMaterial;
+    public Action<Soldier.UnitType> OnUnitTypeChange;
 
     public override void OnNetworkSpawn()
     {
@@ -185,17 +187,24 @@ public class Outpost : NetworkBehaviour, ICommander
 
     // change spawn type and icon
     Sprite ChangeSpawnType(int n) {
+        Sprite icon = null;
         switch (n) {
             case 1:
                 outpostUnitType = Soldier.UnitType.Archer;
-                return ArcherIcon;
+                icon = ArcherIcon;
+                break;
             case 2:
                 outpostUnitType = Soldier.UnitType.Horseman;
-                return HorsemanIcon;
+                icon = HorsemanIcon;
+                break;
             default:
                 outpostUnitType = Soldier.UnitType.Pawn;
-                return PawnIcon;
+                icon = PawnIcon;
+                break;
         }
+
+        OnUnitTypeChange?.Invoke(outpostUnitType);
+        return icon;
     }
 
     [ClientRpc]
