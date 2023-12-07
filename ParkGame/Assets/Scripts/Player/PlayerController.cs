@@ -307,7 +307,7 @@ namespace Player
                 return;
             }
 
-            if (soldier.TransformToFollow == transform)
+            if (isActualOwner())
                 uiInGameScreenController.AddUnit(soldier, soldier.OnMouseDown);
         }
 
@@ -335,7 +335,7 @@ namespace Player
                 return;
             }
 
-            if (soldier.TransformToFollow == transform)
+            if (isActualOwner())
                 uiInGameScreenController.RemoveUnit(soldier);
         }
         
