@@ -23,6 +23,12 @@ public class Outpost : NetworkBehaviour, ICommander
     [SerializeField] private Soldier.UnitType InitOutpostUnitType;
     [SerializeField] private GameObject revealer;
     [SerializeField] private Collider2D switchCollider;
+   
+    [Tooltip("# seconds. After changing spawnedType wait until you can change it again.")]
+    [SerializeField] private int TimeBetweenToggles;
+    // if changing spawn type. small time reserve to retoggle (e.g. type0 -> -> type2)
+    private const float FastRetoggleTime = 1.5f; // seconds
+    private float RetoggleTime = 0; // counting since spawnToggle down. counter
 
     List<NetworkObjectReference> Units = new List<NetworkObjectReference>();
 
@@ -87,6 +93,7 @@ public class Outpost : NetworkBehaviour, ICommander
 
     void Update()
     {
+
         // updating only on server
         if (!IsServer || Team == -1)
         { return; }
@@ -100,6 +107,10 @@ public class Outpost : NetworkBehaviour, ICommander
         {
             SpawnUnit();
             Timer = 0;
+        }
+
+        if (RetoggleTime > 0) {
+            RetoggleTime -= Time.deltaTime;
         }
     }
 
@@ -176,14 +187,24 @@ public class Outpost : NetworkBehaviour, ICommander
     [ServerRpc(RequireOwnership = false)]
     public void RequestChangingSpawnTypeServerRpc(ulong clientID) {
         PlayerController playerController = playerManager.GetPlayerController(clientID);
-        Debug.Log("teams: " + playerController.Team + " outpost from: " + Team);
 
         if (playerController != null && playerController.Team == Team) {
-            Debug.Log("change spawning type");
-            counter++;
-            int numOfUnitTypes = Enum.GetNames(typeof(Soldier.UnitType)).Length;
-            ChangeIconClientRpc(counter % numOfUnitTypes);
+            if (ControlToggleTime() == true) {
+                Debug.Log("change spawning type");
+                counter++;
+                int numOfUnitTypes = Enum.GetNames(typeof(Soldier.UnitType)).Length;
+                ChangeIconClientRpc(counter % numOfUnitTypes);
+            }
         }
+    }
+
+    bool ControlToggleTime() {
+        if ((RetoggleTime > 0) && (TimeBetweenToggles - RetoggleTime > FastRetoggleTime)) {
+            return false;
+        } else if (RetoggleTime <= 0) {
+            RetoggleTime = TimeBetweenToggles;
+        }
+        return true;
     }
 
      void OnMouseDown() {

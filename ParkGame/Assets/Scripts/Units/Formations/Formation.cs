@@ -15,7 +15,8 @@ public class Formation : MonoBehaviour {
         public bool occupated;
     }
 
-    public bool DEBUG;
+    [Tooltip("Show positions for units")]
+    [SerializeField] private bool DEBUG;
     [SerializeField] GameObject PositionPrefab;
     public List<GameObject> soldiers = new List<GameObject>();
     
@@ -42,7 +43,6 @@ public class Formation : MonoBehaviour {
 
     private void Awake() {
         playerController = GetComponent<PlayerController>();
-        DEBUG = true;
     }
 
     // disable renderer of object
@@ -66,12 +66,13 @@ public class Formation : MonoBehaviour {
         go.transform.SetParent(null, true);
         go.transform.position = position;
         go.transform.rotation = Quaternion.Euler(new Vector3(0, 0, 90));
-        Hide(BoxRoot, false);
     }
 
     public void InitializeFormation() {
         Vector3 p = gameObject.transform.position;
         UnparentFormation(BoxRoot, new Vector3(p.x - 2, p.y, p.z));
+        Hide(BoxRoot, false);
+        Hide(HorseRoot, false);
     }
 
     // disable renderer of object

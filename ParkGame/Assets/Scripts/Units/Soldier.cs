@@ -375,7 +375,6 @@ public class Soldier : NetworkBehaviour, ISoldier
 
                 
                 if (TypeOfUnit == UnitType.Pawn || TypeOfUnit == UnitType.Horseman) {
-                    AudioManager.Instance.PlayOneShot(FMODEvents.Instance.SwordHitSFX, transform.position);
                     enemyT.GetComponent<ISoldier>()?.TakeDamage(Damage);
                 
                 }

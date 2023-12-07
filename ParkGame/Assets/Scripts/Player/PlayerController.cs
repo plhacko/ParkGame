@@ -198,17 +198,14 @@ namespace Player
                 if (go.TryGetComponent<ISoldier>(out ISoldier soldier)) {
                     switch (FormationType) {
                         case Formation.FormationType.Free:
-                            Debug.Log("notify soldiers. C is OFF");
                             soldier.NavMeshFormationSwitch(false, SoldierBehaviour.Idle, formationScript, FormationType);
                             formationScript.ResetFormation();
                             break;
                         case Formation.FormationType.Circle:
-                            Debug.Log("notify them. C is ON");
                             soldier.NavMeshFormationSwitch(false, SoldierBehaviour.Idle, formationScript, FormationType);
                             soldier.NavMeshFormationSwitch(true, SoldierBehaviour.Formation, formationScript, FormationType);
                             break;
                         case Formation.FormationType.Box:
-                            Debug.Log("notify them. R is ON");
                             soldier.NavMeshFormationSwitch(false, SoldierBehaviour.Idle, formationScript, FormationType);
                             soldier.NavMeshFormationSwitch(true, SoldierBehaviour.Formation, formationScript, FormationType);
                             break;

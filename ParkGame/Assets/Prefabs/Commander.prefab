@@ -526,7 +526,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0daf9da1e06be9746a47c0165d613f03, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  radius: 5
 --- !u!1001 &3841262987104045785
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -586,6 +585,10 @@ PrefabInstance:
     - target: {fileID: 1220298409517804251, guid: e1c6ecf4c9a3d90489233cc10df744d5, type: 3}
       propertyPath: m_Name
       value: HorseRootPrefab
+      objectReference: {fileID: 0}
+    - target: {fileID: 2519635860870734656, guid: e1c6ecf4c9a3d90489233cc10df744d5, type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

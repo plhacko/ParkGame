@@ -51,7 +51,6 @@ namespace Units.Archer
                 Debug.Log("Arrow hits");
 
                 if (target.GetComponent<ISoldier>() != null) {
-                    AudioManager.Instance.PlayOneShot(FMODEvents.Instance.ArrowHitSFX, transform.position);
                     target.GetComponent<ISoldier>().TakeDamage(damage);
                     dealtDamage = true;
                     Destroy(gameObject);
@@ -60,7 +59,6 @@ namespace Units.Archer
                 }
 
                 if (Vector3.Distance(transform.position, positionOfTarget) < 0.01f) {
-                    AudioManager.Instance.PlayOneShot(FMODEvents.Instance.ArrowHitSFX, transform.position);
                     dealtDamage = true; 
                     Destroy(gameObject);
 
