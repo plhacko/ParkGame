@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 using Player;
+using ProjNet.CoordinateSystems;
 
 public class Outpost : NetworkBehaviour, ICommander
 {
@@ -45,7 +46,13 @@ public class Outpost : NetworkBehaviour, ICommander
     private PlayerManager playerManager;
     private ChangeMaterial changeMaterial;
     public Action<Soldier.UnitType> OnUnitTypeChange;
-
+    // TODO Action and Dictionary should be reinitialized on outpost owner change
+    public Action OnUnitTypeCountChange;
+    public Dictionary<Soldier.UnitType, int> UnitTypeCount = new() {
+        { Soldier.UnitType.Pawn, 0 },
+        { Soldier.UnitType.Archer, 0 },
+        { Soldier.UnitType.Horseman, 0 }
+    };
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
@@ -171,6 +178,31 @@ public class Outpost : NetworkBehaviour, ICommander
         { throw new Exception($"only on server can adding units to outpost be reported\n outpost: {gameObject.name}"); }
 
         Units.Add(networkObjectReference);
+
+        if (!networkObjectReference.TryGet(out var networkObject, NetworkManager.Singleton))
+        {
+            Debug.LogError($"Could not find network object {networkObjectReference}");
+            return;
+        }
+
+        if (!networkObject.TryGetComponent<Soldier>(out var soldier))
+        {
+            Debug.LogError($"Could not find soldier {networkObjectReference}");
+            return;
+        }
+
+        addToUnitsClientRpc(networkObjectReference, Team, soldier.GetUnitType());
+    }
+
+    [ClientRpc]
+    private void addToUnitsClientRpc(NetworkObjectReference networkObjectReference, int team, Soldier.UnitType unitType, ClientRpcParams clientRpcParams = default)
+    {
+        var localPlayer = playerManager.GetLocalPlayerController();
+        if (team == localPlayer.Team)
+        {
+            UnitTypeCount[unitType]++;
+            OnUnitTypeCountChange?.Invoke();
+        }
     }
 
     void ICommander.ReportUnfollowing(NetworkObjectReference networkObjectReference)
@@ -178,7 +210,33 @@ public class Outpost : NetworkBehaviour, ICommander
         if (!IsServer)
         { throw new Exception($"only on server can removing units to outpost be reported\n outpost: {gameObject.name}"); }
 
+        Debug.Log($"removing unit from outpost: {gameObject.name}");
         Units.Remove(networkObjectReference);
+
+        if (!networkObjectReference.TryGet(out var networkObject, NetworkManager.Singleton))
+        {
+            Debug.LogError($"Could not find network object {networkObjectReference}");
+            return;
+        }
+
+        if (!networkObject.TryGetComponent<Soldier>(out var soldier))
+        {
+            Debug.LogError($"Could not find soldier {networkObjectReference}");
+            return;
+        }
+
+        removeFromUnitsClientRpc(networkObjectReference, Team, soldier.GetUnitType());
+    }
+
+    [ClientRpc]
+    private void removeFromUnitsClientRpc(NetworkObjectReference networkObjectReference, int team, Soldier.UnitType unitType, ClientRpcParams clientRpcParams = default)
+    {
+        var localPlayer = playerManager.GetLocalPlayerController();
+        if (team == localPlayer.Team)
+        {
+            UnitTypeCount[unitType]--;
+            OnUnitTypeCountChange?.Invoke();
+        }
     }
 
     public Formation.FormationType GetFormation() {
