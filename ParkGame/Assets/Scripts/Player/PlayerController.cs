@@ -97,6 +97,15 @@ namespace Player
             
             formationScript.InitializeFormation(); // build prefab, get position of the commander
             FormationType = Formation.FormationType.Free; // movement without navmesh
+
+            var castles = FindObjectsOfType<Outpost>();
+            foreach (var castle in castles)
+            {
+                if (castle.IsCastle && castle.Team == Team)
+                {
+                    AddOutpost(castle);
+                }
+            }
         }
 
         private void onIsLockedChanged(bool previousValue, bool newValue)

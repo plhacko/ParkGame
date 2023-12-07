@@ -17,6 +17,7 @@ public class UIOutpost : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     [SerializeField] private TextMeshProUGUI horsemanCount;
     [SerializeField] private Image outpostIcon;
     [SerializeField] private List<Sprite> outpostIcons;
+    [SerializeField] private Sprite castleIcon;
     
     private Outpost outpost;
     [SerializeField] private float holdTimerLimit = 1.0f;
@@ -52,6 +53,12 @@ public class UIOutpost : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     private void OnUnitTypeChange(Soldier.UnitType type)
     {
+        if (outpost.IsCastle)
+        {
+            outpostIcon.sprite = castleIcon;
+            return;
+        }
+
         if (outpostIcons.Count != Enum.GetNames(typeof(Soldier.UnitType)).Length)
             return;
 
