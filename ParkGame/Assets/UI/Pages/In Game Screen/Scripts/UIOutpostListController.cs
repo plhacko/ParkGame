@@ -11,7 +11,7 @@ public class UIOutpostListController : MonoBehaviour
     {
         var outpostUI = Instantiate(outpostPrefab, transform);
         outposts.Add(outpost, outpostUI);
-        outpostUI.Initialize(outpost);
+        outpostUI.Initialize(outpost, () => RemoveOutpost(outpost));
     }
 
     public void RemoveOutpost(Outpost outpost)

@@ -22,14 +22,22 @@ public class UIOutpost : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     private Outpost outpost;
     [SerializeField] private float holdTimerLimit = 1.0f;
     Stopwatch stopwatch = new Stopwatch();
+    private Action removeAction;
     
-    public void Initialize(Outpost outpost)
+    public void Initialize(Outpost outpost, Action removeAction)
     {
         this.outpost = outpost;
+        this.removeAction = removeAction;
         OnUnitTypeChange(outpost.OutpostUnitType);
         outpost.OnUnitTypeChange += OnUnitTypeChange;
         OnUnitTypeCountChange();
         outpost.OnUnitTypeCountChange += OnUnitTypeCountChange;
+        this.outpost.RegisterOnTeamChange(OnTeamChange);
+    }
+
+    private void OnTeamChange()
+    {
+        removeAction?.Invoke();
     }
 
     private void OnDestroy()
@@ -39,6 +47,7 @@ public class UIOutpost : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
         outpost.OnUnitTypeChange -= OnUnitTypeChange;
         outpost.OnUnitTypeCountChange -= OnUnitTypeCountChange;
+        outpost.UnregisterOnTeamChange(OnTeamChange);
     }
 
     public void OnPointerDown(PointerEventData eventData)

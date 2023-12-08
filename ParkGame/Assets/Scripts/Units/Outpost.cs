@@ -84,6 +84,16 @@ public class Outpost : NetworkBehaviour, ICommander
         }
     }
 
+    public void RegisterOnTeamChange(Action action)
+    {
+        _Team.OnValueChanged += (previous, current) => action();
+    }
+
+    public void UnregisterOnTeamChange(Action action)
+    {
+        _Team.OnValueChanged -= (previous, current) => action();
+    }
+
     private void onTeamChanged(int previousTeam, int newTeam)
     {
         var playerData = LobbyManager.Singleton.GetLocalPlayerData();
