@@ -98,10 +98,27 @@ namespace Player
             formationScript.InitializeFormation(); // build prefab, get position of the commander
             FormationType = Formation.FormationType.Free; // movement without navmesh
 
+            if (IsServer)
+            {
+                ClientRpcParams clientRpcParams = new ClientRpcParams
+                {
+                    Send = new ClientRpcSendParams
+                    {
+                        TargetClientIds = new []{ OwnerClientId }
+                    }
+                };
+
+                AddCastleUIClientRpc(clientRpcParams);
+            }
+        }
+
+        [ClientRpc]
+        private void AddCastleUIClientRpc(ClientRpcParams clientRpcParams = default)
+        {
             var castles = FindObjectsOfType<Outpost>();
             foreach (var castle in castles)
             {
-                if (castle.IsCastle && castle.Team == Team)
+                if (castle.IsSyncedCastle && castle.Team == Team)
                 {
                     AddOutpost(castle);
                 }
@@ -302,7 +319,7 @@ namespace Player
         private void addToUnitsClientRpc(NetworkObjectReference networkObjectReference, ClientRpcParams clientRpcParams = default)
         {
             units.Add(networkObjectReference);
-
+            Debug.LogWarning($"!!!!added unit to commander: {gameObject.name}");
             if (!networkObjectReference.TryGet(out var networkObject, NetworkManager.Singleton))
             {
                 Debug.LogWarning($"could not get network object from reference");
@@ -315,8 +332,7 @@ namespace Player
                 return;
             }
 
-            if (isActualOwner())
-                uiInGameScreenController.AddUnit(soldier,
+            uiInGameScreenController.AddUnit(soldier,
                 () => soldier.RequestChangingCommanderToFollowServerRpc(NetworkManager.Singleton.LocalClientId)
             );
         }
@@ -325,14 +341,23 @@ namespace Player
         {
             if (!IsServer)
             { throw new Exception($"only on server can removing units from commander be done: {gameObject.name}"); }
-            
-            removeFromUnitsClientRpc(networkObjectReference);
+
+            ClientRpcParams clientRpcParams = new ClientRpcParams
+            {
+                Send = new ClientRpcSendParams
+                {
+                    TargetClientIds = new []{ OwnerClientId }
+                }
+            };
+
+            removeFromUnitsClientRpc(networkObjectReference, clientRpcParams);
         }
         
         [ClientRpc]
-        private void removeFromUnitsClientRpc(NetworkObjectReference networkObjectReference)
+        private void removeFromUnitsClientRpc(NetworkObjectReference networkObjectReference, ClientRpcParams clientRpcParams = default)
         {
             units.Remove(networkObjectReference);
+            Debug.LogWarning($"!!!!removed unit from commander: {gameObject.name}");
             if (!networkObjectReference.TryGet(out var networkObject, NetworkManager.Singleton))
             {
                 Debug.LogWarning($"could not get network object from reference");
@@ -345,8 +370,7 @@ namespace Player
                 return;
             }
 
-            if (isActualOwner())
-                uiInGameScreenController.RemoveUnit(soldier);
+            uiInGameScreenController.RemoveUnit(soldier);
         }
         
         // commands to the units

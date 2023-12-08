@@ -9,7 +9,8 @@ using ProjNet.CoordinateSystems;
 public class Outpost : NetworkBehaviour, ICommander
 {
     public bool IsCastle = false;
-
+    NetworkVariable<bool> _IsCastle = new();
+    public bool IsSyncedCastle { get => _IsCastle.Value; }
     [SerializeField] int InitialTeam;
     [SerializeField] int MaxUnits = 3; // in total
     [SerializeField] float SpawnTime = 4; // 4s
@@ -61,6 +62,11 @@ public class Outpost : NetworkBehaviour, ICommander
 
     private void initialize()
     {
+        if (IsServer)
+        {
+            _IsCastle.Value = IsCastle;
+        }
+        
         playerManager = FindObjectOfType<PlayerManager>();
         changeMaterial = GetComponent<ChangeMaterial>();
         sr = GetComponent<SpriteRenderer>();

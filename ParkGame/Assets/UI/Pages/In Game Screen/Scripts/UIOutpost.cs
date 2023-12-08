@@ -62,7 +62,7 @@ public class UIOutpost : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     private void OnUnitTypeChange(Soldier.UnitType type)
     {
-        if (outpost.IsCastle)
+        if (outpost.IsSyncedCastle)
         {
             outpostIcon.sprite = castleIcon;
             return;
