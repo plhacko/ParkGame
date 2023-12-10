@@ -272,6 +272,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 16e878c8ac6e19f46bc87fa57d8fe0a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  NavMeshStatusNow: 0
   InitialHP: 7
   MovementSpeed: 1
   InnerDistanceFromCommander: 1
@@ -355,7 +356,7 @@ Rigidbody2D:
     m_Bits: 256
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 640
+    m_Bits: 512
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
@@ -367,7 +368,7 @@ CircleCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2149011059489662585}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Density: 1
   m_Material: {fileID: 0}
   m_IncludeLayers:
@@ -414,7 +415,7 @@ NavMeshAgent:
   m_AutoBraking: 1
   m_AutoRepath: 1
   m_Height: 0.2
-  m_BaseOffset: 0
+  m_BaseOffset: 0.7
   m_WalkableMask: 5
   m_ObstacleAvoidanceType: 4
 --- !u!114 &7124321394914278606
@@ -770,6 +771,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 03de352f8b805c64ab5985a699950e6d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spriteRenderer: {fileID: 7685145008871305747}
   pixelsPerUnit: 2
   radius: 4

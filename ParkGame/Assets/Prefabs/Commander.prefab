@@ -388,7 +388,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6bb49af851bf9364d8a061207283ed6e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DEBUG: 0
+  DEBUG: 1
   PositionPrefab: {fileID: 6223394261764091226, guid: e225b3896b59c98438cc2d5cf8fdb19c, type: 3}
   soldiers: []
   soldiersSwordmen: []
@@ -511,7 +511,7 @@ NavMeshAgent:
   m_AutoBraking: 1
   m_AutoRepath: 1
   m_Height: 0.2
-  m_BaseOffset: 0
+  m_BaseOffset: 0.7
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
 --- !u!114 &6221387868169975507
