@@ -18,6 +18,8 @@ public class Soldier : NetworkBehaviour, ISoldier
         Horseman
     };
 
+    public NavMeshPathStatus NavMeshStatusNow;
+
     // game logic
     private Transform CommanderToFollow = null;
     public Transform TransformToFollow { get => CommanderToFollow; }
@@ -191,6 +193,8 @@ public class Soldier : NetworkBehaviour, ISoldier
             return;
         }
 
+        NavMeshStatusNow = Agent.pathStatus;
+
         // attack timer
         if (AttackTimer <= Attackcooldown)
         { AttackTimer += Time.deltaTime; }
@@ -304,7 +308,11 @@ public class Soldier : NetworkBehaviour, ISoldier
                 return;
             }
 
+
+            //// IDLE ATTACK. 
+            ///////////////////////////////////
             // Attack if enemy close by and in range 
+            /*
             Transform enemyT = GetEnemy(); 
             float distanceFromCommander = Vector3.Distance(CommanderToFollow.position, transform.position);
             if (enemyT != null && distanceFromCommander < DefendDistanceFromCommander) {
@@ -316,6 +324,9 @@ public class Soldier : NetworkBehaviour, ISoldier
                 MoveTowardsEntity(enemyT);
                 return;
             }
+            */
+            /////////////////////////////
+
             // Follow commander
             if (TypeOfUnit == UnitType.Horseman && FormationType == FormationType.Box) {
                 Agent.speed = 1f;
@@ -463,6 +474,8 @@ public class Soldier : NetworkBehaviour, ISoldier
                 if (FormationType == FormationType.Box || FormationType == FormationType.Circle) {
                     SoldierBehaviour = SoldierBehaviour.Formation;
                     NavMeshFormationSwitch(true, SoldierBehaviour.Formation, FormationFromFollowedCommander, FormationType);
+                } else {
+                    SoldierBehaviour = SoldierBehaviour.Move;
                 }
             }
             else

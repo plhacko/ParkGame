@@ -41,7 +41,7 @@ namespace Player
         
         public Vector3 PointerPosition { get => _PointerPosition.Value; set => _PointerPosition.Value = value; }
 
-        public Formation.FormationType FormationType; // todo?
+        public Formation.FormationType FormationType; 
         public Formation.FormationType GetFormation() {
             return FormationType;
         }
@@ -143,7 +143,6 @@ namespace Player
             if (!Application.isFocused) return;
 
             PointerPosition = PlayerPointerPlacer.PinPosition;
-            // move();
 
             if (Input.GetKeyDown(KeyCode.I))
             { CommandMovementServerRpc(); }
@@ -152,18 +151,12 @@ namespace Player
             if (Input.GetKeyDown(KeyCode.P))
             { CommandAttackServerRpc(); }
 
-            // ...ServerRpc???
-            //if (Input.GetKeyDown(KeyCode.C)) { FormatSoldiers(KeyCode.C); }
-            //if (Input.GetKeyDown(KeyCode.R)) { FormatSoldiers(KeyCode.R); }
             if (Input.GetKeyDown(KeyCode.C)) { 
-                //Debug.Log("Nu of Units: " + Units.Count);
                 FormatSoldiersServerRpc(KeyCode.C); }
             if (Input.GetKeyDown(KeyCode.R)) { 
-                //Debug.Log("Nu of Units: " + Units.Count);
                 FormatSoldiersServerRpc(KeyCode.R); }
         }
 
-        //[ServerRpc]
         [ServerRpc(RequireOwnership = false)]
         public void FormatSoldiersServerRpc(KeyCode key) {
             FormatSoldiers(key);
@@ -224,15 +217,15 @@ namespace Player
                 if (go.TryGetComponent<ISoldier>(out ISoldier soldier)) {
                     switch (FormationType) {
                         case Formation.FormationType.Free:
-                            soldier.NavMeshFormationSwitch(false, SoldierBehaviour.Idle, formationScript, FormationType);
+                            soldier.NavMeshFormationSwitch(false, SoldierBehaviour.Move, formationScript, FormationType);
                             formationScript.ResetFormation();
                             break;
                         case Formation.FormationType.Circle:
-                            soldier.NavMeshFormationSwitch(false, SoldierBehaviour.Idle, formationScript, FormationType);
+                            soldier.NavMeshFormationSwitch(false, SoldierBehaviour.Move, formationScript, FormationType);
                             soldier.NavMeshFormationSwitch(true, SoldierBehaviour.Formation, formationScript, FormationType);
                             break;
                         case Formation.FormationType.Box:
-                            soldier.NavMeshFormationSwitch(false, SoldierBehaviour.Idle, formationScript, FormationType);
+                            soldier.NavMeshFormationSwitch(false, SoldierBehaviour.Move, formationScript, FormationType);
                             soldier.NavMeshFormationSwitch(true, SoldierBehaviour.Formation, formationScript, FormationType);
                             break;
                         default: 

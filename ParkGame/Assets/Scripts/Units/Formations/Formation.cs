@@ -153,8 +153,8 @@ public class Formation : MonoBehaviour {
     }
 
     void Add1PositionOnTheSide() {
-        var formDescr = BoxRoot.GetComponent<FormationDescriptor>(); // 
-        int c = formDescr.NumberOfHorsemenPositions; // add definition to the horse places? how to deal with moles???
+        var formDescr = BoxRoot.GetComponent<FormationDescriptor>(); 
+        int c = formDescr.NumberOfHorsemenPositions; 
         float horseinc = formDescr.HorseIncrement;
         var pos = formDescr.StartingPosition;
         float x = c % 2 == 1 ? -1 : 1;
