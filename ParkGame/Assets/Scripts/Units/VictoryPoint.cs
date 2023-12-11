@@ -1,3 +1,4 @@
+using System;
 using Managers;
 using NavMeshPlus.Extensions.Units;
 using Unity.Netcode;
@@ -10,10 +11,19 @@ public class VictoryPoint : NetworkBehaviour, IConquerable
     [SerializeField] float timeToNotifyPlayersBeforeOpening;
     [SerializeField] ColorSettings colorSettings;
     
+    public Action<int, int> OnPointConquered;
+    
     private float lastConquestTime;
     private bool isOpen;
     private bool isNotified;
-        
+    
+    private NetworkVariable<int>[] teamScores = {
+        new(),
+        new(),
+        new(),
+        new()
+    };
+    
     private SpriteRenderer spriteRenderer;
     private GameObject conquerModuleObject;
     private PlayerManager playerManager;
@@ -39,8 +49,8 @@ public class VictoryPoint : NetworkBehaviour, IConquerable
         conquerModuleObject = GetComponentInChildren<ConquerModule>().gameObject;
         spriteRenderer = GetComponent<SpriteRenderer>();
         lastConquestTime = float.MaxValue;
-        announcer = FindObjectOfType<Announcer>();
         playerManager = FindObjectOfType<PlayerManager>();
+        announcer = FindObjectOfType<Announcer>();
         playerManager.OnAllPlayersReady += onAllPlayersReady;
     }
 
@@ -83,7 +93,7 @@ public class VictoryPoint : NetworkBehaviour, IConquerable
     [ClientRpc]
     private void onStartedConqueringClientRpc(int team, ClientRpcParams clientRpcParams = default)
     {
-        NamedColor c = colorSettings.Colors[team];
+        var c = colorSettings.Colors[team];
         c.Color.a = 0.8f;
         spriteRenderer.color = c.Color;
     }
@@ -91,9 +101,12 @@ public class VictoryPoint : NetworkBehaviour, IConquerable
     public void OnConquered(int team)
     {
         lastConquestTime = Time.time;
-        CloseVPClientRpc();        
-        NamedColor c = colorSettings.Colors[team];
-        announcer.AnnounceEventClientRpc($"Victory Point has been captured by team {c.Name}!", 5);
+        CloseVPClientRpc();
+        
+        int numPoints = teamScores[team].Value + 1;
+        teamScores[team].Value = numPoints;
+        
+        OnPointConquered?.Invoke(team, numPoints);
     }
     
     public void OnStoppedConquering(int team)
@@ -104,7 +117,10 @@ public class VictoryPoint : NetworkBehaviour, IConquerable
     [ClientRpc]
     private void onStoppedConqueringClientRpc(int team, ClientRpcParams clientRpcParams = default)
     {
-        spriteRenderer.color = Color.white;
+        if (isOpen)
+        {
+            spriteRenderer.color = Color.white;   
+        }
     }
 
     public int GetTeam()

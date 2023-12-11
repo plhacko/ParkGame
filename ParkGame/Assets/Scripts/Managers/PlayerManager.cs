@@ -208,5 +208,27 @@ namespace Managers
 
             return teamMembers;
         }
+        
+        public List<PlayerController> GetAllEnemyMembers(int team)
+        {
+            List<PlayerController> teamMembers = new List<PlayerController>();
+            foreach (var (_, controller) in playerControllers)
+            {
+                if (controller.Team != team)
+                {
+                    teamMembers.Add(controller);
+                }
+            }
+
+            return teamMembers;
+        }
+
+        public void DisableAllPlayers()
+        {
+            foreach (var (_, controller) in playerControllers) 
+            {
+                controller.IsLocked = true;
+            }
+        }
     }
 }

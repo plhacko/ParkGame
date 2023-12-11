@@ -78,6 +78,8 @@ public class Soldier : NetworkBehaviour, ISoldier
     private PlayerManager playerManager;
     private ChangeMaterial changeMaterial;
 
+    private SpriteRenderer circleRenderer;
+
     private void Initialize()
     {
         playerManager = FindObjectOfType<PlayerManager>();
@@ -87,6 +89,7 @@ public class Soldier : NetworkBehaviour, ISoldier
         Networkanimator = GetComponent<NetworkAnimator>();
         shooting = GetComponent<ShootScript>();
         changeMaterial = GetComponent<ChangeMaterial>();
+        circleRenderer = transform.Find("Circle")?.GetComponent<SpriteRenderer>();
         
         _Team.OnValueChanged += OnTeamChanged;
         _SoldierBehaviour.OnValueChanged += OnBehaviourChange;
@@ -112,10 +115,9 @@ public class Soldier : NetworkBehaviour, ISoldier
     private void OnTeamChanged(int previousValue, int newValue) //DEBUG (just tem membership visualization) // TODO: rm
     {
         TeaM = newValue; // tmp
-        SpriteRenderer sr = transform.Find("Circle")?.GetComponent<SpriteRenderer>();
-        if (sr != null && newValue != -1)
+        if (circleRenderer != null && newValue != -1)
         {
-            sr.color = colorSettings.Colors[newValue].Color;
+            circleRenderer.color = colorSettings.Colors[newValue].Color;
         }
 
         var localPlayerData = LobbyManager.Singleton.GetLocalPlayerData();
@@ -356,7 +358,7 @@ public class Soldier : NetworkBehaviour, ISoldier
                 AudioManager.Instance.PlayOneShot(FMODEvents.Instance.SwordHitSFX, transform.position);
                 
                 if (TypeOfUnit == UnitType.Pawn) {
-                    // enemyT.GetComponent<ISoldier>()?.TakeDamage(Damage); // todo uncomment back!!
+                    enemyT.GetComponent<ISoldier>()?.TakeDamage(Damage);
                 }
                 if (TypeOfUnit == UnitType.Archer) {
                     SpriteRenderer.flipX = (enemyT.position.x - transform.position.x < 0);

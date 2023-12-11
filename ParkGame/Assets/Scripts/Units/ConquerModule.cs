@@ -11,17 +11,17 @@ public class ConquerModule : NetworkBehaviour
     //     set { if (TeamMember != null) { TeamMember.Team = value; } }
     // }
     [SerializeField] IConquerable conquerable = null;
-    [SerializeField] int? ConquererTeam = null;
     [SerializeField] NetworkVariable<float> _ConquerPoints = new();
     [SerializeField] float ConquerPointsRequired = 50.0f;
-    [SerializeField] List<Transform> VisibleConquerUnits = new();
-    [SerializeField] List<Transform> VisibleOtherUnits = new();
-
+    [SerializeField] List<ITeamMember> VisibleConquerUnits = new();
+    [SerializeField] List<ITeamMember> VisibleOtherUnits = new();
+    
     public VictoryPoint victoryPoint;
 
     public float ConquerPoints { get => _ConquerPoints.Value; set => _ConquerPoints.Value = value; }
 
     private IProgressBar ProgressBar = null;
+    private int ConquererTeam => VisibleConquerUnits.Count > 0 ? VisibleConquerUnits[0].Team : -1;
 
     // public UnityAction<float> OnConquerPointsChanged;
 
@@ -53,25 +53,48 @@ public class ConquerModule : NetworkBehaviour
         if (VisibleConquerUnits.Count > 0 && VisibleOtherUnits.Count > 0)
         { return; }
 
-        // score points (note - one of those will always be 0)
-        ConquerPoints += VisibleConquerUnits.Count * Time.deltaTime;
-        ConquerPoints -= VisibleOtherUnits.Count * Time.deltaTime;
-        if (VisibleOtherUnits.Count == 0 && VisibleConquerUnits.Count == 0)
+        if (ConquererTeam == -1)
+        {
+            if(VisibleConquerUnits.Count > 0)
+            {
+                if (conquerable.GetTeam() != ConquererTeam)
+                {
+                    conquerable.OnStartedConquering(ConquererTeam);   
+                }
+            }
+            else if (VisibleOtherUnits.Count > 0)
+            {
+                if (conquerable.GetTeam() != ConquererTeam)
+                {
+                    conquerable.OnStartedConquering(ConquererTeam);
+                }
+                
+                VisibleConquerUnits.AddRange(VisibleOtherUnits);
+                VisibleOtherUnits.Clear();
+            }
+        }
+        
+        if (VisibleConquerUnits.Count > 0)
+        {
+            if (conquerable.GetTeam() != VisibleConquerUnits[0].Team)
+            {
+                // score points
+                ConquerPoints += VisibleConquerUnits.Count * Time.deltaTime;   
+            }
+        }
+        else if (VisibleOtherUnits.Count == 0 && VisibleConquerUnits.Count == 0)
         { ConquerPoints -= 1 * Time.deltaTime; }
 
         // clamp conquer points to zero
         ConquerPoints = Mathf.Max(ConquerPoints, 0.0f);
 
-        // check if site wasn't conquered
-        // note - this happens only if there no visible friendly or other units
+        // check if site was conquered
         if (ConquerPoints > ConquerPointsRequired)
         {
-            conquerable.OnConquered(ConquererTeam.Value);
-            ConquererTeam = -1;
+            conquerable.OnConquered(ConquererTeam);
             ConquerPoints = 0.0f;
-
-            VisibleOtherUnits = VisibleConquerUnits;
-            VisibleConquerUnits = new List<Transform>();
+            VisibleConquerUnits.Clear();
+            VisibleOtherUnits.Clear();
         }
     }
 
@@ -83,21 +106,20 @@ public class ConquerModule : NetworkBehaviour
         {
             if (tm.Team == ConquererTeam)
             {
-                if (!VisibleConquerUnits.Contains(collision.transform))
-                { VisibleConquerUnits.Add(collision.transform); }
+                if (!VisibleConquerUnits.Contains(tm))
+                { VisibleConquerUnits.Add(tm); }
             }
             else if (tm.Team != conquerable.GetTeam() && VisibleConquerUnits.Count == 0)
             {
-                ConquererTeam = tm.Team;
-                conquerable.OnStartedConquering(tm.Team);
+                if (!VisibleConquerUnits.Contains(tm))
+                { VisibleConquerUnits.Add(tm); }
                 
-                if (!VisibleConquerUnits.Contains(collision.transform))
-                { VisibleConquerUnits.Add(collision.transform); }
+                conquerable.OnStartedConquering(tm.Team);
             }
-            else
+            else if(tm.Team != ConquererTeam && ConquererTeam != -1)
             {
-                if (!VisibleOtherUnits.Contains(collision.transform))
-                { VisibleOtherUnits.Add(collision.transform); }
+                if (!VisibleOtherUnits.Contains(tm))
+                { VisibleOtherUnits.Add(tm); }
             }
         }
     }
@@ -109,15 +131,23 @@ public class ConquerModule : NetworkBehaviour
         if (collision.gameObject.TryGetComponent<ITeamMember>(out ITeamMember tm))
         {
             if (tm.Team == ConquererTeam)
-            { VisibleConquerUnits.Remove(collision.transform); }
+            {
+                int conquererTeam = ConquererTeam;
+                VisibleConquerUnits.Remove(tm);
+                
+                if (VisibleConquerUnits.Count == 0)
+                {
+                    conquerable.OnStoppedConquering(conquererTeam);
+                    if (VisibleOtherUnits.Count > 0)
+                    {
+                        VisibleConquerUnits.AddRange(VisibleOtherUnits);
+                        VisibleOtherUnits.Clear();
+                        conquerable.OnStartedConquering(ConquererTeam);
+                    }
+                }
+            }
             else
-            { VisibleOtherUnits.Remove(collision.transform); }
-        }
-
-        if (VisibleOtherUnits.Count == 0)
-        {
-            conquerable.OnStoppedConquering(ConquererTeam.Value);
-            ConquererTeam = -1;
+            { VisibleOtherUnits.Remove(tm); }
         }
     }
 }

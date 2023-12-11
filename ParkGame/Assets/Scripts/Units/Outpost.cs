@@ -205,21 +205,31 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
         onStartedConqueringClientRpc(team);
         
         NamedColor c = colorSettings.Colors[team];
-        announcer.AnnounceEventClientRpc($"Outpost is being captured by team {c.Name}!", 5);
-        if(Team != -1 && Team != team)
+        
+        var teamMembers = playerManager.GetAllMembersOfTeam(Team);
+        foreach (var teamMember in teamMembers)
         {
-            var teamMembers = playerManager.GetAllMembersOfTeam(Team);
-            foreach (var teamMember in teamMembers)
+            ClientRpcParams clientRpcParams = new ClientRpcParams
             {
-                ClientRpcParams clientRpcParams = new ClientRpcParams
+                Send = new ClientRpcSendParams
                 {
-                    Send = new ClientRpcSendParams
-                    {
-                        TargetClientIds = new []{ teamMember.OwnerClientId }
-                    }
-                };
-                announcer.AnnounceEventClientRpc($"Your outpost is being captured by team {c.Name}!", 5, clientRpcParams);
-            }
+                    TargetClientIds = new []{ teamMember.OwnerClientId }
+                }
+            };
+            announcer.AnnounceEventClientRpc($"Your outpost is being captured by team {c.Name}!", 5, clientRpcParams);
+        }
+            
+        var enemyMembers = playerManager.GetAllEnemyMembers(Team);
+        foreach (var teamMember in enemyMembers)
+        {
+            ClientRpcParams clientRpcParams = new ClientRpcParams
+            {
+                Send = new ClientRpcSendParams
+                {
+                    TargetClientIds = new []{ teamMember.OwnerClientId }
+                }
+            };
+            announcer.AnnounceEventClientRpc($"Outpost is being captured by team {c.Name}!", 5, clientRpcParams);
         }
     }
     
