@@ -1,10 +1,10 @@
 using Managers;
 using System;
 using System.Collections.Generic;
-using NavMeshPlus.Extensions.Units;
 using Unity.Netcode;
 using UnityEngine;
 using Player;
+using ProjNet.CoordinateSystems;
 
 public class Outpost : NetworkBehaviour, ICommander, IConquerable
 {
@@ -13,6 +13,8 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
     [SerializeField] float SpawnTime = 4; // 4s
     [SerializeField] GameObject UnitPrefab;
     [SerializeField] GameObject ArcherPrefab;
+    [SerializeField] GameObject HorsemanPrefab;
+
 
     [SerializeField] Sprite PawnIcon;
     [SerializeField] Sprite ArcherIcon;
@@ -20,10 +22,15 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
     [SerializeField] private Soldier.UnitType InitOutpostUnitType;
     [SerializeField] private GameObject revealer;
     [SerializeField] ColorSettings colorSettings;
+    [SerializeField] private Collider2D switchCollider;
+   
+    [Tooltip("# seconds. After changing spawnedType wait until you can change it again.")]
+    [SerializeField] private int TimeBetweenToggles;
+    // if changing spawn type. small time reserve to retoggle (e.g. type0 -> -> type2)
+    private const float FastRetoggleTime = 1.5f; // seconds
+    private float RetoggleTime = 0; // counting since spawnToggle down. counter
 
-    //[SerializeField] GameObject HorsemanPrefab; // todo
     List<NetworkObjectReference> Units = new List<NetworkObjectReference>();
-    //ToggleSpawnedUnitScript OutpostSpawnerChanger;
 
     NetworkVariable<float> _Timer = new(0.0f);
     public float Timer { get => _Timer.Value; private set => _Timer.Value = value; }
@@ -36,10 +43,19 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
     [SerializeField] NetworkVariable<bool> _IsCastle = new();
     
     private Soldier.UnitType outpostUnitType;
+    public Soldier.UnitType OutpostUnitType { get => outpostUnitType; }
     private SpriteRenderer sr;
     private int counter;
     private PlayerManager playerManager;
     private ChangeMaterial changeMaterial;
+    public Action<Soldier.UnitType> OnUnitTypeChange;
+    // TODO Action and Dictionary should be reinitialized on outpost owner change
+    public Action OnUnitTypeCountChange;
+    public Dictionary<Soldier.UnitType, int> UnitTypeCount = new() {
+        { Soldier.UnitType.Pawn, 0 },
+        { Soldier.UnitType.Archer, 0 },
+        { Soldier.UnitType.Horseman, 0 }
+    };
     private Announcer announcer;
 
     public override void OnNetworkSpawn()
@@ -50,6 +66,11 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
 
     private void initialize()
     {
+        if (IsServer)
+        {
+            _IsCastle.Value = IsCastle;
+        }
+        
         playerManager = FindObjectOfType<PlayerManager>();
         announcer = FindObjectOfType<Announcer>();
         changeMaterial = GetComponent<ChangeMaterial>();
@@ -73,10 +94,39 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
         }
     }
 
+    public void RegisterOnTeamChange(Action action)
+    {
+        _Team.OnValueChanged += (previous, current) => action();
+    }
+
+    public void UnregisterOnTeamChange(Action action)
+    {
+        _Team.OnValueChanged -= (previous, current) => action();
+    }
+
     private void onTeamChanged(int previousTeam, int newTeam)
     {
         var playerData = LobbyManager.Singleton.GetLocalPlayerData();
         Debug.Log($"onTeamChanged on outpost, new team: {newTeam} for {gameObject.name}, (local player's team is: {playerData.Team})");
+
+        if (playerData.Team == previousTeam)
+        {
+            var playerController = playerManager.GetLocalPlayerController();
+            if (playerController != null)
+            {
+                playerController.RemoveOutpost(this);
+            }
+        }
+
+        if (playerData.Team == newTeam)
+        {
+            var playerController = playerManager.GetLocalPlayerController();
+            if (playerController != null)
+            {
+                playerController.AddOutpost(this);
+            }
+        }
+
         if (playerData.Team == newTeam)
         {
             revealer.gameObject.SetActive(true);
@@ -108,12 +158,18 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
             SpawnUnit();
             Timer = 0;
         }
+
+        if (RetoggleTime > 0) {
+            RetoggleTime -= Time.deltaTime;
+        }
     }
 
     GameObject SpawnWhichUnit() {
         switch (outpostUnitType) {
             case Soldier.UnitType.Archer:
                 return ArcherPrefab;
+            case Soldier.UnitType.Horseman:
+                return HorsemanPrefab;
             default:
                 return UnitPrefab;
         }
@@ -144,6 +200,31 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
         { throw new Exception($"only on server can adding units to outpost be reported\n outpost: {gameObject.name}"); }
 
         Units.Add(networkObjectReference);
+
+        if (!networkObjectReference.TryGet(out var networkObject, NetworkManager.Singleton))
+        {
+            Debug.LogError($"Could not find network object {networkObjectReference}");
+            return;
+        }
+
+        if (!networkObject.TryGetComponent<Soldier>(out var soldier))
+        {
+            Debug.LogError($"Could not find soldier {networkObjectReference}");
+            return;
+        }
+
+        addToUnitsClientRpc(networkObjectReference, Team, soldier.GetUnitType());
+    }
+
+    [ClientRpc]
+    private void addToUnitsClientRpc(NetworkObjectReference networkObjectReference, int team, Soldier.UnitType unitType, ClientRpcParams clientRpcParams = default)
+    {
+        var localPlayer = playerManager.GetLocalPlayerController();
+        if (team == localPlayer.Team)
+        {
+            UnitTypeCount[unitType]++;
+            OnUnitTypeCountChange?.Invoke();
+        }
     }
 
     void ICommander.ReportUnfollowing(NetworkObjectReference networkObjectReference)
@@ -151,7 +232,33 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
         if (!IsServer)
         { throw new Exception($"only on server can removing units to outpost be reported\n outpost: {gameObject.name}"); }
 
+        Debug.Log($"removing unit from outpost: {gameObject.name}");
         Units.Remove(networkObjectReference);
+
+        if (!networkObjectReference.TryGet(out var networkObject, NetworkManager.Singleton))
+        {
+            Debug.LogError($"Could not find network object {networkObjectReference}");
+            return;
+        }
+
+        if (!networkObject.TryGetComponent<Soldier>(out var soldier))
+        {
+            Debug.LogError($"Could not find soldier {networkObjectReference}");
+            return;
+        }
+
+        removeFromUnitsClientRpc(networkObjectReference, Team, soldier.GetUnitType());
+    }
+
+    [ClientRpc]
+    private void removeFromUnitsClientRpc(NetworkObjectReference networkObjectReference, int team, Soldier.UnitType unitType, ClientRpcParams clientRpcParams = default)
+    {
+        var localPlayer = playerManager.GetLocalPlayerController();
+        if (team == localPlayer.Team)
+        {
+            UnitTypeCount[unitType]--;
+            OnUnitTypeCountChange?.Invoke();
+        }
     }
 
     public Formation.FormationType GetFormation() {
@@ -160,17 +267,24 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
 
     // change spawn type and icon
     Sprite ChangeSpawnType(int n) {
+        Sprite icon = null;
         switch (n) {
             case 1:
                 outpostUnitType = Soldier.UnitType.Archer;
-                return ArcherIcon;
-            //case 2:
-            //    OutpostUnitType = UnitType.Horseman;
-            //    return Instantiate(HorsemanIcon);
+                icon = ArcherIcon;
+                break;
+            case 2:
+                outpostUnitType = Soldier.UnitType.Horseman;
+                icon = HorsemanIcon;
+                break;
             default:
                 outpostUnitType = Soldier.UnitType.Pawn;
-                return PawnIcon;
+                icon = PawnIcon;
+                break;
         }
+
+        OnUnitTypeChange?.Invoke(outpostUnitType);
+        return icon;
     }
 
     [ClientRpc]
@@ -181,23 +295,34 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
     [ServerRpc(RequireOwnership = false)]
     public void RequestChangingSpawnTypeServerRpc(ulong clientID) {
         PlayerController playerController = playerManager.GetPlayerController(clientID);
-        Debug.Log("teams: " + playerController.Team + " outpost from: " + Team);
 
         if (playerController != null && playerController.Team == Team) {
-            Debug.Log("ZMEN IKONU!");
-            counter++;
-            int numOfUnitTypes = Enum.GetNames(typeof(Soldier.UnitType)).Length;
-            ChangeIconClientRpc(counter % numOfUnitTypes);
+            if (ControlToggleTime() == true) {
+                Debug.Log("change spawning type");
+                counter++;
+                int numOfUnitTypes = Enum.GetNames(typeof(Soldier.UnitType)).Length;
+                ChangeIconClientRpc(counter % numOfUnitTypes);
+            }
         }
     }
 
-    void OnMouseDown() {
-        /*
-        Debug.Log("ICON CLICKED");
+    bool ControlToggleTime() {
+        if ((RetoggleTime > 0) && (TimeBetweenToggles - RetoggleTime > FastRetoggleTime)) {
+            return false;
+        } else if (RetoggleTime <= 0) {
+            RetoggleTime = TimeBetweenToggles;
+        }
+        return true;
+    }
+
+     void OnMouseDown() {
+        if (IsCastle) {
+            return;
+        }
 
         ulong clientID = NetworkManager.Singleton.LocalClientId;
         RequestChangingSpawnTypeServerRpc(clientID);
-        */
+        
     }
 
     public void OnStartedConquering(int team)

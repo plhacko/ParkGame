@@ -14,7 +14,8 @@ public class UIUnit : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     private Soldier unit;
     [SerializeField] private float pressHoldTimeSuccess = 1f;
     private Stopwatch pressHoldTimer = new Stopwatch();   
-    private Action removeAction; 
+    private Action removeAction;
+    private Action onDeath; 
 
     // Update is called once per frame
     void Update()
@@ -34,10 +35,21 @@ public class UIUnit : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         }
     }
 
-    public void Initialize(Soldier unit, Action removeAction)
+    private void OnDestroy()
+    {
+        if (unit == null)
+        {
+            return;
+        }
+        unit.OnDeath -= onDeath;
+    }   
+
+    public void Initialize(Soldier unit, Action removeAction, Action onDeath)
     {
         this.unit = unit;
         this.removeAction = removeAction;
+        this.onDeath = onDeath;
+        unit.OnDeath += this.onDeath;
         
         if (unitIcons.Count == Enum.GetNames(typeof(Soldier.UnitType)).Length)
         {

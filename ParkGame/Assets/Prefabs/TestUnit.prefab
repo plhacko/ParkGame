@@ -272,6 +272,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 16e878c8ac6e19f46bc87fa57d8fe0a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  NavMeshStatusNow: 0
   InitialHP: 7
   MovementSpeed: 1
   InnerDistanceFromCommander: 1
@@ -279,7 +280,7 @@ MonoBehaviour:
   DefendDistanceFromCommander: 3
   AttackDistanceFromCommander: 6
   MinAttackRange: 0
-  MaxAttackRange: 0.4
+  MaxAttackRange: 0.67
   Attackcooldown: 1
   Damage: 1
   TypeOfUnit: 0
@@ -287,7 +288,6 @@ MonoBehaviour:
   revealer: {fileID: 8791321709472324239}
   colorSettings: {fileID: 11400000, guid: 540e0efb517eb1d4f8598ecd8326dff1, type: 2}
   ClosestEnemyDEBUG: 0
-  TeaM: 0
   Behaviour: 0
   BehaviourChangedEvent:
     m_PersistentCalls:
@@ -297,6 +297,9 @@ MonoBehaviour:
   FormationFromFollowedCommander: {fileID: 0}
   ObjectToFollowInFormation: {fileID: 0}
   FormationType: 0
+  midPointPositionForHorseman: {x: 0, y: 0, z: 0}
+  midPointReached: 0
+  targetedEnemy: {fileID: 0}
 --- !u!70 &8848524197970868838
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -354,7 +357,7 @@ Rigidbody2D:
     m_Bits: 256
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 640
+    m_Bits: 512
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
@@ -366,15 +369,15 @@ CircleCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2149011059489662585}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Density: 1
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
-    m_Bits: 256
+    m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 256
   m_LayerOverridePriority: 0
   m_ForceSendLayers:
     serializedVersion: 2
@@ -413,8 +416,8 @@ NavMeshAgent:
   m_AutoBraking: 1
   m_AutoRepath: 1
   m_Height: 0.2
-  m_BaseOffset: 0
-  m_WalkableMask: 4294967295
+  m_BaseOffset: 0.7
+  m_WalkableMask: 5
   m_ObstacleAvoidanceType: 4
 --- !u!114 &7124321394914278606
 MonoBehaviour:

@@ -27,6 +27,34 @@ public class EnemyObserver : MonoBehaviour
     public List<Transform> GetAllFriends() => visibleFriends;
     public void SetRadius(float radius) => CircleCollider2D.radius = radius;
 
+    // for Molerider
+    public Transform GetFarthestEnemy() {
+        Transform enemy = null;
+        float d, dist = -8;
+        foreach (Transform e in visibleEnemies) {
+            if ((d = Vector3.Distance(e.position, transform.position)) > dist) {
+                dist = d;
+                enemy = e;
+            }
+        }
+        return enemy;
+    }
+
+    public Transform GetRandomEnemy() {
+        int randomIndex = Random.Range(0, visibleEnemies.Count);
+        return visibleEnemies[randomIndex];
+    }
+
+    public Transform GetEnemyInRange(float minDist, float maxDist) {
+        foreach (Transform e in visibleEnemies) {
+            float dist = Vector3.Distance(e.position, transform.position);
+            if (dist >= minDist && dist <= maxDist) {
+                return e;
+            }
+        }
+        return null;
+    }
+
     void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.TryGetComponent<ITeamMember>(out ITeamMember tm))

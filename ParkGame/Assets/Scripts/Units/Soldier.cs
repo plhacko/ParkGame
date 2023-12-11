@@ -18,6 +18,8 @@ public class Soldier : NetworkBehaviour, ISoldier
         Horseman
     };
 
+    public NavMeshPathStatus NavMeshStatusNow;
+
     // game logic
     private Transform CommanderToFollow = null;
     public Transform TransformToFollow { get => CommanderToFollow; }
@@ -25,13 +27,13 @@ public class Soldier : NetworkBehaviour, ISoldier
     [SerializeField] int InitialHP = 3;
     [Header("game logic values")]
     [SerializeField] float MovementSpeed = 1;
-    [SerializeField] float InnerDistanceFromCommander = 1.0f;
-    [SerializeField] float OuterDistanceFromCommander = 2.0f;
-    [SerializeField] float DefendDistanceFromCommander = 2.5f;
-    [SerializeField] float AttackDistanceFromCommander = 6.0f;
+    [SerializeField] float InnerDistanceFromCommander;
+    [SerializeField] float OuterDistanceFromCommander;
+    [SerializeField] float DefendDistanceFromCommander;
+    [SerializeField] float AttackDistanceFromCommander;
     //[SerializeField] float AttackRange = 0.4f; // old pawn
-    [SerializeField] float MinAttackRange = 0.4f; // for pawn: 0
-    [SerializeField] float MaxAttackRange = 0.4f; // for pawn: 0.4
+    [SerializeField] float MinAttackRange;
+    [SerializeField] float MaxAttackRange;
     [SerializeField] float Attackcooldown = 1.0f;
     [SerializeField] int Damage = 1;
     [SerializeField] UnitType TypeOfUnit;
@@ -47,7 +49,6 @@ public class Soldier : NetworkBehaviour, ISoldier
 
     private NetworkVariable<int> _HP = new();
     public int HP { get => _HP.Value; set => _HP.Value = value; }
-    public int TeaM;
     private NetworkVariable<int> _Team = new(-1);
     public int Team { get => _Team.Value; set => _Team.Value = value; }
     private NetworkVariable<SoldierBehaviour> _SoldierBehaviour = new();
@@ -73,12 +74,18 @@ public class Soldier : NetworkBehaviour, ISoldier
     public Formation FormationFromFollowedCommander; 
     public GameObject ObjectToFollowInFormation; // other formation
     public FormationType FormationType;
+
+    public Vector3 midPointPositionForHorseman;
+    public bool midPointReached;
+    public Transform targetedEnemy;
     
     private ShootScript shooting;
     private PlayerManager playerManager;
     private ChangeMaterial changeMaterial;
 
     private SpriteRenderer circleRenderer;
+
+    public Action OnDeath;
 
     private void Initialize()
     {
@@ -114,7 +121,6 @@ public class Soldier : NetworkBehaviour, ISoldier
     
     private void OnTeamChanged(int previousValue, int newValue) //DEBUG (just tem membership visualization) // TODO: rm
     {
-        TeaM = newValue; // tmp
         if (circleRenderer != null && newValue != -1)
         {
             circleRenderer.color = colorSettings.Colors[newValue].Color;
@@ -191,10 +197,16 @@ public class Soldier : NetworkBehaviour, ISoldier
             return;
         }
 
+        NavMeshStatusNow = Agent.pathStatus;
+
         // attack timer
         if (AttackTimer <= Attackcooldown)
         { AttackTimer += Time.deltaTime; }
-        
+
+        if (TypeOfUnit == UnitType.Horseman) {
+            Agent.speed = 3.5f;
+        }
+
         // soldier behaviour
         switch (SoldierBehaviour)
         {
@@ -222,7 +234,7 @@ public class Soldier : NetworkBehaviour, ISoldier
 
     private void IdleBehaviour()
     {
-        Transform enemyT = EnemyObserver.GetClosestEnemy();
+        Transform enemyT = GetEnemy(); 
         float distanceFromCommander = Vector3.Distance(CommanderToFollow.position, transform.position);
         if (enemyT != null && distanceFromCommander < DefendDistanceFromCommander)
         {
@@ -243,12 +255,6 @@ public class Soldier : NetworkBehaviour, ISoldier
 
     private void MovementBehaviour()
     {
-        // TODO: think if make sense or rm
-        // Transform enemyT = EnemyObserver.GetClosestEnemy();
-        // if (enemyT != null)
-        // { AttackEnemyIfInRAnge(enemyT); }
-
-        //  moves to the inner circle around the commander
         if (Vector3.Distance(CommanderToFollow.position, transform.position) > InnerDistanceFromCommander)
         { MoveTowardsEntity(CommanderToFollow); }
         else
@@ -290,6 +296,7 @@ public class Soldier : NetworkBehaviour, ISoldier
     private void FollowObjectWithAnimation(Transform toFollow) {
         Agent.SetDestination(toFollow.position);
         Vector2 direction = toFollow.position - gameObject.transform.position;
+
         if (direction.magnitude < 0.001f) {
             Networkanimator.Animator.SetFloat(AnimatorMovementSpeedHash, 0.0f);
         } else {
@@ -305,21 +312,51 @@ public class Soldier : NetworkBehaviour, ISoldier
                 return;
             }
 
+
+            //// IDLE ATTACK. 
+            ///////////////////////////////////
             // Attack if enemy close by and in range 
-            Transform enemyT = EnemyObserver.GetClosestEnemy();
+            /*
+            Transform enemyT = GetEnemy(); 
             float distanceFromCommander = Vector3.Distance(CommanderToFollow.position, transform.position);
             if (enemyT != null && distanceFromCommander < DefendDistanceFromCommander) {
-                AttackEnemyIfInRange(enemyT);
+                if (AttackEnemyIfInRange(enemyT)) {
+                    return;
+                }
+            }
+            if (enemyT != null && TypeOfUnit == UnitType.Horseman) {
+                MoveTowardsEntity(enemyT);
                 return;
             }
+            */
+            /////////////////////////////
+
             // Follow commander
+            if (TypeOfUnit == UnitType.Horseman && FormationType == FormationType.Box) {
+                Agent.speed = 1f;
+            }
             FollowObjectWithAnimation(ObjectToFollowInFormation.transform);
         }
     }
 
+    private Transform GetEnemy() {
+        if (targetedEnemy != null) {
+            return targetedEnemy;
+        }
+        Transform enemyT = EnemyObserver.GetClosestEnemy();
+        if (TypeOfUnit == UnitType.Archer) {
+            enemyT = EnemyObserver.GetEnemyInRange(MinAttackRange, MaxAttackRange);
+        }
+        if (TypeOfUnit == UnitType.Horseman) {
+            enemyT = EnemyObserver.GetFarthestEnemy();
+        }
+        targetedEnemy = enemyT;
+        return enemyT;
+    }
+
     private void AttackBehaviour()
     {
-        Transform enemyT = EnemyObserver.GetClosestEnemy();
+        Transform enemyT = GetEnemy();
 
         // if the front of the group can see the enemy, the rest will go forward (to the commander), but will not stop attacking
         if (enemyT == null)
@@ -349,20 +386,19 @@ public class Soldier : NetworkBehaviour, ISoldier
             if (AttackTimer >= Attackcooldown)
             {
                 AttackTimer = 0.0f;
-                Debug.Log("ATTACK");
                 Networkanimator.Animator.SetFloat(AnimatorMovementSpeedHash, 0.0f); //("MovementSpeed", 0);
 
                 Networkanimator.SetTrigger("Attack");
 
-                // sound effect
-                AudioManager.Instance.PlayOneShot(FMODEvents.Instance.SwordHitSFX, transform.position);
                 
-                if (TypeOfUnit == UnitType.Pawn) {
+                if (TypeOfUnit == UnitType.Pawn || TypeOfUnit == UnitType.Horseman) {
                     enemyT.GetComponent<ISoldier>()?.TakeDamage(Damage);
+                
                 }
                 if (TypeOfUnit == UnitType.Archer) {
                     SpriteRenderer.flipX = (enemyT.position.x - transform.position.x < 0);
                     XSpriteFlip.Value = SpriteRenderer.flipX;
+                    Debug.Log("shoot");
                     shooting.Shoot(enemyT, Damage, XSpriteFlip.Value);
                 }
             }
@@ -371,13 +407,28 @@ public class Soldier : NetworkBehaviour, ISoldier
         return false;
     }
 
+    // idea for horseman
+    private void GetMidPoint() {
+        if (!targetedEnemy) {
+            return;
+        }
+        // ch = commander - horseman
+        // enemy - horseman + (-ch.x, -ch.y)
+        Vector3 comHor = CommanderToFollow.position - transform.position;
+        comHor = new Vector3(-comHor.x, -comHor.y, transform.position.z);
+        midPointPositionForHorseman = (targetedEnemy.position - transform.position) / 2 + comHor;
+        midPointPositionForHorseman.z = transform.position.z;
+        midPointReached = false;
+    }
+
     private void MoveTowardsEntity(Transform entityT)
     {
         // archers, don't go closer! you'd just die 
-        if (Vector3.Distance(entityT.position, transform.position) < MinAttackRange) {
+        if (Vector3.Distance(entityT.position, transform.position) < MinAttackRange && TypeOfUnit == UnitType.Archer) {
             SoldierBehaviour = SoldierBehaviour.Idle;
             return;
         }
+
         FollowObjectWithAnimation(entityT);
     }
 
@@ -427,6 +478,8 @@ public class Soldier : NetworkBehaviour, ISoldier
                 if (FormationType == FormationType.Box || FormationType == FormationType.Circle) {
                     SoldierBehaviour = SoldierBehaviour.Formation;
                     NavMeshFormationSwitch(true, SoldierBehaviour.Formation, FormationFromFollowedCommander, FormationType);
+                } else {
+                    SoldierBehaviour = SoldierBehaviour.Move;
                 }
             }
             else
@@ -472,7 +525,6 @@ public class Soldier : NetworkBehaviour, ISoldier
     {
         HP = 0;
         SoldierBehaviour = SoldierBehaviour.Death;
-        Debug.Log("die ");
         CommanderToFollow?.GetComponent<ICommander>()?.ReportUnfollowing(gameObject);
         Networkanimator.SetTrigger("Die");
         handleDeath();
@@ -495,6 +547,7 @@ public class Soldier : NetworkBehaviour, ISoldier
 
         if (IsServer)
         {
+            OnDeath?.Invoke();
             Destroy(gameObject, DeathFadeTime);   
         }
     }

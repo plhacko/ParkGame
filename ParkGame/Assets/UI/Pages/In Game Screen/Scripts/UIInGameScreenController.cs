@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -21,7 +20,7 @@ public class UIInGameScreenController : UIPageController
     [SerializeField] private Button formationButton2;
     [SerializeField] private Button formationButtonClose;
     [SerializeField] private UIUnitListController unitsList;
-    [SerializeField] private RectTransform buildingsList;
+    [SerializeField] private UIOutpostListController outpostsList;
     [SerializeField] private UIPage optionsPage;
     [SerializeField] private GameManager gameManager;
 
@@ -135,6 +134,16 @@ public class UIInGameScreenController : UIPageController
     {
         unitsList.RemoveUnit(unit);
     }   
+
+    public void AddOutpost(Outpost outpost)
+    {
+        outpostsList.AddOutpost(outpost);
+    }
+
+    public void RemoveOutpost(Outpost outpost)
+    {
+        outpostsList.RemoveOutpost(outpost);
+    }
 
     public override void OnEnter()
     {

@@ -12,7 +12,7 @@ public class UIUnitListController : MonoBehaviour
     {
         var unit = Instantiate(unitPrefab, transform);
         units.Add(soldier, unit);
-        unit.Initialize(soldier, removeAction);
+        unit.Initialize(soldier, removeAction , () => RemoveUnit(soldier));
     }
 
     public void RemoveUnit(Soldier soldier)

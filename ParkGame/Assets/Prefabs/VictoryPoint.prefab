@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 1638022579292356743}
   - component: {fileID: 6153146166916960611}
   - component: {fileID: 8986716610305630673}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: VictoryPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
