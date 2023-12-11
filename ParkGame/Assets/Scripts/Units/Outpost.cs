@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 using Player;
-using ProjNet.CoordinateSystems;
 
 public class Outpost : NetworkBehaviour, ICommander, IConquerable
 {
@@ -14,7 +13,6 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
     [SerializeField] GameObject UnitPrefab;
     [SerializeField] GameObject ArcherPrefab;
     [SerializeField] GameObject HorsemanPrefab;
-
 
     [SerializeField] Sprite PawnIcon;
     [SerializeField] Sprite ArcherIcon;
