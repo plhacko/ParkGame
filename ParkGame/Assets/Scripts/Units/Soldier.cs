@@ -26,7 +26,9 @@ public class Soldier : NetworkBehaviour, ISoldier
     [Header("initial values")]
     [SerializeField] int InitialHP = 3;
     [Header("game logic values")]
-    [SerializeField] float MovementSpeed = 1;
+    [SerializeField] float BaseMovementSpeed = 1f;
+    [SerializeField] float HorseManSpeed = 1.5f;
+    [SerializeField] float PathMovementSpeedMultiplier = 1.5f;
     [SerializeField] float InnerDistanceFromCommander;
     [SerializeField] float OuterDistanceFromCommander;
     [SerializeField] float DefendDistanceFromCommander;
@@ -53,6 +55,9 @@ public class Soldier : NetworkBehaviour, ISoldier
     public int Team { get => _Team.Value; set => _Team.Value = value; }
     private NetworkVariable<SoldierBehaviour> _SoldierBehaviour = new();
     public SoldierBehaviour SoldierBehaviour { get => _SoldierBehaviour.Value; set => _SoldierBehaviour.Value = value; } // derived form ISoldier
+    private NetworkVariable<bool> _ReturningToOutpost = new(false);
+    public bool ReturningToOutpost { get => _ReturningToOutpost.Value; set => _ReturningToOutpost.Value = value; }
+
     public SoldierBehaviour Behaviour;
     public UnityEvent BehaviourChangedEvent;
     EnemyObserver EnemyObserver;
@@ -82,6 +87,7 @@ public class Soldier : NetworkBehaviour, ISoldier
     private ShootScript shooting;
     private PlayerManager playerManager;
     private ChangeMaterial changeMaterial;
+    private PathTileChecker pathTileChecker;
 
     private SpriteRenderer circleRenderer;
 
@@ -97,6 +103,7 @@ public class Soldier : NetworkBehaviour, ISoldier
         shooting = GetComponent<ShootScript>();
         changeMaterial = GetComponent<ChangeMaterial>();
         circleRenderer = transform.Find("Circle")?.GetComponent<SpriteRenderer>();
+        pathTileChecker = FindObjectOfType<PathTileChecker>();
         
         _Team.OnValueChanged += OnTeamChanged;
         _SoldierBehaviour.OnValueChanged += OnBehaviourChange;
@@ -204,7 +211,7 @@ public class Soldier : NetworkBehaviour, ISoldier
         { AttackTimer += Time.deltaTime; }
 
         if (TypeOfUnit == UnitType.Horseman) {
-            Agent.speed = 3.5f;
+            Agent.speed = HorseManSpeed;
         }
 
         // soldier behaviour
@@ -256,7 +263,10 @@ public class Soldier : NetworkBehaviour, ISoldier
     private void MovementBehaviour()
     {
         if (Vector3.Distance(CommanderToFollow.position, transform.position) > InnerDistanceFromCommander)
-        { MoveTowardsEntity(CommanderToFollow); }
+        {
+            SetSoldierSpeed();
+            MoveTowardsEntity(CommanderToFollow);
+        }
         else
         {
             SoldierBehaviour = SoldierBehaviour.Idle;
@@ -306,6 +316,18 @@ public class Soldier : NetworkBehaviour, ISoldier
         XSpriteFlip.Value = SpriteRenderer.flipX;
     }
 
+    private void SetSoldierSpeed()
+    {
+        if (TypeOfUnit != UnitType.Horseman || (TypeOfUnit == UnitType.Horseman && FormationType == FormationType.Box)) {
+            if (
+                playerManager.GetLocalPlayerController().IsOnPath ||
+                (ReturningToOutpost && pathTileChecker.IsNearbyPath(Agent.transform.position)) // short-circuiting for efficiency
+            )
+                Agent.speed = BaseMovementSpeed * PathMovementSpeedMultiplier;
+            else
+                Agent.speed = BaseMovementSpeed;
+        }
+    }
     private void FormationBehaviour() {
         if (FollowInNavMeshFormation) {
             if (!ObjectToFollowInFormation) {
@@ -332,9 +354,7 @@ public class Soldier : NetworkBehaviour, ISoldier
             /////////////////////////////
 
             // Follow commander
-            if (TypeOfUnit == UnitType.Horseman && FormationType == FormationType.Box) {
-                Agent.speed = 1f;
-            }
+            SetSoldierSpeed();
             FollowObjectWithAnimation(ObjectToFollowInFormation.transform);
         }
     }
@@ -432,7 +452,7 @@ public class Soldier : NetworkBehaviour, ISoldier
         FollowObjectWithAnimation(entityT);
     }
 
-    private void Move(Vector2 direction) {
+    private void Move(Vector2 direction) { // TODO - remove unused?
 
         if (direction.magnitude < 0.01f)
         {
@@ -442,7 +462,7 @@ public class Soldier : NetworkBehaviour, ISoldier
 
         direction = direction.normalized;
 
-        Vector2 movement = direction * MovementSpeed;
+        Vector2 movement = direction * BaseMovementSpeed;
 
         Networkanimator.Animator.SetFloat(AnimatorMovementSpeedHash, movement.magnitude);
 
@@ -471,6 +491,7 @@ public class Soldier : NetworkBehaviour, ISoldier
         {
             if (playerController.gameObject.transform != CommanderToFollow)
             {
+                ReturningToOutpost = false;
                 SetCommanderToFollow(playerController.gameObject.transform);
                 FormationType = CommanderToFollow.GetComponent<ICommander>().GetFormation(); // get type of formation
                 FormationFromFollowedCommander = CommanderToFollow.GetComponent<Formation>();
@@ -484,6 +505,7 @@ public class Soldier : NetworkBehaviour, ISoldier
             }
             else
             {
+                ReturningToOutpost = true;
                 var closestOutpost = ClosestOutpost();
                 SetCommanderToFollow(closestOutpost);
                 NavMeshFormationSwitch(false, SoldierBehaviour.Idle, FormationFromFollowedCommander, FormationType.Free);
@@ -491,7 +513,7 @@ public class Soldier : NetworkBehaviour, ISoldier
         }
     }
 
-    /// <summary> !call only on server! </summary>
+    /// <summary> !call only on server! Set target as a commander or a closest outpost/castle </summary>
     public void SetCommanderToFollow(Transform commanderToFollow)
     {
         if (!IsServer)

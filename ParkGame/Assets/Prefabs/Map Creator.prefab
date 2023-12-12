@@ -185,8 +185,6 @@ GameObject:
   - component: {fileID: 7082442908320556444}
   - component: {fileID: 2702916133622361448}
   - component: {fileID: 8006070244973194763}
-  - component: {fileID: 1192503947614251555}
-  - component: {fileID: 4825654840615286094}
   - component: {fileID: 1781082805267355394}
   m_Layer: 0
   m_Name: Tilemap ActionLayer 1
@@ -297,54 +295,6 @@ TilemapRenderer:
   m_Mode: 0
   m_DetectChunkCullingBounds: 0
   m_MaskInteraction: 0
---- !u!19719996 &1192503947614251555
-TilemapCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2396792479261192639}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 1
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
-  m_MaximumTileChangeCount: 1000
-  m_ExtrusionFactor: 0
-  m_UseDelaunayMesh: 0
---- !u!114 &4825654840615286094
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2396792479261192639}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 756d7877058ca2b4b87e2349525776f5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1781082805267355394
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -668,6 +618,7 @@ GameObject:
   - component: {fileID: 2601613019165809592}
   - component: {fileID: 2601613019165809593}
   - component: {fileID: 487343575829671299}
+  - component: {fileID: 8551411621058794154}
   m_Layer: 0
   m_Name: Tilemap BaseLayer 0
   m_TagString: Untagged
@@ -793,6 +744,19 @@ MonoBehaviour:
   m_Area: 0
   m_IgnoreFromBuild: 0
   m_AffectedAgents: ffffffff
+--- !u!114 &8551411621058794154
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2601613019165809599}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 756d7877058ca2b4b87e2349525776f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pathTile: {fileID: 11400000, guid: 4eee53f6b85514f4b8b1bfdad422cdfa, type: 2}
 --- !u!1 &6178624808299035946
 GameObject:
   m_ObjectHideFlags: 0
@@ -852,7 +816,7 @@ MonoBehaviour:
   m_OverrideTileSize: 0
   m_TileSize: 256
   m_OverrideVoxelSize: 0
-  m_VoxelSize: 0.05333333
+  m_VoxelSize: 0.016666668
   m_BuildHeightMesh: 0
   m_HideEditorLogs: 0
   m_NavMeshData: {fileID: 23800000, guid: b4dc7badfa4c06143b4a5dbafb1650a6, type: 2}

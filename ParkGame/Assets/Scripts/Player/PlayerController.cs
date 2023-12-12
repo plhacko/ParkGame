@@ -24,6 +24,7 @@ namespace Player
         private Formation formationScript;
         private ChangeMaterial changeMaterial;
         private List<NetworkObjectReference> units = new();
+        private PathTileChecker pathTileChecker;
         private string firebaseId;
         
         // Replicated variable for sprite orientation
@@ -33,13 +34,14 @@ namespace Player
         private readonly NetworkVariable<int> _Team = new(-1);
         private readonly NetworkVariable<bool> _IsLocked = new(true);
         private readonly NetworkVariable<Vector3> _PointerPosition = new(Vector3.zero, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-
+        private readonly NetworkVariable<bool> _IsOnPath = new (false);
         public int Team { get => _Team.Value; set => _Team.Value = value; }
         public string Name { get => _Name.Value.Value; set => _Name.Value = value; }
         public string FirebaseId { get => _FirebaseId.Value.Value; set => _FirebaseId.Value = value; }
         public bool IsLocked { get => _IsLocked.Value; set => _IsLocked.Value = value; }
         
         public Vector3 PointerPosition { get => _PointerPosition.Value; set => _PointerPosition.Value = value; }
+        public bool IsOnPath { get => _IsOnPath.Value; set => _IsOnPath.Value = value; }
 
         public Formation.FormationType FormationType; 
         public Formation.FormationType GetFormation() {
@@ -60,6 +62,7 @@ namespace Player
             Agent = GetComponent<NavMeshAgent>();
             playerManager = FindObjectOfType<PlayerManager>();
             uiInGameScreenController = UIController.Singleton.GetComponentInChildren<UIInGameScreenController>();
+            pathTileChecker = FindObjectOfType<PathTileChecker>();
 
             if (IsServer) {
                 Team = initialTeam;
@@ -250,6 +253,7 @@ namespace Player
 
             spriteRenderer.flipX = direction.x < 0;
             xSpriteFlip.Value = spriteRenderer.flipX;
+            IsOnPath = pathTileChecker.IsNearbyPath(Agent.transform.position);
         }
 
         private void move()
