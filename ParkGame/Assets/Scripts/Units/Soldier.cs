@@ -12,7 +12,8 @@ using DG.Tweening;
 
 public class Soldier : NetworkBehaviour, ISoldier
 {
-    public enum UnitType {
+    public enum UnitType
+    {
         Pawn,
         Archer,
         Horseman
@@ -40,7 +41,7 @@ public class Soldier : NetworkBehaviour, ISoldier
     [SerializeField] float DeathFadeTime = 2f;
     [SerializeField] private GameObject revealer;
     public int MaxHP { get => InitialHP; }
-    
+
     public float ClosestEnemyDEBUG; // DEBUG // TODO: rm
 
     public UnitType Type { get => TypeOfUnit; }
@@ -59,6 +60,7 @@ public class Soldier : NetworkBehaviour, ISoldier
 
     // animation
     private static readonly int AnimatorMovementSpeedHash = Animator.StringToHash("MovementSpeed");
+    private static readonly int AnimatorDirection = Animator.StringToHash("Direction");
     private SpriteRenderer SpriteRenderer;
     private NetworkAnimator Networkanimator;
     private NetworkVariable<bool> XSpriteFlip = new(false,
@@ -69,14 +71,14 @@ public class Soldier : NetworkBehaviour, ISoldier
     private NavMeshAgent Agent;
     public bool FollowInNavMeshFormation;
     private SoldierBehaviour PrevSoldierBehaviour;
-    public Formation FormationFromFollowedCommander; 
+    public Formation FormationFromFollowedCommander;
     public GameObject ObjectToFollowInFormation; // other formation
     public FormationType FormationType;
 
     public Vector3 midPointPositionForHorseman;
     public bool midPointReached;
     public Transform targetedEnemy;
-    
+
     private ShootScript shooting;
     private PlayerManager playerManager;
     private ChangeMaterial changeMaterial;
@@ -92,7 +94,7 @@ public class Soldier : NetworkBehaviour, ISoldier
         Networkanimator = GetComponent<NetworkAnimator>();
         shooting = GetComponent<ShootScript>();
         changeMaterial = GetComponent<ChangeMaterial>();
-        
+
         _Team.OnValueChanged += OnTeamChanged;
         _SoldierBehaviour.OnValueChanged += OnBehaviourChange;
 
@@ -113,7 +115,7 @@ public class Soldier : NetworkBehaviour, ISoldier
     }
 
     private void OnXSpriteFlipChanged(bool previousValue, bool newValue) => SpriteRenderer.flipX = newValue;
-    
+
     private void OnTeamChanged(int previousValue, int newValue) //DEBUG (just tem membership visualization) // TODO: rm
     {
         SpriteRenderer sr = transform.Find("Circle")?.GetComponent<SpriteRenderer>();
@@ -155,16 +157,20 @@ public class Soldier : NetworkBehaviour, ISoldier
         }
     }
 
-    Transform ClosestOutpost() {
+    Transform ClosestOutpost()
+    {
         GameObject selectedCommander = gameObject; // just to be sure that something is returned
         float shortestDist = float.PositiveInfinity;
-        
+
         var outposts = FindObjectsOfType<Outpost>();
-               
-        foreach (var iCom in outposts) {
-            if (iCom.Team == Team) {
+
+        foreach (var iCom in outposts)
+        {
+            if (iCom.Team == Team)
+            {
                 float distCom = Vector3.Distance(transform.position, iCom.gameObject.transform.position);
-                if (distCom < shortestDist) {
+                if (distCom < shortestDist)
+                {
                     shortestDist = distCom;
                     selectedCommander = iCom.gameObject;
                 }
@@ -189,7 +195,8 @@ public class Soldier : NetworkBehaviour, ISoldier
 
         // death timer
         //if (TimeUntilDestroyed > 0 || HP == 0) {
-        if (HP <= 0) {
+        if (HP <= 0)
+        {
             return;
         }
 
@@ -199,7 +206,8 @@ public class Soldier : NetworkBehaviour, ISoldier
         if (AttackTimer <= Attackcooldown)
         { AttackTimer += Time.deltaTime; }
 
-        if (TypeOfUnit == UnitType.Horseman) {
+        if (TypeOfUnit == UnitType.Horseman)
+        {
             Agent.speed = 3.5f;
         }
 
@@ -230,16 +238,16 @@ public class Soldier : NetworkBehaviour, ISoldier
 
     private void IdleBehaviour()
     {
-        Transform enemyT = GetEnemy(); 
+        Transform enemyT = GetEnemy();
         float distanceFromCommander = Vector3.Distance(CommanderToFollow.position, transform.position);
         if (enemyT != null && distanceFromCommander < DefendDistanceFromCommander)
         {
             if (AttackEnemyIfInRange(enemyT)) { return; }
-            
-            MoveTowardsEntity(enemyT); 
+
+            MoveTowardsEntity(enemyT);
             return;
         }
-        
+
         if (distanceFromCommander > OuterDistanceFromCommander)
         {
             MoveTowardsEntity(CommanderToFollow);
@@ -260,51 +268,74 @@ public class Soldier : NetworkBehaviour, ISoldier
         }
     }
 
-    public void NavMeshFormationSwitch(bool enable, SoldierBehaviour newBehaviour, Formation formation, FormationType formationType) {
+    public void NavMeshFormationSwitch(bool enable, SoldierBehaviour newBehaviour, Formation formation, FormationType formationType)
+    {
         FollowInNavMeshFormation = enable;
         //PrevSoldierBehaviour = SoldierBehaviour;
         SoldierBehaviour = newBehaviour;
 
-        if (!enable) { // disable, Unsubscribe from formation
+        if (!enable)
+        { // disable, Unsubscribe from formation
             formation.RemoveFromFormation(gameObject, ObjectToFollowInFormation, FormationType);
             ObjectToFollowInFormation = null;
 
-        } else {
+        }
+        else
+        {
             FormationFromFollowedCommander = formation;
             FormationType = formationType;
-            switch (FormationType) {
+            switch (FormationType)
+            {
                 case FormationType.Circle:
-                    ObjectToFollowInFormation = FormationFromFollowedCommander.GetPositionInFormation(gameObject, FormationType.Circle); 
+                    ObjectToFollowInFormation = FormationFromFollowedCommander.GetPositionInFormation(gameObject, FormationType.Circle);
                     break;
                 case FormationType.Box:
-                    ObjectToFollowInFormation = FormationFromFollowedCommander.GetPositionInFormation(gameObject, FormationType.Box); 
+                    ObjectToFollowInFormation = FormationFromFollowedCommander.GetPositionInFormation(gameObject, FormationType.Box);
                     break;
                 default:
                     break;
             }
         }
     }
-
-    public UnitType GetUnitType() {
+    public UnitType GetUnitType()
+    {
         return TypeOfUnit;
     }
-
-    private void FollowObjectWithAnimation(Transform toFollow) {
+    private Direction GetDirectionEnum(Vector2 d)
+    {
+        if (Mathf.Abs(d.x) > Mathf.Abs(d.y))
+        {
+            return d.x > 0 ? Direction.Right : Direction.Left;
+        }
+        else
+        {
+            return d.y > 0 ? Direction.Up : Direction.Down;
+        }
+    }
+    private void FollowObjectWithAnimation(Transform toFollow)
+    {
         Agent.SetDestination(toFollow.position);
         Vector2 direction = toFollow.position - gameObject.transform.position;
 
-        if (direction.magnitude < 0.001f) {
-          Networkanimator.Animator.SetFloat(AnimatorMovementSpeedHash, 0.0f);
-        } else {
+        if (direction.magnitude < 0.001f)
+        {
+            Networkanimator.Animator.SetFloat(AnimatorMovementSpeedHash, 0.0f);
+        }
+        else
+        {
             Networkanimator.Animator.SetFloat(AnimatorMovementSpeedHash, 1.0f);
+            Networkanimator.Animator.SetInteger(AnimatorDirection, (int)GetDirectionEnum(direction));
         }
         SpriteRenderer.flipX = direction.x < 0;
         XSpriteFlip.Value = SpriteRenderer.flipX;
     }
 
-    private void FormationBehaviour() {
-        if (FollowInNavMeshFormation) {
-            if (!ObjectToFollowInFormation) {
+    private void FormationBehaviour()
+    {
+        if (FollowInNavMeshFormation)
+        {
+            if (!ObjectToFollowInFormation)
+            {
                 return;
             }
 
@@ -328,22 +359,27 @@ public class Soldier : NetworkBehaviour, ISoldier
             /////////////////////////////
 
             // Follow commander
-            if (TypeOfUnit == UnitType.Horseman && FormationType == FormationType.Box) {
+            if (TypeOfUnit == UnitType.Horseman && FormationType == FormationType.Box)
+            {
                 Agent.speed = 1f;
             }
             FollowObjectWithAnimation(ObjectToFollowInFormation.transform);
         }
     }
 
-    private Transform GetEnemy() {
-        if (targetedEnemy != null) {
+    private Transform GetEnemy()
+    {
+        if (targetedEnemy != null)
+        {
             return targetedEnemy;
         }
         Transform enemyT = EnemyObserver.GetClosestEnemy();
-        if (TypeOfUnit == UnitType.Archer) {
+        if (TypeOfUnit == UnitType.Archer)
+        {
             enemyT = EnemyObserver.GetEnemyInRange(MinAttackRange, MaxAttackRange);
         }
-        if (TypeOfUnit == UnitType.Horseman) {
+        if (TypeOfUnit == UnitType.Horseman)
+        {
             enemyT = EnemyObserver.GetFarthestEnemy();
         }
         targetedEnemy = enemyT;
@@ -361,7 +397,7 @@ public class Soldier : NetworkBehaviour, ISoldier
         // attack the closest enemy if in range
         if (AttackEnemyIfInRange(enemyT)) { return; }
         // go closer to the enemy 
-        MoveTowardsEntity(enemyT); 
+        MoveTowardsEntity(enemyT);
         // move away from entity for archer?
 
         // if the commander is too far, the soldier will stop attacking and will return back to the commander
@@ -386,12 +422,14 @@ public class Soldier : NetworkBehaviour, ISoldier
 
                 Networkanimator.SetTrigger("Attack");
 
-                
-                if (TypeOfUnit == UnitType.Pawn || TypeOfUnit == UnitType.Horseman) {
+
+                if (TypeOfUnit == UnitType.Pawn || TypeOfUnit == UnitType.Horseman)
+                {
                     enemyT.GetComponent<ISoldier>()?.TakeDamage(Damage);
-                
+
                 }
-                if (TypeOfUnit == UnitType.Archer) {
+                if (TypeOfUnit == UnitType.Archer)
+                {
                     SpriteRenderer.flipX = (enemyT.position.x - transform.position.x < 0);
                     XSpriteFlip.Value = SpriteRenderer.flipX;
                     Debug.Log("shoot");
@@ -404,8 +442,10 @@ public class Soldier : NetworkBehaviour, ISoldier
     }
 
     // idea for horseman
-    private void GetMidPoint() {
-        if (!targetedEnemy) {
+    private void GetMidPoint()
+    {
+        if (!targetedEnemy)
+        {
             return;
         }
         // ch = commander - horseman
@@ -420,15 +460,16 @@ public class Soldier : NetworkBehaviour, ISoldier
     private void MoveTowardsEntity(Transform entityT)
     {
         // archers, don't go closer! you'd just die 
-        if (Vector3.Distance(entityT.position, transform.position) < MinAttackRange && TypeOfUnit == UnitType.Archer) {
+        if (Vector3.Distance(entityT.position, transform.position) < MinAttackRange && TypeOfUnit == UnitType.Archer)
+        {
             SoldierBehaviour = SoldierBehaviour.Idle;
             return;
         }
 
         FollowObjectWithAnimation(entityT);
     }
-
-    private void Move(Vector2 direction) {
+    private void Move(Vector2 direction)
+    {
 
         if (direction.magnitude < 0.01f)
         {
@@ -440,15 +481,17 @@ public class Soldier : NetworkBehaviour, ISoldier
 
         Vector2 movement = direction * MovementSpeed;
 
+        // animation
         Networkanimator.Animator.SetFloat(AnimatorMovementSpeedHash, movement.magnitude);
+        Networkanimator.Animator.SetInteger(AnimatorDirection, (int)GetDirectionEnum(direction));
 
         if (direction.magnitude < Mathf.Epsilon)
         { return; }
 
         SpriteRenderer.flipX = movement.x < 0;
         XSpriteFlip.Value = SpriteRenderer.flipX;
-        
-        Agent.SetDestination(transform.position + new Vector3(movement.x, movement.y, 0)); 
+
+        Agent.SetDestination(transform.position + new Vector3(movement.x, movement.y, 0));
     }
 
     public void OnMouseDown()
@@ -470,11 +513,14 @@ public class Soldier : NetworkBehaviour, ISoldier
                 SetCommanderToFollow(playerController.gameObject.transform);
                 FormationType = CommanderToFollow.GetComponent<ICommander>().GetFormation(); // get type of formation
                 FormationFromFollowedCommander = CommanderToFollow.GetComponent<Formation>();
-            
-                if (FormationType == FormationType.Box || FormationType == FormationType.Circle) {
+
+                if (FormationType == FormationType.Box || FormationType == FormationType.Circle)
+                {
                     SoldierBehaviour = SoldierBehaviour.Formation;
                     NavMeshFormationSwitch(true, SoldierBehaviour.Formation, FormationFromFollowedCommander, FormationType);
-                } else {
+                }
+                else
+                {
                     SoldierBehaviour = SoldierBehaviour.Move;
                 }
             }
@@ -500,7 +546,7 @@ public class Soldier : NetworkBehaviour, ISoldier
             CommanderToFollow?.GetComponent<ICommander>().ReportFollowing(gameObject);
         }
     }
-    
+
     /// <summary> !call only on server! </summary>
     public void TakeDamage(int damage)
     {
@@ -512,10 +558,11 @@ public class Soldier : NetworkBehaviour, ISoldier
         else { HP = hp; }
     }
 
-    public Transform GetCommanderWhomIFollow() {
+    public Transform GetCommanderWhomIFollow()
+    {
         return CommanderToFollow;
     }
-    
+
     /// <summary> !call only on server! </summary>
     public void Die()
     {
@@ -533,7 +580,7 @@ public class Soldier : NetworkBehaviour, ISoldier
         if (IsServer) return;
         handleDeath();
     }
-    
+
     private void handleDeath()
     {
         // visualize death: black shadow, fade soldier's sprite, and then self-destruct
@@ -544,7 +591,7 @@ public class Soldier : NetworkBehaviour, ISoldier
         if (IsServer)
         {
             OnDeath?.Invoke();
-            Destroy(gameObject, DeathFadeTime);   
+            Destroy(gameObject, DeathFadeTime);
         }
     }
 }
