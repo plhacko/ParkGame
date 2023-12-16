@@ -52,7 +52,7 @@ public class ConquerModule : NetworkBehaviour, ITeamMember
     private void Update()
     {
         // update should happen only on server
-        if (!NetworkManager.Singleton.IsServer)
+        if (NetworkManager == null || !NetworkManager.Singleton.IsServer)
         { return; }
 
         // stole scoring points if there are teams visible 
