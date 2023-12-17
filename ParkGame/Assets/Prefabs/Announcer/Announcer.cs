@@ -31,7 +31,7 @@ public class Announcer : NetworkBehaviour
     }
 
     [ClientRpc]
-    public void AnnounceEventClientRpc(FixedString512Bytes message, float duration = 45f)
+    public void AnnounceEventClientRpc(FixedString512Bytes message, float duration = 45f, ClientRpcParams clientRpcParams = default)
     {
         AnnounceEvent(message.Value, duration);
     }

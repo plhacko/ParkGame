@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using Managers;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -36,9 +37,10 @@ public class UIOptionsScreenController : UIPageController
         UIController.Singleton.PopUIPage();
     }
 
-    private void Quit()
+    private async void Quit()
     {
         // TODO handle disconnecting from server
+        await LobbyManager.Singleton.LeaveLobby();
         SceneManager.LoadScene(mainMenuSceneName);
     }
 

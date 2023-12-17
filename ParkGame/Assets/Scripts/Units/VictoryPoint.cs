@@ -1,41 +1,44 @@
+using System;
 using Managers;
 using Unity.Netcode;
 using UnityEngine;
 
-public class VictoryPoint : NetworkBehaviour
+public class VictoryPoint : NetworkBehaviour, IConquerable
 {
-
-    //public float timeSinceSpawn;
-    // seconds after spawn till opening, and also time since the last conquest till opening
     [Tooltip("Seconds since spawn to first opening of this Victory Point.")]
-    [SerializeField] float openingTime;  // and delta since conquering
-    [SerializeField] float timeToNotifyPlayersBeforeOpening;  // and delta since conquering
-
-    private float lastConquestTime; // and now also since spawning
+    [SerializeField] float openingTime;
+    [SerializeField] float timeToNotifyPlayersBeforeOpening;
+    [SerializeField] ColorSettings colorSettings;
+    
+    public Action<int, int> OnPointConquered;
+    
+    private float lastConquestTime;
     private bool isOpen;
     private bool isNotified;
-
-    private SpriteRenderer spriteRendrr;
+    
+    private NetworkVariable<int>[] teamScores = {
+        new(),
+        new(),
+        new(),
+        new()
+    };
+    
+    private SpriteRenderer spriteRenderer;
     private GameObject conquerModuleObject;
     private PlayerManager playerManager;
     private Announcer announcer;
 
-    // maybe: add some random range for the delta time
-    // maybe?: add some time after the conquest
-
-    [ClientRpc]
-    void CloseVPClientRpc()
-    {
-        spriteRendrr.color = new Color(0.8f, 0.8f, 0.8f, 0.2f);
+    [ClientRpc]    
+    void CloseVPClientRpc() {
+        spriteRenderer.color = new Color(0.8f, 0.8f, 0.8f, 0.2f);
         isOpen = false;
         conquerModuleObject.SetActive(false);
         isNotified = false;
     }
 
     [ClientRpc]
-    void OpenVPClientRpc()
-    {
-        spriteRendrr.color = new Color(1, 1, 1, 1);
+    void OpenVPClientRpc() {
+        spriteRenderer.color = new Color(1, 1, 1, 1);
         isOpen = true;
         conquerModuleObject.SetActive(true);
     }
@@ -43,10 +46,10 @@ public class VictoryPoint : NetworkBehaviour
     private void Awake()
     {
         conquerModuleObject = GetComponentInChildren<ConquerModule>().gameObject;
-        spriteRendrr = GetComponent<SpriteRenderer>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
         lastConquestTime = float.MaxValue;
-        announcer = FindObjectOfType<Announcer>();
         playerManager = FindObjectOfType<PlayerManager>();
+        announcer = FindObjectOfType<Announcer>();
         playerManager.OnAllPlayersReady += onAllPlayersReady;
     }
 
@@ -57,17 +60,6 @@ public class VictoryPoint : NetworkBehaviour
 
     private void Start()
     {
-        if (IsServer)
-        {
-            CloseVPClientRpc();
-        }
-    }
-
-    public void ConquerThisVP()
-    {
-        Debug.Log("CONQUER THIS vp");
-        lastConquestTime = Time.time;
-
         if (IsServer)
         {
             CloseVPClientRpc();
@@ -92,6 +84,52 @@ public class VictoryPoint : NetworkBehaviour
         if (timeToOpen < 0 && !isOpen)
         {
             OpenVPClientRpc();
+            announcer.AnnounceEventClientRpc("Victory Point has opened!", 5);
         }
+    }
+
+    public void OnStartedConquering(int team)
+    {
+        onStartedConqueringClientRpc(team);
+        NamedColor c = colorSettings.Colors[team];
+        announcer.AnnounceEventClientRpc($"Victory Point is being captured by team {c.Name}!", 5);
+    }
+    
+    [ClientRpc]
+    private void onStartedConqueringClientRpc(int team, ClientRpcParams clientRpcParams = default)
+    {
+        var c = colorSettings.Colors[team];
+        c.Color.a = 0.8f;
+        spriteRenderer.color = c.Color;
+    }
+
+    public void OnConquered(int team)
+    {
+        lastConquestTime = Time.time;
+        CloseVPClientRpc();
+        
+        int numPoints = teamScores[team].Value + 1;
+        teamScores[team].Value = numPoints;
+        
+        OnPointConquered?.Invoke(team, numPoints);
+    }
+    
+    public void OnStoppedConquering(int team)
+    {
+        onStoppedConqueringClientRpc(team);
+    }
+    
+    [ClientRpc]
+    private void onStoppedConqueringClientRpc(int team, ClientRpcParams clientRpcParams = default)
+    {
+        if (isOpen)
+        {
+            spriteRenderer.color = Color.white;   
+        }
+    }
+
+    public int GetTeam()
+    {
+        return -1;
     }
 }

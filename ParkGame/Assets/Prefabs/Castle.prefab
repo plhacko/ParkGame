@@ -160,6 +160,7 @@ MonoBehaviour:
   HorsemanIcon: {fileID: 0}
   InitOutpostUnitType: 0
   revealer: {fileID: 3827981197028292139}
+  colorSettings: {fileID: 11400000, guid: 540e0efb517eb1d4f8598ecd8326dff1, type: 2}
   _Team:
     m_InternalValue: -10
 --- !u!114 &8892233519408517772

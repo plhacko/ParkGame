@@ -273,6 +273,7 @@ MonoBehaviour:
   TypeOfUnit: 1
   DeathFadeTime: 2
   revealer: {fileID: 7039114770966444783}
+  colorSettings: {fileID: 11400000, guid: 540e0efb517eb1d4f8598ecd8326dff1, type: 2}
   ClosestEnemyDEBUG: 0
   Behaviour: 0
   BehaviourChangedEvent:

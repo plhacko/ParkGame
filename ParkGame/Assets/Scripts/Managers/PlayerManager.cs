@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using Player;
 using Unity.Mathematics;
@@ -66,17 +67,30 @@ namespace Managers
             }
 
             if (!allCloseToOutposts) return;
-            
             playersLocked = false;
+            
+            StartCoroutine(CountDownAndStart());
+        }
+        
+        IEnumerator CountDownAndStart()
+        {
+            announcer.AnnounceEventClientRpc("3!", 2);
+            yield return new WaitForSeconds(2f);
+            announcer.AnnounceEventClientRpc("2!", 2);
+            yield return new WaitForSeconds(2f);
+            announcer.AnnounceEventClientRpc("1!", 2);
+            yield return new WaitForSeconds(2f);
+            announcer.AnnounceEventClientRpc("GO!", 2);
+            
             foreach (var (_, controller) in playerControllers) 
             {
                 controller.IsLocked = false;
             }
             
-            announcer.AnnounceEventClientRpc("Go!", 15);
             invokeOnAllPlayersReadyClientRpc();
         }
-        
+
+
         [ClientRpc]
         private void invokeOnAllPlayersReadyClientRpc()
         {
@@ -107,8 +121,9 @@ namespace Managers
             isSceneLoaded = true;   
         }
 
-        private void OnDestroy()
+        public override void OnNetworkDespawn()
         {
+            base.OnNetworkDespawn();
             if (NetworkManager.Singleton)
             {
                 NetworkManager.Singleton.SceneManager.OnLoadComplete -= sceneLoaded;   
@@ -179,5 +194,41 @@ namespace Managers
         }
 
         public PlayerController GetLocalPlayerController() => localPlayerController;
+        
+        public List<PlayerController> GetAllMembersOfTeam(int team)
+        {
+            List<PlayerController> teamMembers = new List<PlayerController>();
+            foreach (var (_, controller) in playerControllers)
+            {
+                if (controller.Team == team)
+                {
+                    teamMembers.Add(controller);
+                }
+            }
+
+            return teamMembers;
+        }
+        
+        public List<PlayerController> GetAllEnemyMembers(int team)
+        {
+            List<PlayerController> teamMembers = new List<PlayerController>();
+            foreach (var (_, controller) in playerControllers)
+            {
+                if (controller.Team != team)
+                {
+                    teamMembers.Add(controller);
+                }
+            }
+
+            return teamMembers;
+        }
+
+        public void DisableAllPlayers()
+        {
+            foreach (var (_, controller) in playerControllers) 
+            {
+                controller.IsLocked = true;
+            }
+        }
     }
 }

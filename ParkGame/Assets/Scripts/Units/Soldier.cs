@@ -40,6 +40,8 @@ public class Soldier : NetworkBehaviour, ISoldier
     [SerializeField] UnitType TypeOfUnit;
     [SerializeField] float DeathFadeTime = 2f;
     [SerializeField] private GameObject revealer;
+    [SerializeField] ColorSettings colorSettings;
+    
     public int MaxHP { get => InitialHP; }
 
     public float ClosestEnemyDEBUG; // DEBUG // TODO: rm
@@ -83,6 +85,8 @@ public class Soldier : NetworkBehaviour, ISoldier
     private PlayerManager playerManager;
     private ChangeMaterial changeMaterial;
 
+    private SpriteRenderer circleRenderer;
+    
     public Action OnDeath;
 
     private void Initialize()
@@ -94,7 +98,8 @@ public class Soldier : NetworkBehaviour, ISoldier
         Networkanimator = GetComponent<NetworkAnimator>();
         shooting = GetComponent<ShootScript>();
         changeMaterial = GetComponent<ChangeMaterial>();
-
+        circleRenderer = transform.Find("Circle")?.GetComponent<SpriteRenderer>();
+        
         _Team.OnValueChanged += OnTeamChanged;
         _SoldierBehaviour.OnValueChanged += OnBehaviourChange;
 
@@ -115,11 +120,10 @@ public class Soldier : NetworkBehaviour, ISoldier
 
     private void OnTeamChanged(int previousValue, int newValue) //DEBUG (just tem membership visualization) // TODO: rm
     {
-        SpriteRenderer sr = transform.Find("Circle")?.GetComponent<SpriteRenderer>();
-        if (sr == null) { return; }
-        if (newValue == 0) { sr.color = Color.blue; }
-        else if (newValue == 1) { sr.color = Color.yellow; }
-        else { sr.color = Color.grey; }
+        if (circleRenderer != null && newValue != -1)
+        {
+            circleRenderer.color = colorSettings.Colors[newValue].Color;
+        }
 
         var localPlayerData = LobbyManager.Singleton.GetLocalPlayerData();
         if (localPlayerData.Team == newValue)

@@ -118,7 +118,7 @@ namespace Player
             var castles = FindObjectsOfType<Outpost>();
             foreach (var castle in castles)
             {
-                if (castle.IsSyncedCastle && castle.Team == Team)
+                if (castle.IsCastle && castle.Team == Team)
                 {
                     AddOutpost(castle);
                 }

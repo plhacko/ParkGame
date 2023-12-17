@@ -4,13 +4,9 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 using Player;
-using ProjNet.CoordinateSystems;
 
-public class Outpost : NetworkBehaviour, ICommander
+public class Outpost : NetworkBehaviour, ICommander, IConquerable
 {
-    public bool IsCastle = false;
-    NetworkVariable<bool> _IsCastle = new();
-    public bool IsSyncedCastle { get => _IsCastle.Value; }
     [SerializeField] int InitialTeam;
     [SerializeField] int MaxUnits = 3; // in total
     [SerializeField] float SpawnTime = 4; // 4s
@@ -18,12 +14,12 @@ public class Outpost : NetworkBehaviour, ICommander
     [SerializeField] GameObject ArcherPrefab;
     [SerializeField] GameObject HorsemanPrefab;
 
-
     [SerializeField] Sprite PawnIcon;
     [SerializeField] Sprite ArcherIcon;
     [SerializeField] Sprite HorsemanIcon;
     [SerializeField] private Soldier.UnitType InitOutpostUnitType;
     [SerializeField] private GameObject revealer;
+    [SerializeField] ColorSettings colorSettings;
     [SerializeField] private Collider2D switchCollider;
    
     [Tooltip("# seconds. After changing spawnedType wait until you can change it again.")]
@@ -39,7 +35,11 @@ public class Outpost : NetworkBehaviour, ICommander
 
     [SerializeField] NetworkVariable<int> _Team = new(-1);
     public int Team { get => _Team.Value; set => _Team.Value = value; }
-
+    
+    public bool IsCastle { get => _IsCastle.Value; private set => _IsCastle.Value = value; }
+    
+    [SerializeField] NetworkVariable<bool> _IsCastle = new();
+    
     private Soldier.UnitType outpostUnitType;
     public Soldier.UnitType OutpostUnitType { get => outpostUnitType; }
     private SpriteRenderer sr;
@@ -54,6 +54,8 @@ public class Outpost : NetworkBehaviour, ICommander
         { Soldier.UnitType.Archer, 0 },
         { Soldier.UnitType.Horseman, 0 }
     };
+    private Announcer announcer;
+
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
@@ -68,6 +70,7 @@ public class Outpost : NetworkBehaviour, ICommander
         }
         
         playerManager = FindObjectOfType<PlayerManager>();
+        announcer = FindObjectOfType<Announcer>();
         changeMaterial = GetComponent<ChangeMaterial>();
         sr = GetComponent<SpriteRenderer>();
 
@@ -79,7 +82,6 @@ public class Outpost : NetworkBehaviour, ICommander
         
         _Team.OnValueChanged += onTeamChanged;
 
-        Debug.Log(revealer);
         if (IsServer)
         {
             Team = InitialTeam;   
@@ -133,11 +135,13 @@ public class Outpost : NetworkBehaviour, ICommander
             revealer.gameObject.SetActive(false);
             changeMaterial.Change(true);
         }
+        
+        if(newTeam == -1) return;
+        sr.color = colorSettings.Colors[newTeam].Color;
     }
 
     void Update()
     {
-
         // updating only on server
         if (!IsServer || Team == -1)
         { return; }
@@ -317,5 +321,75 @@ public class Outpost : NetworkBehaviour, ICommander
         ulong clientID = NetworkManager.Singleton.LocalClientId;
         RequestChangingSpawnTypeServerRpc(clientID);
         
+    }
+
+    public void OnStartedConquering(int team)
+    {
+        onStartedConqueringClientRpc(team);
+        
+        NamedColor c = colorSettings.Colors[team];
+        
+        var teamMembers = playerManager.GetAllMembersOfTeam(Team);
+        foreach (var teamMember in teamMembers)
+        {
+            ClientRpcParams clientRpcParams = new ClientRpcParams
+            {
+                Send = new ClientRpcSendParams
+                {
+                    TargetClientIds = new []{ teamMember.OwnerClientId }
+                }
+            };
+            announcer.AnnounceEventClientRpc($"Your outpost is being captured by team {c.Name}!", 5, clientRpcParams);
+        }
+            
+        var enemyMembers = playerManager.GetAllEnemyMembers(Team);
+        foreach (var teamMember in enemyMembers)
+        {
+            ClientRpcParams clientRpcParams = new ClientRpcParams
+            {
+                Send = new ClientRpcSendParams
+                {
+                    TargetClientIds = new []{ teamMember.OwnerClientId }
+                }
+            };
+            announcer.AnnounceEventClientRpc($"Outpost is being captured by team {c.Name}!", 5, clientRpcParams);
+        }
+    }
+    
+    [ClientRpc]
+    private void onStartedConqueringClientRpc(int team, ClientRpcParams clientRpcParams = default)
+    {
+        NamedColor c = colorSettings.Colors[team];
+        c.Color.a = 0.8f;
+        sr.color = c.Color;
+    }
+
+    public void OnConquered(int team)
+    {
+        Team = team;
+        NamedColor c = colorSettings.Colors[team];
+        announcer.AnnounceEventClientRpc($"Outpost has been captured by team {c.Name}!", 5);
+    }
+
+    public void OnStoppedConquering(int team)
+    {
+        onStoppedConqueringClientRpc(team);
+    }
+    
+    [ClientRpc]
+    private void onStoppedConqueringClientRpc(int team, ClientRpcParams clientRpcParams = default)
+    {
+        if(Team == -1)
+        {
+            sr.color = Color.white;
+            return;
+        }
+        
+        sr.color = colorSettings.Colors[Team].Color;
+    }
+    
+    public int GetTeam()
+    {
+        return Team;
     }
 }

@@ -119,7 +119,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a6030245d92a7e42ab2c247dc0d696c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsCastle: 0
   InitialTeam: -1
   MaxUnits: 3
   SpawnTime: 4
@@ -131,9 +130,12 @@ MonoBehaviour:
   HorsemanIcon: {fileID: 21300000, guid: 46eddd8d370b3be48b1a9d9c76e98342, type: 3}
   InitOutpostUnitType: 0
   revealer: {fileID: 7172483008333775361}
+  colorSettings: {fileID: 11400000, guid: 540e0efb517eb1d4f8598ecd8326dff1, type: 2}
   switchCollider: {fileID: 0}
   TimeBetweenToggles: 5
   _Team:
+    m_InternalValue: 0
+  _IsCastle:
     m_InternalValue: 0
 --- !u!114 &-6080753142415193819
 MonoBehaviour:
