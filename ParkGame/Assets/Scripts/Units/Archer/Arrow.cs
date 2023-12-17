@@ -11,17 +11,20 @@ namespace Units.Archer
         [SerializeField] private float delay;
         [SerializeField] private SpriteRenderer spriteRenderer;
         [SerializeField] private SpriteRenderer feathersSpriteRenderer;
-        
+        [SerializeField] private ColorSettings colorSettings;
+
+        private int team;
         private int damage;
         private Transform target;
         private Vector3 positionOfTarget; // because Transform is directly on some gameobject !
         private float spawnTime;
         private bool dealtDamage;
-        
-        public void Initialize(Transform target, int damage)
+
+        public void Initialize(Transform target, int damage, int team)
         {
             this.target = target;
             this.damage = damage;
+            this.team = team;
             this.positionOfTarget = target.position;
             this.spawnTime = Time.time;
             
@@ -34,29 +37,34 @@ namespace Units.Archer
             spriteRenderer.DOColor(Color.white, 0.1f).SetDelay(delay);
             
             feathersSpriteRenderer.color = Color.clear;
-            feathersSpriteRenderer.DOColor(Color.white, 0.1f).SetDelay(delay);
+            Color teamColor = colorSettings.Colors[team].Color;
+            feathersSpriteRenderer.DOColor(teamColor, 0.1f).SetDelay(delay);
         }
 
         private void Update() {
             if (!IsServer) return;
             if (this.spawnTime + delay > Time.time) return;
-            if (target == null) {
-                Destroy(gameObject);
-                return;
-            }
 
             // ARROW HITS
-            //if(Vector3.Distance(transform.position, targetPosition) < 0.1f)
             if (Vector3.Distance(transform.position, positionOfTarget) < 0.1f && !dealtDamage) {
                 Debug.Log("Arrow hits");
 
-                if (target.GetComponent<ISoldier>() != null) {
-                    target.GetComponent<ISoldier>().TakeDamage(damage);
-                    dealtDamage = true;
-                    Destroy(gameObject);
+                Collider2D[] collider2Ds = Physics2D.OverlapCircleAll(transform.position, 0.1f);
+                foreach (var c in collider2Ds) {
+                    if (c.gameObject.GetComponent<ISoldier>() != null) {
+                        ISoldier hitTarget = c.gameObject.GetComponent<ISoldier>();
 
-                    return;
+                        // find first hit enemy soldier, deal him damage, destruct arrow
+                        if (hitTarget.Team != team) {
+                            Debug.Log(team + " hits " + hitTarget.Team);
+                            hitTarget.TakeDamage(damage);
+                            dealtDamage = true;
+                            Destroy(gameObject);
+                            return;
+                        }
+                    }
                 }
+
 
                 if (Vector3.Distance(transform.position, positionOfTarget) < 0.01f) {
                     dealtDamage = true; 
