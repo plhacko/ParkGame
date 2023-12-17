@@ -43,7 +43,7 @@ public class VictoryPoint : NetworkBehaviour, IConquerable
         isOpen = true;
         conquerModuleObject.SetActive(true);
     }
-    
+
     private void Awake()
     {
         conquerModuleObject = GetComponentInChildren<ConquerModule>().gameObject;
@@ -59,10 +59,11 @@ public class VictoryPoint : NetworkBehaviour, IConquerable
         lastConquestTime = Time.time;
     }
 
-    private void Start() {
+    private void Start()
+    {
         if (IsServer)
         {
-            CloseVPClientRpc();   
+            CloseVPClientRpc();
         }
         
         gameSessionManager = FindObjectOfType<GameSessionManager>();
@@ -70,18 +71,23 @@ public class VictoryPoint : NetworkBehaviour, IConquerable
 
     void Update()
     {
-        if(!NetworkManager.Singleton.IsServer || lastConquestTime == float.MaxValue) return;
-        
+        if (NetworkManager == null || !NetworkManager.Singleton.IsServer || lastConquestTime == float.MaxValue)
+        {
+            return;
+        }
+
         if(gameSessionManager.IsOver) return;
         
         float timeToOpen = lastConquestTime + openingTime - Time.time;
-        
-        if(timeToOpen < timeToNotifyPlayersBeforeOpening && !isNotified) {
+
+        if (timeToOpen < timeToNotifyPlayersBeforeOpening && !isNotified)
+        {
             announcer.AnnounceEventClientRpc($"Victory Point will open soon! ({timeToNotifyPlayersBeforeOpening}s)", 5);
             isNotified = true;
         }
-        
-        if (timeToOpen < 0 && !isOpen) { 
+
+        if (timeToOpen < 0 && !isOpen)
+        {
             OpenVPClientRpc();
             announcer.AnnounceEventClientRpc("Victory Point has opened!", 5);
         }

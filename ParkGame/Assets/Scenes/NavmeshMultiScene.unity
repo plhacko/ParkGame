@@ -207,7 +207,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6403402006258234310, guid: 767d4c3ee472ffe4ea667aae7025b849, type: 3}
       propertyPath: GlobalObjectIdHash
-      value: 4082927649
+      value: 1314421984
       objectReference: {fileID: 0}
     - target: {fileID: 6578423205386703686, guid: 767d4c3ee472ffe4ea667aae7025b849, type: 3}
       propertyPath: m_RootOrder
@@ -300,7 +300,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2918941198
+  GlobalObjectIdHash: 673589848
   AlwaysReplicateAsRoot: 0
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
@@ -317,6 +317,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerControllerPrefab: {fileID: -2561659011316829293, guid: 6792bdcabd42fb04987eb19d3912546f, type: 3}
+  MinInitialDistanceFromOutpost: 5
 --- !u!4 &485991671
 Transform:
   m_ObjectHideFlags: 0
@@ -376,7 +377,7 @@ MonoBehaviour:
   m_OverrideTileSize: 0
   m_TileSize: 256
   m_OverrideVoxelSize: 0
-  m_VoxelSize: 0.05333333
+  m_VoxelSize: 0.016666668
   m_BuildHeightMesh: 0
   m_HideEditorLogs: 0
   m_NavMeshData: {fileID: 23800000, guid: b4dc7badfa4c06143b4a5dbafb1650a6, type: 2}
@@ -564,7 +565,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6403402006258234310, guid: 767d4c3ee472ffe4ea667aae7025b849, type: 3}
       propertyPath: GlobalObjectIdHash
-      value: 1028789356
+      value: 2517074058
       objectReference: {fileID: 0}
     - target: {fileID: 6578423205386703686, guid: 767d4c3ee472ffe4ea667aae7025b849, type: 3}
       propertyPath: m_RootOrder
@@ -645,7 +646,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6403402006258234310, guid: 767d4c3ee472ffe4ea667aae7025b849, type: 3}
       propertyPath: GlobalObjectIdHash
-      value: 2994923739
+      value: 1588052621
       objectReference: {fileID: 0}
     - target: {fileID: 6578423205386703686, guid: 767d4c3ee472ffe4ea667aae7025b849, type: 3}
       propertyPath: m_RootOrder
@@ -913,13 +914,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42057a5c5ee132c4cbdc65b2f69be01a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  GameSceneName: 
   mapId: d95188be-96a1-4666-b5f6-fb055e54d48f
+  startButton: {fileID: 0}
+  hostButton: {fileID: 0}
+  clientButtonPrefab: {fileID: 0}
+  clientButtonParent: {fileID: 0}
+  readyText: {fileID: 0}
+  host:
+    Team: 0
+    Email: 
+    Password: 
+    Button: {fileID: 0}
   clients:
   - Team: 0
-    Name: HOST
+    Email: 
+    Password: 
+    Button: {fileID: 0}
   - Team: 1
-    Name: aaaaaaaaaa
-  spawnPlayersButton: {fileID: 1708224160}
+    Email: 
+    Password: 
+    Button: {fileID: 0}
 --- !u!1001 &1032356003
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1871,7 +1886,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6403402006258234310, guid: 767d4c3ee472ffe4ea667aae7025b849, type: 3}
       propertyPath: GlobalObjectIdHash
-      value: 1239658164
+      value: 291573614
       objectReference: {fileID: 0}
     - target: {fileID: 6578423205386703686, guid: 767d4c3ee472ffe4ea667aae7025b849, type: 3}
       propertyPath: m_RootOrder
@@ -1952,7 +1967,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6403402006258234310, guid: 767d4c3ee472ffe4ea667aae7025b849, type: 3}
       propertyPath: GlobalObjectIdHash
-      value: 3598325415
+      value: 1163386381
       objectReference: {fileID: 0}
     - target: {fileID: 6578423205386703686, guid: 767d4c3ee472ffe4ea667aae7025b849, type: 3}
       propertyPath: m_RootOrder
@@ -1960,11 +1975,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6578423205386703686, guid: 767d4c3ee472ffe4ea667aae7025b849, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -3.38
+      value: -3.08
       objectReference: {fileID: 0}
     - target: {fileID: 6578423205386703686, guid: 767d4c3ee472ffe4ea667aae7025b849, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.52
+      value: 2.2
       objectReference: {fileID: 0}
     - target: {fileID: 6578423205386703686, guid: 767d4c3ee472ffe4ea667aae7025b849, type: 3}
       propertyPath: m_LocalPosition.z
@@ -2328,31 +2343,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8f3b731992ec4b048ab5542b9db58615, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  RunInBackground: 1
-  LogLevel: 1
-  NetworkConfig:
-    ProtocolVersion: 0
-    NetworkTransport: {fileID: 1455148639}
-    PlayerPrefab: {fileID: 0}
-    Prefabs:
-      NetworkPrefabsLists:
-      - {fileID: 11400000, guid: f36479150aa54b740b3e094d8fbc8263, type: 2}
-    TickRate: 30
-    ClientConnectionBufferTimeout: 10
-    ConnectionApproval: 1
-    ConnectionData: 
-    EnableTimeResync: 0
-    TimeResyncInterval: 30
-    EnsureNetworkVariableLengthSafety: 0
-    EnableSceneManagement: 1
-    ForceSamePrefabs: 1
-    RecycleNetworkIds: 1
-    NetworkIdRecycleDelay: 120
-    RpcHashSize: 0
-    LoadSceneTimeOut: 120
-    SpawnTimeout: 1
-    EnableNetworkLogs: 1
-    OldPrefabList: []
 --- !u!4 &1455148641
 Transform:
   m_ObjectHideFlags: 0
@@ -2451,7 +2441,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6403402006258234310, guid: 767d4c3ee472ffe4ea667aae7025b849, type: 3}
       propertyPath: GlobalObjectIdHash
-      value: 3174108274
+      value: 168171716
       objectReference: {fileID: 0}
     - target: {fileID: 6578423205386703686, guid: 767d4c3ee472ffe4ea667aae7025b849, type: 3}
       propertyPath: m_RootOrder

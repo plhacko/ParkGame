@@ -49,7 +49,7 @@ public class ConquerModule : NetworkBehaviour
     private void Update()
     {
         // update should happen only on server
-        if (!NetworkManager.Singleton.IsServer)
+        if (NetworkManager == null || !NetworkManager.Singleton.IsServer)
         { return; }
         
         if(gameSessionManager.IsOver) return;
