@@ -399,7 +399,7 @@ public class Soldier : NetworkBehaviour, ISoldier
                     SpriteRenderer.flipX = (enemyT.position.x - transform.position.x < 0);
                     XSpriteFlip.Value = SpriteRenderer.flipX;
                     Debug.Log("shoot");
-                    shooting.Shoot(enemyT, Damage, XSpriteFlip.Value);
+                    shooting.Shoot(enemyT, Damage, XSpriteFlip.Value, Team);
                 }
             }
             return true;
