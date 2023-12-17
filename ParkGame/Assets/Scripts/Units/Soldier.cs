@@ -102,11 +102,8 @@ public class Soldier : NetworkBehaviour, ISoldier
         SpriteRenderer.flipX = XSpriteFlip.Value;
 
         if (IsServer) HP = InitialHP;
-
-        if (!IsServer)
-        {
-            XSpriteFlip.OnValueChanged += OnXSpriteFlipChanged;
-        }
+        
+        XSpriteFlip.OnValueChanged += OnXSpriteFlipChanged;
     }
     public override void OnNetworkSpawn()
     {
@@ -254,7 +251,10 @@ public class Soldier : NetworkBehaviour, ISoldier
             SoldierBehaviour = SoldierBehaviour.Move;
         }
         else
-        { Networkanimator.Animator.SetFloat(AnimatorMovementSpeedHash, 0.0f); }
+        {
+            Networkanimator.Animator.SetFloat(AnimatorMovementSpeedHash, 0.0f);
+            Agent.SetDestination(transform.position);
+        }
     }
 
     private void MovementBehaviour()
@@ -317,6 +317,8 @@ public class Soldier : NetworkBehaviour, ISoldier
         Agent.SetDestination(toFollow.position);
         Vector2 direction = toFollow.position - gameObject.transform.position;
 
+        Direction directionE = GetDirectionEnum(direction);
+        
         if (direction.magnitude < 0.001f)
         {
             Networkanimator.Animator.SetFloat(AnimatorMovementSpeedHash, 0.0f);
@@ -324,10 +326,10 @@ public class Soldier : NetworkBehaviour, ISoldier
         else
         {
             Networkanimator.Animator.SetFloat(AnimatorMovementSpeedHash, 1.0f);
-            Networkanimator.Animator.SetInteger(AnimatorDirection, (int)GetDirectionEnum(direction));
+            Networkanimator.Animator.SetInteger(AnimatorDirection, (int)directionE);
         }
-        SpriteRenderer.flipX = direction.x < 0;
-        XSpriteFlip.Value = SpriteRenderer.flipX;
+        
+        XSpriteFlip.Value = directionE == Direction.Left;
     }
 
     private void FormationBehaviour()
@@ -430,10 +432,13 @@ public class Soldier : NetworkBehaviour, ISoldier
                 }
                 if (TypeOfUnit == UnitType.Archer)
                 {
-                    SpriteRenderer.flipX = (enemyT.position.x - transform.position.x < 0);
-                    XSpriteFlip.Value = SpriteRenderer.flipX;
+                    Vector2 direction = enemyT.position - transform.position;
+                    Direction directionE = GetDirectionEnum(direction);
+                    bool flip = directionE == Direction.Left;
+                    
+                    XSpriteFlip.Value = flip;
                     Debug.Log("shoot");
-                    shooting.Shoot(enemyT, Damage, XSpriteFlip.Value);
+                    shooting.Shoot(enemyT, Damage, flip);
                 }
             }
             return true;
