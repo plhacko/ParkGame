@@ -13,6 +13,9 @@ public class GameManager : MonoBehaviour
     public bool FollowCommander { get; private set;} = false;
     [SerializeField] private float followRefreshRate = 0.5f;
     private Coroutine panCoroutine = null;
+
+    public string Winner { get; private set;} = "No one";
+    
     private void Awake()
     {
         if (Instance != null && Instance != this)
