@@ -141,22 +141,6 @@ public class Soldier : NetworkBehaviour, ISoldier
     public void OnBehaviourChange(SoldierBehaviour previousValue, SoldierBehaviour newValue)
     {
         BehaviourChangedEvent.Invoke();
-        //Debug.Log("Behaviour change invoked to " + newValue);
-        switch (newValue)
-        {
-            case SoldierBehaviour.Idle:
-                GetComponent<SpriteRenderer>().color = Color.green; // DEBUG // TODO: rm
-                break;
-            case SoldierBehaviour.Move:
-                GetComponent<SpriteRenderer>().color = Color.blue; // DEBUG // TODO: rm
-                break;
-            case SoldierBehaviour.Attack:
-                GetComponent<SpriteRenderer>().color = Color.red; // DEBUG // TODO: rm
-                break;
-            case SoldierBehaviour.Formation:
-                GetComponent<SpriteRenderer>().color = Color.yellow; // DEBUG // TODO: rm
-                break;
-        }
     }
 
     Transform ClosestOutpost()
