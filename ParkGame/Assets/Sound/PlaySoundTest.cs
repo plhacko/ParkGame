@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlaySoundTest : MonoBehaviour
@@ -32,7 +30,6 @@ public class PlaySoundTest : MonoBehaviour
         return counter;
     }
 
-    // Update is called once per frame
     void Update()
     {
         counter1time = UpdateAndPlay(sfx1, sfx1time, counter1time);
