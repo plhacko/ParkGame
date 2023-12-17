@@ -9,11 +9,13 @@ namespace Managers
         [SerializeField] ColorSettings colorSettings;
         [SerializeField] private int maxPoints;
         
+        public Action OnGameOver;
+        public bool IsOver => isOver.Value; 
+        
         private PlayerManager playerManager;
         private Announcer announcer;
         private VictoryPoint victoryPoint;
         private readonly NetworkVariable<bool> isOver = new();
-        public Action OnGameOver;
         
         public override void OnNetworkSpawn()
         {
@@ -60,6 +62,7 @@ namespace Managers
             if(numPoints >= maxPoints) {
                 announcer.AnnounceEventClientRpc($"The {colorSettings.Colors[team].Name} Team has won!", 15);
                 playerManager.DisableAllPlayers();
+                isOver.Value = true;
             }
             else
             {
@@ -72,7 +75,6 @@ namespace Managers
                     _ => "th"
                 };
                 var c = colorSettings.Colors[team];
-                isOver.Value = true;
                 announcer.AnnounceEventClientRpc($"The {c.Name} Team has scored their {numPoints}{numberEnding} point!", 5);
             }
         }

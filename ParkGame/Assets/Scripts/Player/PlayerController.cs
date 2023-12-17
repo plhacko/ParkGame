@@ -18,6 +18,7 @@ namespace Player
         [SerializeField] private GameObject revealer;
         
         private PlayerManager playerManager;
+        private GameSessionManager gameSessionManager;
         private SpriteRenderer spriteRenderer;
         private NetworkAnimator networkAnimator;
         private Guid ownerPlayerId;
@@ -59,6 +60,7 @@ namespace Player
             changeMaterial = GetComponent<ChangeMaterial>();
             Agent = GetComponent<NavMeshAgent>();
             playerManager = FindObjectOfType<PlayerManager>();
+            gameSessionManager = FindObjectOfType<GameSessionManager>();
             uiInGameScreenController = UIController.Singleton.GetComponentInChildren<UIInGameScreenController>();
 
             if (IsServer) {
@@ -141,6 +143,7 @@ namespace Player
         {
             if (!isActualOwner()) return;
             if (!Application.isFocused) return;
+            if (gameSessionManager.IsOver) return;
 
             PointerPosition = PlayerPointerPlacer.PinPosition;
 

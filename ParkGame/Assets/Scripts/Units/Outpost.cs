@@ -45,6 +45,7 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
     private SpriteRenderer sr;
     private int counter;
     private PlayerManager playerManager;
+    private GameSessionManager gameSessionManager;
     private ChangeMaterial changeMaterial;
     public Action<Soldier.UnitType> OnUnitTypeChange;
     // TODO Action and Dictionary should be reinitialized on outpost owner change
@@ -69,6 +70,7 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
             _IsCastle.Value = IsCastle;
         }
         
+        gameSessionManager = FindObjectOfType<GameSessionManager>();
         playerManager = FindObjectOfType<PlayerManager>();
         announcer = FindObjectOfType<Announcer>();
         changeMaterial = GetComponent<ChangeMaterial>();
@@ -145,6 +147,8 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
         // updating only on server
         if (!IsServer || Team == -1)
         { return; }
+        
+        if(gameSessionManager.IsOver) return;
 
         if (Units.Count >= MaxUnits)
         { Timer = 0f; return; }

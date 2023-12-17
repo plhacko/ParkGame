@@ -82,14 +82,15 @@ public class Soldier : NetworkBehaviour, ISoldier
     private ShootScript shooting;
     private PlayerManager playerManager;
     private ChangeMaterial changeMaterial;
-
     private SpriteRenderer circleRenderer;
+    private GameSessionManager gameSessionManager;
 
     public Action OnDeath;
 
     private void Initialize()
     {
         playerManager = FindObjectOfType<PlayerManager>();
+        gameSessionManager = FindObjectOfType<GameSessionManager>();
         EnemyObserver = GetComponentInChildren<EnemyObserver>();
         SpriteRenderer = GetComponent<SpriteRenderer>();
         Agent = GetComponent<NavMeshAgent>();
@@ -184,6 +185,8 @@ public class Soldier : NetworkBehaviour, ISoldier
         // following is done only on server
         if (!IsServer)
         { return; }
+        
+        if(gameSessionManager.IsOver) return;
 
         // check for a Commander
         if (CommanderToFollow == null)
@@ -458,7 +461,8 @@ public class Soldier : NetworkBehaviour, ISoldier
     public void OnMouseDown()
     {
         Debug.Log("Sprite Clicked");
-
+        if(gameSessionManager.IsOver) return;
+        
         ulong clientID = NetworkManager.Singleton.LocalClientId;
         RequestChangingCommanderToFollowServerRpc(clientID: clientID);
     }

@@ -26,6 +26,7 @@ public class VictoryPoint : NetworkBehaviour, IConquerable
     private SpriteRenderer spriteRenderer;
     private GameObject conquerModuleObject;
     private PlayerManager playerManager;
+    private GameSessionManager gameSessionManager;
     private Announcer announcer;
 
     [ClientRpc]    
@@ -63,11 +64,15 @@ public class VictoryPoint : NetworkBehaviour, IConquerable
         {
             CloseVPClientRpc();   
         }
+        
+        gameSessionManager = FindObjectOfType<GameSessionManager>();
     }
 
     void Update()
     {
-        if(!NetworkManager.Singleton.IsServer || lastConquestTime == float.MaxValue) return;        
+        if(!NetworkManager.Singleton.IsServer || lastConquestTime == float.MaxValue) return;
+        
+        if(gameSessionManager.IsOver) return;
         
         float timeToOpen = lastConquestTime + openingTime - Time.time;
         

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Managers;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -15,7 +16,7 @@ public class ConquerModule : NetworkBehaviour
     [SerializeField] List<ITeamMember> VisibleConquerUnits = new();
     [SerializeField] List<ITeamMember> VisibleOtherUnits = new();
     
-    public VictoryPoint victoryPoint;
+    private GameSessionManager gameSessionManager;
 
     public float ConquerPoints { get => _ConquerPoints.Value; set => _ConquerPoints.Value = value; }
 
@@ -35,15 +36,13 @@ public class ConquerModule : NetworkBehaviour
         conquerable = transform.parent.GetComponent<IConquerable>();
         // progress bar
         ProgressBar = GetComponentInChildren<IProgressBar>();
+        gameSessionManager = FindObjectOfType<GameSessionManager>();
+        
         if (ProgressBar != null)
         {
             ProgressBar?.SetMaxValue(ConquerPointsRequired);
             _ConquerPoints.OnValueChanged += UpdateProgressBarDelegate;
         }
-        
-        // if on victory point
-        victoryPoint = gameObject.GetComponentInParent<VictoryPoint>();
-
     }
     void UpdateProgressBarDelegate(float oldValue, float newValue) => ProgressBar?.SetValue(newValue);
 
@@ -52,6 +51,8 @@ public class ConquerModule : NetworkBehaviour
         // update should happen only on server
         if (!NetworkManager.Singleton.IsServer)
         { return; }
+        
+        if(gameSessionManager.IsOver) return;
 
         // stole scoring points if there are teams visible 
         if (VisibleConquerUnits.Count > 0 && VisibleOtherUnits.Count > 0)
