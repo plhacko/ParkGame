@@ -445,7 +445,7 @@ public class Soldier : NetworkBehaviour, ISoldier
                     
                     XSpriteFlip.Value = flip;
                     Debug.Log("shoot");
-                    shooting.Shoot(enemyT, Damage, flip, Team);
+                    shooting.Shoot(enemyT.transform.position, Damage, flip, Team);
                 }
             }
             return true;
