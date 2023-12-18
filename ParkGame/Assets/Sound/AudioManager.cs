@@ -15,6 +15,7 @@ public class AudioManager : MonoBehaviour
     public static AudioManager Instance;
 
     [SerializeField] private AudioSource sfxSource;
+    [SerializeField] private AudioSource notificationsSource;
 
     // formation fanfares: free, circle, box, attack, fallback
     // UI sfx: click on button. start game button (?)
@@ -22,6 +23,7 @@ public class AudioManager : MonoBehaviour
     // chimes: won game, lost game
     [Tooltip("{sfxName, clip}")] 
     [SerializeField] private List<Sound> sfxList;
+    [SerializeField] private List<Sound> notificationsList;
 
     [SerializeField] private List<AudioClip> pawnAttackSfx_list;
     [SerializeField] private List<AudioClip> archerAttackSfx_list;
@@ -29,7 +31,10 @@ public class AudioManager : MonoBehaviour
     [SerializeField] private List<AudioClip> diedSfx_list;
 
     private Dictionary<string, AudioClip> sfxDict;
+    private Dictionary<string, AudioClip> notificationsDict;
+    
     private bool sfxMute;
+    private bool notificationsMute;
 
     private void Awake() {
         if (Instance == null) {
@@ -41,8 +46,12 @@ public class AudioManager : MonoBehaviour
     }
 
     private void Start() {
+        // list to dictionary
         foreach (Sound s in sfxList) {
             sfxDict[s.name] = s.sound;
+        }
+        foreach (Sound s in notificationsList) {
+            notificationsDict[s.name] = s.sound;
         }
     }
 
@@ -52,6 +61,14 @@ public class AudioManager : MonoBehaviour
 
     public void PlaySFX(string sfxName) {
         sfxSource.PlayOneShot(sfxDict[sfxName]);
+    }
+
+    public void PlayNotificationSfx(AudioClip sfx) {
+        notificationsSource.PlayOneShot(sfx);
+    }
+
+    public void PlayNotificationSfx(string sfxName) {
+        notificationsSource.PlayOneShot(notificationsDict[sfxName]);
     }
 
     private AudioClip GetRandomItem(List<AudioClip> lst) {
@@ -83,7 +100,15 @@ public class AudioManager : MonoBehaviour
         sfxSource.volume = volume;
     }
 
+    public void ChangeNotificationsVolume(float volume) {
+        notificationsSource.volume = volume;
+    }
+
     public void ToggleSfx() {
         sfxSource.mute = !sfxMute;
+    }
+
+    public void ToggleNotificationSound() {
+        notificationsSource.mute = !notificationsMute;
     }
 }
