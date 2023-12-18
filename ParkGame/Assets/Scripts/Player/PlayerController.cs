@@ -392,6 +392,7 @@ namespace Player
         [ServerRpc]
         public void CommandAttackServerRpc()
         {
+            formationScript.ResetFormation();
             foreach (GameObject go in units)
             {
                 if (go.TryGetComponent<ISoldier>(out ISoldier soldier))
