@@ -35,7 +35,6 @@ public class UIInGameScreenController : UIPageController
         cameraButton.AddListener("Zoom Out", ZoomOut);
         action1.onClick.AddListener(Attack);
         action2.AddListener("Move", Move);
-        action2.AddListener("Idle", Idle);
         action3.onClick.AddListener(Formations);
         formationButton1.onClick.AddListener(Formation1);
         formationButton2.onClick.AddListener(Formation2);
