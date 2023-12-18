@@ -315,7 +315,6 @@ namespace Player
         private void addToUnitsClientRpc(NetworkObjectReference networkObjectReference, ClientRpcParams clientRpcParams = default)
         {
             units.Add(networkObjectReference);
-            Debug.LogWarning($"!!!!added unit to commander: {gameObject.name}");
             if (!networkObjectReference.TryGet(out var networkObject, NetworkManager.Singleton))
             {
                 Debug.LogWarning($"could not get network object from reference");
@@ -353,7 +352,6 @@ namespace Player
         private void removeFromUnitsClientRpc(NetworkObjectReference networkObjectReference, ClientRpcParams clientRpcParams = default)
         {
             units.Remove(networkObjectReference);
-            Debug.LogWarning($"!!!!removed unit from commander: {gameObject.name}");
             if (!networkObjectReference.TryGet(out var networkObject, NetworkManager.Singleton))
             {
                 Debug.LogWarning($"could not get network object from reference");

@@ -9,8 +9,8 @@ using UnityEngine.UI;
 public class UIUnit : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 {
     [SerializeField] private Slider healthBarSlider;
-    [SerializeField] private List<Texture2D> unitIcons;
-    private Image unitIcon;
+    [SerializeField] private List<Sprite> unitIcons;
+    [SerializeField] private Image unitIcon;
     private Soldier unit;
     [SerializeField] private float pressHoldTimeSuccess = 1f;
     private Stopwatch pressHoldTimer = new Stopwatch();   
@@ -54,7 +54,7 @@ public class UIUnit : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         if (unitIcons.Count == Enum.GetNames(typeof(Soldier.UnitType)).Length)
         {
             var type = unit.Type;
-            unitIcon.sprite = Sprite.Create(unitIcons[(int)type], new Rect(0, 0, unitIcons[(int)type].width, unitIcons[(int)type].height), new Vector2(0.5f, 0.5f));
+            unitIcon.sprite = unitIcons[(int)type];
         }
     }
 
