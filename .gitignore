@@ -1,4 +1,5 @@
 ParkGame/.idea/
+ParkGame/.vscode/
 ParkGame_clone_*/
 ParkGame/Assets/Sprites/Map/customMap.png
 ParkGame/Assets/Sprites/Map/customMap.png.meta
@@ -33,3 +34,5 @@ ParkGame/Assets/StreamingAssets/Master.bank.meta
 ParkGame/Assets/StreamingAssets/Master.strings.bank
 ParkGame/Assets/StreamingAssets/Master.strings.bank.meta
 ParkGame/ProjectSettings/AndroidResolverDependencies.xml
+
+ParkGame/Assets/Adaptive Performance/
