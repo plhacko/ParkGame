@@ -48,7 +48,10 @@ public class UIPage : MonoBehaviour
         pageController = GetComponent<UIPageController>();
         onEnter = pageController.OnEnter;
         onExit = pageController.OnExit;
+    }
 
+    private void Start()
+    {
         PageAnimator.PrepareAnimation(rectTransform, canvasGroup, entryMode);
     }
 
