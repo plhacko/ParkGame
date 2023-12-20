@@ -32,6 +32,11 @@ public class UIController : MonoBehaviour
 
     private void Start()
     {
+        foreach (RectTransform child in transform)
+        {
+            child.GetComponent<UIPage>().Prepare();
+        }
+
         if (initialPage != null)
         {
             if (firstFocusItem != null)

@@ -50,7 +50,7 @@ public class UIPage : MonoBehaviour
         onExit = pageController.OnExit;
     }
 
-    private void Start()
+    public void Prepare()
     {
         PageAnimator.PrepareAnimation(rectTransform, canvasGroup, entryMode);
     }
