@@ -18,7 +18,7 @@ public class UITabButton : Selectable, IPointerEnterHandler, IPointerExitHandler
     public Color hoverColor => _hoverColor;
 
     // Start is called before the first frame update
-    void Awake()
+    protected override void Awake()
     {
         background = GetComponent<Image>();        
         defaultColor = background.color;
@@ -35,13 +35,13 @@ public class UITabButton : Selectable, IPointerEnterHandler, IPointerExitHandler
         tabGroup.OnTabSelected(this);        
     }
 
-    public void OnPointerExit(PointerEventData eventData)
+    public override void OnPointerExit(PointerEventData eventData)
     {
         if (!IsInteractable()) return;
         tabGroup.OnTabExit(this);
     }
 
-    public void OnPointerEnter(PointerEventData eventData)
+    public override void OnPointerEnter(PointerEventData eventData)
     {
         if (!IsInteractable()) return;
         tabGroup.OnTabEnter(this);

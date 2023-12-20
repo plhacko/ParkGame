@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class UIUnit : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
+public class UIUnit : Selectable, IPointerDownHandler, IPointerUpHandler
 {
     [SerializeField] private Slider healthBarSlider;
     [SerializeField] private List<Sprite> unitIcons;
@@ -29,19 +29,21 @@ public class UIUnit : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         if (pressHoldTimer.ElapsedMilliseconds / 1000f > pressHoldTimeSuccess)
         {
             UnityEngine.Debug.Log("Remove unit");
-            removeAction?.Invoke();
+            if (IsInteractable())
+                removeAction?.Invoke();
             pressHoldTimer.Reset();
             pressHoldTimer.Stop();
         }
     }
 
-    private void OnDestroy()
+    protected override void OnDestroy()
     {
         if (unit == null)
         {
             return;
         }
         unit.OnDeath -= onDeath;
+        base.OnDestroy();
     }   
 
     public void Initialize(Soldier unit, Action removeAction, Action onDeath)
@@ -58,12 +60,12 @@ public class UIUnit : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         }
     }
 
-    public void OnPointerUp(PointerEventData eventData)
+    public override void OnPointerUp(PointerEventData eventData)
     {
         pressHoldTimer.Stop();
     }
 
-    public void OnPointerDown(PointerEventData eventData)
+    public override void OnPointerDown(PointerEventData eventData)
     {
         pressHoldTimer.Restart();
     }

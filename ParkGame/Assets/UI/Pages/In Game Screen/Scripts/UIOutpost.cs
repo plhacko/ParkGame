@@ -12,7 +12,7 @@ using UnityEngine.UI;
 
 using Debug = UnityEngine.Debug;
 
-public class UIOutpost : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
+public class UIOutpost : Selectable, IPointerDownHandler, IPointerUpHandler
 {
     [SerializeField] private TextMeshProUGUI pawnCount;
     [SerializeField] private TextMeshProUGUI archerCount;
@@ -42,7 +42,7 @@ public class UIOutpost : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         removeAction?.Invoke();
     }
 
-    private void OnDestroy()
+    protected override void OnDestroy()
     {
         if (outpost == null)
             return;
@@ -50,14 +50,15 @@ public class UIOutpost : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         outpost.OnUnitTypeChange -= OnUnitTypeChange;
         outpost.OnUnitTypeCountChange -= OnUnitTypeCountChange;
         outpost.UnregisterOnTeamChange(OnTeamChange);
+        base.OnDestroy();
     }
 
-    public void OnPointerDown(PointerEventData eventData)
+    public override void OnPointerDown(PointerEventData eventData)
     {
         stopwatch.Restart();
     }
 
-    public void OnPointerUp(PointerEventData eventData)
+    public override void OnPointerUp(PointerEventData eventData)
     {
         stopwatch.Stop();
     }
@@ -94,7 +95,8 @@ public class UIOutpost : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         // Hold
         if (stopwatch.IsRunning && stopwatch.ElapsedMilliseconds / 1000f > holdTimerLimit)
         {
-            GameManager.Instance.PanTo(outpost.transform.position, 0.33f);
+            if (IsInteractable())
+                GameManager.Instance.PanTo(outpost.transform.position, 0.33f);
             stopwatch.Stop();
             stopwatch.Reset();
         }
@@ -103,7 +105,8 @@ public class UIOutpost : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         {
             if (!outpost.IsCastle)
             {
-                outpost.RequestChangingSpawnTypeServerRpc(NetworkManager.Singleton.LocalClientId);
+                if (IsInteractable())
+                    outpost.RequestChangingSpawnTypeServerRpc(NetworkManager.Singleton.LocalClientId);
             }
             stopwatch.Stop();
             stopwatch.Reset();
