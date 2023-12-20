@@ -1,11 +1,12 @@
 using UnityEngine;
 using UnityEngine.UI;
-using Managers;
 using Firebase.Auth;
-using Unity.Services.Authentication;
+using TMPro;
+using DG.Tweening;
 
 public class UITitleScreenController : UIPageController
 {
+    [SerializeField] private TextMeshProUGUI pressEnterText;
     [SerializeField] private Button enterButton;
     [SerializeField] private UIPage welcomePage;
     [SerializeField] private UIPage mainMenuPage;
@@ -13,6 +14,7 @@ public class UITitleScreenController : UIPageController
     private void Start()
     {
         enterButton.onClick.AddListener(Enter);
+        pressEnterText.transform.DOPunchPosition(new Vector3(0, 10, 0), 0.75f, 0, 0.5f).SetLoops(-1);
     }
 
     public override void OnEnter()

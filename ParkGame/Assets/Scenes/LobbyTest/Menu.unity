@@ -2092,14 +2092,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Title Screen
       objectReference: {fileID: 0}
-    - target: {fileID: 5697204347693231425, guid: 78db9bdf6f57a3945a43425a6e6f6f81, type: 3}
-      propertyPath: exitMode
-      value: 6
-      objectReference: {fileID: 0}
-    - target: {fileID: 5697204347693231425, guid: 78db9bdf6f57a3945a43425a6e6f6f81, type: 3}
-      propertyPath: entryMode
-      value: 6
-      objectReference: {fileID: 0}
     - target: {fileID: 6179568006192890378, guid: 78db9bdf6f57a3945a43425a6e6f6f81, type: 3}
       propertyPath: loginPage
       value: 
