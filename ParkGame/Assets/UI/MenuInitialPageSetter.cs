@@ -17,7 +17,11 @@ public class MenuInitialPageSetter : MonoBehaviour
         
         foreach (RectTransform child in transform)
         {
-            child.GetComponent<UIPage>().Prepare();
+            UIPage uiPage = child.GetComponent<UIPage>();
+            if (uiPage != null)
+            {
+                uiPage.Prepare();
+            }
         }   
 
         if (!ServicesManager.Instance.AreInitializedUnityServices() || !ServicesManager.Instance.IsSignedToUnityAuth())

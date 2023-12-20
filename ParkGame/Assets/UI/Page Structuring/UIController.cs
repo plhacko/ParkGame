@@ -34,7 +34,11 @@ public class UIController : MonoBehaviour
     {
         foreach (RectTransform child in transform)
         {
-            child.GetComponent<UIPage>().Prepare();
+            UIPage page = child.GetComponent<UIPage>();
+            if (page != null)
+            {
+                page.Prepare();
+            }
         }
 
         if (initialPage != null)
