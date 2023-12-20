@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
 [RequireComponent(typeof(Image))]
-public class UITabButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
+public class UITabButton : Selectable, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
     private UITabGroup tabGroup;
 
@@ -31,16 +31,19 @@ public class UITabButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
     public void OnPointerClick(PointerEventData eventData)
     {
+        if (!IsInteractable()) return;
         tabGroup.OnTabSelected(this);        
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
+        if (!IsInteractable()) return;
         tabGroup.OnTabExit(this);
     }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
+        if (!IsInteractable()) return;
         tabGroup.OnTabEnter(this);
     }
 }
