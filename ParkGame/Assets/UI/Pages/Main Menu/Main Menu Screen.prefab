@@ -505,6 +505,8 @@ MonoBehaviour:
   joinButton: {fileID: 8489263498999064608}
   aboutButton: {fileID: 3300362142720082708}
   signOutButton: {fileID: 4988202768416491538}
+  headerPanel: {fileID: 3566929009769152165}
+  buttonsPanel: {fileID: 8620471595930394121}
   welcomePage: {fileID: 7888895157239260194, guid: c0cb439c9b24fa74b85169aa71c692b7, type: 3}
   lobbyPage: {fileID: 6412095738284844239, guid: 7fb96de73383a7541ae7aa63fb6a76c5, type: 3}
   prepareGamePage: {fileID: 5897103049968510762, guid: 86bc216476a79ad40b20578ef1f2bf2a, type: 3}
@@ -536,7 +538,7 @@ GameObject:
   - component: {fileID: 7862304594852228042}
   - component: {fileID: 6853653236546992734}
   m_Layer: 5
-  m_Name: Image
+  m_Name: Image - Header
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
