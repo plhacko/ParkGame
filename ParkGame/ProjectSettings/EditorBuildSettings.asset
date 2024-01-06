@@ -23,17 +23,17 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/GameTestScene/NavmeshMultiScene 1.unity
     guid: 3c4367d77bba9ac48b6bfd2a0a66513e
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/NavmeshMultiSceneWithTilemap.unity
     guid: ad5bf916dc910114193cac26c7d75383
   - enabled: 1
     path: Assets/Scenes/GameScene.unity
     guid: 1fc6dd1ea7b1c324f9cd2af971aff93e
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/LobbyTest/DebugMenu.unity
     guid: 682504809189c0940b3fe0be4a9fcef7
   m_configObjects:
-    com.unity.adaptiveperformance.google.android.provider_settings: {fileID: 11400000, guid: 0ab3f1c24dc16ed4686af1c343f5f8e8, type: 2}
+    com.unity.adaptiveperformance.google.android.provider_settings: {fileID: 11400000, guid: ee84c4981670ad748bce22d1f29631a5, type: 2}
     com.unity.adaptiveperformance.loader_settings: {fileID: 11400000, guid: 3ad410e226113ae45a953aa6554aea9c, type: 2}
-    com.unity.adaptiveperformance.samsung.android.provider_settings: {fileID: 11400000, guid: 5f1fac70215ebd34b823b4e512395603, type: 2}
+    com.unity.adaptiveperformance.samsung.android.provider_settings: {fileID: 11400000, guid: f2413ebd9cc90334cac75a8bfc768c0c, type: 2}
     com.unity.adaptiveperformance.simulator.provider_settings: {fileID: 11400000, guid: 439bd770a0624a141bf5dfc5e420bfcc, type: 2}

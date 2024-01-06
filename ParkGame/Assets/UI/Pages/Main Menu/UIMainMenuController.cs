@@ -52,8 +52,8 @@ public class UIMainMenuController : UIPageController
         enableButtons(true);
 
         float animationLength = .5f;
-        headerPanel.DOAnchorPosY(finalHeaderPanelPos.y, animationLength).SetEase(Ease.OutQuart);
-        buttonsPanel.DOAnchorPosY(finalButtonsPanelPos.y, animationLength).SetEase(Ease.OutQuart);
+        headerPanel.DOAnchorPosY(finalHeaderPanelPos.y, animationLength).SetEase(Ease.OutExpo);
+        buttonsPanel.DOAnchorPosY(finalButtonsPanelPos.y, animationLength).SetEase(Ease.OutExpo);
     }
 
     public override void OnExit()
