@@ -181,6 +181,34 @@ public class Soldier : NetworkBehaviour, ISoldier
             return;
         }
 
+        /////////////////////////////////
+        /*
+        vojaci budou mit typeOfBehaviour (pracovni tmp nazev): 
+        - attacking, inOupost (default), folowing: [followingCommander, followingInPosition, returningToOutpost - kdyz neni pridelen, tak se najde nejblizsi?] 
+        // co s fallbackem??? stale to same jako free formace?
+        - mozna jeste fleeing??? - bezi za commanderem, a pokud je commander stale blizko nepratel, tak se vrati automaticky do nejblizsiho outpostu????? 
+        
+        switch (typeOfBehaviour) {
+            case inOutpost: // default
+            // check for enemy in some radius: if enemy in radius -> attack on the closest one
+            // else return
+            case followingSomething: // commander in FreeFormation or Circle or Box formation position, returning to outpost
+            // agent move towards the object
+            case attacking: 
+            // being wary of enemies in some radius
+            // if enemy in that radius, attack some based on your unit type 
+               - Swordman-closest, Archer-in radius, Moleman-farthest (for the first one, then close)
+            
+        }
+        // a pak kdyz umre, tak se pripocte tomu tymu, co mu udelil last hit, bod do statistiky --- potom...
+
+
+
+
+        */
+
+        /////////////////////////////////
+
         // death timer
         //if (TimeUntilDestroyed > 0 || HP == 0) {
         if (HP <= 0)
