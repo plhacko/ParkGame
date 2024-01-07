@@ -219,6 +219,8 @@ namespace Player
             Debug.Log("number of Units: " + units.Count);
             foreach (GameObject go in units) {
                 if (go.TryGetComponent<ISoldier>(out ISoldier soldier)) {
+                    soldier.NewCommand(SoldierCommand.Following);
+
                     switch (FormationType) {
                         case Formation.FormationType.Free:
                             soldier.NavMeshFormationSwitch(false, SoldierBehaviour.Move, formationScript, FormationType);
@@ -375,7 +377,11 @@ namespace Player
             foreach (GameObject go in units)
             {
                 if (go.TryGetComponent<ISoldier>(out ISoldier soldier))
-                { soldier.SoldierBehaviour = SoldierBehaviour.Move; }
+                { 
+                    soldier.SoldierBehaviour = SoldierBehaviour.Move;
+
+                    soldier.NewCommand(SoldierCommand.Following);
+                }
             }
         }
         
@@ -385,7 +391,11 @@ namespace Player
             foreach (GameObject go in units)
             {
                 if (go.TryGetComponent<ISoldier>(out ISoldier soldier))
-                { soldier.SoldierBehaviour = SoldierBehaviour.Idle; }
+                { 
+                    soldier.SoldierBehaviour = SoldierBehaviour.Idle;
+
+                    soldier.NewCommand(SoldierCommand.Following);
+                }
             }
         }
         
@@ -396,7 +406,10 @@ namespace Player
             foreach (GameObject go in units)
             {
                 if (go.TryGetComponent<ISoldier>(out ISoldier soldier))
-                { soldier.SoldierBehaviour = SoldierBehaviour.Attack; }
+                { 
+                    soldier.SoldierBehaviour = SoldierBehaviour.Attack; 
+                    soldier.NewCommand(SoldierCommand.Attack);
+                }
             }
         }
 

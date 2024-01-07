@@ -89,6 +89,14 @@ public class Soldier : NetworkBehaviour, ISoldier
 
     public Action OnDeath;
 
+    private int EnemiesInAttackWaveCounter; // counter in attack wave - how many were targeted in a row during one attack command
+    //public SoldierCommand Command;
+    private NetworkVariable<SoldierCommand> _SoldierCommand = new();
+    public SoldierCommand Command { get => _SoldierCommand.Value; set => _SoldierCommand.Value = value; } 
+
+    public UnityEvent CommandChangedEvent;
+
+
     private void Initialize()
     {
         playerManager = FindObjectOfType<PlayerManager>();
@@ -110,6 +118,11 @@ public class Soldier : NetworkBehaviour, ISoldier
         if (IsServer) HP = InitialHP;
         
         XSpriteFlip.OnValueChanged += OnXSpriteFlipChanged;
+
+        _SoldierCommand.OnValueChanged += OnCommandChange;
+        NewCommand(SoldierCommand.InOutpost);
+
+
     }
     public override void OnNetworkSpawn()
     {
@@ -138,9 +151,15 @@ public class Soldier : NetworkBehaviour, ISoldier
             changeMaterial.Change(true);
         }
     }
+
+    // later change this for SoldierCommand instead
     public void OnBehaviourChange(SoldierBehaviour previousValue, SoldierBehaviour newValue)
     {
         BehaviourChangedEvent.Invoke();
+    }
+
+    public void OnCommandChange(SoldierCommand c1, SoldierCommand c2) {
+        CommandChangedEvent.Invoke();
     }
 
     Transform ClosestOutpost()
@@ -167,6 +186,60 @@ public class Soldier : NetworkBehaviour, ISoldier
 
     }
 
+    void StationedInOutpost() 
+    {
+        float distanceFromOutpost = Vector3.Distance(CommanderToFollow.position, transform.position);
+        if (distanceFromOutpost <= OuterDistanceFromCommander) { // have a value for every unit the same depending on the outpost's range???
+            Networkanimator.Animator.SetFloat(AnimatorMovementSpeedHash, 0.0f);
+            Agent.SetDestination(transform.position);
+        }
+
+        Transform enemyT = EnemyObserver.GetClosestEnemy();
+        float distanceOfEnemyToOutpost = Vector3.Distance(enemyT.position, CommanderToFollow.position);
+
+        if (enemyT != null && distanceFromOutpost < DefendDistanceFromCommander) {
+            if (AttackEnemyIfInRange(enemyT)) { return; }
+            else if (distanceOfEnemyToOutpost <= DefendDistanceFromCommander) 
+            { 
+                MoveTowardsEntity(enemyT);
+                return;
+            }
+        } else {
+            FollowObjectWithAnimation(CommanderToFollow);
+            return;
+        }
+    }
+
+    void Follow() {
+        if (ObjectToFollowInFormation != null) { // attack vlastne znici jejich puvodni formaci
+            FollowObjectWithAnimation(ObjectToFollowInFormation.transform);
+        } else if (CommanderToFollow != null) {
+            FollowObjectWithAnimation(CommanderToFollow);
+        }
+    }
+
+    void AttackOnCommand() {
+        Transform enemyT = GetEnemy();
+        if (enemyT != null) { 
+            targetedEnemy = enemyT;
+            EnemiesInAttackWaveCounter++;
+        } else { // no enemy is close by, stay where you are
+            Follow();
+            return; 
+        }
+
+        // attack the closest enemy if in range
+        if (AttackEnemyIfInRange(targetedEnemy)) { return; }
+        // go closer to the enemy 
+        FollowObjectWithAnimation(targetedEnemy);
+
+        // if the commander is too far, the soldier will stop attacking and will return back to the commander
+        float distanceFromCommander = (CommanderToFollow.position - transform.position).magnitude;
+        if (distanceFromCommander > AttackDistanceFromCommander) {
+            Follow();
+        }
+    }
+
     void Update()
     {
         // following is done only on server
@@ -181,36 +254,6 @@ public class Soldier : NetworkBehaviour, ISoldier
             return;
         }
 
-        /////////////////////////////////
-        /*
-        vojaci budou mit typeOfBehaviour (pracovni tmp nazev): 
-        - attacking, inOupost (default), folowing: [followingCommander, followingInPosition, returningToOutpost - kdyz neni pridelen, tak se najde nejblizsi?] 
-        // co s fallbackem??? stale to same jako free formace?
-        - mozna jeste fleeing??? - bezi za commanderem, a pokud je commander stale blizko nepratel, tak se vrati automaticky do nejblizsiho outpostu????? 
-        
-        switch (typeOfBehaviour) {
-            case inOutpost: // default
-            // check for enemy in some radius: if enemy in radius -> attack on the closest one
-            // else return
-            case followingSomething: // commander in FreeFormation or Circle or Box formation position, returning to outpost
-            // agent move towards the object
-            case attacking: 
-            // being wary of enemies in some radius
-            // if enemy in that radius, attack some based on your unit type 
-               - Swordman-closest, Archer-in radius, Moleman-farthest (for the first one, then close)
-            
-        }
-        // a pak kdyz umre, tak se pripocte tomu tymu, co mu udelil last hit, bod do statistiky --- potom...
-
-
-
-
-        */
-
-        /////////////////////////////////
-
-        // death timer
-        //if (TimeUntilDestroyed > 0 || HP == 0) {
         if (HP <= 0)
         {
             return;
@@ -227,26 +270,16 @@ public class Soldier : NetworkBehaviour, ISoldier
             Agent.speed = 3.5f;
         }
 
-        // soldier behaviour
-        switch (SoldierBehaviour)
-        {
-            case SoldierBehaviour.Idle:
-                IdleBehaviour();
+        switch (Command) {
+            case SoldierCommand.InOutpost:
+                StationedInOutpost();
                 break;
-            case SoldierBehaviour.Move:
-                MovementBehaviour();
+            case SoldierCommand.Following:
+                Follow();
                 break;
-            case SoldierBehaviour.Attack:
-                AttackBehaviour();
+            case SoldierCommand.Attack:
+                AttackOnCommand(); 
                 break;
-
-            // when in move range??? or setup from playercontroller
-            // now: when in formation, go in the formation around the commander
-            // add to it: when close to an enemy, attack him
-            case SoldierBehaviour.Formation:
-                FormationBehaviour();
-                break;
-
             default:
                 break;
         }
@@ -289,6 +322,9 @@ public class Soldier : NetworkBehaviour, ISoldier
 
     public void NavMeshFormationSwitch(bool enable, SoldierBehaviour newBehaviour, Formation formation, FormationType formationType)
     {
+        // if in Circle or Box Formation or Free, it is following something
+        //Command = SoldierCommand.Following;
+        
         FollowInNavMeshFormation = enable;
         //PrevSoldierBehaviour = SoldierBehaviour;
         SoldierBehaviour = newBehaviour;
@@ -338,11 +374,11 @@ public class Soldier : NetworkBehaviour, ISoldier
 
         Direction directionE = GetDirectionEnum(direction);
         
-        if (direction.magnitude < 0.001f)
-        {
+        if (direction.magnitude < 0.001f) 
+        {Networkanimator.Animator.SetFloat(AnimatorMovementSpeedHash, 0.0f);
             Networkanimator.Animator.SetFloat(AnimatorMovementSpeedHash, 0.0f);
-        }
-        else
+            Agent.SetDestination(transform.position);
+        } else
         {
             Networkanimator.Animator.SetFloat(AnimatorMovementSpeedHash, 1.0f);
             Networkanimator.Animator.SetInteger(AnimatorDirection, (int)directionE);
@@ -401,7 +437,9 @@ public class Soldier : NetworkBehaviour, ISoldier
         }
         if (TypeOfUnit == UnitType.Horseman)
         {
-            enemyT = EnemyObserver.GetFarthestEnemy();
+            if (EnemiesInAttackWaveCounter == 0) {
+                enemyT = EnemyObserver.GetFarthestEnemy(); // else attack the closest enemy
+            }
         }
         targetedEnemy = enemyT;
         return enemyT;
@@ -569,6 +607,8 @@ public class Soldier : NetworkBehaviour, ISoldier
             CommanderToFollow?.GetComponent<ICommander>().ReportUnfollowing(gameObject);
             CommanderToFollow = commanderToFollow;
             CommanderToFollow?.GetComponent<ICommander>().ReportFollowing(gameObject);
+
+            Command = SoldierCommand.Following; // following commander or returning to outpost
         }
     }
 
@@ -593,6 +633,7 @@ public class Soldier : NetworkBehaviour, ISoldier
     {
         HP = 0;
         SoldierBehaviour = SoldierBehaviour.Death;
+        Agent.SetDestination(transform.position);
         CommanderToFollow?.GetComponent<ICommander>()?.ReportUnfollowing(gameObject);
         Networkanimator.SetTrigger("Die");
         handleDeath();
@@ -617,6 +658,14 @@ public class Soldier : NetworkBehaviour, ISoldier
         {
             OnDeath?.Invoke();
             Destroy(gameObject, DeathFadeTime);
+        }
+    }
+
+    public void NewCommand(SoldierCommand command) {
+        Command = command;
+
+        if (command == SoldierCommand.Attack) {
+            EnemiesInAttackWaveCounter = 0; // reset counter of targeted enemies (because of moleman's modus operandi)
         }
     }
 }

@@ -188,6 +188,8 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
         unit.GetComponent<NetworkObject>().Spawn();
         unit.GetComponent<ISoldier>().Team = Team;
         unit.GetComponent<ISoldier>().SetCommanderToFollow(transform);
+        unit.GetComponent<ISoldier>().NewCommand(SoldierCommand.InOutpost);
+        
     }
 
     public void SetCastle(int team)

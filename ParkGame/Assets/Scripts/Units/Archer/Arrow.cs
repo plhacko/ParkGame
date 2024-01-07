@@ -48,8 +48,6 @@ namespace Units.Archer {
                     if (hitTarget.Team != team) {
                         Debug.Log(team + " hits " + hitTarget.Team);
                         hitTarget.TakeDamage(damage);
-                        dealtDamage = true;
-                        Destroy(gameObject);
                         return;
                     }
                 }
@@ -61,14 +59,11 @@ namespace Units.Archer {
             if (this.spawnTime + delay > Time.time) return;
 
             // ARROW HITS
-            if (Vector3.Distance(transform.position, positionOfTarget) < 0.1f && !dealtDamage) {
+            if (Vector3.Distance(transform.position, positionOfTarget) < 0.1f) {
                 Hit();
-
-                if (Vector3.Distance(transform.position, positionOfTarget) < 0.01f) {
-                    dealtDamage = true;
-                    Destroy(gameObject);
-                    return;
-                }
+                Destroy(gameObject);
+                return;
+            
             }
 
             Vector3 toTarget = (positionOfTarget - transform.position).normalized;

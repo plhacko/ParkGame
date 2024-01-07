@@ -275,6 +275,9 @@ MonoBehaviour:
   midPointPositionForHorseman: {x: 0, y: 0, z: 0}
   midPointReached: 0
   targetedEnemy: {fileID: 0}
+  CommandChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!70 &3140456785125691185
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -332,7 +335,7 @@ Rigidbody2D:
     m_Bits: 256
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 640
+    m_Bits: 512
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
