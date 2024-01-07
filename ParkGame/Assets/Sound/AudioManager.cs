@@ -14,7 +14,7 @@ public class AudioManager : MonoBehaviour
 
     public static AudioManager Instance;
 
-    [SerializeField] private AudioSource sfxSource;
+    [SerializeField] public AudioSource sfxSource;
     [SerializeField] private AudioSource notificationsSource;
 
     // formation fanfares: free, circle, box, attack, fallback

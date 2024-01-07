@@ -88,7 +88,8 @@ public class Soldier : NetworkBehaviour, ISoldier
     private GameSessionManager gameSessionManager;
 
     public Action OnDeath;
-
+    int randomCounterForTestingSound;
+    float randomCounter;
     private void Initialize()
     {
         playerManager = FindObjectOfType<PlayerManager>();
@@ -110,6 +111,11 @@ public class Soldier : NetworkBehaviour, ISoldier
         if (IsServer) HP = InitialHP;
         
         XSpriteFlip.OnValueChanged += OnXSpriteFlipChanged;
+
+
+        randomCounterForTestingSound = UnityEngine.Random.Range(1, 4);
+        randomCounter = randomCounterForTestingSound;
+
     }
     public override void OnNetworkSpawn()
     {
@@ -172,7 +178,7 @@ public class Soldier : NetworkBehaviour, ISoldier
         // following is done only on server
         if (!IsServer)
         { return; }
-        
+
         if(gameSessionManager.IsOver) return;
 
         // check for a Commander
@@ -180,6 +186,19 @@ public class Soldier : NetworkBehaviour, ISoldier
         {
             return;
         }
+
+        if (randomCounter >= 0) {
+            randomCounter -= Time.deltaTime;
+        } else {
+            randomCounter = randomCounterForTestingSound;
+        }
+        if (randomCounterForTestingSound == randomCounter) {
+            AudioManager.Instance.sfxSource.transform.position = transform.position;
+            AudioManager.Instance.PlayDead();
+        }
+
+
+
 
         // death timer
         //if (TimeUntilDestroyed > 0 || HP == 0) {
@@ -580,6 +599,9 @@ public class Soldier : NetworkBehaviour, ISoldier
 
     private void handleDeath()
     {
+        AudioManager.Instance.sfxSource.transform.position = gameObject.transform.position;
+        AudioManager.Instance.PlayDead();
+
         // visualize death: black shadow, fade soldier's sprite, and then self-destruct
         gameObject.transform.Find("Circle").GetComponent<SpriteRenderer>().color = Color.black;
         gameObject.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;
