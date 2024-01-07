@@ -18,6 +18,7 @@ public class UIInGameScreenController : UIPageController
     [SerializeField] private RectTransform formationButtonParent;
     [SerializeField] private Button formationButton1;
     [SerializeField] private Button formationButton2;
+    [SerializeField] private Button formationButton3;
     [SerializeField] private Button formationButtonClose;
     [SerializeField] private UIUnitListController unitsList;
     [SerializeField] private UIOutpostListController outpostsList;
@@ -34,10 +35,11 @@ public class UIInGameScreenController : UIPageController
         cameraButton.AddListener("Zoom In", ZoomIn);
         cameraButton.AddListener("Zoom Out", ZoomOut);
         action1.onClick.AddListener(Attack);
-        action2.AddListener("Move", Move);
+        action2.AddListener("Move", Move); // Fallback
         action3.onClick.AddListener(Formations);
         formationButton1.onClick.AddListener(Formation1);
         formationButton2.onClick.AddListener(Formation2);
+        formationButton3.onClick.AddListener(Formation3);
         formationButtonClose.onClick.AddListener(FormationClose);
     }
 
@@ -65,6 +67,7 @@ public class UIInGameScreenController : UIPageController
     private void Move()
     {
         gameManager.CommandMove();
+        AudioManager.Instance.PlaySFX("Fallback");
     }
 
     private void HideTilemap()
@@ -84,15 +87,23 @@ public class UIInGameScreenController : UIPageController
         formationMask.DOSizeDelta(targetDelta, .25f).OnComplete(() => action3.interactable = true);
     }
 
-    private void Formation2()
-    {
-        gameManager.FormationBox();
-    }
-
     private void Formation1()
     {
-        gameManager.FormationCircle();
+        gameManager.CommandMove();
+        AudioManager.Instance.PlaySFX("FormationCircle");
+
     }
+
+    private void Formation2() {
+        gameManager.FormationBox();
+        AudioManager.Instance.PlaySFX("FormationBox");
+    }
+
+    private void Formation3() {
+        gameManager.FormationCircle();
+        AudioManager.Instance.PlaySFX("FormationFree");
+    }
+
 
     private void Formations()
     {

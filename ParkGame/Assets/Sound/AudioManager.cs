@@ -60,6 +60,8 @@ public class AudioManager : MonoBehaviour
     }
 
     public void PlaySFX(string sfxName) {
+        Debug.Log("playing " + sfxName);
+
         sfxSource.PlayOneShot(sfxDict[sfxName]);
     }
 

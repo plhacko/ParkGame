@@ -77,7 +77,7 @@ namespace Player
                 //     Camera.main.gameObject.transform.SetParent(transform);
                 // }
                 playerManager.SetLocalPlayerController(this);
-                gameObject.AddComponent<AudioListener>();
+            //    gameObject.AddComponent<AudioListener>();
             }
             else
             {
