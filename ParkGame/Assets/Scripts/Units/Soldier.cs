@@ -152,7 +152,6 @@ public class Soldier : NetworkBehaviour, ISoldier
         }
     }
 
-    // later change this for SoldierCommand instead
     public void OnBehaviourChange(SoldierBehaviour previousValue, SoldierBehaviour newValue)
     {
         BehaviourChangedEvent.Invoke();
@@ -309,17 +308,6 @@ public class Soldier : NetworkBehaviour, ISoldier
         }
     }
 
-    private void MovementBehaviour()
-    {
-        if (Vector3.Distance(CommanderToFollow.position, transform.position) > InnerDistanceFromCommander)
-        { MoveTowardsEntity(CommanderToFollow); }
-        else
-        {
-            SoldierBehaviour = SoldierBehaviour.Idle;
-            Networkanimator.Animator.SetFloat(AnimatorMovementSpeedHash, 0.0f);
-        }
-    }
-
     public void NavMeshFormationSwitch(bool enable, SoldierBehaviour newBehaviour, Formation formation, FormationType formationType)
     {
         // if in Circle or Box Formation or Free, it is following something
@@ -387,43 +375,6 @@ public class Soldier : NetworkBehaviour, ISoldier
         XSpriteFlip.Value = directionE == Direction.Left;
     }
 
-    private void FormationBehaviour()
-    {
-        if (FollowInNavMeshFormation)
-        {
-            if (!ObjectToFollowInFormation)
-            {
-                return;
-            }
-
-
-            //// IDLE ATTACK. 
-            ///////////////////////////////////
-            // Attack if enemy close by and in range 
-            /*
-            Transform enemyT = GetEnemy(); 
-            float distanceFromCommander = Vector3.Distance(CommanderToFollow.position, transform.position);
-            if (enemyT != null && distanceFromCommander < DefendDistanceFromCommander) {
-                if (AttackEnemyIfInRange(enemyT)) {
-                    return;
-                }
-            }
-            if (enemyT != null && TypeOfUnit == UnitType.Horseman) {
-                MoveTowardsEntity(enemyT);
-                return;
-            }
-            */
-            /////////////////////////////
-
-            // Follow commander
-            if (TypeOfUnit == UnitType.Horseman && FormationType == FormationType.Box)
-            {
-                Agent.speed = 1f;
-            }
-            FollowObjectWithAnimation(ObjectToFollowInFormation.transform);
-        }
-    }
-
     private Transform GetEnemy()
     {
         if (targetedEnemy != null)
@@ -445,27 +396,6 @@ public class Soldier : NetworkBehaviour, ISoldier
         return enemyT;
     }
 
-    private void AttackBehaviour()
-    {
-        Transform enemyT = GetEnemy();
-
-        // if the front of the group can see the enemy, the rest will go forward (to the commander), but will not stop attacking
-        if (enemyT == null)
-        { MoveTowardsEntity(CommanderToFollow); return; }
-
-        // attack the closest enemy if in range
-        if (AttackEnemyIfInRange(enemyT)) { return; }
-        // go closer to the enemy 
-        MoveTowardsEntity(enemyT);
-        // move away from entity for archer?
-
-        // if the commander is too far, the soldier will stop attacking and will return back to the commander
-        float distanceFromCommander = (CommanderToFollow.position - transform.position).magnitude;
-        if (distanceFromCommander > AttackDistanceFromCommander)
-        {
-            SoldierBehaviour = SoldierBehaviour.Move;
-        }
-    }
     /// <summary> attacks the closest enemy in range</summary>
     /// <returns> returns if enemy was in range </returns>
     private bool AttackEnemyIfInRange(Transform enemyT)
@@ -503,22 +433,6 @@ public class Soldier : NetworkBehaviour, ISoldier
         return false;
     }
 
-    // idea for horseman
-    private void GetMidPoint()
-    {
-        if (!targetedEnemy)
-        {
-            return;
-        }
-        // ch = commander - horseman
-        // enemy - horseman + (-ch.x, -ch.y)
-        Vector3 comHor = CommanderToFollow.position - transform.position;
-        comHor = new Vector3(-comHor.x, -comHor.y, transform.position.z);
-        midPointPositionForHorseman = (targetedEnemy.position - transform.position) / 2 + comHor;
-        midPointPositionForHorseman.z = transform.position.z;
-        midPointReached = false;
-    }
-
     private void MoveTowardsEntity(Transform entityT)
     {
         // archers, don't go closer! you'd just die 
@@ -529,31 +443,6 @@ public class Soldier : NetworkBehaviour, ISoldier
         }
 
         FollowObjectWithAnimation(entityT);
-    }
-    private void Move(Vector2 direction)
-    {
-
-        if (direction.magnitude < 0.01f)
-        {
-            Networkanimator.Animator.SetFloat(AnimatorMovementSpeedHash, 0.0f);
-            return;
-        }
-
-        direction = direction.normalized;
-
-        Vector2 movement = direction * MovementSpeed;
-
-        // animation
-        Networkanimator.Animator.SetFloat(AnimatorMovementSpeedHash, movement.magnitude);
-        Networkanimator.Animator.SetInteger(AnimatorDirection, (int)GetDirectionEnum(direction));
-
-        if (direction.magnitude < Mathf.Epsilon)
-        { return; }
-
-        SpriteRenderer.flipX = movement.x < 0;
-        XSpriteFlip.Value = SpriteRenderer.flipX;
-
-        Agent.SetDestination(transform.position + new Vector3(movement.x, movement.y, 0));
     }
 
     public void OnMouseDown()
