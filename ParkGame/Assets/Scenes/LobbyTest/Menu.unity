@@ -1369,22 +1369,33 @@ MonoBehaviour:
   sfxList: []
   notificationsList:
   - name: Attack
-    sound: {fileID: 8300000, guid: 8932f131d6f30f04b8da7e78c513fa87, type: 3}
+    sound: {fileID: 8300000, guid: 82850d383a4fd6b48b3d32ef0a772ba1, type: 3}
   - name: Fallback
-    sound: {fileID: 8300000, guid: 23231948a92f86043b5bc08790e1043c, type: 3}
+    sound: {fileID: 8300000, guid: 72d3b459de63a9a48aee87bff4fc1d1c, type: 3}
   - name: FormationBox
-    sound: {fileID: 8300000, guid: 0955184db0df77042af3d0dae507cb05, type: 3}
+    sound: {fileID: 8300000, guid: d5d46ab70c0261445883f79604e5166c, type: 3}
   - name: FormationCircle
-    sound: {fileID: 8300000, guid: a851cc8ee0a56fd41ad814fa41912073, type: 3}
+    sound: {fileID: 8300000, guid: 7a82472f39c356744a2e0260e3b2ab2e, type: 3}
   - name: FormationFree
-    sound: {fileID: 8300000, guid: e35bf7585d6cd3c48a4c3cf30d77c66d, type: 3}
-  pawnAttackSfx_list: []
-  archerAttackSfx_list: []
+    sound: {fileID: 8300000, guid: a584c9345f1387f40a14ab93961c72bd, type: 3}
+  pawnAttackSfx_list:
+  - {fileID: 8300000, guid: 31e42e37fd79d124eaa444b847905510, type: 3}
+  - {fileID: 8300000, guid: 65b4f6844a45a7e44be8ccd1b919ce74, type: 3}
+  archerAttackSfx_list:
+  - {fileID: 8300000, guid: e0a2af8713c067145b380c0a9fcdda8a, type: 3}
+  - {fileID: 8300000, guid: 5a771d365be2b7f4eb6562043e9192ed, type: 3}
+  - {fileID: 8300000, guid: fe87812ba2206904788cc2804d72b5b2, type: 3}
+  - {fileID: 8300000, guid: 8b52819ea56a9a64aa7c299518e966a4, type: 3}
+  - {fileID: 8300000, guid: 3fea785a4fc7f5644a6a2bea79ded5f5, type: 3}
+  - {fileID: 8300000, guid: b4fa152340da8fa4a9206d2fd280b064, type: 3}
   molemanAttackSfx_list: []
+  soldierClickSfx_list:
+  - {fileID: 8300000, guid: f841c6d9596cf0d4cb546b0b5cf48559, type: 3}
+  - {fileID: 8300000, guid: 0bad6e3d8600c504e901e5da34406fb0, type: 3}
   diedSfx_list:
-  - {fileID: 8300000, guid: 6c47867f6d4b52c4b9bd85042a3414ca, type: 3}
-  - {fileID: 8300000, guid: accf0834640082b46b47db91f1d35676, type: 3}
-  - {fileID: 8300000, guid: 4b0f12ca0350ea44f81990d4a76c9fcb, type: 3}
+  - {fileID: 8300000, guid: 0e3fd8387549af94aa7d82758b3406df, type: 3}
+  - {fileID: 8300000, guid: c183e738be4e6d34888111cdf5da3e56, type: 3}
+  - {fileID: 8300000, guid: 26863cf2db9cb7c46a3c8ef3ff4ae5e6, type: 3}
 --- !u!4 &1039231701
 Transform:
   m_ObjectHideFlags: 0

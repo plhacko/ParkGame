@@ -192,11 +192,12 @@ public class Soldier : NetworkBehaviour, ISoldier
         } else {
             randomCounter = randomCounterForTestingSound;
         }
+        /*
         if (randomCounterForTestingSound == randomCounter) {
             AudioManager.Instance.sfxSource.transform.position = transform.position;
             AudioManager.Instance.PlayDead();
         }
-
+        */
 
 
 
@@ -437,6 +438,7 @@ public class Soldier : NetworkBehaviour, ISoldier
 
                 if (TypeOfUnit == UnitType.Pawn || TypeOfUnit == UnitType.Horseman)
                 {
+                    AudioManager.Instance.PlayPawnAttack(transform.position);
                     enemyT.GetComponent<ISoldier>()?.TakeDamage(Damage);
 
                 }
@@ -448,6 +450,7 @@ public class Soldier : NetworkBehaviour, ISoldier
                     
                     XSpriteFlip.Value = flip;
                     Debug.Log("shoot");
+                    AudioManager.Instance.PlayArcherAttack(transform.position);
                     shooting.Shoot(enemyT.transform.position, Damage, flip, Team);
                 }
             }
@@ -524,6 +527,8 @@ public class Soldier : NetworkBehaviour, ISoldier
         PlayerController playerController = playerManager.GetPlayerController(clientID);
         if (playerController != null && playerController.Team == Team)
         {
+            AudioManager.Instance.PlayClickOnDwarf(transform.position);
+
             if (playerController.gameObject.transform != CommanderToFollow)
             {
                 SetCommanderToFollow(playerController.gameObject.transform);
@@ -599,8 +604,7 @@ public class Soldier : NetworkBehaviour, ISoldier
 
     private void handleDeath()
     {
-        AudioManager.Instance.sfxSource.transform.position = gameObject.transform.position;
-        AudioManager.Instance.PlayDead();
+        AudioManager.Instance.PlayDead(gameObject.transform.position);
 
         // visualize death: black shadow, fade soldier's sprite, and then self-destruct
         gameObject.transform.Find("Circle").GetComponent<SpriteRenderer>().color = Color.black;
