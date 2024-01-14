@@ -1,10 +1,14 @@
 ﻿using System.Collections;
 using UnityEngine;
+using Unity.Netcode;
 
 public enum SoldierBehaviour { Idle, Move, Attack, Formation, Death }
 public enum SoldierCommand {
     InOutpost, // defensive, wary
     Following, // following commander or position in formation
+    FollowingCommander, // following commander or position in formation
+    FollowingInFormationCircle, // following commander or position in formation
+    FollowingInFormationBox, // following commander or position in formation
     Attack,
     ReturnToOutpost, // return to closest outpost, or also attack just when attacked? but be wary of close enemies??? 
     Fallback, // ? follow commander or return to closest outpost?
