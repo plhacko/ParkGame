@@ -358,13 +358,20 @@ public class Soldier : NetworkBehaviour, ISoldier
     }
     private void FollowObjectWithAnimation(Transform toFollow)
     {
-        Agent.SetDestination(toFollow.position);
-        Vector2 direction = toFollow.position - gameObject.transform.position;
+        Vector3 toFollowPosition = new Vector3(toFollow.position.x, toFollow.position.y, transform.position.z);
+        Agent.SetDestination(toFollowPosition);
+        Vector2 direction = toFollowPosition - gameObject.transform.position;
 
         Direction directionE = GetDirectionEnum(direction);
         
-        if (direction.magnitude < 0.001f) 
-        {Networkanimator.Animator.SetFloat(AnimatorMovementSpeedHash, 0.0f);
+        if (direction.magnitude < 0.5f) {
+            if (toFollow == CommanderToFollow && CommanderToFollow.GetComponent<Outpost>()) {
+                NewCommand(SoldierCommand.InOutpost);
+            }
+        }
+
+        if (direction.magnitude < 0.1f) 
+        {   
             Networkanimator.Animator.SetFloat(AnimatorMovementSpeedHash, 0.0f);
             Agent.SetDestination(transform.position);
         } else
