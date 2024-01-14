@@ -2071,10 +2071,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Welcome Screen
       objectReference: {fileID: 0}
-    - target: {fileID: 5180419811621639846, guid: c0cb439c9b24fa74b85169aa71c692b7, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 5580539624123972558, guid: c0cb439c9b24fa74b85169aa71c692b7, type: 3}
       propertyPath: loginPage
       value: 
@@ -2170,14 +2166,6 @@ PrefabInstance:
     - target: {fileID: 7530403938473826165, guid: c0cb439c9b24fa74b85169aa71c692b7, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7888895157239260194, guid: c0cb439c9b24fa74b85169aa71c692b7, type: 3}
-      propertyPath: exitMode
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 7888895157239260194, guid: c0cb439c9b24fa74b85169aa71c692b7, type: 3}
-      propertyPath: entryMode
-      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
