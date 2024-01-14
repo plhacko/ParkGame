@@ -194,9 +194,9 @@ public class Soldier : NetworkBehaviour, ISoldier
         }
 
         Transform enemyT = EnemyObserver.GetClosestEnemy();
-        float distanceOfEnemyToOutpost = Vector3.Distance(enemyT.position, CommanderToFollow.position);
 
         if (enemyT != null && distanceFromOutpost < DefendDistanceFromCommander) {
+            float distanceOfEnemyToOutpost = Vector3.Distance(enemyT.position, CommanderToFollow.position);
             if (AttackEnemyIfInRange(enemyT)) { return; }
             else if (distanceOfEnemyToOutpost <= DefendDistanceFromCommander) 
             { 

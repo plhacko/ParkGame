@@ -160,7 +160,7 @@ namespace Managers
                 CreateLobbyOptions createLobbyOptions = new()
                 {
                     IsPrivate = true,
-                    Player = GetPlayerWithData(),
+                    Player = CreateDefaultPlayerData(),
                     Data = GetLobbyData(),
                 };
 
@@ -243,7 +243,7 @@ namespace Managers
             {
                 JoinLobbyByCodeOptions joinLobbyByCodeOptions = new()
                 {
-                    Player = GetPlayerWithData(),
+                    Player = CreateDefaultPlayerData(),
                 };
 
                 Lobby = await LobbyService.Instance.JoinLobbyByCodeAsync(code, joinLobbyByCodeOptions);
@@ -280,7 +280,7 @@ namespace Managers
             }
         }
 
-        private Unity.Services.Lobbies.Models.Player GetPlayerWithData()
+        private Unity.Services.Lobbies.Models.Player CreateDefaultPlayerData()
         {
             return new() 
             {
@@ -349,7 +349,13 @@ namespace Managers
         {
             try 
             {
-                var player = GetPlayerWithData();
+                var currentPlayer = Lobby.Players.Find(player => player.Id == AuthenticationService.Instance.PlayerId);
+                if (currentPlayer != null && currentPlayer.Data.TryGetValue("TeamNumber", out var teamNumberDataObject))
+                {
+                    if (int.TryParse(teamNumberDataObject.Value, out int currentTeamNumber) && currentTeamNumber == teamNumber) return true;    
+                }
+                
+                var player = CreateDefaultPlayerData();
                 player.Data["TeamNumber"].Value = teamNumber.ToString();
 
                 UpdatePlayerOptions updatePlayerOptions = new()

@@ -76,6 +76,7 @@ namespace UI.Lobby
             if (LobbyManager.Singleton.IsHost)
             {
                 startGameButton.gameObject.SetActive(true);
+                startGameButton.interactable = isGameValid(LobbyManager.Singleton.MapData);
             }
             else
             {
@@ -130,6 +131,29 @@ namespace UI.Lobby
             }
 
             UpdateUI();
+        }
+        
+        private bool isGameValid(MapData mapData)
+        {
+            int numTeams = mapData.MetaData.NumTeams;
+            bool[] teamHasPlayer = new bool[numTeams];
+
+            var teams = LobbyManager.Singleton.GetTeams();
+            foreach (var (_, team) in teams)
+            {
+                if (team != -1)
+                {
+                    teamHasPlayer[team] = true;   
+                }
+            }
+
+            bool isValid = true;
+            foreach (var hasPlayer in teamHasPlayer)
+            {
+                isValid = isValid && hasPlayer;
+            }
+
+            return isValid;
         }
 
         private UILobbyTeam InitializeTeamUI(int teamNumber)
