@@ -115,6 +115,13 @@ namespace Managers
         private void Start()
         {
             NetworkManager.Singleton.ConnectionApprovalCallback = onConnectionApproval;
+            NetworkManager.Singleton.OnClientDisconnectCallback += (clientId) =>
+            {
+                if (firebaseIdToClientId.ContainsKey(clientId))
+                {
+                    firebaseIdToClientId.Remove(clientId);
+                }
+            };
         }
 
         private void OnDestroy()
@@ -421,6 +428,21 @@ namespace Managers
 
             return teams;
         }
+        
+        public Dictionary<string, int> GetFirebaseIdTeams()
+        {
+            Dictionary<string, int> teams = new();
+
+            foreach (var player in Lobby.Players)
+            {
+                if (player.Data.ContainsKey("TeamNumber") && player.Data.ContainsKey("FirebaseId"))
+                {
+                    teams.Add(player.Data["FirebaseId"].Value, int.Parse(player.Data["TeamNumber"].Value));
+                }
+            }
+
+            return teams;
+        }
 
         public async Task DownloadMapData()
         {
@@ -551,7 +573,7 @@ namespace Managers
                 return null;
             }
         }
-
+        
         private async Task<JoinAllocation> JoinRelay(string joinCode)
         {
             try
@@ -566,8 +588,30 @@ namespace Managers
             }
         }
 
-        public void StartGame()
+        public async void StartGame()
         {
+            var teams = GetFirebaseIdTeams();
+            var persistentIds = GetPersistentIds();
+            
+            List<ulong> clientIdsCopy = new List<ulong>(NetworkManager.Singleton.ConnectedClientsIds);
+            foreach (var clientId in clientIdsCopy)
+            {
+                if (firebaseIdToClientId.TryGetValue(clientId, out var firebaseId))
+                {
+                    if (teams.TryGetValue(firebaseId, out var teamNumber))
+                    {
+                        if(teamNumber == -1)
+                        {
+                            var clientAuthId = persistentIds.First(x => x.Value == firebaseId).Key;
+                            await RemovePlayerFromLobby(clientAuthId);
+                        }
+                        continue;
+                    }
+                }
+                
+                NetworkManager.Singleton.DisconnectClient(clientId);
+            }
+
             NetworkManager.Singleton.SceneManager.LoadScene(GameScene, LoadSceneMode.Single);
         }
         

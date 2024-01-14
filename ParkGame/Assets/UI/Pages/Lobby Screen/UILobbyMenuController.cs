@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Managers;
 using TMPro;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -172,6 +173,7 @@ namespace UI.Lobby
         {
             backButton.interactable = false;
             await LobbyManager.Singleton.LeaveLobby();
+            NetworkManager.Singleton.Shutdown();
             backButton.interactable = true;
         }
 
