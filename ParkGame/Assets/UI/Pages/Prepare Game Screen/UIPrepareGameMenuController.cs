@@ -26,6 +26,7 @@ public class UIPrepareGameMenuController : UIPageController
     public override async void OnEnter()
     {
         setInteractable(false);
+        mapPicker.SetInteractable(false);
         processing = false;
         await mapPicker.DownloadMaps();
     }
@@ -49,6 +50,7 @@ public class UIPrepareGameMenuController : UIPageController
     private async void Create()
     {
         setInteractable(false);
+        mapPicker.SetInteractable(false);
         
         MapData mapData = mapPicker.GetCurrentMapData();
         

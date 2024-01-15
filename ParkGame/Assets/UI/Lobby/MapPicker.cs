@@ -72,6 +72,12 @@ public class MapPicker : MonoBehaviour
         previousMapButton.onClick.AddListener(onPreviousClicked);
     }
 
+    public void SetInteractable(bool interactable)
+    {
+        nextMapButton.interactable = interactable;
+        previousMapButton.interactable = interactable;
+    }
+    
     private void onNextClicked()
     {
         currentMapIndex = (currentMapIndex + 1) % mapDatas.Count;
