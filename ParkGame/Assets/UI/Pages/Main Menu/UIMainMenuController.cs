@@ -102,6 +102,7 @@ public class UIMainMenuController : UIPageController
         joinCodeInputField.interactable = isInteractable;
         joinButton.interactable = isInteractable;
         signOutButton.interactable = isInteractable;
+        aboutButton.interactable = isInteractable;
     }
 
     private void Prepare()
