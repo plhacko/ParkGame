@@ -9,7 +9,6 @@ public class UIInGameScreenController : UIPageController
 {
     [SerializeField] private Button optionsButton;
     [SerializeField] private ToggleButton mapButton;
-    [SerializeField] private ToggleButton lockUIButton;
     [SerializeField] private ToggleButton cameraButton;
     [SerializeField] private Button action1;
     [SerializeField] private ToggleButton action2;
@@ -29,8 +28,6 @@ public class UIInGameScreenController : UIPageController
         optionsButton.onClick.AddListener(Options);
         mapButton.AddListener("Show", ShowTilemap);
         mapButton.AddListener("Hide", HideTilemap);
-        lockUIButton.AddListener("Unlock", UnlockUI);
-        lockUIButton.AddListener("Lock", LockUI);
         cameraButton.AddListener("Zoom In", ZoomIn);
         cameraButton.AddListener("Zoom Out", ZoomOut);
         action1.onClick.AddListener(Attack);
@@ -51,7 +48,7 @@ public class UIInGameScreenController : UIPageController
         GameManager.Instance.CameraFollowCommander();
     }
 
-    private void UnlockUI()
+    public void UnlockUI()
     {
         var canvasGroup = GetComponent<CanvasGroup>();
         canvasGroup.interactable = true;
@@ -113,7 +110,7 @@ public class UIInGameScreenController : UIPageController
         GameManager.Instance.Zoom(float.MaxValue);
     }
 
-    private void LockUI()
+    public void LockUI()
     {
         var canvasGroup = GetComponent<CanvasGroup>();
         canvasGroup.interactable = false;
