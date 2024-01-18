@@ -147,27 +147,19 @@ namespace Player
             if (gameSessionManager.IsOver) return;
 
             PointerPosition = PlayerPointerPlacer.PinPosition;
-
-            if (Input.GetKeyDown(KeyCode.I))
-            { CommandMovementServerRpc(); }
-            if (Input.GetKeyDown(KeyCode.O))
-            { CommandIdleServerRpc(); }
-            if (Input.GetKeyDown(KeyCode.P)) { 
-                formationScript.ResetFormation();
-                FormationType = Formation.FormationType.Free;
+            
+            if (Input.GetKeyDown(KeyCode.P)) {
                 CommandAttackServerRpc();
-                Debug.Log("ATTACK");
             }
-        
-
-            if (Input.GetKeyDown(KeyCode.C)) { 
-                //FormatSoldiersServerRpc(KeyCode.C); }
-                FormatSoldiers(KeyCode.C); }
-            if (Input.GetKeyDown(KeyCode.R)) { 
-                //FormatSoldiersServerRpc(KeyCode.R); }
-                FormatSoldiers(KeyCode.R); }
+            if (Input.GetKeyDown(KeyCode.C))
+            {
+                FormatSoldiersServerRpc(KeyCode.C);
+            }
+            if (Input.GetKeyDown(KeyCode.R)) 
+            { 
+                FormatSoldiersServerRpc(KeyCode.R); 
+            }
         }
-
 
         [ServerRpc(RequireOwnership = false)]
         public void FormatSoldiersServerRpc(KeyCode key) {
@@ -184,13 +176,13 @@ namespace Player
                         FormationType = Formation.FormationType.Circle;
                         formationScript.ResetFormation();
                         // notify soldiers
-                        NotifySoldiersServerRpc();
+                        notifySoldiers();
                         break;
 
                     case Formation.FormationType.Circle:
                         FormationType = Formation.FormationType.Free;
                         // notify soldiers
-                        NotifySoldiersServerRpc();
+                        notifySoldiers();
                         break;
 
                     default:
@@ -205,14 +197,14 @@ namespace Player
                         FormationType = Formation.FormationType.Box;
                         formationScript.ResetFormation();
                         // notify soldiers
-                        NotifySoldiersServerRpc();
+                        notifySoldiers();
                         break;
 
                     case Formation.FormationType.Box:
                         FormationType = Formation.FormationType.Free;
                         formationScript.ResetFormation();
                         // notify soldiers
-                        NotifySoldiersServerRpc();
+                        notifySoldiers();
                         break;
 
                     default:
@@ -228,9 +220,9 @@ namespace Player
         }
         
         //[ServerRpc]
-        [ServerRpc(RequireOwnership = false)]
-        public void NotifySoldiersServerRpc(ServerRpcParams serverRpcParams = default) {
-            Debug.Log("NOTIFY SOLDIERS to change formation - SERVER RPC by " + serverRpcParams.Receive.SenderClientId);
+        // [ServerRpc(RequireOwnership = false)]
+        private void notifySoldiers() {
+            // Debug.Log("NOTIFY SOLDIERS to change formation - SERVER RPC by " + serverRpcParams.Receive.SenderClientId);
             foreach (GameObject go in units) {
                 if (go.TryGetComponent<ISoldier>(out ISoldier soldier)) {
                     soldier.NewCommand(SoldierCommand.Following);
@@ -326,7 +318,7 @@ namespace Player
             {
                 Send = new ClientRpcSendParams
                 {
-                    TargetClientIds = new []{ OwnerClientId }
+                    TargetClientIds = new []{ OwnerClientId, NetworkManager.Singleton.LocalClientId }
                 }
             };
             
@@ -349,9 +341,12 @@ namespace Player
                 return;
             }
 
-            uiInGameScreenController.AddUnit(soldier,
-                () => soldier.RequestChangingCommanderToFollowServerRpc(NetworkManager.Singleton.LocalClientId)
-            );
+            if (isActualOwner())
+            {
+                uiInGameScreenController.AddUnit(soldier,
+                    () => soldier.RequestChangingCommanderToFollowServerRpc(NetworkManager.Singleton.LocalClientId)
+                );   
+            }
         }
 
         void ICommander.ReportUnfollowing(NetworkObjectReference networkObjectReference) {
@@ -359,7 +354,7 @@ namespace Player
 
             ClientRpcParams clientRpcParams = new ClientRpcParams {
                 Send = new ClientRpcSendParams {
-                    TargetClientIds = new[] { OwnerClientId }
+                    TargetClientIds = new[] { OwnerClientId, NetworkManager.Singleton.LocalClientId }
                 }
             };
 
@@ -382,7 +377,10 @@ namespace Player
                 return;
             }
 
-            uiInGameScreenController.RemoveUnit(soldier);
+            if (isActualOwner())
+            {
+                uiInGameScreenController.RemoveUnit(soldier);
+            }
         }
         
         // commands to the units
@@ -421,14 +419,17 @@ namespace Player
 
         [ServerRpc(RequireOwnership = false)]
         public void CommandAttackServerRpc(ServerRpcParams serverRpcParams = default) {
+            formationScript.ResetFormation();
+            FormationType = Formation.FormationType.Free;
+            
             Debug.Log("SERVER ATTACK RPC CALLED BY " + serverRpcParams.Receive.SenderClientId);
                 //formationScript.ResetFormation();  
-                foreach (GameObject go in units) {
-                    if (go.TryGetComponent<ISoldier>(out ISoldier soldier)) {
-                        soldier.SoldierBehaviour = SoldierBehaviour.Attack;
-                        soldier.NewCommand(SoldierCommand.Attack);
-                    }
+            foreach (GameObject go in units) {
+                if (go.TryGetComponent<ISoldier>(out ISoldier soldier)) {
+                    soldier.SoldierBehaviour = SoldierBehaviour.Attack;
+                    soldier.NewCommand(SoldierCommand.Attack);
                 }
+            }
         }
 
         public void AddOutpost(Outpost outpost) {
