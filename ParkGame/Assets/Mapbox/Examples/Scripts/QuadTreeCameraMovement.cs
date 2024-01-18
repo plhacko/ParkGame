@@ -421,6 +421,38 @@ namespace Mapbox.Examples
 		{
 			_selectingRegion = toggle.isOn;
 		    lineRenderer.gameObject.SetActive(toggle.isOn);
+			if (toggle.isOn)
+			{
+				Vector2 screenSpaceInitial;
+				Vector2 screenSpaceFinal;
+
+				Debug.Log(Screen.width + " " + Screen.height);
+
+				var portrait = Screen.width < Screen.height;
+				if (portrait)
+				{
+					screenSpaceInitial = new Vector2(0.25f * Screen.width, 0.5f * Screen.height - 0.25f * Screen.width);
+					screenSpaceFinal = new Vector2(0.75f * Screen.width, 0.5f * Screen.height + 0.25f * Screen.width);
+				}
+				else
+				{
+					screenSpaceInitial = new Vector2(0.5f * Screen.width - 0.25f * Screen.height, 0.25f * Screen.height);
+					screenSpaceFinal = new Vector2(0.5f * Screen.width + 0.25f * Screen.height, 0.75f * Screen.height);
+				}
+
+				Debug.Log(screenSpaceInitial + " " + screenSpaceFinal);
+
+				// Transform into world space
+				_initialPosition = _referenceCamera.ScreenToWorldPoint(new Vector3(screenSpaceInitial.x, screenSpaceInitial.y, _referenceCamera.transform.localPosition.y));
+				_lastPosition = _referenceCamera.ScreenToWorldPoint(new Vector3(screenSpaceFinal.x, screenSpaceFinal.y, _referenceCamera.transform.localPosition.y));
+
+				lineRenderer.positionCount = 4;	
+				lineRenderer.SetPosition(0, new Vector3(_initialPosition.x, 0.1f, _initialPosition.z));
+				lineRenderer.SetPosition(1, new Vector3(_lastPosition.x, 0.1f, _initialPosition.z));
+				lineRenderer.SetPosition(2, new Vector3(_lastPosition.x, 0.1f, _lastPosition.z));
+				lineRenderer.SetPosition(3, new Vector3(_initialPosition.x, 0.1f, _lastPosition.z));
+
+			}
 		}
 	}
 }

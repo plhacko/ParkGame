@@ -19,7 +19,8 @@ public enum ServiceType
     UnityServices = 1,
     UnityAuth = 2,
     FirebaseAuth = 4,
-    All = UnityServices | FirebaseAuth | UnityAuth
+    GPS = 8,
+    All = UnityServices | FirebaseAuth | UnityAuth | GPS
 }
 
 public class ServicesManager : MonoBehaviour
@@ -44,7 +45,7 @@ public class ServicesManager : MonoBehaviour
 
     private async void Initialize()
     {
-        State = ServiceType.None;
+        State = ServiceType.None;    
 
         await InitializeUnityServices();     
 
@@ -54,10 +55,16 @@ public class ServicesManager : MonoBehaviour
             State |= ServiceType.UnityServices;
         if (IsSignedToUnityAuth())
             State |= ServiceType.UnityAuth;
+        if (IsLocationServiceInitialized())
+            State |= ServiceType.GPS;
     }
 
     private async Task InitializeUnityServices()
     {
+        if (AreInitializedUnityServices())
+            return;
+
+        Debug.Log("Initializing Unity Services");
         await UnityServices.InitializeAsync();
         State |= ServiceType.UnityServices;
     }
@@ -226,4 +233,61 @@ public class ServicesManager : MonoBehaviour
         SignOutFromUnityAuth();
     }
 
+    public bool IsLocationServiceInitialized()
+    {
+        return UnityEngine.Input.location.status == LocationServiceStatus.Running;
+    }
+
+    public bool GPSPermissionGranted()
+    {
+#if UNITY_EDITOR
+        // No permission handling needed in Editor
+        return true; 
+#elif UNITY_ANDROID
+        var fineLocation = UnityEngine.Android.Permission.HasUserAuthorizedPermission(UnityEngine.Android.Permission.FineLocation);
+        var locationEnabled = UnityEngine.Input.location.isEnabledByUser;
+
+        return fineLocation && locationEnabled;
+#elif UNITY_IOS
+        //TODO
+        return false;
+#else 
+        return true;
+#endif
+    }
+
+    public void RequestGPSPermission()
+    {
+#if UNITY_EDITOR
+        // No permission handling needed in Editor
+#elif UNITY_ANDROID
+        if (!UnityEngine.Android.Permission.HasUserAuthorizedPermission(UnityEngine.Android.Permission.FineLocation)) {
+            UnityEngine.Android.Permission.RequestUserPermission(UnityEngine.Android.Permission.FineLocation);
+        }
+
+        // First, check if user has location service enabled
+        if (!UnityEngine.Input.location.isEnabledByUser) {
+            // TODO Failure
+            Debug.Log("Android and Location not enabled");
+        }
+
+#elif UNITY_IOS
+        //TODO
+#else
+        // No permission handling needed in Editor
+#endif
+        State |= ServiceType.GPS;
+    }
+
+    void OnApplicationFocus(bool hasFocus)
+    {
+        if (hasFocus)
+        {
+            Debug.Log("OnApplicationFocus");
+            if (!GPSPermissionGranted())
+            {
+                RequestGPSPermission();
+            }
+        }
+    }
 }

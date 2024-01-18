@@ -23,19 +23,42 @@ public class UIMapSelectPageController : UIPageController
 
     public override void OnExit() {}
 
-    private void Awake() {
+    private void Awake()
+    {
         mapSelectToggle.onValueChanged.AddListener(OnToggleValueChanged);
         mapCreatorButton.onClick.AddListener(OnMapCreatorButtonClicked);
         mainMenuButton.onClick.AddListener(OnMainMenuButtonClicked);
         currentLocationButton.onClick.AddListener(OnCurrentLocationButtonClicked);
         map = quadTreeCameraMovement.GetComponent<AbstractMap>();
-        // TODO set location of map to the current location
+    }
+
+    private void Start() 
+    {
+        if (GPSLocator.instance != null && GPSLocator.instance.IsGPSUsable())
+        {
+            OnCurrentLocationButtonClicked();
+        }
+    }
+
+    private string GetCurrentLocation()
+    {
+        if (GPSLocator.instance != null && GPSLocator.instance.IsGPSUsable())
+        {
+            var lat = GPSLocator.instance.Lattitude;
+            var lon = GPSLocator.instance.Longitude;
+            return $"{lat}, {lon}";
+        }
+        else
+        {
+            // TODO remove this default location
+            return "50.0840313988596, 14.423742114802605";
+        }
     }
 
     private void OnCurrentLocationButtonClicked()
     {
-        // TODO set location of map to the current location
-        map._options.locationOptions.latitudeLongitude = "50.0840313988596, 14.423742114802605";
+        map._options.locationOptions.latitudeLongitude = GetCurrentLocation();
+        map._options.locationOptions.zoom = 15f;
         map.UpdateMap();
     }
 
@@ -53,5 +76,13 @@ public class UIMapSelectPageController : UIPageController
     {
         mapCreatorButton.interactable = arg0;
         quadTreeCameraMovement.SelectRegionOnValueChanged(mapSelectToggle);
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            OnMainMenuButtonClicked();
+        }
     }
 }

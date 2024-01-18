@@ -125,4 +125,9 @@ public class GPSLocator : MonoBehaviour
     {
         return Input.location.status == LocationServiceStatus.Running;
     }
+
+    public bool IsGPSUsable()
+    {
+        return IsLocationServiceEnabled() && IsLocationServiceRunning();
+    }
 }
