@@ -1,7 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using Managers;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -15,7 +13,7 @@ public class UIOptionsScreenController : UIPageController
     [SerializeField] private Button howToPlayButton;
     [SerializeField] private UIPage howToPlayPage;
     [SerializeField] private string mainMenuSceneName = "Menu";
-
+    [SerializeField] private DisconnectionHandler disconnectionHandler;
     private void Awake()
     {
         backButton.onClick.AddListener(Back);
@@ -37,11 +35,11 @@ public class UIOptionsScreenController : UIPageController
         UIController.Singleton.PopUIPage();
     }
 
-    private async void Quit()
+    private void Quit()
     {
-        // TODO handle disconnecting from server
-        await LobbyManager.Singleton.LeaveLobby();
-        SceneManager.LoadScene(mainMenuSceneName);
+        // show do you want to disconnect for host
+        disconnectionHandler.Disconnect();
+        SceneManager.LoadScene("CleanUpScene");
     }
 
     private void ToggleBackgroundNoise()

@@ -29,6 +29,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/GameScene.unity
     guid: 1fc6dd1ea7b1c324f9cd2af971aff93e
+  - enabled: 1
+    path: Assets/Scenes/CleanUpScene.unity
+    guid: 1b51364276a388b48a082dbea3295c32
   - enabled: 0
     path: Assets/Scenes/LobbyTest/DebugMenu.unity
     guid: 682504809189c0940b3fe0be4a9fcef7
