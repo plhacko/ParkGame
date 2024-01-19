@@ -16,7 +16,6 @@ public class UIMapSelectPageController : UIPageController
     [SerializeField] private MapSpriteBuilder mapSpriteBuilder;
     [SerializeField] private Button mainMenuButton;
     [SerializeField] private string mainMenuSceneName = "Menu";
-    [SerializeField] private string mapCreatorSceneName = "MapDrawingScene";
     private AbstractMap map;
 
     public override void OnEnter() {}

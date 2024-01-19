@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -23,6 +24,8 @@ public class GPSLocator : MonoBehaviour
     private double lon;
     private double lat;
     private double horAcc;
+
+    public Action OnLocationInitialized;
 
     private void Awake()
     {
@@ -96,6 +99,7 @@ public class GPSLocator : MonoBehaviour
         }
         else
         {
+            OnLocationInitialized?.Invoke();
             Debug.LogFormat("Location service live. status {0}", UnityEngine.Input.location.status);
             // Access granted and location value could be retrieved
             InvokeRepeating("UpdateLocation", invokeDelay, updateRate);

@@ -46,6 +46,7 @@ namespace Mapbox.Examples
 		private Vector3 _initialPosition;
 
 		private Vector3 _lastPosition;
+		private bool _selectingRegionInitialized = false;
 
 		void Awake()
 		{
@@ -166,6 +167,18 @@ namespace Mapbox.Examples
 			}
 
 			Touch touch = Input.GetTouch(0);
+
+			if (_selectingRegionInitialized && (touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled))
+			{
+				Debug.Log("Selecting region finished");
+				_selectingRegionInitialized = false;
+				return;
+			}
+			if (_selectingRegionInitialized && touch.phase != TouchPhase.Ended)
+			{
+				Debug.Log("Selecting region in progress");
+				return;
+			}
 			
 			Vector3 touchPosition = touch.position;
 			touchPosition.z = Camera.main.transform.localPosition.y;
@@ -181,7 +194,7 @@ namespace Mapbox.Examples
 				lineRenderer.SetPosition(3, new Vector3(_initialPosition.x, 0.1f, _initialPosition.z));
             }
             else if (touch.phase == TouchPhase.Moved || touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled)
-			{            
+			{ 
                 // Save the last touch position
                 _lastPosition = Camera.main.ScreenToWorldPoint(touchPosition);
 				lineRenderer.SetPosition(0, new Vector3(_initialPosition.x, 0.1f, _initialPosition.z));
@@ -277,6 +290,12 @@ namespace Mapbox.Examples
 
 		void PanMapUsingTouchOrMouse()
 		{
+			if (IsPointerOverUI())
+			{
+				Debug.Log("Pointer over UI");
+				return;
+			}
+
 			if (_useDegreeMethod)
 			{
 				UseDegreeConversion();
@@ -426,8 +445,6 @@ namespace Mapbox.Examples
 				Vector2 screenSpaceInitial;
 				Vector2 screenSpaceFinal;
 
-				Debug.Log(Screen.width + " " + Screen.height);
-
 				var portrait = Screen.width < Screen.height;
 				if (portrait)
 				{
@@ -439,20 +456,38 @@ namespace Mapbox.Examples
 					screenSpaceInitial = new Vector2(0.5f * Screen.width - 0.25f * Screen.height, 0.25f * Screen.height);
 					screenSpaceFinal = new Vector2(0.5f * Screen.width + 0.25f * Screen.height, 0.75f * Screen.height);
 				}
-
-				Debug.Log(screenSpaceInitial + " " + screenSpaceFinal);
-
 				// Transform into world space
 				_initialPosition = _referenceCamera.ScreenToWorldPoint(new Vector3(screenSpaceInitial.x, screenSpaceInitial.y, _referenceCamera.transform.localPosition.y));
 				_lastPosition = _referenceCamera.ScreenToWorldPoint(new Vector3(screenSpaceFinal.x, screenSpaceFinal.y, _referenceCamera.transform.localPosition.y));
 
+				_selectingRegionInitialized = true;
 				lineRenderer.positionCount = 4;	
 				lineRenderer.SetPosition(0, new Vector3(_initialPosition.x, 0.1f, _initialPosition.z));
 				lineRenderer.SetPosition(1, new Vector3(_lastPosition.x, 0.1f, _initialPosition.z));
 				lineRenderer.SetPosition(2, new Vector3(_lastPosition.x, 0.1f, _lastPosition.z));
 				lineRenderer.SetPosition(3, new Vector3(_initialPosition.x, 0.1f, _lastPosition.z));
 
+				_firstCornerPosition = _initialPosition;
+				_secondCornerPosition = _lastPosition;
 			}
+		}
+
+		bool IsPointerOverUI()
+		{
+			if (EventSystem.current.IsPointerOverGameObject())
+			{
+				return true;
+			}
+
+			for (int i = 0; i < Input.touchCount; ++i)
+			{
+				if (EventSystem.current.IsPointerOverGameObject(Input.GetTouch(i).fingerId))
+				{
+					return true;
+				}
+			}
+
+			return false;
 		}
 	}
 }
