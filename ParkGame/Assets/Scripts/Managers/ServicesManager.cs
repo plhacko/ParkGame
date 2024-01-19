@@ -7,6 +7,7 @@ using System.Resources;
 using System.Threading.Tasks;
 using Firebase;
 using Firebase.Auth;
+using Unity.Netcode;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
 using Unity.Services.Relay.Models;

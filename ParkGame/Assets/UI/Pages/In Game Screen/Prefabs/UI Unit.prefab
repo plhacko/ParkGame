@@ -33,10 +33,10 @@ RectTransform:
   m_Father: {fileID: 4243263320084881317}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 100}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: -0.271904}
+  m_SizeDelta: {x: -25, y: -25.5439}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &104576066354415454
 CanvasRenderer:
@@ -115,7 +115,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: 120, y: 120}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6050313031654651258
 CanvasRenderer:
@@ -145,8 +145,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
-  m_Type: 0
+  m_Sprite: {fileID: 21300000, guid: 4052384d631cf434c9d906ceaea411a1, type: 3}
+  m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -167,6 +167,35 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5fbcea25ebc0afa4da17c9523bf9b78c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_Navigation:
+    m_Mode: 3
+    m_WrapAround: 0
+    m_SelectOnUp: {fileID: 0}
+    m_SelectOnDown: {fileID: 0}
+    m_SelectOnLeft: {fileID: 0}
+    m_SelectOnRight: {fileID: 0}
+  m_Transition: 1
+  m_Colors:
+    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
+    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0.1
+  m_SpriteState:
+    m_HighlightedSprite: {fileID: 0}
+    m_PressedSprite: {fileID: 0}
+    m_SelectedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 0}
+  m_AnimationTriggers:
+    m_NormalTrigger: Normal
+    m_HighlightedTrigger: Highlighted
+    m_PressedTrigger: Pressed
+    m_SelectedTrigger: Selected
+    m_DisabledTrigger: Disabled
+  m_Interactable: 1
+  m_TargetGraphic: {fileID: 2390462213264319064}
   healthBarSlider: {fileID: 1721078980612208679}
   unitIcons:
   - {fileID: 21300000, guid: 8dd81f39bc3e1f6488bf0bddc35fe56c, type: 3}
@@ -190,17 +219,69 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1967243170285591353, guid: a49e91348d87086418369de2b95084d1, type: 3}
+      propertyPath: m_Type
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1967243170285591353, guid: a49e91348d87086418369de2b95084d1, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 0c3ff4ce7004b134bac8a9b3e32fde95, type: 3}
+    - target: {fileID: 1967243170285591353, guid: a49e91348d87086418369de2b95084d1, type: 3}
+      propertyPath: m_Color.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1967243170285591353, guid: a49e91348d87086418369de2b95084d1, type: 3}
+      propertyPath: m_Color.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1967243170285591353, guid: a49e91348d87086418369de2b95084d1, type: 3}
+      propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1967243170285591353, guid: a49e91348d87086418369de2b95084d1, type: 3}
+      propertyPath: m_Material
+      value: 
+      objectReference: {fileID: 2100000, guid: 17523d2963ac3534d99206fd9ef41e91, type: 2}
     - target: {fileID: 7161322587134782664, guid: a49e91348d87086418369de2b95084d1, type: 3}
       propertyPath: m_Value
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 7252395765904273869, guid: a49e91348d87086418369de2b95084d1, type: 3}
+      propertyPath: m_Type
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7252395765904273869, guid: a49e91348d87086418369de2b95084d1, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 0c3ff4ce7004b134bac8a9b3e32fde95, type: 3}
+    - target: {fileID: 7252395765904273869, guid: a49e91348d87086418369de2b95084d1, type: 3}
+      propertyPath: m_Color.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7252395765904273869, guid: a49e91348d87086418369de2b95084d1, type: 3}
+      propertyPath: m_Color.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7252395765904273869, guid: a49e91348d87086418369de2b95084d1, type: 3}
+      propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7252395765904273869, guid: a49e91348d87086418369de2b95084d1, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7252395765904273869, guid: a49e91348d87086418369de2b95084d1, type: 3}
+      propertyPath: m_Material
+      value: 
+      objectReference: {fileID: 2100000, guid: 85550b1e786f13849b70ea654e084f74, type: 2}
     - target: {fileID: 7276516819874123554, guid: a49e91348d87086418369de2b95084d1, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 7276516819874123554, guid: a49e91348d87086418369de2b95084d1, type: 3}
       propertyPath: m_Pivot.y
-      value: 0.5
+      value: 0.0000025182962
       objectReference: {fileID: 0}
     - target: {fileID: 7276516819874123554, guid: a49e91348d87086418369de2b95084d1, type: 3}
       propertyPath: m_RootOrder
@@ -224,11 +305,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7276516819874123554, guid: a49e91348d87086418369de2b95084d1, type: 3}
       propertyPath: m_SizeDelta.x
-      value: -22
+      value: -24
       objectReference: {fileID: 0}
     - target: {fileID: 7276516819874123554, guid: a49e91348d87086418369de2b95084d1, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 16.6506
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 7276516819874123554, guid: a49e91348d87086418369de2b95084d1, type: 3}
       propertyPath: m_LocalPosition.x
@@ -260,11 +341,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7276516819874123554, guid: a49e91348d87086418369de2b95084d1, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -0.000102996826
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7276516819874123554, guid: a49e91348d87086418369de2b95084d1, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 19.325298
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 7276516819874123554, guid: a49e91348d87086418369de2b95084d1, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -281,6 +362,10 @@ PrefabInstance:
     - target: {fileID: 8170958858571323328, guid: a49e91348d87086418369de2b95084d1, type: 3}
       propertyPath: m_Name
       value: Health Bar
+      objectReference: {fileID: 0}
+    - target: {fileID: 8174467214235041536, guid: a49e91348d87086418369de2b95084d1, type: 3}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

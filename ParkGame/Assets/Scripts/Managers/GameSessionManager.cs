@@ -52,7 +52,10 @@ namespace Managers
             base.OnNetworkDespawn();
             if (NetworkManager.Singleton.IsServer)
             {
-                victoryPoint.OnPointConquered -= onVictoryPointConquered;
+                if (victoryPoint != null)
+                {
+                    victoryPoint.OnPointConquered -= onVictoryPointConquered;   
+                }
                 playerManager.OnAllPlayersReady -= onAllPlayersReady;
             }
         }

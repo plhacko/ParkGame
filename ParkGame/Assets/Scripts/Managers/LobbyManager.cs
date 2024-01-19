@@ -104,6 +104,8 @@ namespace Managers
         {
             if (Singleton != null)
             {
+                Singleton.Reset();
+                NetworkManager.Singleton.Shutdown();
                 Destroy(gameObject);
                 return;
             }
@@ -218,6 +220,8 @@ namespace Managers
             }
             else
             {
+                if(Lobby == null) return;
+                
                 changes.ApplyToLobby(Lobby);
                 LobbyModel = GetLobbyModel();
                 OnLobbyInvalidate?.Invoke();
