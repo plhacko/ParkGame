@@ -187,6 +187,7 @@ public class Formation : MonoBehaviour {
     }
 
     public void ResetFormation() {
+        Debug.Log("reset formace");
         soldiers.Clear();
         soldiersArchers.Clear();
         soldiersSwordmen.Clear();

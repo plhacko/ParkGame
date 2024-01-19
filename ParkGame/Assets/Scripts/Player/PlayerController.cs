@@ -147,18 +147,18 @@ namespace Player
             if (gameSessionManager.IsOver) return;
 
             PointerPosition = PlayerPointerPlacer.PinPosition;
-
-            if (Input.GetKeyDown(KeyCode.I))
-            { CommandMovementServerRpc(); }
-            if (Input.GetKeyDown(KeyCode.O))
-            { CommandIdleServerRpc(); }
-            if (Input.GetKeyDown(KeyCode.P))
-            { CommandAttackServerRpc(); }
-
-            if (Input.GetKeyDown(KeyCode.C)) { 
-                FormatSoldiersServerRpc(KeyCode.C); }
-            if (Input.GetKeyDown(KeyCode.R)) { 
-                FormatSoldiersServerRpc(KeyCode.R); }
+            
+            if (Input.GetKeyDown(KeyCode.P)) {
+                CommandAttackServerRpc();
+            }
+            if (Input.GetKeyDown(KeyCode.C))
+            {
+                FormatSoldiersServerRpc(KeyCode.C);
+            }
+            if (Input.GetKeyDown(KeyCode.R)) 
+            { 
+                FormatSoldiersServerRpc(KeyCode.R); 
+            }
         }
 
         [ServerRpc(RequireOwnership = false)]
@@ -176,13 +176,13 @@ namespace Player
                         FormationType = Formation.FormationType.Circle;
                         formationScript.ResetFormation();
                         // notify soldiers
-                        NotifySoldiersServerRpc();
+                        notifySoldiers();
                         break;
 
                     case Formation.FormationType.Circle:
                         FormationType = Formation.FormationType.Free;
                         // notify soldiers
-                        NotifySoldiersServerRpc();
+                        notifySoldiers();
                         break;
 
                     default:
@@ -197,14 +197,14 @@ namespace Player
                         FormationType = Formation.FormationType.Box;
                         formationScript.ResetFormation();
                         // notify soldiers
-                        NotifySoldiersServerRpc();
+                        notifySoldiers();
                         break;
 
                     case Formation.FormationType.Box:
                         FormationType = Formation.FormationType.Free;
                         formationScript.ResetFormation();
                         // notify soldiers
-                        NotifySoldiersServerRpc();
+                        notifySoldiers();
                         break;
 
                     default:
@@ -213,24 +213,35 @@ namespace Player
             }
         }
 
-        [ServerRpc]
-        public void NotifySoldiersServerRpc() {
-
+        [ClientRpc]
+        public void ShoutClientRpc(string plea) {
+            Debug.Log(plea);
             Debug.Log("number of Units: " + units.Count);
+        }
+        
+        //[ServerRpc]
+        // [ServerRpc(RequireOwnership = false)]
+        private void notifySoldiers() {
+            // Debug.Log("NOTIFY SOLDIERS to change formation - SERVER RPC by " + serverRpcParams.Receive.SenderClientId);
             foreach (GameObject go in units) {
                 if (go.TryGetComponent<ISoldier>(out ISoldier soldier)) {
                     soldier.NewCommand(SoldierCommand.Following);
+                    //soldier.NewCommand(SoldierCommand.Attack);     
+                    soldier.SoldierBehaviour = SoldierBehaviour.Formation;
 
                     switch (FormationType) {
                         case Formation.FormationType.Free:
+                        //    soldier.NewCommand(SoldierCommand.FollowingCommander);
                             soldier.NavMeshFormationSwitch(false, SoldierBehaviour.Move, formationScript, FormationType);
                             formationScript.ResetFormation();
                             break;
                         case Formation.FormationType.Circle:
+                        //    soldier.NewCommand(SoldierCommand.FollowingInFormationCircle);
                             soldier.NavMeshFormationSwitch(false, SoldierBehaviour.Move, formationScript, FormationType);
                             soldier.NavMeshFormationSwitch(true, SoldierBehaviour.Formation, formationScript, FormationType);
                             break;
                         case Formation.FormationType.Box:
+                        //    soldier.NewCommand(SoldierCommand.FollowingInFormationBox);
                             soldier.NavMeshFormationSwitch(false, SoldierBehaviour.Move, formationScript, FormationType);
                             soldier.NavMeshFormationSwitch(true, SoldierBehaviour.Formation, formationScript, FormationType);
                             break;
@@ -307,7 +318,7 @@ namespace Player
             {
                 Send = new ClientRpcSendParams
                 {
-                    TargetClientIds = new []{ OwnerClientId }
+                    TargetClientIds = new []{ OwnerClientId, NetworkManager.Singleton.LocalClientId }
                 }
             };
             
@@ -330,21 +341,20 @@ namespace Player
                 return;
             }
 
-            uiInGameScreenController.AddUnit(soldier,
-                () => soldier.RequestChangingCommanderToFollowServerRpc(NetworkManager.Singleton.LocalClientId)
-            );
+            if (isActualOwner())
+            {
+                uiInGameScreenController.AddUnit(soldier,
+                    () => soldier.RequestChangingCommanderToFollowServerRpc(NetworkManager.Singleton.LocalClientId)
+                );   
+            }
         }
 
-        void ICommander.ReportUnfollowing(NetworkObjectReference networkObjectReference)
-        {
-            if (!IsServer)
-            { throw new Exception($"only on server can removing units from commander be done: {gameObject.name}"); }
+        void ICommander.ReportUnfollowing(NetworkObjectReference networkObjectReference) {
+            if (!IsServer) { throw new Exception($"only on server can removing units from commander be done: {gameObject.name}"); }
 
-            ClientRpcParams clientRpcParams = new ClientRpcParams
-            {
-                Send = new ClientRpcSendParams
-                {
-                    TargetClientIds = new []{ OwnerClientId }
+            ClientRpcParams clientRpcParams = new ClientRpcParams {
+                Send = new ClientRpcSendParams {
+                    TargetClientIds = new[] { OwnerClientId, NetworkManager.Singleton.LocalClientId }
                 }
             };
 
@@ -367,7 +377,10 @@ namespace Player
                 return;
             }
 
-            uiInGameScreenController.RemoveUnit(soldier);
+            if (isActualOwner())
+            {
+                uiInGameScreenController.RemoveUnit(soldier);
+            }
         }
         
         // commands to the units
@@ -377,49 +390,53 @@ namespace Player
             foreach (GameObject go in units)
             {
                 if (go.TryGetComponent<ISoldier>(out ISoldier soldier))
-                { 
+                {
                     soldier.SoldierBehaviour = SoldierBehaviour.Move;
-
                     soldier.NewCommand(SoldierCommand.Following);
                 }
             }
         }
-        
+
         [ServerRpc]
-        public void CommandIdleServerRpc()
-        {
-            foreach (GameObject go in units)
-            {
-                if (go.TryGetComponent<ISoldier>(out ISoldier soldier))
-                { 
+        public void CommandIdleServerRpc() {
+            foreach (GameObject go in units) {
+                if (go.TryGetComponent<ISoldier>(out ISoldier soldier)) {
                     soldier.SoldierBehaviour = SoldierBehaviour.Idle;
-
                     soldier.NewCommand(SoldierCommand.Following);
                 }
             }
         }
-        
-        [ServerRpc]
-        public void CommandAttackServerRpc()
-        {
+
+        [ClientRpc]
+        public void AttackClientRpc() {
             formationScript.ResetFormation();
-            foreach (GameObject go in units)
-            {
-                if (go.TryGetComponent<ISoldier>(out ISoldier soldier))
-                { 
-                    soldier.SoldierBehaviour = SoldierBehaviour.Attack; 
+            foreach (GameObject go in units) {
+                if (go.TryGetComponent<ISoldier>(out ISoldier soldier)) {
                     soldier.NewCommand(SoldierCommand.Attack);
                 }
             }
         }
 
-        public void AddOutpost(Outpost outpost)
-        {
+        [ServerRpc(RequireOwnership = false)]
+        public void CommandAttackServerRpc(ServerRpcParams serverRpcParams = default) {
+            formationScript.ResetFormation();
+            FormationType = Formation.FormationType.Free;
+            
+            Debug.Log("SERVER ATTACK RPC CALLED BY " + serverRpcParams.Receive.SenderClientId);
+                //formationScript.ResetFormation();  
+            foreach (GameObject go in units) {
+                if (go.TryGetComponent<ISoldier>(out ISoldier soldier)) {
+                    soldier.SoldierBehaviour = SoldierBehaviour.Attack;
+                    soldier.NewCommand(SoldierCommand.Attack);
+                }
+            }
+        }
+
+        public void AddOutpost(Outpost outpost) {
             uiInGameScreenController.AddOutpost(outpost);
         }
 
-        public void RemoveOutpost(Outpost outpost)
-        {
+        public void RemoveOutpost(Outpost outpost) {
             uiInGameScreenController.RemoveOutpost(outpost);
         }
     }
