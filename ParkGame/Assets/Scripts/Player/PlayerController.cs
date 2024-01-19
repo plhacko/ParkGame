@@ -78,6 +78,7 @@ namespace Player
                 // }
                 playerManager.SetLocalPlayerController(this);
                 gameObject.AddComponent<AudioListener>();
+                AudioManager.Instance.notificationsSource = gameObject.GetComponent<AudioSource>();
             }
             else
             {

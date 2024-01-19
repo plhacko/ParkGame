@@ -12,6 +12,7 @@ public enum SoldierCommand {
     Attack,
     ReturnToOutpost, // return to closest outpost, or also attack just when attacked? but be wary of close enemies??? 
     Fallback, // ? follow commander or return to closest outpost?
+    Die // :/
 }
 
 public interface ISoldier : ITeamMember

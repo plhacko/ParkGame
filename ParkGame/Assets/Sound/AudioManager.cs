@@ -16,7 +16,8 @@ public class AudioManager : MonoBehaviour
     public static AudioManager Instance;
 
     [SerializeField] public AudioSource sfxSource;
-    [SerializeField] private AudioSource notificationsSource;
+    //[SerializeField] private AudioSource notificationsSource;
+    public AudioSource notificationsSource;
 
     // formation fanfares: free, circle, box, attack, fallback
     // UI sfx: click on button. start game button (?)
@@ -71,6 +72,7 @@ public class AudioManager : MonoBehaviour
     }
 
     public void PlayNotificationSfx(AudioClip sfx) {
+        //notificationsSource.transform.position = playerPosition;
         notificationsSource.PlayOneShot(sfx);
     }
 

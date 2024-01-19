@@ -16,16 +16,12 @@ public class UnitBehaviourDrawer : MonoBehaviour
     {
         SpriteRenderer = GetComponent<SpriteRenderer>();
         TheSoldier = GetComponentInParent<Soldier>();
-        //BehaviourEvent = TheSoldier.BehaviourChangedEvent;
-        //BehaviourEvent.AddListener(DrawIcon);
-
         BehaviourEvent = TheSoldier.CommandChangedEvent;
         BehaviourEvent.AddListener(DrawCommandIcon);
 
     }
 
     private void DrawCommandIcon() {
-        Debug.Log("COMMAND CHANGED EVENT - DRAW ICON");
         SoldierCommand command = TheSoldier.Command;
         //SoldierCommand command = TheSoldier._SoldierCommand.Value; // nefunguje, jen na hostu!
         Sprite icon;
@@ -45,31 +41,9 @@ public class UnitBehaviourDrawer : MonoBehaviour
             case SoldierCommand.FollowingInFormationBox:
                 icon = FormationIcon;
                 break;
+            case SoldierCommand.Die:
             default:
                 icon = EmptyIcon;
-                break;
-        }
-
-        SpriteRenderer.sprite = icon;
-    }
-
-    private void DrawIcon() {
-        SoldierBehaviour behaviour = TheSoldier.SoldierBehaviour;
-        Sprite icon;
-        switch (behaviour) {
-            case SoldierBehaviour.Attack:
-                icon = AttackIcon;
-                break;
-            case SoldierBehaviour.Idle:
-                icon = IdleIcon;
-                break;
-            case SoldierBehaviour.Move:
-                icon = MovementIcon;
-                break;
-            case SoldierBehaviour.Formation:
-                icon = FormationIcon;
-                break;
-            default: icon = EmptyIcon;
                 break;
         }
 

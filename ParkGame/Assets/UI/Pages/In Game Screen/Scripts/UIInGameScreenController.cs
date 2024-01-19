@@ -56,11 +56,6 @@ public class UIInGameScreenController : UIPageController
         canvasGroup.interactable = true;
     }
 
-    private void Idle()
-    {
-        gameManager.CommandIdle();
-    }
-
     private void Move()
     {
         gameManager.CommandMove();

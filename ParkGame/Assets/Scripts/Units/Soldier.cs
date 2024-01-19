@@ -227,12 +227,13 @@ public class Soldier : NetworkBehaviour, ISoldier {
         if (enemyT != null) {
             targetedEnemy = enemyT;
             EnemiesInAttackWaveCounter++;
-        } else { // no enemy is close by, stay where you are
+        } else { // no enemy is close by, go to the commander
+            // not reset the formation positions upon calling Attack?
             Follow();
             return;
         }
 
-        // attack the closest enemy if in range
+        // attack the targeted enemy if in range
         if (AttackEnemyIfInRange(targetedEnemy)) { return; }
         // go closer to the enemy 
         FollowObjectWithAnimation(targetedEnemy);
@@ -375,6 +376,7 @@ public class Soldier : NetworkBehaviour, ISoldier {
     /// <returns> returns if enemy was in range </returns>
     private bool AttackEnemyIfInRange(Transform enemyT) {
         ClosestEnemyDEBUG = Vector3.Distance(enemyT.position, transform.position);
+
         if (Vector3.Distance(enemyT.position, transform.position) <= MaxAttackRange
             && Vector3.Distance(enemyT.position, transform.position) >= MinAttackRange) {
             if (AttackTimer >= Attackcooldown) {
@@ -486,7 +488,7 @@ public class Soldier : NetworkBehaviour, ISoldier {
         CommanderToFollow?.GetComponent<ICommander>()?.ReportUnfollowing(gameObject);
         Networkanimator.SetTrigger("Die");
         handleDeath();
-        handleDeathClientRpc();
+        //handleDeathClientRpc();
     }
 
     [ClientRpc]
@@ -500,11 +502,10 @@ public class Soldier : NetworkBehaviour, ISoldier {
         AudioManager.Instance.PlayDead(gameObject.transform.position);
 
         // visualize death: black shadow, fade soldier's sprite, and then self-destruct
-        gameObject.transform.Find("Circle").GetComponent<SpriteRenderer>().color = Color.black;
         gameObject.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;
-        gameObject.GetComponent<SpriteRenderer>()?.DOFade(0, DeathFadeTime);
-
+        
         if (IsServer) {
+            NewCommand(SoldierCommand.Die);
             OnDeath?.Invoke();
             Destroy(gameObject, DeathFadeTime);
         }
