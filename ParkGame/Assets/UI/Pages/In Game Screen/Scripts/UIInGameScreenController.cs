@@ -97,8 +97,7 @@ public class UIInGameScreenController : UIPageController
         gameManager.FormationCircle();
         AudioManager.Instance.PlayNotificationSFX("FormationCircle");
     }
-
-
+    
     private void Formations()
     {
         action3.interactable = false;
