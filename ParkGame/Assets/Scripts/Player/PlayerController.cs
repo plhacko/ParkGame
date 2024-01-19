@@ -171,53 +171,21 @@ namespace Player
         public void FormatSoldiers(KeyCode key) {
 
             if (key == KeyCode.C) {
-                // circle formation
-                switch (FormationType) {
-                    case Formation.FormationType.Box:
-                    case Formation.FormationType.Free:
-                        FormationType = Formation.FormationType.Circle;
-                        formationScript.ResetFormation();
-                        // notify soldiers
-                        notifySoldiers();
-                        break;
-
-                    case Formation.FormationType.Circle:
-                        FormationType = Formation.FormationType.Free;
-                        // notify soldiers
-                        notifySoldiers();
-                        break;
-
-                    default:
-                        break;
-                }
+                // circle (Circular) formation
+                FormationType = Formation.FormationType.Circle;
+                formationScript.ResetFormation();
+                notifySoldiers();
             }
             if (key == KeyCode.R) {
-                // rectangle formation
-                switch (FormationType) {
-                    case Formation.FormationType.Circle:
-                    case Formation.FormationType.Free:
-                        FormationType = Formation.FormationType.Box;
-                        formationScript.ResetFormation();
-                        // notify soldiers
-                        notifySoldiers();
-                        break;
-
-                    case Formation.FormationType.Box:
-                        FormationType = Formation.FormationType.Free;
-                        formationScript.ResetFormation();
-                        // notify soldiers
-                        notifySoldiers();
-                        break;
-
-                    default:
-                        break;
-                }
+                // box (Rectangular) formation
+                FormationType = Formation.FormationType.Box;
+                formationScript.ResetFormation();
+                notifySoldiers();
             }
         }
 
 
         private void notifySoldiers() {
-            // Debug.Log("NOTIFY SOLDIERS to change formation - SERVER RPC by " + serverRpcParams.Receive.SenderClientId);
             foreach (GameObject go in units) {
                 if (go.TryGetComponent<ISoldier>(out ISoldier soldier)) {
                     soldier.NewCommand(SoldierCommand.Following);
@@ -225,17 +193,14 @@ namespace Player
 
                     switch (FormationType) {
                         case Formation.FormationType.Free:
-                        //    soldier.NewCommand(SoldierCommand.FollowingCommander);
                             soldier.NavMeshFormationSwitch(false, SoldierBehaviour.Move, formationScript, FormationType);
                             formationScript.ResetFormation();
                             break;
                         case Formation.FormationType.Circle:
-                        //    soldier.NewCommand(SoldierCommand.FollowingInFormationCircle);
                             soldier.NavMeshFormationSwitch(false, SoldierBehaviour.Move, formationScript, FormationType);
                             soldier.NavMeshFormationSwitch(true, SoldierBehaviour.Formation, formationScript, FormationType);
                             break;
                         case Formation.FormationType.Box:
-                        //    soldier.NewCommand(SoldierCommand.FollowingInFormationBox);
                             soldier.NavMeshFormationSwitch(false, SoldierBehaviour.Move, formationScript, FormationType);
                             soldier.NavMeshFormationSwitch(true, SoldierBehaviour.Formation, formationScript, FormationType);
                             break;
@@ -377,7 +342,6 @@ namespace Player
             }
         }
         
-        // commands to the units
         [ServerRpc]
         public void CommandMovementServerRpc()
         {
