@@ -78,6 +78,7 @@ namespace Player
                 // }
                 playerManager.SetLocalPlayerController(this);
                 gameObject.AddComponent<AudioListener>();
+                gameObject.AddComponent<AudioSource>();
                 AudioManager.Instance.notificationsSource = gameObject.GetComponent<AudioSource>();
             }
             else
@@ -214,20 +215,12 @@ namespace Player
             }
         }
 
-        [ClientRpc]
-        public void ShoutClientRpc(string plea) {
-            Debug.Log(plea);
-            Debug.Log("number of Units: " + units.Count);
-        }
-        
-        //[ServerRpc]
-        // [ServerRpc(RequireOwnership = false)]
+
         private void notifySoldiers() {
             // Debug.Log("NOTIFY SOLDIERS to change formation - SERVER RPC by " + serverRpcParams.Receive.SenderClientId);
             foreach (GameObject go in units) {
                 if (go.TryGetComponent<ISoldier>(out ISoldier soldier)) {
                     soldier.NewCommand(SoldierCommand.Following);
-                    //soldier.NewCommand(SoldierCommand.Attack);     
                     soldier.SoldierBehaviour = SoldierBehaviour.Formation;
 
                     switch (FormationType) {
@@ -422,9 +415,6 @@ namespace Player
         public void CommandAttackServerRpc(ServerRpcParams serverRpcParams = default) {
             formationScript.ResetFormation();
             FormationType = Formation.FormationType.Free;
-            
-            Debug.Log("SERVER ATTACK RPC CALLED BY " + serverRpcParams.Receive.SenderClientId);
-                //formationScript.ResetFormation();  
             foreach (GameObject go in units) {
                 if (go.TryGetComponent<ISoldier>(out ISoldier soldier)) {
                     soldier.SoldierBehaviour = SoldierBehaviour.Attack;

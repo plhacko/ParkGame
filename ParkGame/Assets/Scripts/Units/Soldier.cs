@@ -92,6 +92,7 @@ public class Soldier : NetworkBehaviour, ISoldier {
     public SoldierCommand Command { get => _SoldierCommand.Value; set => _SoldierCommand.Value = value; } 
     
     public UnityEvent CommandChangedEvent;
+    private bool isDead;
 
 
     private void Initialize() {
@@ -117,13 +118,8 @@ public class Soldier : NetworkBehaviour, ISoldier {
 
         FormationType = FormationType.Free;
         _SoldierCommand.OnValueChanged += OnCommandChange;
-        if (IsServer) {
-            _SoldierCommand.OnValueChanged += OnCommandChangeOnServer;
-        }
-        if (IsClient) {
-            _SoldierCommand.OnValueChanged += OnCommandChangeOnClient;
-        }
         OnCommandChange(0, Command);
+        isDead = false;
 
     }
     public override void OnNetworkSpawn() {
@@ -149,21 +145,26 @@ public class Soldier : NetworkBehaviour, ISoldier {
         }
     }
 
+    [ClientRpc]
+    void PlayDeathSFXClientRpc() {
+        AudioManager.Instance.PlayDead(transform.position);
+    }
+
+    [ClientRpc]
+    void PlaySwordAttackSFXClientRpc() {
+        AudioManager.Instance.PlayPawnAttack(transform.position);
+    }
+    [ClientRpc]
+    void PlayArcherAttackSFXClientRpc() {
+        AudioManager.Instance.PlayArcherAttack(transform.position);
+    }
+    [ClientRpc]
+    void PlaySelectedDwarfSFXClientRpc(ClientRpcParams clientRpcParams = default) {
+        AudioManager.Instance.PlayClickOnDwarf(transform.position);
+    }
+
     public void OnBehaviourChange(SoldierBehaviour previousValue, SoldierBehaviour newValue) {
-        Debug.Log("BEHAVIOUR CHANGED from " + previousValue + " to " + newValue);
         BehaviourChangedEvent.Invoke();
-    }
-
-    [ClientRpc] // to je asi zbytecny. fungovalo to stejne...
-    private void NewCommandClientRpc() {
-        // invoke. nope!!!! to nefunguje! finguje to nejak sketchy!
-    }
-
-    private void OnCommandChangeOnServer(SoldierCommand previousValue, SoldierCommand newValue) {
-        Debug.Log("OnServer            change on to command " + newValue);
-    }
-    private void OnCommandChangeOnClient(SoldierCommand previousValue, SoldierCommand newValue) {
-        Debug.Log("OnClient             change to command " + newValue);
     }
 
     private void OnCommandChange(SoldierCommand previousValue, SoldierCommand newValue) {
@@ -269,8 +270,6 @@ public class Soldier : NetworkBehaviour, ISoldier {
             Agent.speed = 3.5f;
         }
 
-        //switch ()
-
         switch (Command) {
             case SoldierCommand.InOutpost:
                 StationedInOutpost();
@@ -298,7 +297,6 @@ public class Soldier : NetworkBehaviour, ISoldier {
     public void NavMeshFormationSwitch(bool enable, SoldierBehaviour newBehaviour, Formation formation, FormationType formationType) {
         // if in Circle or Box Formation or Free, it is following something
         //Command = SoldierCommand.Following;
-        Debug.Log("~~~navmesh formation switch");
         FollowInNavMeshFormation = enable;
         SoldierBehaviour = newBehaviour;
 
@@ -388,7 +386,7 @@ public class Soldier : NetworkBehaviour, ISoldier {
 
                 if (TypeOfUnit == UnitType.Pawn || TypeOfUnit == UnitType.Horseman)
                 {
-                    AudioManager.Instance.PlayPawnAttack(transform.position);
+                    PlaySwordAttackSFXClientRpc();
                     enemyT.GetComponent<ISoldier>()?.TakeDamage(Damage);
 
                 }
@@ -399,7 +397,7 @@ public class Soldier : NetworkBehaviour, ISoldier {
 
                     XSpriteFlip.Value = flip;
                     Debug.Log("shoot");
-                    AudioManager.Instance.PlayArcherAttack(transform.position);
+                    PlayArcherAttackSFXClientRpc();
                     shooting.Shoot(enemyT.transform.position, Damage, flip, Team);
                 }
             }
@@ -430,10 +428,14 @@ public class Soldier : NetworkBehaviour, ISoldier {
     public void RequestChangingCommanderToFollowServerRpc(ulong clientID) {
         PlayerController playerController = playerManager.GetPlayerController(clientID);
         if (playerController != null && playerController.Team == Team) {
+            
+            // play dwarf's 'mrouk'
+            ClientRpcParams clientRpcParams = new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new[] { clientID } } };
+            PlaySelectedDwarfSFXClientRpc(clientRpcParams);
+
             if (playerController.gameObject.transform != CommanderToFollow) {
 
-        AudioManager.Instance.PlayClickOnDwarf(transform.position);
-        SetCommanderToFollow(playerController.gameObject.transform);
+                SetCommanderToFollow(playerController.gameObject.transform);
                 //NewCommand(SoldierCommand.FollowingCommander);
                 NewCommand(SoldierCommand.Following);
                 FormationType = CommanderToFollow.GetComponent<ICommander>().GetFormation(); // get type of formation
@@ -482,13 +484,16 @@ public class Soldier : NetworkBehaviour, ISoldier {
 
     /// <summary> !call only on server! </summary>
     public void Die() {
+        if (isDead) {
+            return;
+        }
+        isDead = true;
         HP = 0;
         SoldierBehaviour = SoldierBehaviour.Death;
         Agent.SetDestination(transform.position);
         CommanderToFollow?.GetComponent<ICommander>()?.ReportUnfollowing(gameObject);
         Networkanimator.SetTrigger("Die");
         handleDeath();
-        //handleDeathClientRpc();
     }
 
     [ClientRpc]
@@ -499,9 +504,8 @@ public class Soldier : NetworkBehaviour, ISoldier {
 
     private void handleDeath()
     {
-        AudioManager.Instance.PlayDead(gameObject.transform.position);
+        PlayDeathSFXClientRpc();
 
-        // visualize death: black shadow, fade soldier's sprite, and then self-destruct
         gameObject.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;
         
         if (IsServer) {
@@ -511,16 +515,10 @@ public class Soldier : NetworkBehaviour, ISoldier {
         }
     }
 
-    [ClientRpc]
-    public void NCClientRpc(SoldierCommand c) {
-        Debug.Log("NC CLIENT RPC "  + c);
-    }
-
     public void NewCommand(SoldierCommand command) {
-        Debug.Log("--------------COMMAND " + command);
         if (!IsServer) { return; }
 
-        Debug.Log("NEW COMMAND " + command);
+        Debug.Log("new command " + command);
         Command = command;
 
         if (command == SoldierCommand.Attack) {

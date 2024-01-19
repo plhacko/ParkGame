@@ -79,21 +79,23 @@ public class UIInGameScreenController : UIPageController
         formationMask.DOSizeDelta(targetDelta, .25f).OnComplete(() => action3.interactable = true);
     }
 
-    private void Formation1()
+    private void Formation3()
     {
         gameManager.CommandMove();
-        AudioManager.Instance.PlayNotificationSFX("FormationCircle");
+        AudioManager.Instance.PlayNotificationSFX("FormationFree");
 
     }
 
-    private void Formation2() {
+    private void Formation2() 
+    {
         gameManager.FormationBox();
         AudioManager.Instance.PlayNotificationSFX("FormationBox");
     }
 
-    private void Formation3() {
+    private void Formation1() 
+    {
         gameManager.FormationCircle();
-        AudioManager.Instance.PlayNotificationSFX("FormationFree");
+        AudioManager.Instance.PlayNotificationSFX("FormationCircle");
     }
 
 
