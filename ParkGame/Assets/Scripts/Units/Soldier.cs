@@ -50,12 +50,8 @@ public class Soldier : NetworkBehaviour, ISoldier {
     public int HP { get => _HP.Value; set => _HP.Value = value; }
     private NetworkVariable<int> _Team = new(-1);
     public int Team { get => _Team.Value; set => _Team.Value = value; }
-    private NetworkVariable<SoldierBehaviour> _SoldierBehaviour = new();
-    public SoldierBehaviour SoldierBehaviour { get => _SoldierBehaviour.Value; set => _SoldierBehaviour.Value = value; } // derived form ISoldier
-    public UnityEvent BehaviourChangedEvent;
     EnemyObserver EnemyObserver;
-    //private float AttackTimer = 0.0f;
-    public float AttackTimer = 0.0f; // public for debug
+    float AttackTimer = 0.0f;
 
     // animation
     private static readonly int AnimatorMovementSpeedHash = Animator.StringToHash("MovementSpeed");
@@ -84,7 +80,6 @@ public class Soldier : NetworkBehaviour, ISoldier {
     private GameSessionManager gameSessionManager;
 
     public Action OnDeath;
-
     private int EnemiesInAttackWaveCounter; // counter in attack wave - how many were targeted in a row during one attack command
                                             //public SoldierCommand Command;
 
@@ -107,9 +102,7 @@ public class Soldier : NetworkBehaviour, ISoldier {
         circleRenderer = transform.Find("Circle")?.GetComponent<SpriteRenderer>();
 
         _Team.OnValueChanged += OnTeamChanged;
-        _SoldierBehaviour.OnValueChanged += OnBehaviourChange;
 
-        OnBehaviourChange(0, SoldierBehaviour);
         SpriteRenderer.flipX = XSpriteFlip.Value;
 
         if (IsServer) HP = InitialHP;
@@ -162,13 +155,8 @@ public class Soldier : NetworkBehaviour, ISoldier {
     void PlaySelectedDwarfSFXClientRpc(ClientRpcParams clientRpcParams = default) {
         AudioManager.Instance.PlayClickOnDwarf(transform.position);
     }
-
-    public void OnBehaviourChange(SoldierBehaviour previousValue, SoldierBehaviour newValue) {
-        BehaviourChangedEvent.Invoke();
-    }
-
     private void OnCommandChange(SoldierCommand previousValue, SoldierCommand newValue) {
-        Debug.Log("on value change: old val " + previousValue + " new val " + newValue + " | Command = " + Command + " _SC = " + _SoldierCommand.Value);
+        Debug.Log("on value change: old val " + previousValue + " new val " + newValue);
         CommandChangedEvent.Invoke();
     }
 
@@ -275,10 +263,6 @@ public class Soldier : NetworkBehaviour, ISoldier {
                 StationedInOutpost();
                 break;
             case SoldierCommand.Following:
-            case SoldierCommand.FollowingCommander:
-            case SoldierCommand.FollowingInFormationCircle:
-            case SoldierCommand.FollowingInFormationBox:
-            case SoldierCommand.ReturnToOutpost:
                 Follow();
                 break;
             case SoldierCommand.Attack:
@@ -294,11 +278,10 @@ public class Soldier : NetworkBehaviour, ISoldier {
      * Get position to follow in formation - based on formationType 
      * Called from PlayerController 
      */
-    public void NavMeshFormationSwitch(bool enable, SoldierBehaviour newBehaviour, Formation formation, FormationType formationType) {
+    public void NavMeshFormationSwitch(bool enable, Formation formation, FormationType formationType) {
         // if in Circle or Box Formation or Free, it is following something
         //Command = SoldierCommand.Following;
         FollowInNavMeshFormation = enable;
-        SoldierBehaviour = newBehaviour;
 
         if (!enable) { // disable, Unsubscribe from formation
             formation.RemoveFromFormation(gameObject, ObjectToFollowInFormation, FormationType);
@@ -409,7 +392,6 @@ public class Soldier : NetworkBehaviour, ISoldier {
     private void MoveTowardsEntity(Transform entityT) {
         // archers, don't go closer! you'd just die 
         if (Vector3.Distance(entityT.position, transform.position) < MinAttackRange && TypeOfUnit == UnitType.Archer) {
-     //       SoldierBehaviour = SoldierBehaviour.Idle;
             return;
         }
 
@@ -442,17 +424,14 @@ public class Soldier : NetworkBehaviour, ISoldier {
                 FormationFromFollowedCommander = CommanderToFollow.GetComponent<Formation>();
 
                 if (FormationType == FormationType.Box || FormationType == FormationType.Circle) {
-                    SoldierBehaviour = SoldierBehaviour.Formation;
-                    NavMeshFormationSwitch(true, SoldierBehaviour.Formation, FormationFromFollowedCommander, FormationType);
-                } else {
-                 //   SoldierBehaviour = SoldierBehaviour.Move;
+                    NavMeshFormationSwitch(true, FormationFromFollowedCommander, FormationType);
                 }
             } else {
                 var closestOutpost = ClosestOutpost();
                 SetCommanderToFollow(closestOutpost);
                 //NewCommand(SoldierCommand.ReturnToOutpost);
                 NewCommand(SoldierCommand.Following);
-                NavMeshFormationSwitch(false, SoldierBehaviour.Idle, FormationFromFollowedCommander, FormationType.Free);
+                NavMeshFormationSwitch(false, FormationFromFollowedCommander, FormationType.Free);
             }
         }
     }
@@ -489,7 +468,6 @@ public class Soldier : NetworkBehaviour, ISoldier {
         }
         isDead = true;
         HP = 0;
-        SoldierBehaviour = SoldierBehaviour.Death;
         Agent.SetDestination(transform.position);
         CommanderToFollow?.GetComponent<ICommander>()?.ReportUnfollowing(gameObject);
         Networkanimator.SetTrigger("Die");

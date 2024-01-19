@@ -189,20 +189,19 @@ namespace Player
             foreach (GameObject go in units) {
                 if (go.TryGetComponent<ISoldier>(out ISoldier soldier)) {
                     soldier.NewCommand(SoldierCommand.Following);
-                    soldier.SoldierBehaviour = SoldierBehaviour.Formation;
 
                     switch (FormationType) {
                         case Formation.FormationType.Free:
-                            soldier.NavMeshFormationSwitch(false, SoldierBehaviour.Move, formationScript, FormationType);
+                            soldier.NavMeshFormationSwitch(false, formationScript, FormationType);
                             formationScript.ResetFormation();
                             break;
                         case Formation.FormationType.Circle:
-                            soldier.NavMeshFormationSwitch(false, SoldierBehaviour.Move, formationScript, FormationType);
-                            soldier.NavMeshFormationSwitch(true, SoldierBehaviour.Formation, formationScript, FormationType);
+                            soldier.NavMeshFormationSwitch(false, formationScript, FormationType);
+                            soldier.NavMeshFormationSwitch(true, formationScript, FormationType);
                             break;
                         case Formation.FormationType.Box:
-                            soldier.NavMeshFormationSwitch(false, SoldierBehaviour.Move, formationScript, FormationType);
-                            soldier.NavMeshFormationSwitch(true, SoldierBehaviour.Formation, formationScript, FormationType);
+                            soldier.NavMeshFormationSwitch(false, formationScript, FormationType);
+                            soldier.NavMeshFormationSwitch(true, formationScript, FormationType);
                             break;
                         default: 
                             break;
@@ -349,7 +348,6 @@ namespace Player
             {
                 if (go.TryGetComponent<ISoldier>(out ISoldier soldier))
                 {
-                    soldier.SoldierBehaviour = SoldierBehaviour.Move;
                     soldier.NewCommand(SoldierCommand.Following);
                 }
             }
@@ -359,7 +357,6 @@ namespace Player
         public void CommandIdleServerRpc() {
             foreach (GameObject go in units) {
                 if (go.TryGetComponent<ISoldier>(out ISoldier soldier)) {
-                    soldier.SoldierBehaviour = SoldierBehaviour.Idle;
                     soldier.NewCommand(SoldierCommand.Following);
                 }
             }
@@ -381,7 +378,6 @@ namespace Player
             FormationType = Formation.FormationType.Free;
             foreach (GameObject go in units) {
                 if (go.TryGetComponent<ISoldier>(out ISoldier soldier)) {
-                    soldier.SoldierBehaviour = SoldierBehaviour.Attack;
                     soldier.NewCommand(SoldierCommand.Attack);
                 }
             }
