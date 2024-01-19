@@ -384,7 +384,9 @@ public class Soldier : NetworkBehaviour, ISoldier {
                 Networkanimator.SetTrigger("Attack");
 
 
-                if (TypeOfUnit == UnitType.Pawn || TypeOfUnit == UnitType.Horseman) {
+                if (TypeOfUnit == UnitType.Pawn || TypeOfUnit == UnitType.Horseman)
+                {
+                    AudioManager.Instance.PlayPawnAttack(transform.position);
                     enemyT.GetComponent<ISoldier>()?.TakeDamage(Damage);
 
                 }
@@ -395,6 +397,7 @@ public class Soldier : NetworkBehaviour, ISoldier {
 
                     XSpriteFlip.Value = flip;
                     Debug.Log("shoot");
+                    AudioManager.Instance.PlayArcherAttack(transform.position);
                     shooting.Shoot(enemyT.transform.position, Damage, flip, Team);
                 }
             }
@@ -426,7 +429,9 @@ public class Soldier : NetworkBehaviour, ISoldier {
         PlayerController playerController = playerManager.GetPlayerController(clientID);
         if (playerController != null && playerController.Team == Team) {
             if (playerController.gameObject.transform != CommanderToFollow) {
-                SetCommanderToFollow(playerController.gameObject.transform);
+
+        AudioManager.Instance.PlayClickOnDwarf(transform.position);
+        SetCommanderToFollow(playerController.gameObject.transform);
                 //NewCommand(SoldierCommand.FollowingCommander);
                 NewCommand(SoldierCommand.Following);
                 FormationType = CommanderToFollow.GetComponent<ICommander>().GetFormation(); // get type of formation
@@ -490,7 +495,10 @@ public class Soldier : NetworkBehaviour, ISoldier {
         handleDeath();
     }
 
-    private void handleDeath() {
+    private void handleDeath()
+    {
+        AudioManager.Instance.PlayDead(gameObject.transform.position);
+
         // visualize death: black shadow, fade soldier's sprite, and then self-destruct
         gameObject.transform.Find("Circle").GetComponent<SpriteRenderer>().color = Color.black;
         gameObject.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;

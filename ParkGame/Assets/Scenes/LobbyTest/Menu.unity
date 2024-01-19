@@ -2265,7 +2265,7 @@ AudioSource:
   Priority: 128
   DopplerLevel: 1
   MinDistance: 1
-  MaxDistance: 10
+  MaxDistance: 4000
   Pan2D: 0
   rolloffMode: 1
   BypassEffects: 0
@@ -2558,6 +2558,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  - {fileID: 8300000, guid: 31e42e37fd79d124eaa444b847905510, type: 3}
+  - {fileID: 8300000, guid: 65b4f6844a45a7e44be8ccd1b919ce74, type: 3}
+  archerAttackSfx_list:
+  - {fileID: 8300000, guid: e0a2af8713c067145b380c0a9fcdda8a, type: 3}
+  - {fileID: 8300000, guid: 5a771d365be2b7f4eb6562043e9192ed, type: 3}
+  - {fileID: 8300000, guid: fe87812ba2206904788cc2804d72b5b2, type: 3}
+  - {fileID: 8300000, guid: 8b52819ea56a9a64aa7c299518e966a4, type: 3}
+  - {fileID: 8300000, guid: 3fea785a4fc7f5644a6a2bea79ded5f5, type: 3}
+  - {fileID: 8300000, guid: b4fa152340da8fa4a9206d2fd280b064, type: 3}
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
@@ -3161,11 +3170,26 @@ MonoBehaviour:
   sfxSource: {fileID: 2133801131}
   notificationsSource: {fileID: 710050037}
   sfxList: []
-  notificationsList: []
-  pawnAttackSfx_list: []
-  archerAttackSfx_list: []
+  notificationsList:
+  - name: Attack
+    sound: {fileID: 8300000, guid: 82850d383a4fd6b48b3d32ef0a772ba1, type: 3}
+  - name: Fallback
+    sound: {fileID: 8300000, guid: 72d3b459de63a9a48aee87bff4fc1d1c, type: 3}
+  - name: FormationBox
+    sound: {fileID: 8300000, guid: d5d46ab70c0261445883f79604e5166c, type: 3}
+  - name: FormationCircle
+    sound: {fileID: 8300000, guid: 7a82472f39c356744a2e0260e3b2ab2e, type: 3}
+  - name: FormationFree
+    sound: {fileID: 8300000, guid: a584c9345f1387f40a14ab93961c72bd, type: 3}
+  pawnAttackSfx_list:
   molemanAttackSfx_list: []
-  diedSfx_list: []
+  soldierClickSfx_list:
+  - {fileID: 8300000, guid: f841c6d9596cf0d4cb546b0b5cf48559, type: 3}
+  - {fileID: 8300000, guid: 0bad6e3d8600c504e901e5da34406fb0, type: 3}
+  diedSfx_list:
+  - {fileID: 8300000, guid: 0e3fd8387549af94aa7d82758b3406df, type: 3}
+  - {fileID: 8300000, guid: c183e738be4e6d34888111cdf5da3e56, type: 3}
+  - {fileID: 8300000, guid: 26863cf2db9cb7c46a3c8ef3ff4ae5e6, type: 3}
 --- !u!4 &1039231701
 Transform:
   m_ObjectHideFlags: 0

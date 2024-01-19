@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using System.Collections.Generic;
+using System.Collections;
 
 
 
@@ -14,7 +15,7 @@ public class AudioManager : MonoBehaviour
 
     public static AudioManager Instance;
 
-    [SerializeField] private AudioSource sfxSource;
+    [SerializeField] public AudioSource sfxSource;
     [SerializeField] private AudioSource notificationsSource;
 
     // formation fanfares: free, circle, box, attack, fallback
@@ -28,11 +29,12 @@ public class AudioManager : MonoBehaviour
     [SerializeField] private List<AudioClip> pawnAttackSfx_list;
     [SerializeField] private List<AudioClip> archerAttackSfx_list;
     [SerializeField] private List<AudioClip> molemanAttackSfx_list;
+    [SerializeField] private List<AudioClip> soldierClickSfx_list;
     [SerializeField] private List<AudioClip> diedSfx_list;
 
-    private Dictionary<string, AudioClip> sfxDict;
-    private Dictionary<string, AudioClip> notificationsDict;
-    
+    private Dictionary<string, AudioClip> sfxDict = new Dictionary<string, AudioClip>();
+    private Dictionary<string, AudioClip> notificationsDict = new Dictionary<string, AudioClip>();
+
     private bool sfxMute;
     private bool notificationsMute;
 
@@ -55,11 +57,16 @@ public class AudioManager : MonoBehaviour
         }
     }
 
+    public void MoveSource(AudioSource source, Vector3 position) {
+        source.transform.position = position;
+    }
+
     public void PlaySFX(AudioClip sfx) {
         sfxSource.PlayOneShot(sfx);
     }
 
     public void PlaySFX(string sfxName) {
+
         sfxSource.PlayOneShot(sfxDict[sfxName]);
     }
 
@@ -67,8 +74,28 @@ public class AudioManager : MonoBehaviour
         notificationsSource.PlayOneShot(sfx);
     }
 
-    public void PlayNotificationSfx(string sfxName) {
+    public static IEnumerator FadeOutFadeIn(AudioSource source, float duration, AudioClip sfx) {
+        float currentTime = 0;
+        float start = source.volume;
+        float prevNotificationVolume = source.volume;
+        while (currentTime < duration) {
+            currentTime += Time.deltaTime;
+            source.volume -= start * Time.deltaTime / duration;
+            yield return null;
+        }
+        source.Stop();
+        source.volume = prevNotificationVolume;
+        source.PlayOneShot(sfx);
+        yield break;
+    }
+
+    public void PlayNotificationSFX(string sfxName) {
+        if (notificationsSource.isPlaying) {
+            StartCoroutine(FadeOutFadeIn(notificationsSource, 0.3f, notificationsDict[sfxName]));
+            return;
+        }
         notificationsSource.PlayOneShot(notificationsDict[sfxName]);
+        Debug.Log("playing " + sfxName);
     }
 
     private AudioClip GetRandomItem(List<AudioClip> lst) {
@@ -76,23 +103,33 @@ public class AudioManager : MonoBehaviour
         return lst[idx];
     }
 
-    public void PlayPawnAttack() {
+    public void PlayPawnAttack(Vector3 position) {
+        MoveSource(sfxSource, position);
         AudioClip sfx = GetRandomItem(pawnAttackSfx_list);
         sfxSource.PlayOneShot(sfx);
     }
 
-    public void PlayArcherAttack() {
+    public void PlayArcherAttack(Vector3 position) {
+        MoveSource(sfxSource, position);
         AudioClip sfx = GetRandomItem(archerAttackSfx_list);
         sfxSource.PlayOneShot(sfx);
     }
 
-    public void PlayMolemanAttack() {
+    public void PlayMolemanAttack(Vector3 position) {
+        MoveSource(sfxSource, position);
         AudioClip sfx = GetRandomItem(molemanAttackSfx_list);
         sfxSource.PlayOneShot(sfx);
     }
 
-    public void PlayDead() {
+    public void PlayDead(Vector3 position) {
+        MoveSource(sfxSource, position);
         AudioClip sfx = GetRandomItem(diedSfx_list);
+        sfxSource.PlayOneShot(sfx);
+    }
+
+    public void PlayClickOnDwarf(Vector3 position) {
+        MoveSource(sfxSource, position);
+        AudioClip sfx = GetRandomItem(soldierClickSfx_list);
         sfxSource.PlayOneShot(sfx);
     }
 
