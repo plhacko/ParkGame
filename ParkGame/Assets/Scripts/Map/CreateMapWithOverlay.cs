@@ -78,11 +78,7 @@ public class CreateMapWithOverlay : NetworkBehaviour
         SetLowResTextureForTilemapCreation(mapData.DrawnTexture);
         SetTilemapBounds(mapData.MetaData.TopLeftTileIdx, mapData.MetaData.BottomRightTileIdx);
         CreateTilemapFromTexture(fromUploadedTexture: true, structures: mapData.MetaData.Structures);
-
-        if (IsServer)
-        {
-            requestBuildNavmeshClientRpc();   
-        }
+        
 
         var mapDisplayer = mapSprite.GetComponent<MapDisplayer>();
         mapDisplayer.mapData = mapData;
@@ -91,6 +87,11 @@ public class CreateMapWithOverlay : NetworkBehaviour
         fetchedMap = mapDisplayer.transform.gameObject;
         BaseMap = Instantiate(mapSprite, transform).GetComponent<MapDisplayer>();
         
+        SetFetchedMapScale();
+        if (IsServer)
+        {
+            requestBuildNavmeshClientRpc();   
+        }
         Debug.Log("Map fetched and created");
     }
     
@@ -193,8 +194,11 @@ public class CreateMapWithOverlay : NetworkBehaviour
     private void CreateNewTextureForDrawing()
     {
         // create new texture and sprite where to draw based on resolution of map snippet
-        int scaleRation = 4;
-        drawableTexture = new Texture2D(mapOverlay.texture.width / scaleRation, mapOverlay.texture.height / scaleRation);
+        int scaleCompressionRatio = 4; // Lower the resolution to improve drawing performance
+        drawableTexture = new Texture2D(
+            mapOverlay.texture.width / scaleCompressionRatio,
+            mapOverlay.texture.height / scaleCompressionRatio
+        );
         drawableTexture.name = "DrawableTexture";
         drawableTexture.Apply();
         drawableSprite = Sprite.Create(
@@ -203,10 +207,28 @@ public class CreateMapWithOverlay : NetworkBehaviour
             new Vector2(0.5f, 0.5f)
         );
         drawableSprite.name = "DrawableSprite";
+        var newScale = SetFetchedMapScale();
+        
+
         // set the newly created sprite to the drawable script
-        mapDrawable.SetDrawableSprite(drawableSprite, scaleRation);
+        mapDrawable.SetDrawableSprite(drawableSprite, scaleCompressionRatio * newScale);
     }
-    
+
+    private float SetFetchedMapScale()
+    {
+        var tileSizeInMetersSquared = 5 * 5;
+        var mapToScale = fetchedMap.GetComponent<SpriteRenderer>().sprite ? fetchedMap : BaseMap.gameObject;
+        var fetchedMapSprite = mapToScale.GetComponent<SpriteRenderer>().sprite;
+        var vertsDist = fetchedMapSprite.vertices[1] - fetchedMapSprite.vertices[0];
+        
+        var inGameArea = Mathf.Abs(vertsDist[0] * vertsDist[1]);
+        var realArea = (float)mapToScale.GetComponent<MapDisplayer>().CalculateBoundingBoxAreaInSquareMeters(); 
+        
+        var newScale = Mathf.Sqrt((realArea / inGameArea * 1 / (tileSizeInMetersSquared)));
+        mapToScale.transform.localScale *= newScale;
+        return newScale;
+    }
+
     /// <summary>
     /// Set map image as an overlay for drawing texture
     /// </summary>
@@ -485,6 +507,12 @@ public class CreateMapWithOverlay : NetworkBehaviour
                 if (victoryPoint.GetStructureCount() == 0)
                 {
                     errorMessages.Add("Add victory point to the map");
+                    return;
+                }
+
+                if (outposts.GetStructureCount() == 0)
+                {
+                    errorMessages.Add("Add at least 1 outpost to the map");
                     return;
                 }
                 // Also for adjusting uploaded tilemap (Not used for now)

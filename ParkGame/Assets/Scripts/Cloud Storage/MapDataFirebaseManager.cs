@@ -74,7 +74,7 @@ public class MapDataFirebaseManager : MonoBehaviour
             Guid.NewGuid(),
             mapName == string.Empty ? "Untitled" : mapName,
             mapDisplayer.urlProperty,
-            14.418540,
+            14.418540, // TODO - Change to real coordinates
             50.073658,
             drawTexture.width,
             drawTexture.height,
