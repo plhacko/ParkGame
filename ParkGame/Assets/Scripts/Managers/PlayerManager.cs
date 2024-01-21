@@ -74,14 +74,21 @@ namespace Managers
         
         IEnumerator CountDownAndStart()
         {
-            announcer.AnnounceEventClientRpc("3!", 2);
-            yield return new WaitForSeconds(2f);
-            announcer.AnnounceEventClientRpc("2!", 2);
-            yield return new WaitForSeconds(2f);
-            announcer.AnnounceEventClientRpc("1!", 2);
-            yield return new WaitForSeconds(2f);
-            announcer.AnnounceEventClientRpc("GO!", 2);
+            announcer.AnnounceEventClientRpc("3", 2);
             
+            yield return new WaitForSeconds(2f);
+            PlaySFXNotificationClientRpc("CountToStart");
+
+            announcer.AnnounceEventClientRpc("2", 2);
+            yield return new WaitForSeconds(2f);
+            PlaySFXNotificationClientRpc("CountToStart");
+
+            announcer.AnnounceEventClientRpc("1", 2);
+            yield return new WaitForSeconds(2f);
+            PlaySFXNotificationClientRpc("StartGame");
+
+            announcer.AnnounceEventClientRpc("GO!", 2);
+
             foreach (var (_, controller) in playerControllers) 
             {
                 controller.IsLocked = false;
@@ -90,6 +97,12 @@ namespace Managers
             invokeOnAllPlayersReadyClientRpc();
         }
 
+
+        [ClientRpc] 
+        void PlaySFXNotificationClientRpc(string sfxName) 
+        {
+            AudioManager.Instance.PlayNotificationSFX(sfxName);
+        }
 
         [ClientRpc]
         private void invokeOnAllPlayersReadyClientRpc()
