@@ -296,6 +296,11 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
         sr.sprite = ChangeSpawnType(si);
     }
 
+    [ClientRpc]
+    void PlayNotificationClientRpc(string sfxName, ClientRpcParams clientRpcParams = default) {
+        AudioManager.Instance.PlayNotificationSFX(sfxName);
+    }
+
     [ServerRpc(RequireOwnership = false)]
     public void RequestChangingSpawnTypeServerRpc(ulong clientID) {
         PlayerController playerController = playerManager.GetPlayerController(clientID);
@@ -306,6 +311,10 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
                 counter++;
                 int numOfUnitTypes = Enum.GetNames(typeof(Soldier.UnitType)).Length;
                 ChangeIconClientRpc(counter % numOfUnitTypes);
+
+                // play sfx just for the changing player -- maybe for the whole team?
+                ClientRpcParams clientRpcParams = new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new[] { clientID } } };
+                PlayNotificationClientRpc("OutpostSpawnChanged", clientRpcParams);
             }
         }
     }
