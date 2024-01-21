@@ -78,6 +78,22 @@ MonoBehaviour:
     sound: {fileID: 8300000, guid: 2ee6796f79703df46878aa699a02c20e, type: 3}
   - name: StartGame
     sound: {fileID: 8300000, guid: 8368cfce6ba268b49b6d933c90d709d0, type: 3}
+  - name: OutpostLost
+    sound: {fileID: 8300000, guid: b759ce85de1bd6842a4d81a77a341d1d, type: 3}
+  - name: OutpostGained
+    sound: {fileID: 8300000, guid: 0848fe5535b80ad429f52c370abf9d96, type: 3}
+  - name: Notification
+    sound: {fileID: 8300000, guid: ce0112a0bfc572b45b9324b37c177e64, type: 3}
+  - name: OutpostSpawnChanged
+    sound: {fileID: 8300000, guid: b44000507de2b284ea57ac858be7eba4, type: 3}
+  - name: VPnotGained
+    sound: {fileID: 8300000, guid: db7a0e4f5fdae6b47826949214d33228, type: 3}
+  - name: VPGained
+    sound: {fileID: 8300000, guid: aec4ca9c465002f42b7621ab0c1fd593, type: 3}
+  - name: GameLost
+    sound: {fileID: 8300000, guid: c43a1e5c79fea934d85e5a21f3f9aa52, type: 3}
+  - name: GameWon
+    sound: {fileID: 8300000, guid: f76643490b72ff846b788f203c7917af, type: 3}
   pawnAttackSfx_list:
   - {fileID: 8300000, guid: 3fea785a4fc7f5644a6a2bea79ded5f5, type: 3}
   - {fileID: 8300000, guid: b4fa152340da8fa4a9206d2fd280b064, type: 3}

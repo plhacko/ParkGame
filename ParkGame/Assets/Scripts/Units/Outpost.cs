@@ -306,6 +306,10 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
                 counter++;
                 int numOfUnitTypes = Enum.GetNames(typeof(Soldier.UnitType)).Length;
                 ChangeIconClientRpc(counter % numOfUnitTypes);
+
+                // play sfx just for the changing player -- maybe for the whole team?
+                ClientRpcParams clientRpcParams = new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new[] { clientID } } };
+                announcer.PlayNotificationClientRpc("OutpostSpawnChanged", clientRpcParams);
             }
         }
     }
@@ -346,6 +350,7 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
                 }
             };
             announcer.AnnounceEventClientRpc($"Your outpost is being captured by team {c.Name}!", 5, clientRpcParams);
+            announcer.PlayNotificationClientRpc("Notification");
         }
             
         var enemyMembers = playerManager.GetAllEnemyMembers(Team);
@@ -359,6 +364,7 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
                 }
             };
             announcer.AnnounceEventClientRpc($"Outpost is being captured by team {c.Name}!", 5, clientRpcParams);
+            announcer.PlayNotificationClientRpc("Notification");
         }
     }
     
@@ -370,11 +376,53 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
         sr.color = c.Color;
     }
 
+    ulong[] CreateMemberList(List<PlayerController> members) {
+        if (members != null || members.Count > 0) {
+            ulong[] uList = new ulong[members.Count];
+            int i = 0;
+            foreach (var m in members) {
+                uList[i] = m.OwnerClientId;
+                Debug.Log(m.OwnerClientId);
+                i++;
+            }
+            return uList;
+        }
+        return null;
+    }
+
+    [ServerRpc]
+    void NotifyInvolvedTeamsServerRpc(int winningTeam, int losingTeam) {
+        // sfx for winners
+        var winners = playerManager.GetAllMembersOfTeam(winningTeam);
+
+        Debug.Log("winners ");
+        ClientRpcParams clientRpcParams = new ClientRpcParams {
+            Send = new ClientRpcSendParams {
+                TargetClientIds = CreateMemberList(winners)
+            }
+        };
+        announcer.PlayOutpostConqueredSFXClientRpc(true, clientRpcParams);
+        
+        // sfx for losers
+        var losers = playerManager.GetAllMembersOfTeam(losingTeam);
+        Debug.Log("_________\nlosers ");
+
+        clientRpcParams = new ClientRpcParams {
+            Send = new ClientRpcSendParams {
+                TargetClientIds = CreateMemberList(losers)
+            }
+        };
+        announcer.PlayOutpostConqueredSFXClientRpc(false, clientRpcParams);
+    }
+
     public void OnConquered(int team)
     {
+        int originalTeam = Team;
         Team = team;
         NamedColor c = colorSettings.Colors[team];
         announcer.AnnounceEventClientRpc($"Outpost has been captured by team {c.Name}!", 5);
+
+        NotifyInvolvedTeamsServerRpc(Team, originalTeam);
     }
 
     public void OnStoppedConquering(int team)

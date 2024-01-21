@@ -64,6 +64,8 @@ namespace Managers
         {
             if(numPoints >= maxPoints) {
                 announcer.AnnounceEventClientRpc($"The {colorSettings.Colors[team].Name} Team has won!", 15);
+                announcer.PlayConqueredSFXClientRpc(team, playerManager.GetPlayerController(NetworkManager.Singleton.LocalClientId).Team, Announcer.Wonable.game);
+
                 playerManager.DisableAllPlayers();
                 isOver.Value = true;
             }
@@ -79,6 +81,8 @@ namespace Managers
                 };
                 var c = colorSettings.Colors[team];
                 announcer.AnnounceEventClientRpc($"The {c.Name} Team has scored their {numPoints}{numberEnding} point!", 5);
+                announcer.PlayConqueredSFXClientRpc(team, playerManager.GetPlayerController(NetworkManager.Singleton.LocalClientId).Team, Announcer.Wonable.vp);
+                announcer.PlayNotificationClientRpc("Notification");
             }
         }
     }
