@@ -34,4 +34,13 @@ public class ToggleButtonImage : MonoBehaviour
         targetImage.sprite = states[(int)nextState].Sprite;
         states[(int)CurrentState].OnClick.Invoke();
     }
+
+    // kinda hack but w/e
+    public void SwitchState(uint stateIndex)
+    {
+        if(CurrentState == stateIndex) return;
+        
+        CurrentState = stateIndex;
+        targetImage.sprite = states[(int)stateIndex].Sprite;
+    }
 }

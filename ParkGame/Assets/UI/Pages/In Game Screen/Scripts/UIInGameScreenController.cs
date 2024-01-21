@@ -7,11 +7,10 @@ using UnityEngine.UI;
 
 public class UIInGameScreenController : UIPageController
 {
+    [SerializeField] private ToggleButtonImage cameraButton;
     [SerializeField] private Button optionsButton;
-    [SerializeField] private ToggleButton mapButton;
-    [SerializeField] private ToggleButton cameraButton;
     [SerializeField] private Button action1;
-    [SerializeField] private ToggleButton action2;
+    [SerializeField] private Button action2;
     [SerializeField] private Button action3;
     [SerializeField] private RectTransform formationMask;
     [SerializeField] private RectTransform formationButtonParent;
@@ -27,12 +26,8 @@ public class UIInGameScreenController : UIPageController
     private void Awake()
     {
         optionsButton.onClick.AddListener(Options);
-        mapButton.AddListener("Show", ShowTilemap);
-        mapButton.AddListener("Hide", HideTilemap);
-        cameraButton.AddListener("Zoom In", ZoomIn);
-        cameraButton.AddListener("Zoom Out", ZoomOut);
         action1.onClick.AddListener(Attack);
-        action2.AddListener("Move", Move); // Fallback
+        action2.onClick.AddListener(Move); // Fallback
         action3.onClick.AddListener(Formations);
         formationButton1.onClick.AddListener(Formation1);
         formationButton2.onClick.AddListener(Formation2);
@@ -45,7 +40,7 @@ public class UIInGameScreenController : UIPageController
         GameManager.Instance.CameraFollowCommander();
     }
 
-    private void ZoomIn()
+    public void ZoomIn()
     {
         GameManager.Instance.CameraFollowCommander();
     }
@@ -62,12 +57,12 @@ public class UIInGameScreenController : UIPageController
         AudioManager.Instance.PlayNotificationSFX("Fallback");
     }
 
-    private void HideTilemap()
+    public void HideTilemap()
     {
         gameManager.Hide();        
     }
 
-    private void ShowTilemap()
+    public void ShowTilemap()
     {
         gameManager.Show();
     }
@@ -116,7 +111,7 @@ public class UIInGameScreenController : UIPageController
         AudioManager.Instance.PlayNotificationSFX("Attack");
     }
 
-    private void ZoomOut()
+    public void ZoomOut()
     {
         GameManager.Instance.Zoom(float.MaxValue);
     }
@@ -164,7 +159,7 @@ public class UIInGameScreenController : UIPageController
     {
         if (!GameManager.Instance.FollowCommander)
         {
-            cameraButton.SwitchState("Zoom Out");
+            cameraButton.SwitchState(1);
         }
     }
 }
