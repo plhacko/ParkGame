@@ -92,6 +92,9 @@ public class AudioManager : MonoBehaviour
     }
 
     public void PlayNotificationSFX(string sfxName) {
+        if (!notificationsSource) {
+            return;
+        }
         if (notificationsSource.isPlaying) {
             StartCoroutine(FadeOutFadeIn(notificationsSource, 0.3f, notificationsDict[sfxName]));
             return;

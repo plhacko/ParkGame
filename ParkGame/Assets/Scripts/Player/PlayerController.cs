@@ -217,7 +217,6 @@ namespace Player
         {
             followPin = true;
             Vector2 direction = position - transform.position;
-            Debug.Log("delta time " + Time.deltaTime);
             transform.DOMove(position, Time.deltaTime * 0.8f);
 
             if (direction.magnitude > 0.03f)

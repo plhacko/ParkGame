@@ -13,6 +13,10 @@ public class Announcer : NetworkBehaviour
     private TextMeshProUGUI text;
     private TweenerCore<Color, Color, ColorOptions> colorTween;
     
+    public enum Wonable {
+        game, outpost, vp
+    }
+
     private void Awake()
     {
         text = GetComponent<TextMeshProUGUI>();
@@ -28,6 +32,35 @@ public class Announcer : NetworkBehaviour
         text.text = message;
         text.color = Color.white;
         colorTween = text.DOColor(Color.clear, fadeOutDuration).SetDelay(duration);
+    }
+
+    [ClientRpc]
+    public void PlayOutpostConqueredSFXClientRpc(bool wins, ClientRpcParams clientRpcParams = default) {
+        string sfxName = (wins ? "OutpostGained" : "OutpostLost");
+        PlayNotificationClientRpc(sfxName);
+
+    }
+
+    [ClientRpc]
+    public void PlayConqueredSFXClientRpc(int winners, int affiliation, Wonable what, ClientRpcParams clientRpcParams = default) {
+        bool wins = (affiliation == winners);
+        string sfxName = "";
+        switch (what) {
+            case Wonable.game:
+                sfxName = (wins ? "GameWon" : "GameLost");
+                break;
+            case Wonable.vp:
+                sfxName = (wins ? "VPGained" : "VPnotGained");
+                break;
+            default:
+                break;
+        }
+        PlayNotificationClientRpc(sfxName);
+    }
+
+    [ClientRpc]
+    public void PlayNotificationClientRpc(string sfxName, ClientRpcParams clientRpcParams = default) {
+        AudioManager.Instance.PlayNotificationSFX(sfxName);
     }
 
     [ClientRpc]
