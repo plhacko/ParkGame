@@ -76,7 +76,6 @@ public class UIInGameScreenController : UIPageController
 
     private void Formation3()
     {
-        Debug.Log("FREE");
         gameManager.CommandMove();
         AudioManager.Instance.PlayNotificationSFX("FormationFree");
 
@@ -84,14 +83,12 @@ public class UIInGameScreenController : UIPageController
 
     private void Formation2() 
     {
-        Debug.Log("BOX");
         gameManager.FormationBox();
         AudioManager.Instance.PlayNotificationSFX("FormationBox");
     }
 
     private void Formation1() 
     {
-        Debug.Log("CIRCLE");
         gameManager.FormationCircle();
         AudioManager.Instance.PlayNotificationSFX("FormationCircle");
     }

@@ -382,7 +382,6 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
             int i = 0;
             foreach (var m in members) {
                 uList[i] = m.OwnerClientId;
-                Debug.Log(m.OwnerClientId);
                 i++;
             }
             return uList;
@@ -395,7 +394,6 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
         // sfx for winners
         var winners = playerManager.GetAllMembersOfTeam(winningTeam);
 
-        Debug.Log("winners ");
         ClientRpcParams clientRpcParams = new ClientRpcParams {
             Send = new ClientRpcSendParams {
                 TargetClientIds = CreateMemberList(winners)
@@ -405,7 +403,6 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
         
         // sfx for losers
         var losers = playerManager.GetAllMembersOfTeam(losingTeam);
-        Debug.Log("_________\nlosers ");
 
         clientRpcParams = new ClientRpcParams {
             Send = new ClientRpcSendParams {
