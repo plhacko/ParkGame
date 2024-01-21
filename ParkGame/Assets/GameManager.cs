@@ -44,6 +44,7 @@ public class GameManager : MonoBehaviour
                 {
                     var newPosition = PlayerPointerPlacer.PinPosition;
                     playerController.MoveTowards(newPosition);
+                    break;
                 }
             }
             yield return new WaitForSeconds(followRefreshRate);

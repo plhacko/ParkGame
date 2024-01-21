@@ -7,6 +7,7 @@ using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
 using UnityEngine.AI;
+using DG.Tweening;
 
 namespace Player
 {
@@ -34,7 +35,6 @@ namespace Player
         private readonly NetworkVariable<int> _Team = new(-1);
         private readonly NetworkVariable<bool> _IsLocked = new(true);
         private readonly NetworkVariable<Vector3> _PointerPosition = new(Vector3.zero, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-
         public int Team { get => _Team.Value; set => _Team.Value = value; }
         public string Name { get => _Name.Value.Value; set => _Name.Value = value; }
         public string FirebaseId { get => _FirebaseId.Value.Value; set => _FirebaseId.Value = value; }
@@ -42,13 +42,14 @@ namespace Player
         
         public Vector3 PointerPosition { get => _PointerPosition.Value; set => _PointerPosition.Value = value; }
 
-        public Formation.FormationType FormationType; 
+        public Formation.FormationType FormationType;
+        public bool followPin = false;
+
         public Formation.FormationType GetFormation() {
             return FormationType;
         }
         
         private static readonly int movementSpeedAnimationHash = Animator.StringToHash("MovementSpeed");
-        private NavMeshAgent Agent;
 
         private UIInGameScreenController uiInGameScreenController;
 
@@ -58,7 +59,6 @@ namespace Player
             networkAnimator = GetComponent<NetworkAnimator>();
             formationScript = GetComponent<Formation>();
             changeMaterial = GetComponent<ChangeMaterial>();
-            Agent = GetComponent<NavMeshAgent>();
             playerManager = FindObjectOfType<PlayerManager>();
             gameSessionManager = FindObjectOfType<GameSessionManager>();
             uiInGameScreenController = UIController.Singleton.GetComponentInChildren<UIInGameScreenController>();
@@ -149,6 +149,9 @@ namespace Player
             if (gameSessionManager.IsOver) return;
 
             PointerPosition = PlayerPointerPlacer.PinPosition;
+            if (followPin) {
+                MoveTowards(PointerPosition);
+            }
             
             if (Input.GetKeyDown(KeyCode.P)) {
                 CommandAttackServerRpc();
@@ -212,9 +215,12 @@ namespace Player
 
         public void MoveTowards(Vector3 position)
         {
-            Agent.SetDestination(position);
+            followPin = true;
             Vector2 direction = position - transform.position;
-            if (direction.magnitude > 0.1f)
+            Debug.Log("delta time " + Time.deltaTime);
+            transform.DOMove(position, Time.deltaTime * 0.8f);
+
+            if (direction.magnitude > 0.03f)
             {
                 networkAnimator.Animator.SetFloat(movementSpeedAnimationHash, 1);
             }
@@ -225,27 +231,6 @@ namespace Player
 
             spriteRenderer.flipX = direction.x < 0;
             xSpriteFlip.Value = spriteRenderer.flipX;
-        }
-
-        private void move()
-        {
-            Vector2 input = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
-
-            Vector2 movement = input * movementSpeed;
-
-            if (movement == Vector2.zero)
-            {
-                //FormationScript.ListFormationPositions();
-            }
-            
-            networkAnimator.Animator.SetFloat(movementSpeedAnimationHash, movement.magnitude);
-
-            if (input.magnitude < Mathf.Epsilon) return;
-
-            spriteRenderer.flipX = movement.x < 0;
-            xSpriteFlip.Value = spriteRenderer.flipX;
-
-            transform.Translate(movement * Time.deltaTime);
         }
 
         private void onXSpriteFlipChanged(bool previousValue, bool newValue)
