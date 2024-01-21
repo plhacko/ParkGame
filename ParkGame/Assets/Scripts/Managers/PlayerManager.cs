@@ -74,19 +74,16 @@ namespace Managers
         
         IEnumerator CountDownAndStart()
         {
+            PlaySFXNotificationClientRpc("CountToStart");
             announcer.AnnounceEventClientRpc("3", 2);
-            
             yield return new WaitForSeconds(2f);
             PlaySFXNotificationClientRpc("CountToStart");
-
             announcer.AnnounceEventClientRpc("2", 2);
             yield return new WaitForSeconds(2f);
             PlaySFXNotificationClientRpc("CountToStart");
-
             announcer.AnnounceEventClientRpc("1", 2);
             yield return new WaitForSeconds(2f);
             PlaySFXNotificationClientRpc("StartGame");
-
             announcer.AnnounceEventClientRpc("GO!", 2);
 
             foreach (var (_, controller) in playerControllers) 
