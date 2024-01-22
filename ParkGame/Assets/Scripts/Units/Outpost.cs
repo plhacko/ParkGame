@@ -349,8 +349,8 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
                     TargetClientIds = new []{ teamMember.OwnerClientId }
                 }
             };
-            announcer.AnnounceEventClientRpc($"Your outpost is being captured by team {c.Name}!", 5, clientRpcParams);
-            announcer.PlayNotificationClientRpc("Notification");
+            announcer.AnnounceEventClientRpc($"Your outpost is being captured by team {c.Name}!", c.TextColor, 5, clientRpcParams);
+            //announcer.PlayNotificationClientRpc("Notification");
         }
             
         var enemyMembers = playerManager.GetAllEnemyMembers(Team);
@@ -363,8 +363,8 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
                     TargetClientIds = new []{ teamMember.OwnerClientId }
                 }
             };
-            announcer.AnnounceEventClientRpc($"Outpost is being captured by team {c.Name}!", 5, clientRpcParams);
-            announcer.PlayNotificationClientRpc("Notification");
+            announcer.AnnounceEventClientRpc($"Outpost is being captured by team {c.Name}!", c.TextColor, 5, clientRpcParams);
+            //announcer.PlayNotificationClientRpc("Notification");
         }
     }
     
@@ -381,8 +381,7 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
         int originalTeam = Team;
         Team = team;
         NamedColor c = colorSettings.Colors[team];
-        announcer.AnnounceEventClientRpc($"Outpost has been captured by team {c.Name}!", 5);
-
+        announcer.AnnounceEventClientRpc($"Outpost has been captured by team {c.Name}!", c.TextColor, 5);
         announcer.NotifyInvolvedTeamsServerRpc(Team, originalTeam, Announcer.Wonable.Outpost);
     }
 

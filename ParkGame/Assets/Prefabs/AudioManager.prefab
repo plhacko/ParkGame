@@ -107,8 +107,12 @@ MonoBehaviour:
   - {fileID: 8300000, guid: fe87812ba2206904788cc2804d72b5b2, type: 3}
   molemanAttackSfx_list: []
   soldierClickSfx_list:
-  - {fileID: 8300000, guid: f841c6d9596cf0d4cb546b0b5cf48559, type: 3}
-  - {fileID: 8300000, guid: 0bad6e3d8600c504e901e5da34406fb0, type: 3}
+  - {fileID: 8300000, guid: 2b94d218feb677a4aa08df204077bddf, type: 3}
+  - {fileID: 8300000, guid: fb5f14ea6620ae04c9ca69108bf81f8c, type: 3}
+  - {fileID: 8300000, guid: 33563766bb61a994282f5c5a03b05444, type: 3}
+  - {fileID: 8300000, guid: 4c54756da3c5d6743821482736e518b5, type: 3}
+  - {fileID: 8300000, guid: e7e0b0cba65dffa42a8bd58efae4e575, type: 3}
+  - {fileID: 8300000, guid: 37f020e5ba9a9be49950be30d4680c62, type: 3}
   diedSfx_list:
   - {fileID: 8300000, guid: fcb332b9b5dc37b4285c03f13410bed5, type: 3}
   - {fileID: 8300000, guid: be011d515cd0b0943aafd160e83407c5, type: 3}

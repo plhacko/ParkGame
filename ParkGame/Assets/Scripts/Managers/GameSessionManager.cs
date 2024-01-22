@@ -67,7 +67,7 @@ namespace Managers
             int affiliation = playerController.Team;
 
             if (numPoints >= maxPoints) {
-                announcer.AnnounceEventClientRpc($"The {colorSettings.Colors[team].Name} Team has won!", 15);
+                announcer.AnnounceEventClientRpc($"The {colorSettings.Colors[team].Name} Team has won!", colorSettings.Colors[team].TextColor, 15);
                 announcer.NotifyInvolvedTeamsServerRpc(team, -1, Announcer.Wonable.Game);
 
                 playerManager.DisableAllPlayers();
@@ -84,7 +84,7 @@ namespace Managers
                     _ => "th"
                 };
                 var c = colorSettings.Colors[team];
-                announcer.AnnounceEventClientRpc($"The {c.Name} Team has scored their {numPoints}{numberEnding} point!", 5);
+                announcer.AnnounceEventClientRpc($"The {c.Name} Team has scored their {numPoints}{numberEnding} point!", c.TextColor, 5);
                 announcer.NotifyInvolvedTeamsServerRpc(team, -1, Announcer.Wonable.VP);
             }
         }

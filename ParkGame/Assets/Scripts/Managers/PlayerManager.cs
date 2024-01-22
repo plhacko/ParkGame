@@ -75,16 +75,16 @@ namespace Managers
         IEnumerator CountDownAndStart()
         {
             PlaySFXNotificationClientRpc("CountToStart");
-            announcer.AnnounceEventClientRpc("3", 2);
+            announcer.AnnounceEventClientRpc("3", Color.white, 2);
             yield return new WaitForSeconds(2f);
             PlaySFXNotificationClientRpc("CountToStart");
-            announcer.AnnounceEventClientRpc("2", 2);
+            announcer.AnnounceEventClientRpc("2", Color.white, 2);
             yield return new WaitForSeconds(2f);
             PlaySFXNotificationClientRpc("CountToStart");
-            announcer.AnnounceEventClientRpc("1", 2);
+            announcer.AnnounceEventClientRpc("1", Color.white, 2);
             yield return new WaitForSeconds(2f);
             PlaySFXNotificationClientRpc("StartGame");
-            announcer.AnnounceEventClientRpc("GO!", 2);
+            announcer.AnnounceEventClientRpc("GO!", Color.white, 2);
 
             foreach (var (_, controller) in playerControllers) 
             {
@@ -151,7 +151,7 @@ namespace Managers
             numClientsWithLoadedScene++;
             if (numClientsWithLoadedScene == NetworkManager.Singleton.ConnectedClients.Count)
             {
-                announcer.AnnounceEventClientRpc("Walk to your castles!");
+                announcer.AnnounceEventClientRpc("Walk to your castles!", Color.white);
                 Debug.Log("All players scene loaded");
                 OnAllPlayersSceneLoaded?.Invoke();
                 spawnPlayers();

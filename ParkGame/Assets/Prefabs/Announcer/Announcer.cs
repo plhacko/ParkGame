@@ -26,7 +26,7 @@ public class Announcer : NetworkBehaviour
         playerManager = FindObjectOfType<PlayerManager>();
     }
 
-    public void AnnounceEvent(string message, float duration = 45f)
+    public void AnnounceEvent(string message, Color color, float duration = 45f)
     {
         if (colorTween != null && !colorTween.IsComplete())
         {
@@ -34,7 +34,7 @@ public class Announcer : NetworkBehaviour
         }
         
         text.text = message;
-        text.color = Color.white;
+        text.color = color;
         colorTween = text.DOColor(Color.clear, fadeOutDuration).SetDelay(duration);
     }
 
@@ -53,10 +53,9 @@ public class Announcer : NetworkBehaviour
 
     [ClientRpc]
     public void PlayNotificationClientRpc(string sfxName, ClientRpcParams clientRpcParams = default) {
-        Debug.Log("NOTIFICATION " + sfxName);
         AudioManager.Instance.PlayNotificationSFX(sfxName);
     }
-    ulong[] CreateMemberList(List<PlayerController> members) {
+    public ulong[] CreateMemberList(List<PlayerController> members) {
         if (members != null || members.Count > 0) {
             ulong[] uList = new ulong[members.Count];
             int i = 0;
@@ -81,10 +80,15 @@ public class Announcer : NetworkBehaviour
         };
         PlayConqueredSFXClientRpc(true, what, clientRpcParams);
 
-        // sfx for losers
-        var losers = playerManager.GetAllMembersOfTeam(losingTeam);
-        if (losingTeam == -1) { // all enemies of winning team are losers
-            losers = playerManager.GetAllEnemyMembers(winningTeam);
+
+        List<PlayerController> losers;
+        if (losingTeam == -1) { // no one or everyone was loser. except for the winners
+            if (what == Wonable.Outpost) {
+                return; // no one is the loser. no one was conquered. the outpost just stood there. lonely...
+            }
+            losers = playerManager.GetAllEnemyMembers(winningTeam); // didn't win VP nor the game
+        } else {
+            losers = playerManager.GetAllMembersOfTeam(losingTeam);
         }
 
         clientRpcParams = new ClientRpcParams {
@@ -96,8 +100,9 @@ public class Announcer : NetworkBehaviour
     }
 
     [ClientRpc]
-    public void AnnounceEventClientRpc(FixedString512Bytes message, float duration = 45f, ClientRpcParams clientRpcParams = default)
+    public void AnnounceEventClientRpc(FixedString512Bytes message, Color color, float duration = 45f, ClientRpcParams clientRpcParams = default)
     {
-        AnnounceEvent(message.Value, duration);
+        Debug.Log("___announce: " + message);
+        AnnounceEvent(message.Value, color, duration);
     }
 }
