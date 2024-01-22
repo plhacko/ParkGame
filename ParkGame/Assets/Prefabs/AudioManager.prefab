@@ -100,7 +100,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 3fea785a4fc7f5644a6a2bea79ded5f5, type: 3}
   - {fileID: 8300000, guid: b4fa152340da8fa4a9206d2fd280b064, type: 3}
   - {fileID: 8300000, guid: 31e42e37fd79d124eaa444b847905510, type: 3}
-  - {fileID: 8300000, guid: 65b4f6844a45a7e44be8ccd1b919ce74, type: 3}
+  - {fileID: 8300000, guid: 5dde8d85c4df83640aa874dddde5e4c5, type: 3}
   archerAttackSfx_list:
   - {fileID: 8300000, guid: e0a2af8713c067145b380c0a9fcdda8a, type: 3}
   - {fileID: 8300000, guid: 5a771d365be2b7f4eb6562043e9192ed, type: 3}
