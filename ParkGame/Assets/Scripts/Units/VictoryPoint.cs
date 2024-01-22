@@ -82,7 +82,8 @@ public class VictoryPoint : NetworkBehaviour, IConquerable
 
         if (timeToOpen < timeToNotifyPlayersBeforeOpening && !isNotified)
         {
-            announcer.AnnounceEventClientRpc($"Victory Point will open soon! ({timeToNotifyPlayersBeforeOpening}s)", 5);
+            announcer.AnnounceEventClientRpc($"Victory Point will open soon! ({timeToNotifyPlayersBeforeOpening} s)", 5);
+            announcer.PlayNotificationClientRpc("Notification");
             isNotified = true;
         }
 
@@ -90,6 +91,7 @@ public class VictoryPoint : NetworkBehaviour, IConquerable
         {
             OpenVPClientRpc();
             announcer.AnnounceEventClientRpc("Victory Point has opened!", 5);
+            announcer.PlayNotificationClientRpc("Notification");
         }
     }
 
@@ -98,8 +100,9 @@ public class VictoryPoint : NetworkBehaviour, IConquerable
         onStartedConqueringClientRpc(team);
         NamedColor c = colorSettings.Colors[team];
         announcer.AnnounceEventClientRpc($"Victory Point is being captured by team {c.Name}!", 5);
+        announcer.PlayNotificationClientRpc("Foreboding");
     }
-    
+
     [ClientRpc]
     private void onStartedConqueringClientRpc(int team, ClientRpcParams clientRpcParams = default)
     {

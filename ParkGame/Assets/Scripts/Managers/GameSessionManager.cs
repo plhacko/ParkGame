@@ -1,6 +1,7 @@
 ﻿using System;
 using Unity.Netcode;
 using UnityEngine;
+using Player;
 
 namespace Managers
 {
@@ -62,9 +63,12 @@ namespace Managers
         
         private void onVictoryPointConquered(int team, int numPoints)
         {
-            if(numPoints >= maxPoints) {
+            PlayerController playerController = playerManager.GetLocalPlayerController();
+            int affiliation = playerController.Team;
+
+            if (numPoints >= maxPoints) {
                 announcer.AnnounceEventClientRpc($"The {colorSettings.Colors[team].Name} Team has won!", 15);
-                announcer.PlayConqueredSFXClientRpc(team, playerManager.GetPlayerController(NetworkManager.Singleton.LocalClientId).Team, Announcer.Wonable.game);
+                announcer.NotifyInvolvedTeamsServerRpc(team, -1, Announcer.Wonable.Game);
 
                 playerManager.DisableAllPlayers();
                 isOver.Value = true;
@@ -81,8 +85,7 @@ namespace Managers
                 };
                 var c = colorSettings.Colors[team];
                 announcer.AnnounceEventClientRpc($"The {c.Name} Team has scored their {numPoints}{numberEnding} point!", 5);
-                announcer.PlayConqueredSFXClientRpc(team, playerManager.GetPlayerController(NetworkManager.Singleton.LocalClientId).Team, Announcer.Wonable.vp);
-                announcer.PlayNotificationClientRpc("Notification");
+                announcer.NotifyInvolvedTeamsServerRpc(team, -1, Announcer.Wonable.VP);
             }
         }
     }

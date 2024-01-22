@@ -168,7 +168,7 @@ namespace Managers
 
         public PlayerController GetPlayerController(ulong clientId)
         {
-            var playerData = LobbyManager.Singleton.GetPlayerData(clientId);
+            var playerData  = LobbyManager.Singleton.GetPlayerData(clientId);
             return playerControllers[playerData.FirebaseId];
         }
 

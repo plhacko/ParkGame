@@ -403,6 +403,7 @@ public class Soldier : NetworkBehaviour, ISoldier {
         if (gameSessionManager.IsOver) return;
 
         ulong clientID = NetworkManager.Singleton.LocalClientId;
+        Debug.Log("__________CLIENT id " + clientID);
         RequestChangingCommanderToFollowServerRpc(clientID: clientID);
     }
 
