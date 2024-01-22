@@ -52,25 +52,8 @@ public class Announcer : NetworkBehaviour
     }
 
     [ClientRpc]
-    public void PlayConqueredSFXClientRpc(int winners, int affiliation, Wonable what, ClientRpcParams clientRpcParams = default) {
-        bool wins = (affiliation == winners);
-        string sfxName = "";
-        switch (what) {
-            case Wonable.Game:
-                sfxName = (wins ? "GameWon" : "GameLost");
-                break;
-            case Wonable.VP:
-                sfxName = (wins ? "VPGained" : "VPnotGained");
-                break;
-            default:
-                break;
-        }
-        PlayNotificationClientRpc(sfxName);
-    }
-
-    [ClientRpc]
     public void PlayNotificationClientRpc(string sfxName, ClientRpcParams clientRpcParams = default) {
-        Debug.Log("PLAY NOTIFICATION " + sfxName);
+        Debug.Log("NOTIFICATION " + sfxName);
         AudioManager.Instance.PlayNotificationSFX(sfxName);
     }
     ulong[] CreateMemberList(List<PlayerController> members) {
