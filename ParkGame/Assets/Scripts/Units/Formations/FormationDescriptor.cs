@@ -16,6 +16,7 @@ public class FormationDescriptor : MonoBehaviour {
         Increment = 0.75f;
         HorseIncrement = 2f;
     }
+
     /* in form: 3 * X + c
     o o o
     o o o

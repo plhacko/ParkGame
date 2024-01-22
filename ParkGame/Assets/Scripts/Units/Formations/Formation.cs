@@ -139,7 +139,26 @@ public class Formation : MonoBehaviour {
             theta += chord / away;
         }
     }
+    public int GetNumberOfUnassignedPositions(List<GameObject> positions) {
+        int count = 0;
+        foreach (var p in positions) {
+            bool free = ! p.GetComponent<PositionDescriptor>().isAssigned;
+            if (free) {
+                //count++;
+            }
+        }
 
+
+
+        foreach (var p in positions) {
+            var pos = p.GetComponent<PositionDescriptor>();
+            if (! pos.isAssigned) { count++; }
+        }
+        Debug.Log("free positions in this formation: " + count);
+
+
+        return count;
+    }
     void Add1PositionToBoxFormation() {
         var formDescr = BoxRoot.GetComponent<FormationDescriptor>();
         int c = formDescr.NumberOfPositions;
@@ -208,22 +227,30 @@ public class Formation : MonoBehaviour {
        
     }
 
-    public void RemoveFromFormation(GameObject soldier, GameObject position, FormationType shape = FormationType.Circle) {
+    public void RemoveFromFormation(GameObject soldier, GameObject position, FormationType shape = FormationType.Circle, bool destroy = true) {
         Soldier.UnitType unitType = soldier.GetComponent<Soldier>().GetUnitType();
         var positionList = FormationCircle; // now not used list
+        var soldierList = soldiersSwordmen; // default
+        
         if (shape == FormationType.Box) {
             if (unitType == Soldier.UnitType.Horseman) {
                 positionList = FormationBoxForHorses;
+                soldierList = soldiersMolemen;
             } else {
                 positionList = FormationBox;
+                if (unitType == Soldier.UnitType.Archer) {
+                    soldierList = soldiersArchers;
+                }
             }
         } else {
             if (unitType == Soldier.UnitType.Pawn) {
                 positionList = FormationCircleOuter;
             } else if (unitType == Soldier.UnitType.Archer) {
                 positionList = FormationCircleInner;
+                soldierList = soldiersArchers;
             } else {
                 positionList = FormationCircleForHorses;
+                soldierList = soldiersMolemen;
             }
         }
 
@@ -234,8 +261,11 @@ public class Formation : MonoBehaviour {
                 var pos = item.GetComponent<PositionDescriptor>();
                 if (item == position) {
                     pos.isAssigned = false;
-                    positionList.Remove(item);
-                    Destroy(position);
+                    soldierList.Remove(soldier);
+                    if (destroy) {
+                        positionList.Remove(item);
+                        Destroy(position);
+                    } 
                     return;
                 }
             }
@@ -279,10 +309,12 @@ public class Formation : MonoBehaviour {
     public GameObject GetPositionInBox(Soldier.UnitType unitType) {
         var positionList = FormationBox;
         //if (FormationBox.Count < soldiers.Count) {
-        if (unitType != Soldier.UnitType.Horseman && FormationBox.Count < soldiersArchers.Count + soldiersSwordmen.Count) {
+        int freeInBox = GetNumberOfUnassignedPositions(FormationBox);
+        int freeHorses = GetNumberOfUnassignedPositions(FormationBoxForHorses);
+        if (unitType != Soldier.UnitType.Horseman && freeInBox < 1) {
             Add1PositionToBoxFormation();
         } 
-        if (unitType == Soldier.UnitType.Horseman) {
+        if (unitType == Soldier.UnitType.Horseman && freeHorses < 1) {
             Add1PositionOnTheSide();
             positionList = FormationBoxForHorses;
         }
@@ -311,10 +343,10 @@ public class Formation : MonoBehaviour {
             soldierList = soldiersMolemen;
             parent = HorseRoot;
         }
-
+        
         var positions = ListCircularPositionsByUnitType(unitType);
-
-        if (soldierList.Count > positionList.Count) {
+        int freeCount = GetNumberOfUnassignedPositions(positionList);
+        if (freeCount < 1) {
             Add1PositionToCircularFormation(positions[positions.Count - 1], positionList, parent);
         }
 
@@ -357,10 +389,15 @@ public class Formation : MonoBehaviour {
         int j = 0;
         //Debug.Log("adjust formation!!!!!");
         for (int i = 0; i < formationList.Count; i++) {
-           // var a = formationList[i].transform.localPosition;
+            // var a = formationList[i].transform.localPosition;
+            if (j >= formationList.Count) {
+                return formationList;
+            }
+
             var a = formationList[i].transform.position;
             var b = positions[j];
             double eps = 0.002f;
+            
             if (Vector3.Distance(a, b) <= eps) {
                 // identical, moving on
                 j++;

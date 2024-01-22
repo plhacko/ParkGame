@@ -153,13 +153,18 @@ namespace Player
                 MoveTowards(PointerPosition);
             }
             
+            // Attack
             if (Input.GetKeyDown(KeyCode.P)) {
                 CommandAttackServerRpc();
             }
+
+            // Circular formation
             if (Input.GetKeyDown(KeyCode.C))
             {
                 FormatSoldiersServerRpc(KeyCode.C);
             }
+
+            // Box (Rectangular) formation
             if (Input.GetKeyDown(KeyCode.R)) 
             { 
                 FormatSoldiersServerRpc(KeyCode.R); 
@@ -329,7 +334,7 @@ namespace Player
         public void CommandMovementServerRpc()
         {
             formationScript.ResetFormation();
-
+            FormationType = Formation.FormationType.Free;
             foreach (GameObject go in units)
             {
                 if (go.TryGetComponent<ISoldier>(out ISoldier soldier))
@@ -348,20 +353,10 @@ namespace Player
             }
         }
 
-        [ClientRpc]
-        public void AttackClientRpc() {
-            formationScript.ResetFormation();
-            foreach (GameObject go in units) {
-                if (go.TryGetComponent<ISoldier>(out ISoldier soldier)) {
-                    soldier.NewCommand(SoldierCommand.Attack);
-                }
-            }
-        }
-
         [ServerRpc(RequireOwnership = false)]
         public void CommandAttackServerRpc(ServerRpcParams serverRpcParams = default) {
-            formationScript.ResetFormation();
-            FormationType = Formation.FormationType.Free;
+            //formationScript.ResetFormation();
+            //FormationType = Formation.FormationType.Free;
             foreach (GameObject go in units) {
                 if (go.TryGetComponent<ISoldier>(out ISoldier soldier)) {
                     soldier.NewCommand(SoldierCommand.Attack);

@@ -403,7 +403,6 @@ public class Soldier : NetworkBehaviour, ISoldier {
         if (gameSessionManager.IsOver) return;
 
         ulong clientID = NetworkManager.Singleton.LocalClientId;
-        Debug.Log("__________CLIENT id " + clientID);
         RequestChangingCommanderToFollowServerRpc(clientID: clientID);
     }
 
@@ -419,7 +418,6 @@ public class Soldier : NetworkBehaviour, ISoldier {
             if (playerController.gameObject.transform != CommanderToFollow) {
 
                 SetCommanderToFollow(playerController.gameObject.transform);
-                //NewCommand(SoldierCommand.FollowingCommander);
                 NewCommand(SoldierCommand.Following);
                 FormationType = CommanderToFollow.GetComponent<ICommander>().GetFormation(); // get type of formation
                 FormationFromFollowedCommander = CommanderToFollow.GetComponent<Formation>();
@@ -430,7 +428,6 @@ public class Soldier : NetworkBehaviour, ISoldier {
             } else {
                 var closestOutpost = ClosestOutpost();
                 SetCommanderToFollow(closestOutpost);
-                //NewCommand(SoldierCommand.ReturnToOutpost);
                 NewCommand(SoldierCommand.Following);
                 NavMeshFormationSwitch(false, FormationFromFollowedCommander, FormationType.Free);
             }
@@ -444,6 +441,7 @@ public class Soldier : NetworkBehaviour, ISoldier {
         if (CommanderToFollow != commanderToFollow) // change Commander to follow
         {
             CommanderToFollow?.GetComponent<ICommander>().ReportUnfollowing(gameObject);
+            if (FormationFromFollowedCommander) { FormationFromFollowedCommander.RemoveFromFormation(gameObject, ObjectToFollowInFormation, FormationType, false); }
             CommanderToFollow = commanderToFollow;
             CommanderToFollow?.GetComponent<ICommander>().ReportFollowing(gameObject);
             NewCommand(SoldierCommand.Following);
@@ -470,7 +468,9 @@ public class Soldier : NetworkBehaviour, ISoldier {
         isDead = true;
         HP = 0;
         Agent.SetDestination(transform.position);
+        ObjectToFollowInFormation.GetComponent<PositionDescriptor>().isAssigned = false;
         CommanderToFollow?.GetComponent<ICommander>()?.ReportUnfollowing(gameObject);
+        FormationFromFollowedCommander.RemoveFromFormation(gameObject, ObjectToFollowInFormation, FormationType, false);
         Networkanimator.SetTrigger("Die");
         handleDeath();
     }
