@@ -65,59 +65,60 @@ MonoBehaviour:
   sfxList: []
   notificationsList:
   - name: Attack
-    sound: {fileID: 8300000, guid: 82850d383a4fd6b48b3d32ef0a772ba1, type: 3}
+    sound: {fileID: 8300000, guid: 5b4a8523e0d1fbf4fb7757ed27da28a7, type: 3}
   - name: Fallback
-    sound: {fileID: 8300000, guid: 72d3b459de63a9a48aee87bff4fc1d1c, type: 3}
+    sound: {fileID: 8300000, guid: 449b3edf07b3b374fb89f8da9f18baf5, type: 3}
   - name: FormationBox
-    sound: {fileID: 8300000, guid: d5d46ab70c0261445883f79604e5166c, type: 3}
+    sound: {fileID: 8300000, guid: 10f71536a3dd1974da4cd1a3e4ac758d, type: 3}
   - name: FormationCircle
-    sound: {fileID: 8300000, guid: 7a82472f39c356744a2e0260e3b2ab2e, type: 3}
+    sound: {fileID: 8300000, guid: 465cdb08b17e55741a5ee1c5d82d67b7, type: 3}
   - name: FormationFree
-    sound: {fileID: 8300000, guid: a584c9345f1387f40a14ab93961c72bd, type: 3}
+    sound: {fileID: 8300000, guid: fbaa9e42d6408ab4aa663f0527a59091, type: 3}
   - name: CountToStart
-    sound: {fileID: 8300000, guid: 2ee6796f79703df46878aa699a02c20e, type: 3}
+    sound: {fileID: 8300000, guid: ffeac128759efb64b939a2766a0aeffd, type: 3}
   - name: StartGame
-    sound: {fileID: 8300000, guid: 8368cfce6ba268b49b6d933c90d709d0, type: 3}
+    sound: {fileID: 8300000, guid: d3f786137b321e64b9e60eae473fa773, type: 3}
   - name: OutpostLost
-    sound: {fileID: 8300000, guid: b759ce85de1bd6842a4d81a77a341d1d, type: 3}
+    sound: {fileID: 8300000, guid: 23bca77d9cd484f42a8e91ab08185a0f, type: 3}
   - name: OutpostGained
-    sound: {fileID: 8300000, guid: 0848fe5535b80ad429f52c370abf9d96, type: 3}
+    sound: {fileID: 8300000, guid: d4980d7251538a34bb330b42e7fdce77, type: 3}
   - name: Notification
-    sound: {fileID: 8300000, guid: ce0112a0bfc572b45b9324b37c177e64, type: 3}
+    sound: {fileID: 8300000, guid: 7bb0054d87abc5843a22d0614afdedf7, type: 3}
   - name: OutpostSpawnChanged
-    sound: {fileID: 8300000, guid: b44000507de2b284ea57ac858be7eba4, type: 3}
+    sound: {fileID: 8300000, guid: ec8f26fe9941e1f4aa104007ac6d1116, type: 3}
   - name: VPnotGained
-    sound: {fileID: 8300000, guid: db7a0e4f5fdae6b47826949214d33228, type: 3}
+    sound: {fileID: 8300000, guid: 1adfcb63d4dfb644f8b8a88cfa3407d4, type: 3}
   - name: VPGained
-    sound: {fileID: 8300000, guid: aec4ca9c465002f42b7621ab0c1fd593, type: 3}
+    sound: {fileID: 8300000, guid: d28c392ad1351504db10eb8ed1f587e7, type: 3}
   - name: GameLost
-    sound: {fileID: 8300000, guid: c43a1e5c79fea934d85e5a21f3f9aa52, type: 3}
+    sound: {fileID: 8300000, guid: d014419dd15b0334691034a00c68c814, type: 3}
   - name: GameWon
-    sound: {fileID: 8300000, guid: f76643490b72ff846b788f203c7917af, type: 3}
+    sound: {fileID: 8300000, guid: 689cc2c6a6cf09848acaec8b65fad117, type: 3}
   - name: Foreboding
-    sound: {fileID: 8300000, guid: 65f533e422a2658469a04cbfbf1d6025, type: 3}
+    sound: {fileID: 8300000, guid: 9ebc1450e5743a04fa0182e540cd9677, type: 3}
   pawnAttackSfx_list:
-  - {fileID: 8300000, guid: 3fea785a4fc7f5644a6a2bea79ded5f5, type: 3}
-  - {fileID: 8300000, guid: b4fa152340da8fa4a9206d2fd280b064, type: 3}
-  - {fileID: 8300000, guid: 31e42e37fd79d124eaa444b847905510, type: 3}
-  - {fileID: 8300000, guid: 5dde8d85c4df83640aa874dddde5e4c5, type: 3}
+  - {fileID: 8300000, guid: 9dd30fc2638cb0049af378d76bba373a, type: 3}
+  - {fileID: 8300000, guid: a625091d167d28748a1e9b5c54cd88d8, type: 3}
+  - {fileID: 8300000, guid: 2da1941a0bc5b0845bf6c6ccf81a47b9, type: 3}
+  - {fileID: 8300000, guid: 27208c258e7cf8844ad74939796729f6, type: 3}
   archerAttackSfx_list:
-  - {fileID: 8300000, guid: e0a2af8713c067145b380c0a9fcdda8a, type: 3}
-  - {fileID: 8300000, guid: 5a771d365be2b7f4eb6562043e9192ed, type: 3}
-  - {fileID: 8300000, guid: fe87812ba2206904788cc2804d72b5b2, type: 3}
+  - {fileID: 8300000, guid: 859f23dce8d136744ba135e3fbd07dc8, type: 3}
+  - {fileID: 8300000, guid: 1a16e555bcc18694a92dd5889bff4293, type: 3}
+  - {fileID: 8300000, guid: 376c351524b11ee4093a44abc7342d93, type: 3}
+  - {fileID: 8300000, guid: 4a857d9f9ad96c543b927ae4e36dfb64, type: 3}
   molemanAttackSfx_list: []
   soldierClickSfx_list:
-  - {fileID: 8300000, guid: 2b94d218feb677a4aa08df204077bddf, type: 3}
-  - {fileID: 8300000, guid: fb5f14ea6620ae04c9ca69108bf81f8c, type: 3}
-  - {fileID: 8300000, guid: 33563766bb61a994282f5c5a03b05444, type: 3}
-  - {fileID: 8300000, guid: 4c54756da3c5d6743821482736e518b5, type: 3}
-  - {fileID: 8300000, guid: e7e0b0cba65dffa42a8bd58efae4e575, type: 3}
-  - {fileID: 8300000, guid: 37f020e5ba9a9be49950be30d4680c62, type: 3}
+  - {fileID: 8300000, guid: 56fea83cd1edac8439a5ee71ce29a491, type: 3}
+  - {fileID: 8300000, guid: af8f4820bba13c747a0fc2166e35fb79, type: 3}
+  - {fileID: 8300000, guid: d77d6313fbe537f408a64934ea8a531f, type: 3}
+  - {fileID: 8300000, guid: 15477dbc2b3141c48b90345e911a9ec4, type: 3}
+  - {fileID: 8300000, guid: fbfa574e1085cad42b757021ea19945f, type: 3}
+  - {fileID: 8300000, guid: 8cf4343bcd8eb7e4bbf6e7cbf39ad504, type: 3}
   diedSfx_list:
-  - {fileID: 8300000, guid: fcb332b9b5dc37b4285c03f13410bed5, type: 3}
-  - {fileID: 8300000, guid: be011d515cd0b0943aafd160e83407c5, type: 3}
-  - {fileID: 8300000, guid: 6b890ff915b5ff248b5180f7a406fdb8, type: 3}
-  - {fileID: 8300000, guid: 5c9a8aeb189aff64688a38274c29c799, type: 3}
+  - {fileID: 8300000, guid: 57fc7a4b72210eb47b5cea2486930155, type: 3}
+  - {fileID: 8300000, guid: 328c981fec6c63d4f8247fd60f4a6132, type: 3}
+  - {fileID: 8300000, guid: fbd08d7b80d59544da04b0853d99c7f8, type: 3}
+  - {fileID: 8300000, guid: 17a4fdd2cb68d9b41b60a3875f6b9dc5, type: 3}
 --- !u!1 &5446646869533372604
 GameObject:
   m_ObjectHideFlags: 0
