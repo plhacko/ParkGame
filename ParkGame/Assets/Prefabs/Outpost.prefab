@@ -125,8 +125,8 @@ MonoBehaviour:
   UnitPrefab: {fileID: 2149011059489662585, guid: 767d4c3ee472ffe4ea667aae7025b849, type: 3}
   ArcherPrefab: {fileID: 2149011059489662585, guid: d7dabec280dc4e54d93803fe26a0bb73, type: 3}
   HorsemanPrefab: {fileID: 5515698993845621550, guid: 8cfe5a199b3c20445bc24ab6439cf170, type: 3}
-  PawnIcon: {fileID: 21300000, guid: ae323a182267631428b30f4a4e3deaf1, type: 3}
-  ArcherIcon: {fileID: 21300000, guid: a4e42e7f3a142544483fa5f55e0eb678, type: 3}
+  PawnIcon: {fileID: 21300000, guid: a3f44146f54c33845aaa4b0b13440bfd, type: 3}
+  ArcherIcon: {fileID: 21300000, guid: 6c2c46ab69eac124687f68963aa9aa37, type: 3}
   HorsemanIcon: {fileID: 21300000, guid: 8942c93d2dc69a54a9d32d7e7c8b3c03, type: 3}
   InitOutpostUnitType: 0
   revealer: {fileID: 7172483008333775361}

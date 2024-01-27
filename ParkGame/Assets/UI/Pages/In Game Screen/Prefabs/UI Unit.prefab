@@ -198,9 +198,9 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2390462213264319064}
   healthBarSlider: {fileID: 1721078980612208679}
   unitIcons:
-  - {fileID: 21300000, guid: 8dd81f39bc3e1f6488bf0bddc35fe56c, type: 3}
-  - {fileID: 21300000, guid: 73627ee55b850e542a049677c16184bc, type: 3}
-  - {fileID: 21300000, guid: 46eddd8d370b3be48b1a9d9c76e98342, type: 3}
+  - {fileID: 21300000, guid: a3f44146f54c33845aaa4b0b13440bfd, type: 3}
+  - {fileID: 21300000, guid: 6c2c46ab69eac124687f68963aa9aa37, type: 3}
+  - {fileID: 21300000, guid: 8942c93d2dc69a54a9d32d7e7c8b3c03, type: 3}
   unitIcon: {fileID: 9141068443579837822}
   pressHoldTimeSuccess: 1
 --- !u!1001 &8394886476439901423
