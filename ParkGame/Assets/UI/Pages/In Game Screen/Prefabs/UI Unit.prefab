@@ -198,7 +198,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2390462213264319064}
   healthBarSlider: {fileID: 1721078980612208679}
   unitIcons:
-  - {fileID: 21300000, guid: a3f44146f54c33845aaa4b0b13440bfd, type: 3}
+  - {fileID: 21300000, guid: 7c1c8fc1095e0c347b891b57f65df8d2, type: 3}
   - {fileID: 21300000, guid: 6c2c46ab69eac124687f68963aa9aa37, type: 3}
   - {fileID: 21300000, guid: 8942c93d2dc69a54a9d32d7e7c8b3c03, type: 3}
   unitIcon: {fileID: 9141068443579837822}

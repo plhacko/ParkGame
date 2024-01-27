@@ -458,7 +458,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: a3f44146f54c33845aaa4b0b13440bfd, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 7c1c8fc1095e0c347b891b57f65df8d2, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -763,10 +763,10 @@ MonoBehaviour:
   horsemanCount: {fileID: 6660573854448494483}
   outpostIcon: {fileID: 5760148257073029376}
   outpostIcons:
-  - {fileID: 21300000, guid: a3f44146f54c33845aaa4b0b13440bfd, type: 3}
+  - {fileID: 21300000, guid: 7c1c8fc1095e0c347b891b57f65df8d2, type: 3}
   - {fileID: 21300000, guid: 6c2c46ab69eac124687f68963aa9aa37, type: 3}
   - {fileID: 21300000, guid: 8942c93d2dc69a54a9d32d7e7c8b3c03, type: 3}
-  castleIcon: {fileID: 21300000, guid: 9ed5cd98ef41eda43a6b5c967de4c79d, type: 3}
+  castleIcon: {fileID: 21300000, guid: ed6f231de5f144c48833cc832986b875, type: 3}
   holdTimerLimit: 1
 --- !u!1 &6118300518283442738
 GameObject:
