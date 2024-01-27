@@ -32,6 +32,7 @@ public class AudioManager : MonoBehaviour
     [SerializeField] private List<AudioClip> molemanAttackSfx_list;
     [SerializeField] private List<AudioClip> soldierClickSfx_list;
     [SerializeField] private List<AudioClip> diedSfx_list;
+    [SerializeField] private List<AudioClip> clickSfx_list;
 
     private Dictionary<string, AudioClip> sfxDict = new Dictionary<string, AudioClip>();
     private Dictionary<string, AudioClip> notificationsDict = new Dictionary<string, AudioClip>();
@@ -64,6 +65,11 @@ public class AudioManager : MonoBehaviour
 
     public void PlaySFX(AudioClip sfx) {
         sfxSource.PlayOneShot(sfx);
+    }
+
+    public void PlayClickSFX() {
+        AudioClip sfx = GetRandomItem(clickSfx_list);
+        notificationsSource.PlayOneShot(sfx);
     }
 
     public void PlaySFX(string sfxName) {

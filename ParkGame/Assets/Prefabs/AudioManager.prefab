@@ -119,6 +119,8 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 328c981fec6c63d4f8247fd60f4a6132, type: 3}
   - {fileID: 8300000, guid: fbd08d7b80d59544da04b0853d99c7f8, type: 3}
   - {fileID: 8300000, guid: 17a4fdd2cb68d9b41b60a3875f6b9dc5, type: 3}
+  clickSfx_list:
+  - {fileID: 8300000, guid: a035fa7ebd9212b4a9a8beb7671f4930, type: 3}
 --- !u!1 &5446646869533372604
 GameObject:
   m_ObjectHideFlags: 0
