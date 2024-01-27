@@ -80,7 +80,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 3
-  m_Sprite: {fileID: 21300000, guid: 46eddd8d370b3be48b1a9d9c76e98342, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 1b7bf4a342f52624e845b07bd638a8ec, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 0.5019608}
   m_FlipX: 0
   m_FlipY: 0
@@ -125,9 +125,9 @@ MonoBehaviour:
   UnitPrefab: {fileID: 2149011059489662585, guid: 767d4c3ee472ffe4ea667aae7025b849, type: 3}
   ArcherPrefab: {fileID: 2149011059489662585, guid: d7dabec280dc4e54d93803fe26a0bb73, type: 3}
   HorsemanPrefab: {fileID: 5515698993845621550, guid: 8cfe5a199b3c20445bc24ab6439cf170, type: 3}
-  PawnIcon: {fileID: 21300000, guid: 8dd81f39bc3e1f6488bf0bddc35fe56c, type: 3}
-  ArcherIcon: {fileID: 21300000, guid: 73627ee55b850e542a049677c16184bc, type: 3}
-  HorsemanIcon: {fileID: 21300000, guid: 46eddd8d370b3be48b1a9d9c76e98342, type: 3}
+  PawnIcon: {fileID: 21300000, guid: ae323a182267631428b30f4a4e3deaf1, type: 3}
+  ArcherIcon: {fileID: 21300000, guid: a4e42e7f3a142544483fa5f55e0eb678, type: 3}
+  HorsemanIcon: {fileID: 21300000, guid: 8942c93d2dc69a54a9d32d7e7c8b3c03, type: 3}
   InitOutpostUnitType: 0
   revealer: {fileID: 7172483008333775361}
   colorSettings: {fileID: 11400000, guid: 540e0efb517eb1d4f8598ecd8326dff1, type: 2}

@@ -80,7 +80,7 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
         {
             counter = 1;
         }
-        sr.sprite = ChangeSpawnType(counter);
+        //sr.sprite = ChangeSpawnType(counter);
         
         _Team.OnValueChanged += onTeamChanged;
 
@@ -309,7 +309,7 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
 
                 // play sfx just for the changing player -- maybe for the whole team?
                 ClientRpcParams clientRpcParams = new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new[] { clientID } } };
-                announcer.PlayNotificationClientRpc("OutpostSpawnChanged", clientRpcParams);
+                announcer.PlayNotificationClientRpc("OutpostSpawnChanged", clientRpcParams); // without this sound altogether?
             }
         }
     }
@@ -383,6 +383,10 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
         NamedColor c = colorSettings.Colors[team];
         announcer.AnnounceEventClientRpc($"Outpost has been captured by team {c.Name}!", c.TextColor, 5);
         announcer.NotifyInvolvedTeamsServerRpc(Team, originalTeam, Announcer.Wonable.Outpost);
+
+        if (originalTeam == -1) {
+            ChangeIconClientRpc(0);
+        }
     }
 
     public void OnStoppedConquering(int team)

@@ -148,21 +148,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a6030245d92a7e42ab2c247dc0d696c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsCastle: 0
   InitialTeam: -1
   MaxUnits: 6
   SpawnTime: 2.5
   UnitPrefab: {fileID: 2149011059489662585, guid: 767d4c3ee472ffe4ea667aae7025b849, type: 3}
   ArcherPrefab: {fileID: 0}
   HorsemanPrefab: {fileID: 0}
-  PawnIcon: {fileID: 21300000, guid: 1787590b164c3d14392ce6bdc77a4d97, type: 3}
+  PawnIcon: {fileID: 21300000, guid: 9ed5cd98ef41eda43a6b5c967de4c79d, type: 3}
   ArcherIcon: {fileID: 0}
   HorsemanIcon: {fileID: 0}
   InitOutpostUnitType: 0
   revealer: {fileID: 3827981197028292139}
   colorSettings: {fileID: 11400000, guid: 540e0efb517eb1d4f8598ecd8326dff1, type: 2}
+  switchCollider: {fileID: 0}
+  TimeBetweenToggles: 0
   _Team:
     m_InternalValue: -10
+  _IsCastle:
+    m_InternalValue: 0
 --- !u!114 &8892233519408517772
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -246,7 +249,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 3
-  m_Sprite: {fileID: 21300000, guid: 1787590b164c3d14392ce6bdc77a4d97, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 9ed5cd98ef41eda43a6b5c967de4c79d, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 0.59607846}
   m_FlipX: 0
   m_FlipY: 0
