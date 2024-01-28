@@ -137,6 +137,9 @@ MonoBehaviour:
     m_InternalValue: 0
   _IsCastle:
     m_InternalValue: 0
+  arrowCooldownTime: 0
+  salveOfArrows: 0
+  Damage: 0
 --- !u!114 &-6080753142415193819
 MonoBehaviour:
   m_ObjectHideFlags: 0

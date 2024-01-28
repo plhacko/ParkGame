@@ -305,7 +305,7 @@ public class Soldier : NetworkBehaviour, ISoldier {
     public UnitType GetUnitType() {
         return TypeOfUnit;
     }
-    private Direction GetDirectionEnum(Vector2 d) {
+    public static Direction GetDirectionEnum(Vector2 d) {
         if (Mathf.Abs(d.x) > Mathf.Abs(d.y)) {
             return d.x > 0 ? Direction.Right : Direction.Left;
         } else {
