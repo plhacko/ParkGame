@@ -263,11 +263,6 @@ MonoBehaviour:
   revealer: {fileID: 1578417005418209535}
   colorSettings: {fileID: 11400000, guid: 540e0efb517eb1d4f8598ecd8326dff1, type: 2}
   ClosestEnemyDEBUG: 0
-  Behaviour: 0
-  BehaviourChangedEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  AttackTimer: 0
   FollowInNavMeshFormation: 0
   FormationFromFollowedCommander: {fileID: 0}
   ObjectToFollowInFormation: {fileID: 0}
@@ -275,6 +270,8 @@ MonoBehaviour:
   midPointPositionForHorseman: {x: 0, y: 0, z: 0}
   midPointReached: 0
   targetedEnemy: {fileID: 0}
+  _SoldierCommand:
+    m_InternalValue: 0
   CommandChangedEvent:
     m_PersistentCalls:
       m_Calls: []
@@ -476,7 +473,7 @@ MonoBehaviour:
   shader1: {fileID: 4800000, guid: 6a731f9a56e00be4b86162ee046e0493, type: 3}
   shader2: {fileID: 10753, guid: 0000000000000000f000000000000000, type: 0}
   excludeObjects:
-  - {fileID: 0}
+  - {fileID: 1578417005418209535}
 --- !u!1 &5861823242978903207
 GameObject:
   m_ObjectHideFlags: 0
