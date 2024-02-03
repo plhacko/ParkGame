@@ -22,7 +22,7 @@ public class VictoryPoint : NetworkBehaviour, IConquerable
         new(),
         new()
     };
-    
+
     private SpriteRenderer spriteRenderer;
     private GameObject conquerModuleObject;
     private PlayerManager playerManager;
@@ -136,6 +136,17 @@ public class VictoryPoint : NetworkBehaviour, IConquerable
         }
     }
 
+    public (int, int)[] GetTeamScores()
+    {
+        var scores = new (int, int)[4];
+        for (int i = 0; i < 4; i++)
+        {
+            scores[i] = (i, this.teamScores[i].Value);
+        }
+
+        return scores;
+    }
+    
     public int GetTeam()
     {
         return -1;
