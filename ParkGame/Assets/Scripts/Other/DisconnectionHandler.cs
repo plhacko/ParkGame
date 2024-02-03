@@ -1,5 +1,3 @@
-using System.Threading.Tasks;
-using Managers;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -12,13 +10,10 @@ public class DisconnectionHandler : NetworkBehaviour
     
     private void Start()
     {
-        backToMenuButton.onClick.AddListener(() =>
-        {
-            SceneManager.LoadScene("CleanUpScene");
-        });
+        backToMenuButton.onClick.AddListener(DisconnectAndLeave);
     }
     
-    public void Disconnect()
+    public void DisconnectAndLeave()
     {
         if (IsHost)
         {
@@ -29,6 +24,7 @@ public class DisconnectionHandler : NetworkBehaviour
             sendDisconnectServerRpc(NetworkManager.Singleton.LocalClientId);
             NetworkManager.Singleton.Shutdown();
         }
+        SceneManager.LoadScene("CleanUpScene");
     }
     
     [ServerRpc(RequireOwnership = false)]
