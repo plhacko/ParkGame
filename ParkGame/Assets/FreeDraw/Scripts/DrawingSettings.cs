@@ -8,6 +8,23 @@ namespace FreeDraw
     // Helper methods used to set drawing settings
     public class DrawingSettings : MonoBehaviour
     {
+        [SerializeField] private Sprite activeSprite;
+        [SerializeField] private Sprite activeSpritePressed;
+        [SerializeField] private Sprite inactiveSprite;
+        [SerializeField] private Sprite inactiveSpritePressed;
+    
+        [SerializeField] private GameObject boundsObject;
+        [SerializeField] private GameObject wallsObject;
+        [SerializeField] private GameObject pathsObject;
+        [SerializeField] private GameObject eraserObject;
+        private GameObject activeSpriteGameObject;
+
+        private void Start()
+        {
+            SetActiveSprite(boundsObject);
+        }
+    
+
         public static bool isCursorOverUI = false;
         public float Transparency = 1f;
 
@@ -42,6 +59,7 @@ namespace FreeDraw
             c.a = Transparency;
             SetMarkerColour(c);
             Drawable.drawable.SetPenBrush();
+            SetActiveSprite(boundsObject);
         }
         public void SetMarkerGreen()
         {
@@ -57,6 +75,7 @@ namespace FreeDraw
             c.a = Transparency;
             SetMarkerColour(c);
             Drawable.drawable.SetPenBrush();
+            SetActiveSprite(pathsObject);
         }
         
         public void SetMarkerBlue()
@@ -65,15 +84,41 @@ namespace FreeDraw
             c.a = Transparency;
             SetMarkerColour(c);
             Drawable.drawable.SetPenBrush();
+            SetActiveSprite(wallsObject);
         }
+
         public void SetEraser()
         {
             SetMarkerColour(new Color(255f, 255f, 255f, 0f));
+            SetActiveSprite(eraserObject);
         }
 
         public void PartialSetEraser()
         {
             SetMarkerColour(new Color(255f, 255f, 255f, 0.5f));
+        }
+
+        private void SetActiveSprite(GameObject go)
+        {
+            if (activeSpriteGameObject != null) {
+                var currentImage = activeSpriteGameObject.GetComponent<UnityEngine.UI.Image>();
+                var currentButton = activeSpriteGameObject.GetComponent<UnityEngine.UI.Button>();
+                var currentSpriteState = currentButton.spriteState;
+
+                currentImage.sprite = inactiveSprite;
+                currentSpriteState.pressedSprite = inactiveSpritePressed;
+                currentButton.spriteState = currentSpriteState;
+            }
+
+            var newImage = go.GetComponent<UnityEngine.UI.Image>();
+            var newButton = go.GetComponent<UnityEngine.UI.Button>();
+            var newSpriteState = newButton.spriteState;
+
+            newImage.sprite = activeSprite;
+            newSpriteState.pressedSprite = activeSpritePressed;
+            newButton.spriteState = newSpriteState;
+
+            activeSpriteGameObject = go;
         }
     }
 }

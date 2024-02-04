@@ -17,14 +17,13 @@ public class ItemSlot : MonoBehaviour, IDropHandler, IPointerDownHandler
     public Tilemap tilemap;
     public Sprite trashSprite;
     
-    private StructureCounter counter;
+    [SerializeField] private StructureCounter counter;
     private Image image;
     private Camera mainCamera;
     private Sprite defaultSprite;
     private void Awake()
     {
         mainCamera = Camera.main;
-        counter = GetComponentInParent<StructureCounter>();
         image = GetComponent<Image>();
         defaultSprite = image.sprite;
     }

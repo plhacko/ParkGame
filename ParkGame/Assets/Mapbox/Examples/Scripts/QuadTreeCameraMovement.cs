@@ -292,7 +292,7 @@ namespace Mapbox.Examples
 		{
 			if (IsPointerOverUI())
 			{
-				Debug.Log("Pointer over UI");
+
 				return;
 			}
 
