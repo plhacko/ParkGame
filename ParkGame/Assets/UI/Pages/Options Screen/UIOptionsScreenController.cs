@@ -1,5 +1,3 @@
-using Managers;
-using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -14,6 +12,7 @@ public class UIOptionsScreenController : UIPageController
     [SerializeField] private UIPage howToPlayPage;
     [SerializeField] private string mainMenuSceneName = "Menu";
     [SerializeField] private DisconnectionHandler disconnectionHandler;
+    
     private void Awake()
     {
         backButton.onClick.AddListener(Back);
@@ -37,9 +36,8 @@ public class UIOptionsScreenController : UIPageController
 
     private void Quit()
     {
-        // show do you want to disconnect for host
-        disconnectionHandler.Disconnect();
-        SceneManager.LoadScene("CleanUpScene");
+        // todo show do you want to disconnect for host
+        disconnectionHandler.DisconnectAndLeave();
     }
 
     private void ToggleBackgroundNoise()
