@@ -245,7 +245,7 @@ public class Soldier : NetworkBehaviour, ISoldier {
             return;
         }
 
-        if (HP <= 0) {
+        if (HP <= 0 && isDead) {
             return;
         }
 
@@ -465,7 +465,6 @@ public class Soldier : NetworkBehaviour, ISoldier {
         if (isDead) {
             return;
         }
-        isDead = true;
         HP = 0;
         Agent.SetDestination(transform.position);
         ObjectToFollowInFormation.GetComponent<PositionDescriptor>().isAssigned = false;
@@ -486,7 +485,8 @@ public class Soldier : NetworkBehaviour, ISoldier {
         PlayDeathSFXClientRpc();
 
         gameObject.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;
-        
+        isDead = true;
+
         if (IsServer) {
             NewCommand(SoldierCommand.Die);
             OnDeath?.Invoke();
