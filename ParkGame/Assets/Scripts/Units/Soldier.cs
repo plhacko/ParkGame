@@ -67,7 +67,8 @@ public class Soldier : NetworkBehaviour, ISoldier {
     public bool FollowInNavMeshFormation;
     public Formation FormationFromFollowedCommander;
     public GameObject ObjectToFollowInFormation; // other formation
-    public FormationType FormationType; // mela by byt network variable????
+    public FormationType FormationType;
+    private float Radius; // until what distance will follow some object - commander, outpost or castle
 
     public Vector3 midPointPositionForHorseman;
     public bool midPointReached;
@@ -81,11 +82,10 @@ public class Soldier : NetworkBehaviour, ISoldier {
 
     public Action OnDeath;
     private int EnemiesInAttackWaveCounter; // counter in attack wave - how many were targeted in a row during one attack command
-                                            //public SoldierCommand Command;
 
     public NetworkVariable<SoldierCommand> _SoldierCommand = new NetworkVariable<SoldierCommand>();
-    public SoldierCommand Command { get => _SoldierCommand.Value; set => _SoldierCommand.Value = value; } 
-    
+    public SoldierCommand Command { get => _SoldierCommand.Value; set => _SoldierCommand.Value = value; }
+
     public UnityEvent CommandChangedEvent;
     private bool isDead;
 
@@ -113,6 +113,8 @@ public class Soldier : NetworkBehaviour, ISoldier {
         _SoldierCommand.OnValueChanged += OnCommandChange;
         OnCommandChange(0, Command);
         isDead = false;
+
+        Radius = UnityEngine.Random.Range(0.06f, 1f);
 
     }
     public override void OnNetworkSpawn() {
@@ -191,9 +193,9 @@ public class Soldier : NetworkBehaviour, ISoldier {
 
         if (enemyT != null && distanceFromOutpost < DefendDistanceFromCommander) {
             float distanceOfEnemyToOutpost = Vector3.Distance(enemyT.position, CommanderToFollow.position);
-            if (AttackEnemyIfInRange(enemyT)) { return; }
-            else if (distanceOfEnemyToOutpost <= DefendDistanceFromCommander) 
-            { 
+            if (AttackEnemyIfInRange(enemyT)) { 
+                return; 
+            } else if (distanceOfEnemyToOutpost <= DefendDistanceFromCommander) {
                 MoveTowardsEntity(enemyT);
                 return;
             }
@@ -205,9 +207,9 @@ public class Soldier : NetworkBehaviour, ISoldier {
 
     void Follow() {
         if (ObjectToFollowInFormation != null) { // attack vlastne znici jejich puvodni formaci
-            FollowObjectWithAnimation(ObjectToFollowInFormation.transform);
+            FollowObjectWithAnimation(ObjectToFollowInFormation.transform, true); // follow precisely object in formation
         } else if (CommanderToFollow != null) {
-            FollowObjectWithAnimation(CommanderToFollow);
+            FollowObjectWithAnimation(CommanderToFollow); // follow till some distance (commander in free formation or outpost)
         }
     }
 
@@ -225,7 +227,7 @@ public class Soldier : NetworkBehaviour, ISoldier {
         // attack the targeted enemy if in range
         if (AttackEnemyIfInRange(targetedEnemy)) { return; }
         // go closer to the enemy 
-        FollowObjectWithAnimation(targetedEnemy);
+        FollowObjectWithAnimation(targetedEnemy, true);
 
         // if the commander is too far, the soldier will stop attacking and will return back to the commander
         float distanceFromCommander = (CommanderToFollow.position - transform.position).magnitude;
@@ -312,20 +314,24 @@ public class Soldier : NetworkBehaviour, ISoldier {
             return d.y > 0 ? Direction.Up : Direction.Down;
         }
     }
-    private void FollowObjectWithAnimation(Transform toFollow) {
+
+    // precise: follow directly to the position
+    // ! precise: follow in free formation commander or within outposts
+    private void FollowObjectWithAnimation(Transform toFollow, bool precise = false) {
         Vector3 toFollowPosition = new Vector3(toFollow.position.x, toFollow.position.y, transform.position.z);
         Agent.SetDestination(toFollowPosition);
         Vector2 direction = toFollowPosition - gameObject.transform.position;
 
+        // get back to the outpost
         Direction directionE = GetDirectionEnum(direction);
-
-        if (direction.magnitude < 0.5f && Command != SoldierCommand.InOutpost) {
+        if (direction.magnitude < 1f && Command != SoldierCommand.InOutpost) {
             if (toFollow == CommanderToFollow && CommanderToFollow.GetComponent<Outpost>()) {
                 NewCommand(SoldierCommand.InOutpost);
             }
         }
 
-        if (direction.magnitude < 0.1f) {
+        // got somewhere
+        if ((direction.magnitude < Radius && !precise) || (direction.magnitude < 0.1f && precise)) {
             Networkanimator.Animator.SetFloat(AnimatorMovementSpeedHash, 0.0f);
             Agent.SetDestination(transform.position);
         } else {
@@ -395,7 +401,7 @@ public class Soldier : NetworkBehaviour, ISoldier {
             return;
         }
 
-        FollowObjectWithAnimation(entityT);
+        FollowObjectWithAnimation(entityT, true);
     }
 
     public void OnMouseDown() {
