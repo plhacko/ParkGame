@@ -114,6 +114,7 @@ public class Soldier : NetworkBehaviour, ISoldier {
         OnCommandChange(0, Command);
         isDead = false;
 
+
     }
     public override void OnNetworkSpawn() {
         base.OnNetworkSpawn();
@@ -126,6 +127,7 @@ public class Soldier : NetworkBehaviour, ISoldier {
     {
         if (circleRenderer != null && newValue != -1) {
             circleRenderer.color = colorSettings.Colors[newValue].Color;
+            SpriteRenderer.color = colorSettings.Colors[newValue].Color;
         }
 
         var localPlayerData = LobbyManager.Singleton.GetLocalPlayerData();
