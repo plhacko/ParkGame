@@ -191,9 +191,9 @@ public class Soldier : NetworkBehaviour, ISoldier {
 
         if (enemyT != null && distanceFromOutpost < DefendDistanceFromCommander) {
             float distanceOfEnemyToOutpost = Vector3.Distance(enemyT.position, CommanderToFollow.position);
-            if (AttackEnemyIfInRange(enemyT)) { return; }
-            else if (distanceOfEnemyToOutpost <= DefendDistanceFromCommander) 
-            { 
+            if (AttackEnemyIfInRange(enemyT)) {
+                return;
+            } else if (distanceOfEnemyToOutpost <= DefendDistanceFromCommander) {
                 MoveTowardsEntity(enemyT);
                 return;
             }
@@ -245,7 +245,8 @@ public class Soldier : NetworkBehaviour, ISoldier {
             return;
         }
 
-        if (HP <= 0 && isDead) {
+        if (HP <= 0 && !isDead) {
+       		Die();
             return;
         }
 
@@ -465,18 +466,13 @@ public class Soldier : NetworkBehaviour, ISoldier {
         if (isDead) {
             return;
         }
+        isDead = true;
         HP = 0;
         Agent.SetDestination(transform.position);
         ObjectToFollowInFormation.GetComponent<PositionDescriptor>().isAssigned = false;
         CommanderToFollow?.GetComponent<ICommander>()?.ReportUnfollowing(gameObject);
         FormationFromFollowedCommander.RemoveFromFormation(gameObject, ObjectToFollowInFormation, FormationType, false);
         Networkanimator.SetTrigger("Die");
-        handleDeath();
-    }
-
-    [ClientRpc]
-    public void handleDeathClientRpc(ClientRpcParams clientRpcParams = default) {
-        if (IsServer) return;
         handleDeath();
     }
 
