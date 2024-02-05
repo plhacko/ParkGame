@@ -106,7 +106,7 @@ public class UIOutpost : Selectable, IPointerDownHandler, IPointerUpHandler
             if (!outpost.IsCastle)
             {
                 if (IsInteractable())
-                    outpost.RequestChangingSpawnTypeServerRpc(NetworkManager.Singleton.LocalClientId);
+                    outpost.RequestChangingSpawnTypeServerRpc(NetworkManager.Singleton.LocalClientId, true);
             }
             stopwatch.Stop();
             stopwatch.Reset();

@@ -22,12 +22,6 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
     [SerializeField] ColorSettings colorSettings;
     [SerializeField] private Collider2D switchCollider;
    
-    [Tooltip("# seconds. After changing spawnedType wait until you can change it again.")]
-    [SerializeField] private int TimeBetweenToggles;
-    // if changing spawn type. small time reserve to retoggle (e.g. type0 -> -> type2)
-    private const float FastRetoggleTime = 1.5f; // seconds
-    private float RetoggleTime = 0; // counting since spawnToggle down. counter
-
     List<NetworkObjectReference> Units = new List<NetworkObjectReference>();
 
     NetworkVariable<float> _Timer = new(0.0f);
@@ -205,10 +199,6 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
             SpawnUnit();
             Timer = 0;
         }
-
-        if (RetoggleTime > 0) {
-            RetoggleTime -= Time.deltaTime;
-        }
     }
 
     GameObject SpawnWhichUnit() {
@@ -342,11 +332,11 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
     }
 
     [ServerRpc(RequireOwnership = false)]
-    public void RequestChangingSpawnTypeServerRpc(ulong clientID) {
+    public void RequestChangingSpawnTypeServerRpc(ulong clientID, bool canBeToggled=false) {
         PlayerController playerController = playerManager.GetPlayerController(clientID);
 
         if (playerController != null && playerController.Team == Team) {
-            if (ControlToggleTime() == true) {
+            if (canBeToggled) {
                 Debug.Log("change spawning type");
                 counter++;
                 int numOfUnitTypes = Enum.GetNames(typeof(Soldier.UnitType)).Length;
@@ -357,15 +347,6 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
                 announcer.PlayNotificationClientRpc("OutpostSpawnChanged", clientRpcParams); // without this sound altogether?
             }
         }
-    }
-
-    bool ControlToggleTime() {
-        if ((RetoggleTime > 0) && (TimeBetweenToggles - RetoggleTime > FastRetoggleTime)) {
-            return false;
-        } else if (RetoggleTime <= 0) {
-            RetoggleTime = TimeBetweenToggles;
-        }
-        return true;
     }
 
      void OnMouseDown() {
