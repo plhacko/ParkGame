@@ -18,6 +18,7 @@ public class ItemSlot : MonoBehaviour, IDropHandler, IPointerDownHandler
     public Sprite trashSprite;
     
     [SerializeField] private StructureCounter counter;
+    [SerializeField] private ColorSettings colorSettings;
     private Image image;
     private Camera mainCamera;
     private Sprite defaultSprite;
@@ -78,6 +79,7 @@ public class ItemSlot : MonoBehaviour, IDropHandler, IPointerDownHandler
         if (counter.structureType == StructureCounter.StructureType.Castle)
         {
             var teamLabel = $"TEAM {(counter.GetIndexOfStructure(newStructure) + 1).ToString()}";
+            newStructure.GetComponent<Image>().color = colorSettings.Colors[counter.GetIndexOfStructure(newStructure)].Color;
             newStructure.GetComponentInChildren<TextMeshProUGUI>().text = teamLabel;
         }
     }
