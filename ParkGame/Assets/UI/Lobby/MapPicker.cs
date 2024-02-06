@@ -237,6 +237,11 @@ public class MapPicker : MonoBehaviour
     {
         double currentLongitude = 14.418540; // todo get actual current geographical location
         double currentLatitude = 50.073658; // todo -----------------||----------------------
+        
+        if (GPSLocator.instance.IsGPSUsable()) {
+            currentLongitude = GPSLocator.instance.Longitude;
+            currentLatitude = GPSLocator.instance.Lattitude;
+        }
 
         return (currentLongitude, currentLatitude);
     }

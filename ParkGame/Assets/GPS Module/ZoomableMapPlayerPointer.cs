@@ -15,13 +15,23 @@ public class ZoomableMapPlayerPointer : MonoBehaviour
     {
         if (GPSLocator.instance != null)
         {
-            GPSLocator.instance.OnLocationInitialized += () =>
+            if (GPSLocator.instance.IsLocationServiceRunning())
             {
                 inUse = true;
                 map = FindObjectOfType<AbstractMap>();
                 GetComponent<SpriteRenderer>().enabled = true;
                 transform.localScale = new Vector3(8.0f, 8.0f, 8.0f);
-            };
+            }
+            else
+            {
+                GPSLocator.instance.OnLocationInitialized += () =>
+                {
+                    inUse = true;
+                    map = FindObjectOfType<AbstractMap>();
+                    GetComponent<SpriteRenderer>().enabled = true;
+                    transform.localScale = new Vector3(8.0f, 8.0f, 8.0f);
+                };
+            }
         }
     }
 
