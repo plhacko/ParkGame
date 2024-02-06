@@ -36,7 +36,7 @@ EditorBuildSettings:
     path: Assets/Scenes/LobbyTest/DebugMenu.unity
     guid: 682504809189c0940b3fe0be4a9fcef7
   m_configObjects:
-    com.unity.adaptiveperformance.google.android.provider_settings: {fileID: 11400000, guid: ee84c4981670ad748bce22d1f29631a5, type: 2}
+    com.unity.adaptiveperformance.google.android.provider_settings: {fileID: 11400000, guid: dc4ef995ff485f345b8a0d50f33958d7, type: 2}
     com.unity.adaptiveperformance.loader_settings: {fileID: 11400000, guid: 3ad410e226113ae45a953aa6554aea9c, type: 2}
-    com.unity.adaptiveperformance.samsung.android.provider_settings: {fileID: 11400000, guid: f2413ebd9cc90334cac75a8bfc768c0c, type: 2}
+    com.unity.adaptiveperformance.samsung.android.provider_settings: {fileID: 11400000, guid: 04fd52fd2a7ca2a4d8acd1d574c39e8f, type: 2}
     com.unity.adaptiveperformance.simulator.provider_settings: {fileID: 11400000, guid: 439bd770a0624a141bf5dfc5e420bfcc, type: 2}
