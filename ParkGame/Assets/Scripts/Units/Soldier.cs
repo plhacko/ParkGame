@@ -36,7 +36,7 @@ public class Soldier : NetworkBehaviour, ISoldier {
     [SerializeField] float Attackcooldown = 1.0f;
     [SerializeField] int Damage = 1;
     [SerializeField] UnitType TypeOfUnit;
-    [SerializeField] float DeathFadeTime = 2f;
+    private float DeathFadeTime = 2f;
     [SerializeField] private GameObject revealer;
     [SerializeField] ColorSettings colorSettings;
 
@@ -88,6 +88,7 @@ public class Soldier : NetworkBehaviour, ISoldier {
 
     public UnityEvent CommandChangedEvent;
     private bool isDead;
+    private float timeToDeath;
 
 
     private void Initialize() {
@@ -113,6 +114,7 @@ public class Soldier : NetworkBehaviour, ISoldier {
         _SoldierCommand.OnValueChanged += OnCommandChange;
         OnCommandChange(0, Command);
         isDead = false;
+        timeToDeath = DeathFadeTime;
 
         Radius = UnityEngine.Random.Range(0.06f, 1f);
 
@@ -158,7 +160,6 @@ public class Soldier : NetworkBehaviour, ISoldier {
         AudioManager.Instance.PlayClickOnDwarf(transform.position);
     }
     private void OnCommandChange(SoldierCommand previousValue, SoldierCommand newValue) {
-        Debug.Log("on value change: old val " + previousValue + " new val " + newValue);
         CommandChangedEvent.Invoke();
     }
 
@@ -250,6 +251,13 @@ public class Soldier : NetworkBehaviour, ISoldier {
         if (HP <= 0 && !isDead) {
        		Die();
             return;
+        }
+        if (isDead && timeToDeath > 0) {
+            timeToDeath -= Time.deltaTime;
+            return;
+        }
+        if (isDead && timeToDeath <= 0) {
+            Destroy(this.gameObject);
         }
 
         NavMeshStatusNow = Agent.pathStatus;
@@ -458,6 +466,7 @@ public class Soldier : NetworkBehaviour, ISoldier {
     /// <summary> !call only on server! </summary>
     public void TakeDamage(int damage) {
         if (!IsServer) { throw new Exception($"soldier ({gameObject.name}) can take damage only on server"); }
+        if (isDead) { return; }
         Debug.Log("take damage");
         int hp = HP - damage;
         if (hp <= 0) { Die(); } else { HP = hp; }
@@ -469,31 +478,31 @@ public class Soldier : NetworkBehaviour, ISoldier {
 
     /// <summary> !call only on server! </summary>
     public void Die() {
-        if (isDead) {
-            return;
-        }
+        if (!IsServer) { return; }
+        //if (isDead) {
+        //    return;
+        //}
+        Debug.Log("DIEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
         isDead = true;
         HP = 0;
+        NewCommand(SoldierCommand.Die);
+
         Agent.SetDestination(transform.position);
-        ObjectToFollowInFormation.GetComponent<PositionDescriptor>().isAssigned = false;
-        CommanderToFollow?.GetComponent<ICommander>()?.ReportUnfollowing(gameObject);
-        FormationFromFollowedCommander.RemoveFromFormation(gameObject, ObjectToFollowInFormation, FormationType, false);
+        gameObject.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;
+
         Networkanimator.SetTrigger("Die");
-        handleDeath();
+        PlayDeathSFXClientRpc();
+        CommanderToFollow?.GetComponent<ICommander>()?.ReportUnfollowing(gameObject);
+
+        FormationFromFollowedCommander?.RemoveFromFormation(gameObject, ObjectToFollowInFormation, FormationType, false);
+        if (ObjectToFollowInFormation) { ObjectToFollowInFormation.GetComponent<PositionDescriptor>().isAssigned = false; }
+        OnDeath?.Invoke();
+        playerManager.RemoveSoldierFromTeam(Team, transform);
+        TimeToDestroy(DeathFadeTime);
     }
 
-    private void handleDeath()
-    {
-        PlayDeathSFXClientRpc();
-
-        gameObject.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;
-        isDead = true;
-
-        if (IsServer) {
-            NewCommand(SoldierCommand.Die);
-            OnDeath?.Invoke();
-            Destroy(gameObject, DeathFadeTime);
-        }
+    private void TimeToDestroy(float time) {
+        timeToDeath = time;
     }
 
     public void NewCommand(SoldierCommand command) {

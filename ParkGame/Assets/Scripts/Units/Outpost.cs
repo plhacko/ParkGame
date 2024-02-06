@@ -50,8 +50,6 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
     private ShootScript shooting;
     private EnemyObserver enemyObserver;
 
-
-
     // TODO Action and Dictionary should be reinitialized on outpost owner change
     public Action OnUnitTypeCountChange;
     public Dictionary<Soldier.UnitType, int> UnitTypeCount = new() {
@@ -217,6 +215,10 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
         // only server can spawn unit
         if (!IsServer)
         { throw new Exception("only server can spawn unit"); }
+
+        bool canSpawn = playerManager.CanAddSoldierToTeam(Team);
+        if (! canSpawn) { return; }
+
         float r = 0.2f;
         Vector3 RndOffset = new Vector3(UnityEngine.Random.Range(-r, r), UnityEngine.Random.Range(-r, r), 0f);
         GameObject unit = Instantiate(SpawnWhichUnit(), position: transform.position + RndOffset, rotation: transform.rotation);
@@ -224,7 +226,7 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
         unit.GetComponent<ISoldier>().Team = Team;
         unit.GetComponent<ISoldier>().SetCommanderToFollow(transform);
         unit.GetComponent<ISoldier>().NewCommand(SoldierCommand.InOutpost);
-        
+        playerManager.AddSoldierToTeam(Team, unit.transform);
     }
 
     public void SetCastle(int team)

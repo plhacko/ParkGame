@@ -18,6 +18,7 @@ namespace Managers
     {
         [SerializeField] private PlayerController playerControllerPrefab;
         [SerializeField] private float MinInitialDistanceFromOutpost = 5f;
+        [SerializeField] private int unitCapacity = 12;
         
         private Map map;
         private Announcer announcer;
@@ -34,7 +35,9 @@ namespace Managers
         private bool playersLocked = true; 
         private bool isSceneLoaded = false;
         private PlayerPointerPlacer playerPointerPlacer;
-        
+
+        private Dictionary<int, List<Transform>> unitsInTeam = new Dictionary<int, List<Transform>>(); 
+
         private void Awake()
         {
             announcer = FindObjectOfType<Announcer>();
@@ -45,6 +48,10 @@ namespace Managers
             if(NetworkManager.Singleton != null)
             {
                 NetworkManager.Singleton.SceneManager.OnLoadComplete += sceneLoaded;
+            }
+
+            for (int i = 0; i < 4; i++) {
+                unitsInTeam[i] = new List<Transform>();
             }
         }
 
@@ -240,5 +247,25 @@ namespace Managers
                 controller.IsLocked = true;
             }
         }
+
+        public bool CanAddSoldierToTeam(int team) {
+            if (team < 0 || team > 3) {
+                return false; 
+            }
+            if (unitsInTeam[team].Count >= unitCapacity) {
+                return false;
+            }
+            return true;
+        }
+
+        public void AddSoldierToTeam(int team, Transform unit) {
+            unitsInTeam[team].Add(unit);
+        }
+
+        public void RemoveSoldierFromTeam(int team, Transform unit) {
+            if (team < 0 || team > 3) { return; }
+            unitsInTeam[team]?.Remove(unit);
+        }
+
     }
 }
