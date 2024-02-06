@@ -159,31 +159,36 @@ namespace Mapbox.Examples
 			return xLength > yLength ? new Vector2(1, yLength / xLength) : new Vector2(xLength / yLength, 1);
 		}
 
+		private bool _selectionInProgress = false;
+
         private void HandleTouchSelectRegion()
         {
-			if (Input.touchCount > 1)
+			if (Input.touchCount > 1 || IsPointerOverUI())
 			{
+				Debug.Log("Over UI");
+				_selectionInProgress = false;
 				return;
 			}
+			Debug.Log("Not over UI");
 
 			Touch touch = Input.GetTouch(0);
 
-			if (_selectingRegionInitialized && (touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled))
-			{
-				Debug.Log("Selecting region finished");
-				_selectingRegionInitialized = false;
-				return;
-			}
-			if (_selectingRegionInitialized && touch.phase != TouchPhase.Ended)
-			{
-				Debug.Log("Selecting region in progress");
-				return;
-			}
+			// if (_selectingRegionInitialized && (touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled))
+			// {
+			// 	Debug.Log("Selecting region finished");
+			// 	_selectingRegionInitialized = false;
+			// 	return;
+			// }
+			// if (_selectingRegionInitialized && touch.phase != TouchPhase.Ended)
+			// {
+			// 	Debug.Log("Selecting region in progress");
+			// 	return;
+			// }
 			
 			Vector3 touchPosition = touch.position;
 			touchPosition.z = Camera.main.transform.localPosition.y;
 
-			if (touch.phase == TouchPhase.Began)
+			if (touch.phase == TouchPhase.Began && !_selectionInProgress)
             {
                 // Save the initial touch position
                 _initialPosition = Camera.main.ScreenToWorldPoint(touchPosition);
@@ -192,8 +197,9 @@ namespace Mapbox.Examples
 				lineRenderer.SetPosition(1, new Vector3(_initialPosition.x, 0.1f, _initialPosition.z));
 				lineRenderer.SetPosition(2, new Vector3(_initialPosition.x, 0.1f, _initialPosition.z));
 				lineRenderer.SetPosition(3, new Vector3(_initialPosition.x, 0.1f, _initialPosition.z));
+				_selectionInProgress = true;
             }
-            else if (touch.phase == TouchPhase.Moved || touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled)
+            else if ((touch.phase == TouchPhase.Moved || touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled) && _selectionInProgress)
 			{ 
                 // Save the last touch position
                 _lastPosition = Camera.main.ScreenToWorldPoint(touchPosition);
@@ -202,8 +208,9 @@ namespace Mapbox.Examples
 				lineRenderer.SetPosition(2, new Vector3(_lastPosition.x, 0.1f, _lastPosition.z));
 				lineRenderer.SetPosition(3, new Vector3(_initialPosition.x, 0.1f, _lastPosition.z));
 			}
-			if (touch.phase == TouchPhase.Ended)
+			if ((touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled) && _selectionInProgress)
 			{
+				_selectionInProgress = false;
 				_firstCornerPosition = _initialPosition;
 				_secondCornerPosition = _lastPosition;
 			}
@@ -460,7 +467,6 @@ namespace Mapbox.Examples
 				_initialPosition = _referenceCamera.ScreenToWorldPoint(new Vector3(screenSpaceInitial.x, screenSpaceInitial.y, _referenceCamera.transform.localPosition.y));
 				_lastPosition = _referenceCamera.ScreenToWorldPoint(new Vector3(screenSpaceFinal.x, screenSpaceFinal.y, _referenceCamera.transform.localPosition.y));
 
-				_selectingRegionInitialized = true;
 				lineRenderer.positionCount = 4;	
 				lineRenderer.SetPosition(0, new Vector3(_initialPosition.x, 0.1f, _initialPosition.z));
 				lineRenderer.SetPosition(1, new Vector3(_lastPosition.x, 0.1f, _initialPosition.z));
