@@ -217,8 +217,8 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
         // only server can spawn unit
         if (!IsServer)
         { throw new Exception("only server can spawn unit"); }
-
-        Vector3 RndOffset = new Vector3(UnityEngine.Random.Range(-0.01f, 0.01f), UnityEngine.Random.Range(-0.01f, 0.01f), 0f);
+        float r = 0.2f;
+        Vector3 RndOffset = new Vector3(UnityEngine.Random.Range(-r, r), UnityEngine.Random.Range(-r, r), 0f);
         GameObject unit = Instantiate(SpawnWhichUnit(), position: transform.position + RndOffset, rotation: transform.rotation);
         unit.GetComponent<NetworkObject>().Spawn();
         unit.GetComponent<ISoldier>().Team = Team;

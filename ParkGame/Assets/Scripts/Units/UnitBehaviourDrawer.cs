@@ -11,6 +11,7 @@ public class UnitBehaviourDrawer : MonoBehaviour
     [SerializeField] Sprite IdleIcon;
     [SerializeField] Sprite FormationIcon;
     [SerializeField] Sprite MovementIcon;
+    [SerializeField] Sprite DeathIcon;
 
     void Awake()
     {
@@ -37,7 +38,7 @@ public class UnitBehaviourDrawer : MonoBehaviour
                 break;
             case SoldierCommand.Die:
             default:
-                icon = EmptyIcon;
+                icon = DeathIcon;
                 break;
         }
 
