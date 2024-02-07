@@ -6108,7 +6108,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   structureType: 2
-  maxStructures: 4
+  maxStructures: 100
   tilemap: {fileID: 1954708517}
 --- !u!1 &1630678966
 GameObject:
