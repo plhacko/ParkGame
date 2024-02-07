@@ -16,6 +16,7 @@ using TMPro;
 using UI;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
+using Mapbox.Utils;
 
 public class MapDataFirebaseManager : MonoBehaviour
 {
@@ -69,13 +70,17 @@ public class MapDataFirebaseManager : MonoBehaviour
         var (castleString, castleGridPositions) = CastleCounter.GetPlacedStructurePositions();
 
         var (topLeft, bottomRight) = MapWithOverlay.GetTilemapBounds();
+
+        var gpsMinCoords = new Vector2d(mapDisplayer.MinLongitude, mapDisplayer.MinLatitude);
+        var gpsMaxCoords = new Vector2d(mapDisplayer.MaxLongitude, mapDisplayer.MaxLatitude);
+        var centerCoords = gpsMinCoords + (gpsMaxCoords - gpsMinCoords) / 2;
         
         return new MapMetaData(
             Guid.NewGuid(),
             mapName == string.Empty ? "Untitled" : mapName,
             mapDisplayer.urlProperty,
-            14.418540,
-            50.073658,
+            centerCoords.x,
+            centerCoords.y,
             drawTexture.width,
             drawTexture.height,
             new MapStructures(outpostGridPositions, victoryPointGridPositions, castleGridPositions),

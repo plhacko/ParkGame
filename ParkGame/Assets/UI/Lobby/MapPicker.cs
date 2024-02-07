@@ -116,7 +116,7 @@ public class MapPicker : MonoBehaviour
         drawnTexture.rectTransform.sizeDelta = imageSize;
 
         mapNameText.text = mapMetaData.MapName;
-        mapDistanceText.text = "(" +(distance / 1000).ToString("F1") + " km)";
+        mapDistanceText.text = "(" +(distance / 1000.0).ToString("F1") + " km)";
         maxNumTeamsText.text = "Max teams: " + mapMetaData.NumTeams;
     }
 

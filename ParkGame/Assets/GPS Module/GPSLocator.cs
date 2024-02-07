@@ -34,13 +34,19 @@ public class GPSLocator : MonoBehaviour
         }
         else
         {
-            Destroy(gameObject);
+            if (instance != this)
+            {
+                Destroy(gameObject);
+            }
         }
     }
 
     public void Start()
     {
-        StartCoroutine(InitializeLocator());
+        if (Input.location.status != LocationServiceStatus.Running) 
+        {
+            StartCoroutine(InitializeLocator());
+        }
     }
 
     IEnumerator InitializeLocator()
@@ -107,7 +113,11 @@ public class GPSLocator : MonoBehaviour
 
     private void OnDestroy()
     {
-        Input.location.Stop();
+        if (instance == this)
+        {
+            instance = null;
+            Input.location.Stop();
+        }
     }
 
 
