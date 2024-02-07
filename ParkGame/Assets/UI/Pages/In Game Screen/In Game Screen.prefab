@@ -2652,17 +2652,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68e6eea85f69a304490bc09605b31368, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cameraButton: {fileID: 0}
   optionsButton: {fileID: 6882205930316462002}
-  mapButton: {fileID: 4819664359783265664}
-  lockUIButton: {fileID: 3397289903911989494}
-  cameraButton: {fileID: 757592626180927467}
   action1: {fileID: 506987109615007727}
-  action2: {fileID: 4532654445798674577}
+  action2: {fileID: 0}
   action3: {fileID: 8519923484337579704}
   formationMask: {fileID: 3261117530086517295}
   formationButtonParent: {fileID: 3636386602102918639}
   formationButton1: {fileID: 4409165369953135210}
   formationButton2: {fileID: 3952243090828789202}
+  formationButton3: {fileID: 0}
   formationButtonClose: {fileID: 1880662284918621109}
   unitsList: {fileID: 6131710127656213427}
   outpostsList: {fileID: 3479671386592543706}
