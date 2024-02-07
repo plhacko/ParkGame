@@ -117,7 +117,8 @@ public class MapPicker : MonoBehaviour
 
         mapNameText.text = mapMetaData.MapName;
         mapDistanceText.text = "(" +(distance / 1000.0).ToString("F1") + " km)";
-        maxNumTeamsText.text = "Max teams: " + mapMetaData.NumTeams;
+        Debug.Log(mapMetaData.NumTeams);
+        maxNumTeamsText.text = "Number of teams: " + mapMetaData.NumTeams;
     }
 
     IEnumerator gpsTextureRequest(MapData mapData)
