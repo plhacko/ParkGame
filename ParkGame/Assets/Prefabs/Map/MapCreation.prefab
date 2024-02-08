@@ -11,8 +11,6 @@ GameObject:
   - component: {fileID: 6476253433202332185}
   - component: {fileID: 2173846108126059245}
   - component: {fileID: 6103191253605685646}
-  - component: {fileID: 3108893754943069606}
-  - component: {fileID: 8741919952145416907}
   - component: {fileID: 2530476792587214983}
   m_Layer: 0
   m_Name: Tilemap ActionLayer 1
@@ -123,54 +121,6 @@ TilemapRenderer:
   m_Mode: 0
   m_DetectChunkCullingBounds: 0
   m_MaskInteraction: 0
---- !u!19719996 &3108893754943069606
-TilemapCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1939569761775207994}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 1
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
-  m_MaximumTileChangeCount: 1000
-  m_ExtrusionFactor: 0
-  m_UseDelaunayMesh: 0
---- !u!114 &8741919952145416907
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1939569761775207994}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 756d7877058ca2b4b87e2349525776f5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &2530476792587214983
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -471,6 +421,7 @@ MonoBehaviour:
   doNotFetch: 0
   navMesh: {fileID: 6742970777859922634, guid: a83edac981429054c8a9dac7cf70b780, type: 3}
   gridLayout: {fileID: 2284287230310182246}
+  mapDrawable: {fileID: 0}
   mapSprite: {fileID: 863442115086188281, guid: 53f9e5c24c8a22141afc0ba340f28b3e, type: 3}
 --- !u!212 &2284287231549463749
 SpriteRenderer:

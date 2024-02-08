@@ -25,7 +25,9 @@ public class Soldier : NetworkBehaviour, ISoldier {
     [Header("initial values")]
     [SerializeField] int InitialHP = 3;
     [Header("game logic values")]
-    [SerializeField] float MovementSpeed = 1;
+    [SerializeField] float BaseMovementSpeed = 1f;
+    [SerializeField] float HorseManSpeed = 1.5f;
+    [SerializeField] float PathMovementSpeedMultiplier = 1.5f;
     [SerializeField] float InnerDistanceFromCommander;
     [SerializeField] float OuterDistanceFromCommander;
     [SerializeField] float DefendDistanceFromCommander;
@@ -50,6 +52,8 @@ public class Soldier : NetworkBehaviour, ISoldier {
     public int HP { get => _HP.Value; set => _HP.Value = value; }
     private NetworkVariable<int> _Team = new(-1);
     public int Team { get => _Team.Value; set => _Team.Value = value; }
+    private NetworkVariable<bool> _ReturningToOutpost = new(false);
+    public bool ReturningToOutpost { get => _ReturningToOutpost.Value; set => _ReturningToOutpost.Value = value; }
     EnemyObserver EnemyObserver;
     float AttackTimer = 0.0f;
 
@@ -77,6 +81,8 @@ public class Soldier : NetworkBehaviour, ISoldier {
     private ShootScript shooting;
     private PlayerManager playerManager;
     private ChangeMaterial changeMaterial;
+    private PathTileChecker pathTileChecker;
+    
     private SpriteRenderer circleRenderer;
     private GameSessionManager gameSessionManager;
 
@@ -101,6 +107,8 @@ public class Soldier : NetworkBehaviour, ISoldier {
         shooting = GetComponent<ShootScript>();
         changeMaterial = GetComponent<ChangeMaterial>();
         circleRenderer = transform.Find("Circle")?.GetComponent<SpriteRenderer>();
+        pathTileChecker = FindObjectOfType<PathTileChecker>();
+
 
         _Team.OnValueChanged += OnTeamChanged;
 
@@ -265,9 +273,7 @@ public class Soldier : NetworkBehaviour, ISoldier {
         // attack timer
         if (AttackTimer <= Attackcooldown) { AttackTimer += Time.deltaTime; }
 
-        if (TypeOfUnit == UnitType.Horseman) {
-            Agent.speed = 3.5f;
-        }
+        SetSoldierSpeed();
 
         switch (Command) {
             case SoldierCommand.InOutpost:
@@ -283,8 +289,8 @@ public class Soldier : NetworkBehaviour, ISoldier {
                 break;
         }
     }
-
-
+    
+    
     /*
      * Get position to follow in formation - based on formationType 
      * Called from PlayerController 
@@ -321,6 +327,21 @@ public class Soldier : NetworkBehaviour, ISoldier {
             return d.x > 0 ? Direction.Right : Direction.Left;
         } else {
             return d.y > 0 ? Direction.Up : Direction.Down;
+        }
+    }
+    private void SetSoldierSpeed()
+    {
+        if (TypeOfUnit == UnitType.Horseman) {
+            Agent.speed = HorseManSpeed;
+        }
+        if (TypeOfUnit != UnitType.Horseman || (TypeOfUnit == UnitType.Horseman && FormationType == FormationType.Box)) {
+            if (
+                playerManager.GetLocalPlayerController().IsOnPath ||
+                (ReturningToOutpost && pathTileChecker.IsNearbyPath(Agent.transform.position)) // short-circuiting for efficiency
+            )
+                Agent.speed = BaseMovementSpeed * PathMovementSpeedMultiplier;
+            else
+                Agent.speed = BaseMovementSpeed;
         }
     }
 
@@ -412,8 +433,9 @@ public class Soldier : NetworkBehaviour, ISoldier {
 
         FollowObjectWithAnimation(entityT, true);
     }
-
-    public void OnMouseDown() {
+    
+    public void OnMouseDown()
+    {
         Debug.Log("Sprite Clicked");
         if (gameSessionManager.IsOver) return;
 
@@ -431,7 +453,7 @@ public class Soldier : NetworkBehaviour, ISoldier {
             PlaySelectedDwarfSFXClientRpc(clientRpcParams);
 
             if (playerController.gameObject.transform != CommanderToFollow) {
-
+                ReturningToOutpost = false;
                 SetCommanderToFollow(playerController.gameObject.transform);
                 NewCommand(SoldierCommand.Following);
                 FormationType = CommanderToFollow.GetComponent<ICommander>().GetFormation(); // get type of formation
@@ -440,7 +462,10 @@ public class Soldier : NetworkBehaviour, ISoldier {
                 if (FormationType == FormationType.Box || FormationType == FormationType.Circle) {
                     NavMeshFormationSwitch(true, FormationFromFollowedCommander, FormationType);
                 }
-            } else {
+            }
+            else
+            {
+                ReturningToOutpost = true;
                 var closestOutpost = ClosestOutpost();
                 SetCommanderToFollow(closestOutpost);
                 NewCommand(SoldierCommand.Following);
@@ -448,7 +473,7 @@ public class Soldier : NetworkBehaviour, ISoldier {
             }
         }
     }
-
+    
     /// <summary> !call only on server! </summary>
     public void SetCommanderToFollow(Transform commanderToFollow) {
         if (!IsServer) { throw new Exception($"only server can set what the unit ({gameObject.name}) can follow ({CommanderToFollow?.name})"); }
