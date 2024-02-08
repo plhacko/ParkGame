@@ -19,6 +19,13 @@ public class UIController : MonoBehaviour
 #if UNITY_EDITOR
     public List<string> PageStackNames = new List<string>();
 #endif
+    [SerializeField] private GameObject popUpScreen;
+    public string TopStackPageName { 
+        get {
+            if (pageStack.Count == 0) { return ""; }
+            return pageStack.Peek().name; 
+        } 
+    }
     private void Awake()
     {
         if (Singleton != null)
@@ -63,7 +70,7 @@ public class UIController : MonoBehaviour
         {
             UIPage currentPage = pageStack.Peek();
 
-            if (currentPage.ExitOnNextPage)
+            if (page.ExitOnNextPage)
             {
                 currentPage.Exit(false);
                 pageStack.Pop();
@@ -98,5 +105,32 @@ public class UIController : MonoBehaviour
             UIPage newPage = pageStack.Peek();
             newPage.Enter(false);
         }
+    }
+
+    public void ShowPopUp(string label, string message, string dismissButtonText = "Dismiss", Action dismissAction = null, string popUpName = "Pop Up Screen")
+    {
+        if (popUpScreen == null)
+        {
+            Debug.LogError("No pop up screen found");
+            return;
+        }
+
+        var go = Instantiate(popUpScreen, transform);
+
+        go.name = popUpName;
+
+        var rectTransform = go.GetComponent<RectTransform>();
+        rectTransform.sizeDelta = Vector2.zero;
+        rectTransform.anchoredPosition = Vector2.zero;
+
+        UIPopUpScreenController popUp = go.GetComponent<UIPopUpScreenController>();
+        popUp.PopUpTitle = label;
+        popUp.TextMessage = message;
+        popUp.ButtonDismissAction = dismissAction;
+        popUp.buttonDismissText = dismissButtonText;
+ 
+        var page = go.GetComponent<UIPage>();
+
+        PushUIPage(page);
     }
 }

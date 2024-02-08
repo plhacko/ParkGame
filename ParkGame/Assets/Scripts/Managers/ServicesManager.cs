@@ -40,7 +40,10 @@ public class ServicesManager : MonoBehaviour
         }
         else
         {
-            Destroy(gameObject);
+            if (Instance != this)
+            {
+                Destroy(gameObject);
+            }
         }
     }
 
@@ -239,6 +242,8 @@ public class ServicesManager : MonoBehaviour
         return UnityEngine.Input.location.status == LocationServiceStatus.Running;
     }
 
+    private bool GPSDontAskAgain = false;
+
     public bool GPSPermissionGranted()
     {
 #if UNITY_EDITOR
@@ -257,38 +262,120 @@ public class ServicesManager : MonoBehaviour
 #endif
     }
 
+
+#if UNITY_ANDROID
+    void GPSPermissionGrantedCallback(string permissionName)
+    {
+        Debug.Log("GPS Permission Granted");
+        GPSLocator.instance.Initialize();
+        GPSDontAskAgain = false;
+    }
+
+    void GPSPermissionDeniedCallback(string permissionName)
+    {
+        Debug.Log("GPS Permission Denied");
+        if (UIController.Singleton.TopStackPageName != "GPSPermission")
+        {
+            UIController.Singleton.ShowPopUp(
+                "GPS Permission Denied",
+                "You need to grant GPS permission to use this application",
+                "Go to settings", () => OpenAndroidApplicationSettings(),
+                "GPSPermission"
+            );
+        }
+    }
+
+    void GPSPermissionDeniedAndDontAskAgainCallback(string permissionName)
+    {
+        Debug.Log("GPS Permission Denied and Dont Ask Again");
+        GPSDontAskAgain = true;
+        if (UIController.Singleton.TopStackPageName != "GPSPermission")
+        {
+            UIController.Singleton.ShowPopUp(
+                "GPS Permission Denied",
+                "You need to grant GPS permission to use this application",
+                "Go to settings", () => OpenAndroidApplicationSettings(),
+                "GPSPermission"
+            );
+        }
+    }
+#endif
+
     public void RequestGPSPermission()
     {
 #if UNITY_EDITOR
         // No permission handling needed in Editor
 #elif UNITY_ANDROID
-        if (!UnityEngine.Android.Permission.HasUserAuthorizedPermission(UnityEngine.Android.Permission.FineLocation)) {
-            UnityEngine.Android.Permission.RequestUserPermission(UnityEngine.Android.Permission.FineLocation);
-        }
+        var callbacks = new UnityEngine.Android.PermissionCallbacks();
+        callbacks.PermissionGranted += GPSPermissionGrantedCallback;
+        callbacks.PermissionDenied += GPSPermissionDeniedCallback;
+        callbacks.PermissionDeniedAndDontAskAgain += GPSPermissionDeniedAndDontAskAgainCallback;
 
-        // First, check if user has location service enabled
-        if (!UnityEngine.Input.location.isEnabledByUser) {
-            // TODO Failure
-            Debug.Log("Android and Location not enabled");
-        }
-
+        UnityEngine.Android.Permission.RequestUserPermission(UnityEngine.Android.Permission.FineLocation, callbacks);
 #elif UNITY_IOS
         //TODO
 #else
-        // No permission handling needed in Editor
 #endif
         State |= ServiceType.GPS;
     }
+
+
+#if UNITY_ANDROID
+    void OpenAndroidApplicationSettings()
+    {
+        try
+        {
+            using (var unityClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
+            using (AndroidJavaObject currentActivityObject = unityClass.GetStatic<AndroidJavaObject>("currentActivity"))
+            {
+                string packageName = currentActivityObject.Call<string>("getPackageName");
+        
+                using (var uriClass = new AndroidJavaClass("android.net.Uri"))
+                using (AndroidJavaObject uriObject = uriClass.CallStatic<AndroidJavaObject>("fromParts", "package", packageName, null))
+                using (var intentObject = new AndroidJavaObject("android.content.Intent", "android.settings.APPLICATION_DETAILS_SETTINGS", uriObject))
+                {
+                    intentObject.Call<AndroidJavaObject>("addCategory", "android.intent.category.DEFAULT");
+                    intentObject.Call<AndroidJavaObject>("setFlags", 0x10000000);
+                    currentActivityObject.Call("startActivity", intentObject);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+        }
+    }
+#endif
 
     void OnApplicationFocus(bool hasFocus)
     {
         if (hasFocus)
         {
             Debug.Log("OnApplicationFocus");
-            if (!GPSPermissionGranted())
+            if (GPSPermissionGranted())
+            {
+                GPSDontAskAgain = false;
+            }
+            
+            if (GPSDontAskAgain)
+            {
+#if UNITY_ANDROID
+                if (UIController.Singleton.TopStackPageName != "GPSPermission")
+                {
+                    UIController.Singleton.ShowPopUp(
+                        "GPS Permission Denied",
+                        "You need to grant GPS permission to use this application",
+                        "Go to settings", () => OpenAndroidApplicationSettings(),
+                        "GPSPermission"
+                    );
+                }
+#endif
+            }
+            else if (!GPSPermissionGranted())
             {
                 RequestGPSPermission();
             }
+
         }
     }
 }

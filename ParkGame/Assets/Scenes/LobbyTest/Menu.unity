@@ -1072,6 +1072,7 @@ MonoBehaviour:
   initialPage: {fileID: 0}
   firstFocusItem: {fileID: 0}
   PageStackNames: []
+  popUpScreen: {fileID: 5180419811621639846, guid: dba72bb0d91ad8441ac3bd484ce3d14a, type: 3}
 --- !u!114 &354576632
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6875,7 +6876,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5034220327070859217, guid: 7fb96de73383a7541ae7aa63fb6a76c5, type: 3}
       propertyPath: m_fontSize
-      value: 48.4
+      value: 46
       objectReference: {fileID: 0}
     - target: {fileID: 5034220327070859217, guid: 7fb96de73383a7541ae7aa63fb6a76c5, type: 3}
       propertyPath: m_fontAsset

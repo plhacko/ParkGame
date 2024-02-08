@@ -41,9 +41,9 @@ public class GPSLocator : MonoBehaviour
         }
     }
 
-    public void Start()
+    public void Initialize()
     {
-        if (Input.location.status != LocationServiceStatus.Running) 
+        if (Input.location.status != LocationServiceStatus.Running)
         {
             StartCoroutine(InitializeLocator());
         }
