@@ -41,6 +41,12 @@ public class GPSLocator : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        if (ServicesManager.Instance.GPSPermissionGranted())
+            Initialize();
+    }
+
     public void Initialize()
     {
         if (Input.location.status != LocationServiceStatus.Running)
