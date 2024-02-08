@@ -52,6 +52,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   structureType: 0
   maxStructures: 3
+  colorSettings: {fileID: 11400000, guid: 540e0efb517eb1d4f8598ecd8326dff1, type: 2}
   tilemap: {fileID: 0}
 --- !u!1 &2678169573904503407
 GameObject:
@@ -108,8 +109,9 @@ MonoBehaviour:
   structureItem: {fileID: 6864133573061210391, guid: fe60f76611dc877468411d5f045eef97, type: 3}
   mapDrawable: {fileID: 0}
   tilemap: {fileID: 0}
-  mainCamera: {fileID: 0}
   trashSprite: {fileID: 21300000, guid: 626b9cddb29049e4cac50cd87b419945, type: 3}
+  counter: {fileID: 0}
+  colorSettings: {fileID: 0}
 --- !u!222 &2678169573904503381
 CanvasRenderer:
   m_ObjectHideFlags: 0

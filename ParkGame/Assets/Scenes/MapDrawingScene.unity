@@ -6243,6 +6243,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   structureType: 2
   maxStructures: 100
+  colorSettings: {fileID: 11400000, guid: 540e0efb517eb1d4f8598ecd8326dff1, type: 2}
   tilemap: {fileID: 1954708517}
 --- !u!1 &1630678966
 GameObject:
@@ -8992,6 +8993,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   structureType: 1
   maxStructures: 1
+  colorSettings: {fileID: 11400000, guid: 540e0efb517eb1d4f8598ecd8326dff1, type: 2}
   tilemap: {fileID: 1954708517}
 --- !u!114 &2678169574065116824
 MonoBehaviour:
@@ -9243,6 +9245,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   structureType: 0
   maxStructures: 4
+  colorSettings: {fileID: 11400000, guid: 540e0efb517eb1d4f8598ecd8326dff1, type: 2}
   tilemap: {fileID: 1954708517}
 --- !u!1 &2678169575153803555
 GameObject:

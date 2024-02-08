@@ -5,6 +5,7 @@ using TMPro;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using UnityEngine.UI;
 
 public class StructureCounter : MonoBehaviour
 {
@@ -18,6 +19,7 @@ public class StructureCounter : MonoBehaviour
     // Start is called before the first frame update
     
     public int maxStructures = 3;
+    [SerializeField] private ColorSettings colorSettings;
     private List<GameObject> currentStructures;
 
     public Tilemap tilemap;
@@ -115,6 +117,7 @@ public class StructureCounter : MonoBehaviour
             for (int idx = 0; idx < currentStructures.Count; idx++)
             {
                 currentStructures[idx].GetComponentInChildren<TextMeshProUGUI>().text = $"TEAM {idx + 1}";
+                currentStructures[idx].GetComponent<Image>().color = colorSettings.Colors[idx].Color;
             }
         }
 
