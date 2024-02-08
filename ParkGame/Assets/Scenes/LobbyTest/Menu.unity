@@ -1925,6 +1925,10 @@ PrefabInstance:
       propertyPath: m_SizeDelta.y
       value: 80
       objectReference: {fileID: 0}
+    - target: {fileID: 3167335048040697323, guid: 86bc216476a79ad40b20578ef1f2bf2a, type: 3}
+      propertyPath: colorSettings
+      value: 
+      objectReference: {fileID: 11400000, guid: 540e0efb517eb1d4f8598ecd8326dff1, type: 2}
     - target: {fileID: 3167335048040697324, guid: 86bc216476a79ad40b20578ef1f2bf2a, type: 3}
       propertyPath: m_SizeDelta.x
       value: 850
@@ -6854,9 +6858,25 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2483579972529308819, guid: 7fb96de73383a7541ae7aa63fb6a76c5, type: 3}
+      propertyPath: castle
+      value: 
+      objectReference: {fileID: 4257347444695511527, guid: f2c363de9d1651a43bd0542d2de1e6d1, type: 3}
+    - target: {fileID: 2483579972529308819, guid: 7fb96de73383a7541ae7aa63fb6a76c5, type: 3}
+      propertyPath: outpost
+      value: 
+      objectReference: {fileID: 5252159290612787808, guid: 9c5bb8b17dc6dde4a9e2f0e6e3b3c335, type: 3}
+    - target: {fileID: 2483579972529308819, guid: 7fb96de73383a7541ae7aa63fb6a76c5, type: 3}
       propertyPath: mainMenuPage
       value: 
       objectReference: {fileID: 1552875232}
+    - target: {fileID: 2483579972529308819, guid: 7fb96de73383a7541ae7aa63fb6a76c5, type: 3}
+      propertyPath: victoryPoint
+      value: 
+      objectReference: {fileID: 2142756419103881207, guid: 19a8cfd472082ba40a48747bb0eb4893, type: 3}
+    - target: {fileID: 2483579972529308819, guid: 7fb96de73383a7541ae7aa63fb6a76c5, type: 3}
+      propertyPath: colorSettings
+      value: 
+      objectReference: {fileID: 11400000, guid: 540e0efb517eb1d4f8598ecd8326dff1, type: 2}
     - target: {fileID: 2483579972529308819, guid: 7fb96de73383a7541ae7aa63fb6a76c5, type: 3}
       propertyPath: startGameButton
       value: 

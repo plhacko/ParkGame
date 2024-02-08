@@ -1373,6 +1373,9 @@ MonoBehaviour:
   mapNameText: {fileID: 3167335047723434347}
   mapDistanceText: {fileID: 3167335048421704135}
   maxNumTeamsText: {fileID: 3167335047159526569}
+  castle: {fileID: 4257347444695511527, guid: f2c363de9d1651a43bd0542d2de1e6d1, type: 3}
+  victoryPoint: {fileID: 2142756419103881207, guid: 19a8cfd472082ba40a48747bb0eb4893, type: 3}
+  outpost: {fileID: 5252159290612787808, guid: 9c5bb8b17dc6dde4a9e2f0e6e3b3c335, type: 3}
 --- !u!1 &3167335048157054807
 GameObject:
   m_ObjectHideFlags: 0
@@ -1868,3 +1871,4 @@ MonoBehaviour:
   mapPicker: {fileID: 3167335048040697323}
   createButton: {fileID: 3167335047415915865}
   lobbyPage: {fileID: 6412095738284844239, guid: 7fb96de73383a7541ae7aa63fb6a76c5, type: 3}
+  mainMenuPage: {fileID: 0}

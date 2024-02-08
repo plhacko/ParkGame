@@ -35,6 +35,58 @@ public class MapData
         
         return new Vector2(GPSTexture.width / (float)GPSTexture.height, 1);
     }
+    
+    private void addOneStructure(
+        GameObject imgObj, RectTransform parentRect, SerializedVector3Int structurePos, Vector3Int topLeft, Vector3Int bottomRight
+    )
+    {
+        var rect = imgObj.GetComponent<RectTransform>();
+        // Set anchor to top left corner
+        rect.anchorMin = new Vector2(0, 1.0f);
+        rect.anchorMax = new Vector2(0, 1.0f);
+        
+        // Calculate t params from (0, 1) range based on structure location between tilemap bounds
+        var tx = (float)(structurePos.x - topLeft.x) / (bottomRight.x - topLeft.x);
+        var ty = (float)(structurePos.y - topLeft.y) / (bottomRight.y - topLeft.y);
+        // Lerp between width and height of the map preview  
+        var imgNewX = Mathf.Lerp(0, parentRect.rect.width, tx);
+        var imgNewY = Mathf.Lerp(0, parentRect.rect.height, ty);
+        rect.anchoredPosition = new Vector3(imgNewX, -imgNewY);
+        // Scale the image accordingly
+        rect.localScale = new Vector3(0.25f, 0.25f);
+    }
+    public void addStructuresToMap(
+        RawImage drawnTexture,
+        ColorSettings colorSettings,
+        GameObject outpost,
+        GameObject castle,
+        GameObject victoryPoint
+    )
+    {
+        var topLeft = MetaData.TopLeftTileIdx;
+        var bottomRight = MetaData.BottomRightTileIdx;
+        var parentRect = drawnTexture.rectTransform;
+        foreach (var structurePos in MetaData.Structures.Outposts)
+        {
+            var img = UnityEngine.Object.Instantiate(outpost, drawnTexture.transform);
+            addOneStructure(img,parentRect, structurePos, topLeft, bottomRight);
+        }
+
+        var castleIdx = 1;
+        foreach (var structurePos in MetaData.Structures.Castles)
+        {
+            var img = UnityEngine.Object.Instantiate(castle, drawnTexture.transform);
+            addOneStructure(img,parentRect, structurePos, topLeft, bottomRight);
+            img.GetComponentInChildren<TextMeshProUGUI>().text = $"TEAM {castleIdx}";
+            img.GetComponent<Image>().color = colorSettings.Colors[castleIdx].Color;
+            castleIdx++;
+        }
+        foreach (var structurePos in MetaData.Structures.VictoryPoints)
+        {
+            var img = UnityEngine.Object.Instantiate(victoryPoint, drawnTexture.transform);
+            addOneStructure(img,parentRect, structurePos, topLeft, bottomRight);
+        }
+    }
 }
 
 public class MapPicker : MonoBehaviour
@@ -47,6 +99,11 @@ public class MapPicker : MonoBehaviour
     [SerializeField] private TextMeshProUGUI mapNameText;
     [SerializeField] private TextMeshProUGUI mapDistanceText;
     [SerializeField] private TextMeshProUGUI maxNumTeamsText;
+    [SerializeField] private ColorSettings colorSettings;
+    [Header("Structre sprites")]
+    [SerializeField] private GameObject castle;
+    [SerializeField] private GameObject victoryPoint;
+    [SerializeField] private GameObject outpost;
     private float maxImageSize;
 
     public List<MapData> MapDatas => mapDatas;
@@ -93,6 +150,15 @@ public class MapPicker : MonoBehaviour
         }
         showCurrentMap();
     }
+
+
+    private void deleteStructuresFromMap()
+    {
+        foreach (Transform child in drawnTexture.transform)
+        {
+            Destroy(child.gameObject);
+        }
+    }
     
     private void showCurrentMap()
     {
@@ -109,12 +175,17 @@ public class MapPicker : MonoBehaviour
         
         drawnTexture.texture = mapData.DrawnTexture;
         drawnTexture.color = drawnTexture.texture == null ? Color.clear : Color.white;
-
+        
         Vector2 imageSize = mapData.GetImageSize() * maxImageSize;
 
         gpsTexture.rectTransform.sizeDelta = imageSize;
         drawnTexture.rectTransform.sizeDelta = imageSize;
-
+        
+        deleteStructuresFromMap();
+        if (drawnTexture.texture)
+        {
+            mapData.addStructuresToMap(drawnTexture, colorSettings, outpost, castle, victoryPoint);
+        }
         mapNameText.text = mapMetaData.MapName;
         mapDistanceText.text = "(" +(distance / 1000.0).ToString("F1") + " km)";
         Debug.Log(mapMetaData.NumTeams);

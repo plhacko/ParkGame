@@ -24,7 +24,11 @@ namespace UI.Lobby
         [SerializeField] private RawImage gpsTexture;
         [SerializeField] private RectTransform teamsParent;
         [SerializeField] private UIPage mainMenuPage;
-
+        [SerializeField] private ColorSettings colorSettings;
+        [Header("Structre sprites")]
+        [SerializeField] private GameObject castle;
+        [SerializeField] private GameObject victoryPoint;
+        [SerializeField] private GameObject outpost;
         private List<UILobbyTeam> newTeamUIs = new ();
 
         private float maxImageSize;
@@ -123,7 +127,7 @@ namespace UI.Lobby
 
             gpsTexture.rectTransform.sizeDelta = imageSize;
             drawnTexture.rectTransform.sizeDelta = imageSize;
-
+            mapData.addStructuresToMap(drawnTexture, colorSettings, outpost, castle, victoryPoint);
             mapNameLabel.text = mapData.MetaData.MapName;
             for (int teamNumber = 0; teamNumber < mapData.MetaData.NumTeams; teamNumber++)
             {
