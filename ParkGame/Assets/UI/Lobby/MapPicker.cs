@@ -80,12 +80,16 @@ public class MapPicker : MonoBehaviour
     
     private void onNextClicked()
     {
+        AudioManager.Instance.PlayClickSFX();
+
         currentMapIndex = (currentMapIndex + 1) % mapDatas.Count;
         showCurrentMap();
     }
     
     private void onPreviousClicked()
     {
+        AudioManager.Instance.PlayClickSFX();
+
         currentMapIndex = (currentMapIndex - 1) % mapDatas.Count;
         if (currentMapIndex == -1)
         {

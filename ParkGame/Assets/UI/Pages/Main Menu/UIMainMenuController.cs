@@ -40,6 +40,8 @@ public class UIMainMenuController : UIPageController
         finalHeaderPanelPos = headerPanel.anchoredPosition;
         finalButtonsPanelPos = buttonsPanel.anchoredPosition;
 
+        AudioManager.Instance.notificationsSource = Camera.main.GetComponent<AudioSource>();
+
         Prepare();
     }
 
@@ -63,17 +65,22 @@ public class UIMainMenuController : UIPageController
     
     private void Create()
     {
+        // click might not be heard here because of the loading!
+        AudioManager.Instance.PlayClickSFX();
         SceneManager.LoadScene(createMapMenuSceneName, LoadSceneMode.Single);
     }
 
     private void Host()
     {
+        AudioManager.Instance.PlayClickSFX();
         UIController.Singleton.PushUIPage(prepareGamePage);
     }
 
     private async void Join()
     {
         enableButtons(false);
+        AudioManager.Instance.PlayClickSFX();
+
         // TODO notify when unsuccessful join
         bool success = await LobbyManager.Singleton.JoinLobbyByCode(joinCodeInputField.text.ToUpper());
         if (success)
@@ -84,11 +91,13 @@ public class UIMainMenuController : UIPageController
 
     private void About()
     {
+        AudioManager.Instance.PlayClickSFX();
         UIController.Singleton.PushUIPage(aboutPage);
     }
 
     private void SignOut()
     {
+        AudioManager.Instance.PlayClickSFX();
         enableButtons(false);
         ServicesManager.Instance.SignOutFromFirebase();
         UIController.Singleton.PopUIPage();

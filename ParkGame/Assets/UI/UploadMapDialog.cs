@@ -22,7 +22,7 @@ public class UploadMapDialog : MonoBehaviour
         returnToMenuButton.gameObject.SetActive(false);
         uploadButton.interactable = true;
         statusText.text = "";
-        
+
         mapDataFirebaseManager.OnMapUploaded.AddListener(() =>
         {
             statusText.text = "Upload successful!";
@@ -37,6 +37,8 @@ public class UploadMapDialog : MonoBehaviour
         
         uploadButton.onClick.AddListener(() =>
         {
+            AudioManager.Instance.PlayClickSFX();
+
             statusText.text = "Uploading...";
             mapDataFirebaseManager.UploadMapData(mapNameInputField.text);
             uploadButton.interactable = false;
@@ -44,6 +46,8 @@ public class UploadMapDialog : MonoBehaviour
         
         returnToMenuButton.onClick.AddListener(() =>
         {
+            AudioManager.Instance.PlayClickSFX();
+
             uploadButton.interactable = false;
             goBackButton.interactable = false;
             Destroy(mapWithOverlay.GetFetchedMap().gameObject);
@@ -53,6 +57,8 @@ public class UploadMapDialog : MonoBehaviour
         
         goBackButton.onClick.AddListener(() =>
         {
+            AudioManager.Instance.PlayClickSFX();
+
             returnToMenuButton.gameObject.SetActive(false);
             uploadButton.interactable = true;
             statusText.text = "";

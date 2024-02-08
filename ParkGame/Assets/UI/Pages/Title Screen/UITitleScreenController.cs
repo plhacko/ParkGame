@@ -28,6 +28,8 @@ public class UITitleScreenController : UIPageController
 
     private async void Enter()
     {
+        AudioManager.Instance.PlayClickSFX();
+
         enterButton.interactable = false;
 
         await ServicesManager.Instance.SignUpAndLogInToUnityAuth();

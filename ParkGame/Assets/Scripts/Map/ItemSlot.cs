@@ -90,6 +90,7 @@ public class ItemSlot : MonoBehaviour, IDropHandler, IPointerDownHandler
             Debug.Log("All structures placed");
             return;
         }
+        AudioManager.Instance.PlayClickSFX();
         InstantiateAndAddNewStructure(new Vector3(Screen.width / 2.0f, Screen.height / 2.0f, 0));
     }
     
@@ -101,7 +102,9 @@ public class ItemSlot : MonoBehaviour, IDropHandler, IPointerDownHandler
         // eventData.pointerDrag.GetComponent<RectTransform>().anchoredPosition =
         //     GetComponent<RectTransform>().anchoredPosition;
         // counter.ItemDropped(eventData.pointerDrag.gameObject);
-        if (counter.RemoveMapStructure(eventData.pointerDrag))
+        if (counter.RemoveMapStructure(eventData.pointerDrag)) {
+            AudioManager.Instance.PlayClickSFX();
             Destroy(eventData.pointerDrag);
+        }
     }
 }

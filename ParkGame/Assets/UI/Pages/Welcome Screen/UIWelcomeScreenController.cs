@@ -33,11 +33,13 @@ public class UIWelcomeScreenController : UIPageController
     // Set name and go to join game menu scene
     private void Login()
     {
+        AudioManager.Instance.PlayClickSFX();
         UIController.Singleton.PushUIPage(loginPage);
     }
     
     private void SignUp()
     {
+        AudioManager.Instance.PlayClickSFX();
         UIController.Singleton.PushUIPage(signUpPage);
     }
 }
