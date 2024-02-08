@@ -370,13 +370,13 @@ public class CreateMapWithOverlay : NetworkBehaviour
     {
         CheckStructureDistances(structuresToAssign);
         var castleTeamID = 0;
-
-        if (NetworkManager.Singleton.IsServer)
+        
+        foreach (var kvp in structuresToAssign)
         {
-            foreach (var kvp in structuresToAssign)
+            if (blockingTilemap.GetTile(kvp.Key) == boundsTile)
+                errorMessages.Add("Cannot place structure out of map bounds");
+            if (NetworkManager.Singleton.IsServer)
             {
-                if (blockingTilemap.GetTile(kvp.Key) == boundsTile)
-                    errorMessages.Add("Cannot place structure out of map bounds");
                 var structure = Instantiate(kvp.Value, gridLayout.CellToWorld(kvp.Key), Quaternion.identity);
                 if (kvp.Value == castlePrefab)
                 {
