@@ -352,26 +352,26 @@ public class ServicesManager : MonoBehaviour
         if (hasFocus)
         {
             Debug.Log("OnApplicationFocus");
-            if (GPSPermissionGranted())
-            {
-                GPSDontAskAgain = false;
-            }
+//             if (GPSPermissionGranted())
+//             {
+//                 GPSDontAskAgain = false;
+//             }
             
-            if (GPSDontAskAgain)
-            {
-#if UNITY_ANDROID
-                if (UIController.Singleton.TopStackPageName != "GPSPermission")
-                {
-                    UIController.Singleton.ShowPopUp(
-                        "GPS Permission Denied",
-                        "You need to grant GPS permission to use this application",
-                        "Go to settings", () => OpenAndroidApplicationSettings(),
-                        "GPSPermission"
-                    );
-                }
-#endif
-            }
-            else if (!GPSPermissionGranted())
+//             if (GPSDontAskAgain)
+//             {
+// #if UNITY_ANDROID
+//                 if (UIController.Singleton.TopStackPageName != "GPSPermission")
+//                 {
+//                     UIController.Singleton.ShowPopUp(
+//                         "GPS Permission Denied",
+//                         "You need to grant GPS permission to use this application",
+//                         "Go to settings", () => OpenAndroidApplicationSettings(),
+//                         "GPSPermission"
+//                     );
+//                 }
+// #endif
+//             }
+            if (!GPSPermissionGranted())
             {
                 RequestGPSPermission();
             }
