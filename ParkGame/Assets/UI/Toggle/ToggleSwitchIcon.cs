@@ -12,9 +12,10 @@ public class ToggleSwitchIcon : MonoBehaviour
         iconOff.GetComponent<Image>().enabled = false;
     }
 
-    public void Toggle() {
+    public bool Toggle() {
         state = !state;
         iconOn.GetComponent<Image>().enabled = state;
         iconOff.GetComponent<Image>().enabled = !state;
+        return state;
     }
 }

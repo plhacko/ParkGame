@@ -31,17 +31,20 @@ public class UIOptionsScreenController : UIPageController
 
     private void Back()
     {
+        AudioManager.Instance.PlayClickSFX();
         UIController.Singleton.PopUIPage();
     }
 
     private void Quit()
     {
+        AudioManager.Instance.PlayClickSFX();
         // todo show do you want to disconnect for host
         disconnectionHandler.DisconnectAndLeave();
     }
 
     private void ToggleNotifications()
     {
+        AudioManager.Instance.PlayClickSFX();
         AudioManager.Instance.ToggleNotificationSound();
         notificationSoundsToggleButton.GetComponent<ToggleSwitchIcon>().Toggle();
     }
@@ -49,11 +52,12 @@ public class UIOptionsScreenController : UIPageController
     private void ToggleSfx()
     {
         AudioManager.Instance.ToggleSfx();
-        soundEffectsToggleButton.GetComponent<ToggleSwitchIcon>().Toggle();
+        if (soundEffectsToggleButton.GetComponent<ToggleSwitchIcon>().Toggle()) { AudioManager.Instance.PlayClickSFX(); }
     }
 
     private void HowToPlay()
     {
+        AudioManager.Instance.PlayClickSFX();
         UIController.Singleton.PushUIPage(howToPlayPage);
     }
 }

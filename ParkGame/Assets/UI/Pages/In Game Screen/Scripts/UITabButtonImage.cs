@@ -15,6 +15,7 @@ public class UITabButtonImage : Selectable, IPointerClickHandler
     public void OnPointerClick(PointerEventData eventData)
     {
         if (!IsInteractable()) return;
+        AudioManager.Instance.PlayClickSFX();
         tabGroup.OnTabSelected(this);        
     }
 }
