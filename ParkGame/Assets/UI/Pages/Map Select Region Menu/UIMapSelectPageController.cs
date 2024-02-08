@@ -33,6 +33,8 @@ public class UIMapSelectPageController : UIPageController
 
     private void Start() 
     {
+        AudioManager.Instance.notificationsSource = Camera.main.GetComponent<AudioSource>();
+
         if (GPSLocator.instance != null && GPSLocator.instance.IsGPSUsable())
         {
             OnCurrentLocationButtonClicked();
@@ -56,6 +58,7 @@ public class UIMapSelectPageController : UIPageController
 
     private void OnCurrentLocationButtonClicked()
     {
+        AudioManager.Instance.PlayClickSFX();
         map._options.locationOptions.latitudeLongitude = GetCurrentLocation();
         map._options.locationOptions.zoom = 15f;
         map.UpdateMap();
@@ -63,16 +66,19 @@ public class UIMapSelectPageController : UIPageController
 
     private void OnMainMenuButtonClicked()
     {
+        AudioManager.Instance.PlayClickSFX();
         SceneManager.LoadScene(mainMenuSceneName);
     }
 
     private void OnMapCreatorButtonClicked()
     {
+        AudioManager.Instance.PlayClickSFX();
         mapSpriteBuilder.InstantiateMapSprite();
     }
 
     private void OnToggleValueChanged(bool arg0)
     {
+        AudioManager.Instance.PlayClickSFX();
         mapCreatorButton.interactable = arg0;
         quadTreeCameraMovement.SelectRegionOnValueChanged(mapSelectToggle);
     }

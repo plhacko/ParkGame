@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -30,6 +29,7 @@ public class MapErrorMessagePanelUI : MonoBehaviour
     
     private void HidePanel()
     {
+        AudioManager.Instance.PlayClickSFX();
         root.SetActive(false);
     }
 }

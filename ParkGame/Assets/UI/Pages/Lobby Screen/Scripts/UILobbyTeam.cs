@@ -16,10 +16,13 @@ public class UILobbyTeam : MonoBehaviour
 
     private string playerId;
 
-    public void Initialize(int teamNumber, Action<int> onJoinTeam)
-    {
+    public void Initialize(int teamNumber, Action<int> onJoinTeam) {
         teamLabel.text = $"Team {teamNumber + 1}";
-        joinButton.onClick.AddListener(() => onJoinTeam?.Invoke(teamNumber));
+        joinButton.onClick.AddListener(() => {
+            onJoinTeam?.Invoke(teamNumber);
+            AudioManager.Instance.PlayClickSFX();
+        });
+    
     }
 
     public void AddPlayerUI(Unity.Services.Lobbies.Models.Player player, Action onRemovePlayer, Func<bool> isHost)

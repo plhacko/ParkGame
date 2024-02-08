@@ -38,6 +38,7 @@ public class UIPrepareGameMenuController : UIPageController
 
     private void Back()
     {
+        AudioManager.Instance.PlayClickSFX();
         UIController.Singleton.PushUIPage(mainMenuPage);
     }
 
@@ -49,6 +50,7 @@ public class UIPrepareGameMenuController : UIPageController
 
     private async void Create()
     {
+        AudioManager.Instance.PlayClickSFX();
         setInteractable(false);
         mapPicker.SetInteractable(false);
         

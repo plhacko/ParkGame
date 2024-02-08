@@ -69,6 +69,7 @@ public class AudioManager : MonoBehaviour
 
     public void PlayClickSFX() {
         AudioClip sfx = GetRandomItem(clickSfx_list);
+        Debug.Log("CLICK");
         notificationsSource.PlayOneShot(sfx);
     }
 

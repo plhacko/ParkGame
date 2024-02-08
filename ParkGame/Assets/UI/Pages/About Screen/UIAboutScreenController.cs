@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -21,6 +19,7 @@ public class UIAboutScreenController : UIPageController
 
     private void Back()
     {
+        AudioManager.Instance.PlayClickSFX();
         UIController.Singleton.PushUIPage(mainMenuPage);
     }
 }

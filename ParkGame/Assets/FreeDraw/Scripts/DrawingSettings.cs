@@ -1,7 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 namespace FreeDraw
 {
@@ -21,6 +18,8 @@ namespace FreeDraw
 
         private void Start()
         {
+            AudioManager.Instance.notificationsSource = Camera.main.GetComponent<AudioSource>();
+
             SetActiveSprite(boundsObject);
         }
     

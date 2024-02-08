@@ -171,6 +171,7 @@ namespace UI.Lobby
 
         private async void Back()
         {
+            AudioManager.Instance.PlayClickSFX();
             backButton.interactable = false;
             await LobbyManager.Singleton.LeaveLobby();
             NetworkManager.Singleton.Shutdown();
@@ -179,6 +180,7 @@ namespace UI.Lobby
 
         private void StartGame()
         {
+            AudioManager.Instance.PlayClickSFX();
             LobbyManager.Singleton.StartGame();
         }
 

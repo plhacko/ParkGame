@@ -36,6 +36,8 @@ public class UILoginController : UIPageController
 
     private async void Login()
     {
+        AudioManager.Instance.PlayClickSFX();
+
         processing = true;
 
         var result = await ServicesManager.Instance.LogInToFirebase(emailInputField.text, passwordInputField.text);
@@ -58,6 +60,7 @@ public class UILoginController : UIPageController
 
     private void Back()
     {
+        AudioManager.Instance.PlayClickSFX();
         UIController.Singleton.PushUIPage(welcomePage);
     }
 

@@ -46,6 +46,7 @@ public class UISignUpScreenController : UIPageController
 
     private async void SignUp()
     {
+        AudioManager.Instance.PlayClickSFX();
         processing = true;
 
         var result = await ServicesManager.Instance.SignUpAndLoginToFirebase(emailInputField.text, passwordInputField.text, nameInputField.text);
@@ -77,6 +78,7 @@ public class UISignUpScreenController : UIPageController
 
     private void Back()
     {
+        AudioManager.Instance.PlayClickSFX();
         UIController.Singleton.PushUIPage(welcomePage);
     }
 
