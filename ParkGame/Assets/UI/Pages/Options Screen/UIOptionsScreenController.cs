@@ -6,8 +6,8 @@ public class UIOptionsScreenController : UIPageController
 {
     [SerializeField] private Button backButton;
     [SerializeField] private Button quitButton;
-    [SerializeField] private Button backgroundNoiseButton;
-    [SerializeField] private Button mainMusicButton;
+    [SerializeField] private Button notificationSoundsToggleButton;
+    [SerializeField] private Button soundEffectsToggleButton;
     [SerializeField] private Button howToPlayButton;
     [SerializeField] private UIPage howToPlayPage;
     [SerializeField] private string mainMenuSceneName = "Menu";
@@ -17,8 +17,8 @@ public class UIOptionsScreenController : UIPageController
     {
         backButton.onClick.AddListener(Back);
         quitButton.onClick.AddListener(Quit);
-        backgroundNoiseButton.onClick.AddListener(ToggleBackgroundNoise);
-        mainMusicButton.onClick.AddListener(ToggleMainMusic);
+        notificationSoundsToggleButton.onClick.AddListener(ToggleNotifications);
+        soundEffectsToggleButton.onClick.AddListener(ToggleSfx);
         howToPlayButton.onClick.AddListener(HowToPlay);        
 
     }
@@ -40,14 +40,16 @@ public class UIOptionsScreenController : UIPageController
         disconnectionHandler.DisconnectAndLeave();
     }
 
-    private void ToggleBackgroundNoise()
+    private void ToggleNotifications()
     {
-        // TODO toggle background noise
+        AudioManager.Instance.ToggleNotificationSound();
+        notificationSoundsToggleButton.GetComponent<ToggleSwitchIcon>().Toggle();
     }
 
-    private void ToggleMainMusic()
+    private void ToggleSfx()
     {
-        // TODO toggle main music
+        AudioManager.Instance.ToggleSfx();
+        soundEffectsToggleButton.GetComponent<ToggleSwitchIcon>().Toggle();
     }
 
     private void HowToPlay()

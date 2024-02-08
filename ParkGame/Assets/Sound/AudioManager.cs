@@ -153,10 +153,12 @@ public class AudioManager : MonoBehaviour
     }
 
     public void ToggleSfx() {
-        sfxSource.mute = !sfxMute;
+        sfxMute = !sfxMute;
+        sfxSource.mute = sfxMute;
     }
 
     public void ToggleNotificationSound() {
-        notificationsSource.mute = !notificationsMute;
+        notificationsMute = !notificationsMute;
+        notificationsSource.mute = notificationsMute;
     }
 }
