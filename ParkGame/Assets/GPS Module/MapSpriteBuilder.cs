@@ -17,18 +17,9 @@ public class MapSpriteBuilder : MonoBehaviour
         // Called after submitting map region
         Vector4 bbox = qt.GetSelectedRegionBoundingBox();
 
-        var areaKm = CalculateBoundingBoxAreaInSquareKm(bbox.x, bbox.y, bbox.z, bbox.w);
-        var areaM = areaKm * 1000000;
-        if (areaM < 100)
-        {
-            // TODO show error message
-            Debug.LogError("Selected region is too small. Please select a larger region.");
-            return;
-        } 
-
         Vector2 normalizedSideLengths = qt.GetSelectedRegionNormalizedSideLengths();
         var pixelSideLengths = 1280 * normalizedSideLengths;
-
+        
         MapDisplayer mapDisplayer = mapSprite.GetComponent<MapDisplayer>();
 
         mapDisplayer.Width = (int)pixelSideLengths.x;
@@ -38,31 +29,27 @@ public class MapSpriteBuilder : MonoBehaviour
         mapDisplayer.MinLatitude = bbox.y;
         mapDisplayer.MaxLongitude = bbox.z;
         mapDisplayer.MaxLatitude = bbox.w;
+        
+        var areaM = mapDisplayer.CalculateBoundingBoxAreaInSquareMeters();
+        if (areaM < 100)
+        {
+            // TODO show error message
+            Debug.LogError("Selected region is too small. Please select a larger region.");
+            return;
+        }
+
+        if (areaM > 1000 * 1000)
+        {
+            // TODO show error message
+            Debug.LogError("Selected region is too large. Please select a smaller region.");
+            return;
+        }
 
         var mapSpriteInstance = Instantiate(mapSprite);
-
         // Pass map sprite to next scene and load it
         StartCoroutine(LoadAsyncSceneWithMapSprite(mapSpriteInstance));
     }
 
-    public double CalculateBoundingBoxAreaInSquareKm(double minLongitude, double minLatitude, double maxLongitude, double maxLatitude)
-    {
-        // Convert degrees to radians
-        double minLatRad = minLatitude * Math.PI / 180;
-        double maxLatRad = maxLatitude * Math.PI / 180;
-        double minLonRad = minLongitude * Math.PI / 180;
-        double maxLonRad = maxLongitude * Math.PI / 180;
-
-        // Radius of the Earth in kilometers
-        double earthRadiusKm = 6371.0;
-
-        // Calculate the area of the spherical rectangle
-        double area = earthRadiusKm * earthRadiusKm *
-                    Math.Abs(Math.Sin(minLatRad) - Math.Sin(maxLatRad)) *
-                    Math.Abs(minLonRad - maxLonRad);
-
-        return area;
-    }
 
     IEnumerator LoadAsyncSceneWithMapSprite(GameObject mapSprite)
     {

@@ -159,6 +159,23 @@ public class MapDisplayer : MonoBehaviour
         mapLoaded = true;
         OnMapLoaded?.Invoke();
     }
+    
+    public double CalculateBoundingBoxAreaInSquareMeters()
+    {
+        // Convert degrees to radians
+        double minLatRad = MinLatitude * Math.PI / 180;
+        double maxLatRad = MaxLatitude * Math.PI / 180;
+        double minLonRad = MinLongitude * Math.PI / 180;
+        double maxLonRad = MaxLongitude * Math.PI / 180;
+
+        // Radius of the Earth in kilometers
+        double earthRadiusKm = 6371.0;
+
+        // Calculate the area of the spherical rectangle
+        return (earthRadiusKm * earthRadiusKm *
+                        Math.Abs(Math.Sin(minLatRad) - Math.Sin(maxLatRad)) *
+                        Math.Abs(minLonRad - maxLonRad)) * 1000000;
+    }
 
     private void OnEnable()
     {

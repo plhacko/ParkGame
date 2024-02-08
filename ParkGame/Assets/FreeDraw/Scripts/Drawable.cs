@@ -305,7 +305,7 @@ namespace FreeDraw
 
         
 
-        public void SetDrawableSprite(Sprite sprite, int scaleRation)
+        public void SetDrawableSprite(Sprite sprite, float scaleRatio)
         {
             if (!sprite)
             {
@@ -320,7 +320,7 @@ namespace FreeDraw
             // Scale 2D box collider according to new texture size
             var spriteRenderer = GetComponent<SpriteRenderer>();
             spriteRenderer.sprite = sprite;
-            spriteRenderer.transform.localScale *= scaleRation;
+            spriteRenderer.transform.localScale *= scaleRatio;
             GetComponent<BoxCollider2D>().size = new Vector2(
                 spriteRenderer.bounds.size.x * transform.localScale.x,
                 spriteRenderer.bounds.size.y * transform.localScale.y
