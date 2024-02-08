@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using FreeDraw;
 using Unity.Netcode;
+using Unity.VisualScripting.Antlr3.Runtime.Tree;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.Windows;
@@ -366,14 +367,21 @@ public class CreateMapWithOverlay : NetworkBehaviour
             }
         }
     }
+
+    private bool IsStructureAccessible(Vector3Int pos, TileBase[] forbiddenTiles)
+    {
+        return !forbiddenTiles.Contains(blockingTilemap.GetTile(pos)) &&
+               pos.x >= topLeftCellPos.x && pos.x <= bottomRightCellPos.x &&
+               pos.y >= bottomRightCellPos.y && pos.y <= topLeftCellPos.y;
+    }
     private void SetStructurePrefabs(Dictionary<Vector3Int, GameObject> structuresToAssign)
     {
         CheckStructureDistances(structuresToAssign);
         var castleTeamID = 0;
-        
+        TileBase[] forbiddenTiles = {boundsTile, wallTile};
         foreach (var kvp in structuresToAssign)
         {
-            if (blockingTilemap.GetTile(kvp.Key) == boundsTile)
+            if (!IsStructureAccessible(kvp.Key, forbiddenTiles))
                 errorMessages.Add("Cannot place structure out of map bounds");
             if (NetworkManager.Singleton.IsServer)
             {
