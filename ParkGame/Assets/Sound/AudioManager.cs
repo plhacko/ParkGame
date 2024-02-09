@@ -16,6 +16,7 @@ public class AudioManager : MonoBehaviour
     public static AudioManager Instance;
 
     [SerializeField] public AudioSource sfxSource;
+    [SerializeField] public AudioSource clickSfxSource;
     //[SerializeField] private AudioSource notificationsSource;
     public AudioSource notificationsSource;
 
@@ -69,8 +70,7 @@ public class AudioManager : MonoBehaviour
 
     public void PlayClickSFX() {
         AudioClip sfx = GetRandomItem(clickSfx_list);
-        Debug.Log("CLICK");
-        notificationsSource.PlayOneShot(sfx);
+        clickSfxSource.PlayOneShot(sfx);
     }
 
     public void PlaySFX(string sfxName) {
@@ -156,6 +156,7 @@ public class AudioManager : MonoBehaviour
     public void ToggleSfx() {
         sfxMute = !sfxMute;
         sfxSource.mute = sfxMute;
+        clickSfxSource.mute = sfxMute;
     }
 
     public void ToggleNotificationSound() {

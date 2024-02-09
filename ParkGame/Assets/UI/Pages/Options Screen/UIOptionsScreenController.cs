@@ -44,9 +44,9 @@ public class UIOptionsScreenController : UIPageController
 
     private void ToggleNotifications()
     {
-        AudioManager.Instance.PlayClickSFX();
         AudioManager.Instance.ToggleNotificationSound();
-        notificationSoundsToggleButton.GetComponent<ToggleSwitchIcon>().Toggle();
+        if (notificationSoundsToggleButton.GetComponent<ToggleSwitchIcon>().Toggle()) { AudioManager.Instance.PlayClickSFX(); }
+
     }
 
     private void ToggleSfx()
