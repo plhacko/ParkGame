@@ -121,7 +121,7 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
             var playerController = playerManager.GetLocalPlayerController();
             if (playerController != null)
             {
-                playerController.RemoveOutpost(this);
+                playerController.RemoveOutpostUI(this);
             }
         }
 
@@ -130,7 +130,7 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
             var playerController = playerManager.GetLocalPlayerController();
             if (playerController != null)
             {
-                playerController.AddOutpost(this);
+                playerController.AddOutpostUI(this);
             }
         }
 

@@ -112,30 +112,16 @@ namespace Player
             formationScript.InitializeFormation(); // build prefab, get position of the commander
             FormationType = Formation.FormationType.Free; // movement without navmesh
 
-            if (IsServer)
+            if (IsOwner)
             {
-                ClientRpcParams clientRpcParams = new ClientRpcParams
+                var castles = FindObjectsOfType<Outpost>();
+                foreach (var castle in castles)
                 {
-                    Send = new ClientRpcSendParams
+                    if (castle.IsCastle && castle.Team == Team)
                     {
-                        TargetClientIds = new []{ OwnerClientId }
+                        AddOutpostUI(castle);
                     }
-                };
-
-                AddCastleUIClientRpc(clientRpcParams);
-            }
-        }
-
-        [ClientRpc]
-        private void AddCastleUIClientRpc(ClientRpcParams clientRpcParams = default)
-        {
-            var castles = FindObjectsOfType<Outpost>();
-            foreach (var castle in castles)
-            {
-                if (castle.IsCastle && castle.Team == Team)
-                {
-                    AddOutpost(castle);
-                }
+                }   
             }
         }
 
@@ -374,11 +360,11 @@ namespace Player
             }
         }
 
-        public void AddOutpost(Outpost outpost) {
+        public void AddOutpostUI(Outpost outpost) {
             uiInGameScreenController.AddOutpost(outpost);
         }
 
-        public void RemoveOutpost(Outpost outpost) {
+        public void RemoveOutpostUI(Outpost outpost) {
             uiInGameScreenController.RemoveOutpost(outpost);
         }
     }
