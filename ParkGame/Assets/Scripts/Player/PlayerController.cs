@@ -84,6 +84,10 @@ namespace Player
                 gameObject.AddComponent<AudioListener>();
                 gameObject.AddComponent<AudioSource>();
                 AudioManager.Instance.notificationsSource = gameObject.GetComponent<AudioSource>();
+                
+                // for trumpet sounds only
+                gameObject.AddComponent<AudioSource>();
+                AudioManager.Instance.commandsSource = gameObject.GetComponent<AudioSource>();
             }
             else
             {

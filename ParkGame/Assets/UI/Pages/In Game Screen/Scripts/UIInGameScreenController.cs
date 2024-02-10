@@ -54,7 +54,8 @@ public class UIInGameScreenController : UIPageController
     private void Move()
     {
         gameManager.CommandMove();
-        AudioManager.Instance.PlayNotificationSFX("Fallback");
+        //AudioManager.Instance.PlayNotificationSFX("Fallback");
+        AudioManager.Instance.PlayCommandSFX("Fallback");
     }
 
     public void HideTilemap()
@@ -77,20 +78,23 @@ public class UIInGameScreenController : UIPageController
     private void Formation3()
     {
         gameManager.CommandMove();
-        AudioManager.Instance.PlayNotificationSFX("FormationFree");
+        //AudioManager.Instance.PlayNotificationSFX("FormationFree");
+        AudioManager.Instance.PlayCommandSFX("FormationFree");
 
     }
 
     private void Formation2() 
     {
         gameManager.FormationBox();
-        AudioManager.Instance.PlayNotificationSFX("FormationBox");
+        //AudioManager.Instance.PlayNotificationSFX("FormationBox");
+        AudioManager.Instance.PlayCommandSFX("FormationBox");
     }
 
     private void Formation1() 
     {
         gameManager.FormationCircle();
-        AudioManager.Instance.PlayNotificationSFX("FormationCircle");
+        //AudioManager.Instance.PlayNotificationSFX("FormationCircle");
+        AudioManager.Instance.PlayCommandSFX("FormationCircle");
     }
     
     private void Formations()
@@ -105,7 +109,8 @@ public class UIInGameScreenController : UIPageController
     private void Attack()
     {
         gameManager.CommandAttack();
-        AudioManager.Instance.PlayNotificationSFX("Attack");
+        //AudioManager.Instance.PlayNotificationSFX("Attack");
+        AudioManager.Instance.PlayCommandSFX("Attack");
     }
 
     public void ZoomOut()

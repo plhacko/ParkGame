@@ -98,16 +98,24 @@ public class AudioManager : MonoBehaviour
         yield break;
     }
 
+    public void PlayCommandSFX(string sfxName) {
+        if (!commandsSource) {
+            return;
+        }
+        if (commandsSource.isPlaying) {
+            StartCoroutine(FadeOutFadeIn(commandsSource, 0.3f, notificationsDict[sfxName]));
+            return;
+        }
+        commandsSource.PlayOneShot(notificationsDict[sfxName]);
+        Debug.Log("playing command: " + sfxName);
+    }
+
     public void PlayNotificationSFX(string sfxName) {
         if (!notificationsSource) {
             return;
         }
-        if (notificationsSource.isPlaying) {
-            StartCoroutine(FadeOutFadeIn(notificationsSource, 0.3f, notificationsDict[sfxName]));
-            return;
-        }
         notificationsSource.PlayOneShot(notificationsDict[sfxName]);
-        Debug.Log("playing " + sfxName);
+        Debug.Log("playing notification: " + sfxName);
     }
 
     private AudioClip GetRandomItem(List<AudioClip> lst) {
@@ -162,5 +170,6 @@ public class AudioManager : MonoBehaviour
     public void ToggleNotificationSound() {
         notificationsMute = !notificationsMute;
         notificationsSource.mute = notificationsMute;
+        commandsSource.mute = notificationsMute;
     }
 }

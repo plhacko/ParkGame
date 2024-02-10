@@ -105,7 +105,8 @@ namespace Managers
         [ClientRpc] 
         void PlaySFXNotificationClientRpc(string sfxName) 
         {
-            AudioManager.Instance.PlayNotificationSFX(sfxName);
+            // sounds starting the match
+            AudioManager.Instance.PlayCommandSFX(sfxName);
         }
 
         [ClientRpc]
