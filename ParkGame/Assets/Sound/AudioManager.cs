@@ -13,11 +13,17 @@ public class AudioManager : MonoBehaviour
         public AudioClip sound;
     }
 
+    [Serializable]
+    public class PoolItem {
+        public Vector3 position;
+        public AudioClip sound;
+    }
+
     public static AudioManager Instance;
 
-    [SerializeField] public AudioSource sfxSource;
-    [SerializeField] public AudioSource clickSfxSource;
-    //[SerializeField] private AudioSource notificationsSource;
+    [SerializeField] private AudioSource sfxSource;
+    [SerializeField] private AudioSource clickSfxSource;
+    public AudioSource commandsSource;
     public AudioSource notificationsSource;
 
     // formation fanfares: free, circle, box, attack, fallback
@@ -25,7 +31,6 @@ public class AudioManager : MonoBehaviour
     // notification sfx: {3. 2. 1. start game}, opening VP, got VP, got outpost, lost outpost
     // chimes: won game, lost game
     [Tooltip("{sfxName, clip}")] 
-    [SerializeField] private List<Sound> sfxList;
     [SerializeField] private List<Sound> notificationsList;
 
     [SerializeField] private List<AudioClip> pawnAttackSfx_list;
@@ -35,12 +40,12 @@ public class AudioManager : MonoBehaviour
     [SerializeField] private List<AudioClip> diedSfx_list;
     [SerializeField] private List<AudioClip> clickSfx_list;
 
-    private Dictionary<string, AudioClip> sfxDict = new Dictionary<string, AudioClip>();
     private Dictionary<string, AudioClip> notificationsDict = new Dictionary<string, AudioClip>();
-
+    private AudioPool pool;
     private bool sfxMute;
     private bool notificationsMute;
 
+    private int frameCounter;
     private void Awake() {
         if (Instance == null) {
             Instance = this;
@@ -51,13 +56,13 @@ public class AudioManager : MonoBehaviour
     }
 
     private void Start() {
+        pool = gameObject.GetComponentInChildren<AudioPool>();
         // list to dictionary
-        foreach (Sound s in sfxList) {
-            sfxDict[s.name] = s.sound;
-        }
         foreach (Sound s in notificationsList) {
             notificationsDict[s.name] = s.sound;
         }
+
+        frameCounter = 0;
     }
 
     public void MoveSource(AudioSource source, Vector3 position) {
@@ -69,17 +74,11 @@ public class AudioManager : MonoBehaviour
     }
 
     public void PlayClickSFX() {
+        // has its own audio source
         AudioClip sfx = GetRandomItem(clickSfx_list);
         clickSfxSource.PlayOneShot(sfx);
     }
-
-    public void PlaySFX(string sfxName) {
-
-        sfxSource.PlayOneShot(sfxDict[sfxName]);
-    }
-
     public void PlayNotificationSfx(AudioClip sfx) {
-        //notificationsSource.transform.position = playerPosition;
         notificationsSource.PlayOneShot(sfx);
     }
 
@@ -126,31 +125,31 @@ public class AudioManager : MonoBehaviour
     public void PlayPawnAttack(Vector3 position) {
         MoveSource(sfxSource, position);
         AudioClip sfx = GetRandomItem(pawnAttackSfx_list);
-        sfxSource.PlayOneShot(sfx);
+        pool.PlayAtPoint(sfx, position);
     }
 
     public void PlayArcherAttack(Vector3 position) {
         MoveSource(sfxSource, position);
         AudioClip sfx = GetRandomItem(archerAttackSfx_list);
-        sfxSource.PlayOneShot(sfx);
+        pool.PlayAtPoint(sfx, position);
     }
 
     public void PlayMolemanAttack(Vector3 position) {
         MoveSource(sfxSource, position);
         AudioClip sfx = GetRandomItem(molemanAttackSfx_list);
-        sfxSource.PlayOneShot(sfx);
+        pool.PlayAtPoint(sfx, position);
     }
 
     public void PlayDead(Vector3 position) {
         MoveSource(sfxSource, position);
         AudioClip sfx = GetRandomItem(diedSfx_list);
-        sfxSource.PlayOneShot(sfx);
+        pool.PlayAtPoint(sfx, position);
     }
 
     public void PlayClickOnDwarf(Vector3 position) {
         MoveSource(sfxSource, position);
         AudioClip sfx = GetRandomItem(soldierClickSfx_list);
-        sfxSource.PlayOneShot(sfx);
+        pool.PlayAtPoint(sfx, position);
     }
 
     public void ChangeSfxVolume(float volume) {

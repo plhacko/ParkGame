@@ -102,7 +102,6 @@ public class Announcer : NetworkBehaviour
     [ClientRpc]
     public void AnnounceEventClientRpc(FixedString512Bytes message, Color color, float duration = 45f, ClientRpcParams clientRpcParams = default)
     {
-        Debug.Log("___announce: " + message);
         AnnounceEvent(message.Value, color, duration);
     }
 }
