@@ -1,3 +1,4 @@
+using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -6,6 +7,7 @@ using UnityEngine.UI;
 public class DisconnectionHandler : NetworkBehaviour
 {
     [SerializeField] private GameObject hostDisconnectScreen;
+    [SerializeField] private GameObject disconnectingScreen;
     [SerializeField] private Button backToMenuButton;
     
     private void Start()
@@ -18,12 +20,24 @@ public class DisconnectionHandler : NetworkBehaviour
         if (IsHost)
         {
             sendDisconnectClientRpc();
+            Debug.Log("Sending bye");
         }
         else
         {
-            sendDisconnectServerRpc(NetworkManager.Singleton.LocalClientId);
-            NetworkManager.Singleton.Shutdown();
+            if (NetworkManager.Singleton.IsConnectedClient)
+            {
+                sendDisconnectServerRpc(NetworkManager.Singleton.LocalClientId);    
+            }
         }
+        
+        StartCoroutine(Disconnecting());
+    }
+    
+    IEnumerator Disconnecting()
+    {
+        disconnectingScreen.SetActive(true);
+        yield return new WaitForSeconds(1);
+        NetworkManager.Singleton.Shutdown();
         SceneManager.LoadScene("CleanUpScene");
     }
     
@@ -37,6 +51,8 @@ public class DisconnectionHandler : NetworkBehaviour
     private void sendDisconnectClientRpc()
     {
         if (IsHost) return;
+        
+        Debug.Log("Receive bye");
         hostDisconnectScreen.SetActive(true);
         NetworkManager.Singleton.Shutdown();
     }

@@ -118,7 +118,7 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
 
         if (playerData.Team == previousTeam)
         {
-            var playerController = playerManager.GetLocalPlayerController();
+            var playerController = playerManager?.GetLocalPlayerController();
             if (playerController != null)
             {
                 playerController.RemoveOutpostUI(this);
@@ -127,7 +127,7 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
 
         if (playerData.Team == newTeam)
         {
-            var playerController = playerManager.GetLocalPlayerController();
+            var playerController = playerManager?.GetLocalPlayerController();
             if (playerController != null)
             {
                 playerController.AddOutpostUI(this);
