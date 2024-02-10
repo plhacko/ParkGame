@@ -36,7 +36,8 @@ namespace Player
         private readonly NetworkVariable<int> _Team = new(-1);
         private readonly NetworkVariable<bool> _IsLocked = new(true);
         private readonly NetworkVariable<Vector3> _PointerPosition = new(Vector3.zero, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-        private readonly NetworkVariable<bool> _IsOnPath = new (false);
+        private readonly NetworkVariable<bool> _IsOnPath = new(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+        
         public int Team { get => _Team.Value; set => _Team.Value = value; }
         public string Name { get => _Name.Value.Value; set => _Name.Value = value; }
         public string FirebaseId { get => _FirebaseId.Value.Value; set => _FirebaseId.Value = value; }

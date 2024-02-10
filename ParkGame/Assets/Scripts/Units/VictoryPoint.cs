@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Managers;
 using Unity.Netcode;
 using UnityEngine;
@@ -16,13 +17,8 @@ public class VictoryPoint : NetworkBehaviour, IConquerable
     private bool isOpen;
     private bool isNotified;
     
-    private NetworkVariable<int>[] teamScores = {
-        new(),
-        new(),
-        new(),
-        new()
-    };
-
+    NetworkList<int> teamScores = new NetworkList<int>(new []{0, 0, 0, 0});
+    
     private SpriteRenderer spriteRenderer;
     private GameObject conquerModuleObject;
     private PlayerManager playerManager;
@@ -115,9 +111,9 @@ public class VictoryPoint : NetworkBehaviour, IConquerable
     {
         lastConquestTime = Time.time;
         CloseVPClientRpc();
-        
-        int numPoints = teamScores[team].Value + 1;
-        teamScores[team].Value = numPoints;
+
+        int numPoints = teamScores[team] + 1;
+        teamScores[team] = numPoints;
         
         OnPointConquered?.Invoke(team, numPoints);
     }
@@ -141,7 +137,7 @@ public class VictoryPoint : NetworkBehaviour, IConquerable
         var scores = new (int, int)[4];
         for (int i = 0; i < 4; i++)
         {
-            scores[i] = (i, this.teamScores[i].Value);
+            scores[i] = (i, this.teamScores[i]);
         }
 
         return scores;
