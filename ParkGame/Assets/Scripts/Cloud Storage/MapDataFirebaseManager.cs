@@ -155,6 +155,7 @@ public class MapDataFirebaseManager : MonoBehaviour
 
         OnMapUploaded.Invoke();
         Debug.Log($"Uploaded to {getUrlTask.Result}");
+        Debug.Log("Map id: " + mapMetaData.MapId);
     }
 
     // Delete the map data from Firebase Database and initiate the deletion of the map image

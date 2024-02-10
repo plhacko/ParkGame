@@ -1187,7 +1187,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_ProtocolType: 1
-  m_MaxPacketQueueSize: 128
+  m_MaxPacketQueueSize: 256
   m_MaxPayloadSize: 6144
   m_HeartbeatTimeoutMS: 500
   m_ConnectTimeoutMS: 1000
@@ -1441,7 +1441,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   GameSceneName: GameScene
-  mapId: 2374ab82-d7a2-4656-9f0e-71fec7e2dc4f
+  mapId: fa149843-7e01-472a-aab6-139f970ac78f
   startButton: {fileID: 444047100}
   hostButton: {fileID: 1236235280}
   clientButtonPrefab: {fileID: 4650210416855682124, guid: 3449cb50a2079d14ab07b032e1ec0b3f, type: 3}
