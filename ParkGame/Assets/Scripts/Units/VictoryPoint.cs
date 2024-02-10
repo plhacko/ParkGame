@@ -16,8 +16,8 @@ public class VictoryPoint : NetworkBehaviour, IConquerable
     private float lastConquestTime;
     private bool isOpen;
     private bool isNotified;
-    
-    NetworkList<int> teamScores = new NetworkList<int>(new []{0, 0, 0, 0});
+
+    private NetworkList<int> teamScores;
     
     private SpriteRenderer spriteRenderer;
     private GameObject conquerModuleObject;
@@ -42,6 +42,15 @@ public class VictoryPoint : NetworkBehaviour, IConquerable
 
     private void Awake()
     {
+        teamScores = new NetworkList<int>();
+        if (IsServer)
+        {
+            teamScores.Add(0);
+            teamScores.Add(0);
+            teamScores.Add(0);
+            teamScores.Add(0);
+        }
+        
         conquerModuleObject = GetComponentInChildren<ConquerModule>().gameObject;
         spriteRenderer = GetComponent<SpriteRenderer>();
         lastConquestTime = float.MaxValue;
