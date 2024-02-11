@@ -66,7 +66,7 @@ public class UIMainMenuController : UIPageController
     private void Create()
     {
         // click might not be heard here because of the loading!
-        AudioManager.Instance.PlayClickSFX();
+        // AudioManager.Instance.PlayClickSFX(); nope. tested it. didn't help. idk... so still hotcakefix. fcuk it
         SceneManager.LoadScene(createMapMenuSceneName, LoadSceneMode.Single);
     }
 
