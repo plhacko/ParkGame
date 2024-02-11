@@ -66,7 +66,7 @@ public class UIMainMenuController : UIPageController
     private void Create()
     {
         // click might not be heard here because of the loading!
-        // AudioManager.Instance.PlayClickSFX(); // fix doubleClickSfx: couldn't find the second call for the action
+        AudioManager.Instance.PlayClickSFX();
         SceneManager.LoadScene(createMapMenuSceneName, LoadSceneMode.Single);
     }
 
