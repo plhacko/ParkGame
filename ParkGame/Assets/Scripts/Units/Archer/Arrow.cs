@@ -32,7 +32,7 @@ namespace Units.Archer {
             spriteRenderer.DOColor(Color.white, 0.1f).SetDelay(delay);
 
             feathersSpriteRenderer.color = Color.clear;
-            Color teamColor = colorSettings.Colors[team].Color;
+            Color teamColor = team == -1 ? Color.white : colorSettings.Colors[team].Color;
             feathersSpriteRenderer.DOColor(teamColor, 0.1f).SetDelay(delay);
         }
 

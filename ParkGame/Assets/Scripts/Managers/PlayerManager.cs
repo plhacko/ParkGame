@@ -101,8 +101,11 @@ namespace Managers
             var outpostss = FindObjectsOfType<Outpost>();
             foreach (var outpost in outpostss)
             {
-                yield return new WaitForSeconds(0.5f);
-                outpost.SpawnInitialUnits();
+                if (outpost.IsCastle)
+                {
+                    yield return new WaitForSeconds(0.5f);
+                    outpost.SpawnInitialUnits();
+                }
             }
             
             invokeOnAllPlayersReadyClientRpc();
@@ -181,20 +184,9 @@ namespace Managers
             {
                 announcer.AnnounceEventClientRpc("Walk to your castles!", Color.white);
                 Debug.Log("All players scene loaded");
-
-                StartCoroutine(aaa());
-                // wait here
-                // OnAllPlayersSceneLoaded?.Invoke();
-                // spawnPlayers();
+                map.LoadMap();
+                spawnPlayers();
             }
-        }
-        
-        IEnumerator aaa()
-        {
-            yield return new WaitForSeconds(10);
-            map.LoadMap();
-            yield return new WaitForSeconds(10);
-            spawnPlayers();
         }
 
         private void spawnPlayers()
