@@ -45,9 +45,9 @@ public class AudioPool : MonoBehaviour {
         }
     }
 
-    public void ChangeSfxVolume(float vol) {
+    public void ChangeSfxVolume(float volume) {
         foreach (AudioSource s in audioSources) {
-            s.volume = vol;
+            s.volume = volume;
         }
     }
 }

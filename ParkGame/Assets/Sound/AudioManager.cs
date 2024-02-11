@@ -60,6 +60,17 @@ public class AudioManager : MonoBehaviour
         foreach (Sound s in notificationsList) {
             notificationsDict[s.name] = s.sound;
         }
+        ResetSoundSettings();
+    }
+
+    // after leaving the game -> unmute everything
+    public void ResetSoundSettings() {
+        Debug.Log("RESET SOUND SETTINGS");
+        clickSfxSource.mute = false;
+        sfxSource.mute = false;
+        notificationsSource.mute = false;
+        commandsSource.mute = false;
+        pool.ToggleSfx(false);
     }
 
     public void MoveSource(AudioSource source, Vector3 position) {
@@ -151,11 +162,13 @@ public class AudioManager : MonoBehaviour
 
     public void ChangeSfxVolume(float volume) {
         sfxSource.volume = volume;
+        clickSfxSource.volume = volume;
+        pool.ChangeSfxVolume(volume);
     }
 
     public void ChangeNotificationsVolume(float volume) {
         notificationsSource.volume = volume;
-        pool.ChangeSfxVolume(volume);
+        commandsSource.volume = volume;
     }
 
     public void ToggleSfx() {
