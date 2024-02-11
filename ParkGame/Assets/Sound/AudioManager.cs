@@ -21,7 +21,6 @@ public class AudioManager : MonoBehaviour
 
     public static AudioManager Instance;
 
-    [SerializeField] private AudioSource sfxSource;
     [SerializeField] private AudioSource clickSfxSource;
     public AudioSource commandsSource;
     public AudioSource notificationsSource;
@@ -66,25 +65,19 @@ public class AudioManager : MonoBehaviour
     // after leaving the game -> unmute everything
     public void ResetSoundSettings() {
         clickSfxSource.mute = false;
-        sfxSource.mute = false;
         if (notificationsSource) { notificationsSource.mute = false; }
         if (commandsSource) { commandsSource.mute = false; }
         pool.ToggleSfx(false);
     }
 
-    public void MoveSource(AudioSource source, Vector3 position) {
-        source.transform.position = position;
-    }
-
     private void PoolSfxBasedOnCommander(AudioClip sfx, Vector3 position) {
+        position.z = notificationsSource.transform.position.z; // move to the same level as commander
         float distance = Vector3.Distance(position, notificationsSource.transform.position);
         if (distance <= 10) {
             pool.PlayAtPoint(sfx, position);
         }
     }
-    public void PlaySFX(AudioClip sfx) {
-        sfxSource.PlayOneShot(sfx);
-    }
+
 
     public void PlayClickSFX() {
         // has its own audio source
@@ -136,42 +129,31 @@ public class AudioManager : MonoBehaviour
     }
 
     public void PlayPawnAttack(Vector3 position) {
-        MoveSource(sfxSource, position);
         AudioClip sfx = GetRandomItem(pawnAttackSfx_list);
         PoolSfxBasedOnCommander(sfx, position);
-        //pool.PlayAtPoint(sfx, position);
     }
 
     public void PlayArcherAttack(Vector3 position) {
-        MoveSource(sfxSource, position);
         AudioClip sfx = GetRandomItem(archerAttackSfx_list);
         PoolSfxBasedOnCommander(sfx, position);
-        //pool.PlayAtPoint(sfx, position);
     }
 
     public void PlayMolemanAttack(Vector3 position) {
-        MoveSource(sfxSource, position);
         AudioClip sfx = GetRandomItem(molemanAttackSfx_list);
         PoolSfxBasedOnCommander(sfx, position);
-        //pool.PlayAtPoint(sfx, position);
     }
 
     public void PlayDead(Vector3 position) {
-        MoveSource(sfxSource, position);
         AudioClip sfx = GetRandomItem(diedSfx_list);
         PoolSfxBasedOnCommander(sfx, position);
-        //pool.PlayAtPoint(sfx, position);
     }
 
     public void PlayClickOnDwarf(Vector3 position) {
-        MoveSource(sfxSource, position);
         AudioClip sfx = GetRandomItem(soldierClickSfx_list);
         PoolSfxBasedOnCommander(sfx, position);
-        //pool.PlayAtPoint(sfx, position);
     }
 
     public void ChangeSfxVolume(float volume) {
-        sfxSource.volume = volume;
         clickSfxSource.volume = volume;
         pool.ChangeSfxVolume(volume);
     }
@@ -183,7 +165,6 @@ public class AudioManager : MonoBehaviour
 
     public void ToggleSfx() {
         sfxMute = !sfxMute;
-        sfxSource.mute = sfxMute;
         clickSfxSource.mute = sfxMute;
 
         pool.ToggleSfx(sfxMute);
