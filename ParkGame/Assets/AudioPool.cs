@@ -5,13 +5,6 @@ public class AudioPool : MonoBehaviour {
     private List<AudioSource> audioSourcesFree = new List<AudioSource>(); // all free sources
     private int lastCheckFrame = -1;
 
-    private void Start() {
-        audioSourcesFree.Clear();
-        foreach (var s in audioSources) {
-            audioSourcesFree.Add(s);
-        }
-    }
-
     private void CheckInUse() {
         foreach (AudioSource source in audioSources) {
             if (!source.isPlaying && !audioSourcesFree.Contains(source)) {

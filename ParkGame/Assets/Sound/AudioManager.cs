@@ -54,22 +54,21 @@ public class AudioManager : MonoBehaviour
         }
     }
 
-    private void Start() {
-        pool = gameObject.GetComponentInChildren<AudioPool>();
+    private void OnEnable() {
         // list to dictionary
         foreach (Sound s in notificationsList) {
             notificationsDict[s.name] = s.sound;
         }
+        pool = gameObject.GetComponentInChildren<AudioPool>();
         ResetSoundSettings();
     }
 
     // after leaving the game -> unmute everything
     public void ResetSoundSettings() {
-        Debug.Log("RESET SOUND SETTINGS");
         clickSfxSource.mute = false;
         sfxSource.mute = false;
-        notificationsSource.mute = false;
-        commandsSource.mute = false;
+        if (notificationsSource) { notificationsSource.mute = false; }
+        if (commandsSource) { commandsSource.mute = false; }
         pool.ToggleSfx(false);
     }
 

@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class ResetSoundSettings : MonoBehaviour
 {
-    private void Awake() {
+    private void Start() {
         AudioManager.Instance.ResetSoundSettings();
     }
 }
