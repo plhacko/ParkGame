@@ -166,7 +166,7 @@ public class MapPicker : MonoBehaviour
     
     private void showCurrentMap()
     {
-        if(currentMapIndex >= mapDatas.Count) return;
+        if(currentMapIndex < 0 || currentMapIndex >= mapDatas.Count) return;
         
         MapData mapData = mapDatas[currentMapIndex];
         MapMetaData mapMetaData = mapData.MetaData;

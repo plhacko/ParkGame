@@ -152,10 +152,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   InitialTeam: -1
   MaxUnits: 6
+  InitialArchers: 2
+  InitialHorsemans: 1
+  InitialPawns: 3
   SpawnTime: 2.5
   UnitPrefab: {fileID: 2149011059489662585, guid: 767d4c3ee472ffe4ea667aae7025b849, type: 3}
-  ArcherPrefab: {fileID: 0}
-  HorsemanPrefab: {fileID: 0}
+  ArcherPrefab: {fileID: 2149011059489662585, guid: d7dabec280dc4e54d93803fe26a0bb73, type: 3}
+  HorsemanPrefab: {fileID: 5515698993845621550, guid: 8cfe5a199b3c20445bc24ab6439cf170, type: 3}
   PawnIcon: {fileID: 21300000, guid: ed6f231de5f144c48833cc832986b875, type: 3}
   ArcherIcon: {fileID: 0}
   HorsemanIcon: {fileID: 0}
@@ -163,7 +166,6 @@ MonoBehaviour:
   revealer: {fileID: 3827981197028292139}
   colorSettings: {fileID: 11400000, guid: 540e0efb517eb1d4f8598ecd8326dff1, type: 2}
   switchCollider: {fileID: 0}
-  TimeBetweenToggles: 0
   _Team:
     m_InternalValue: -10
   _IsCastle:

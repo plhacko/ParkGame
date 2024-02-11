@@ -25,26 +25,9 @@ public class Map : MonoBehaviour
 
         mapCreator.GetComponent<Drawable>().enabled = false;
         playerManager = FindObjectOfType<PlayerManager>();
-        
-        if (NetworkManager.Singleton.IsHost)
-        {
-            playerManager.OnAllPlayersSceneLoaded += loadMap;   
-        }
-        else
-        {
-            loadMap();
-        }
     }
 
-    private void OnDestroy()
-    {
-        if (playerManager)
-        {
-            playerManager.OnAllPlayersSceneLoaded -= loadMap;   
-        }
-    }
-
-    private void loadMap()
+    public void LoadMap()
     {
         mapCreator.CreateTilemapFromFetchedMap(LobbyManager.Singleton.MapData);
         GPSMap = mapCreator.BaseMap.gameObject;

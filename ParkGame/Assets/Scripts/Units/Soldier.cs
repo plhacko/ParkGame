@@ -249,7 +249,7 @@ public class Soldier : NetworkBehaviour, ISoldier {
         // following is done only on server
         if (!IsServer) { return; }
 
-        if (gameSessionManager.IsOver) return;
+        if (gameSessionManager.IsOver || !IsSpawned) return;
 
         // check for a Commander
         if (CommanderToFollow == null) {

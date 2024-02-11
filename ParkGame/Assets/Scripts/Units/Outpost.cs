@@ -7,8 +7,10 @@ using Player;
 
 public class Outpost : NetworkBehaviour, ICommander, IConquerable
 {
-    [SerializeField] int InitialTeam;
     [SerializeField] int MaxUnits = 3; // in total
+    [SerializeField] int InitialArchers = 3;
+    [SerializeField] int InitialHorsemans = 3;
+    [SerializeField] int InitialPawns = 3;
     [SerializeField] float SpawnTime = 4; // 4s
     [SerializeField] GameObject UnitPrefab;
     [SerializeField] GameObject ArcherPrefab;
@@ -30,7 +32,7 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
     [SerializeField] NetworkVariable<int> _Team = new(-1);
     public int Team { get => _Team.Value; set => _Team.Value = value; }
     
-    public bool IsCastle { get => _IsCastle.Value; private set => _IsCastle.Value = value; }
+    public bool IsCastle { get => _IsCastle.Value; set => _IsCastle.Value = value; }
     
     [SerializeField] NetworkVariable<bool> _IsCastle = new();
     
@@ -58,6 +60,7 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
         { Soldier.UnitType.Horseman, 0 }
     };
     private Announcer announcer;
+    private bool isSpawning = false;
 
     public override void OnNetworkSpawn()
     {
@@ -65,23 +68,20 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
         initialize();
     }
 
-    private void initialize()
+    public void initialize()
     {
-        if (IsServer)
-        {
-            _IsCastle.Value = IsCastle;
-            arrowTimer = arrowCooldownTime;
-        }
-        
         gameSessionManager = FindObjectOfType<GameSessionManager>();
         playerManager = FindObjectOfType<PlayerManager>();
         announcer = FindObjectOfType<Announcer>();
         changeMaterial = GetComponent<ChangeMaterial>();
         sr = GetComponent<SpriteRenderer>();
-        if (IsCastle) {
-            shooting = GetComponent<ShootScript>();
-            enemyObserver = GetComponentInChildren<EnemyObserver>();
+        
+        if (IsServer)
+        {
+            arrowTimer = arrowCooldownTime;
         }
+        shooting = GetComponent<ShootScript>();
+        enemyObserver = GetComponentInChildren<EnemyObserver>();
 
         if (InitOutpostUnitType == Soldier.UnitType.Archer)
         {
@@ -90,15 +90,31 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
         //sr.sprite = ChangeSpawnType(counter);
         
         _Team.OnValueChanged += onTeamChanged;
+    }
 
-        if (IsServer)
+    public void SpawnInitialUnits()
+    {
+        Debug.LogWarning("Spawning initial units in outpost + " + InitialHorsemans + " horsemen. " + InitialArchers + " archers. " + InitialPawns + " pawns.");
+        
+        outpostUnitType = Soldier.UnitType.Horseman;
+        for (int i = 0; i < InitialHorsemans; i++)
         {
-            Team = InitialTeam;   
+            SpawnUnit();
         }
-        else
+        
+        outpostUnitType = Soldier.UnitType.Archer;
+        for (int i = 0; i < InitialArchers; i++)
         {
-            onTeamChanged(-1, Team);
+            SpawnUnit();   
         }
+        
+        outpostUnitType = Soldier.UnitType.Pawn;
+        for (int i = 0; i < InitialPawns; i++)
+        {
+            SpawnUnit();
+        }
+
+        isSpawning = true;
     }
 
     public void RegisterOnTeamChange(Action action)
@@ -171,8 +187,8 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
     void Update()
     {
         // updating only on server
-        if (!IsServer) 
-        { return; }
+        if (!IsServer || !isSpawning) { return; }
+        
         if (IsCastle) {
             arrowTimer -= Time.deltaTime;
             if (arrowTimer <= 0) {
@@ -229,11 +245,6 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
         playerManager.AddSoldierToTeam(Team, unit.transform);
     }
 
-    public void SetCastle(int team)
-    {
-        IsCastle = true;
-        InitialTeam = team;
-    }
 
     void ICommander.ReportFollowing(NetworkObjectReference networkObjectReference)
     {

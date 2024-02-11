@@ -376,26 +376,36 @@ public class CreateMapWithOverlay : NetworkBehaviour
     }
     private void SetStructurePrefabs(Dictionary<Vector3Int, GameObject> structuresToAssign)
     {
-        CheckStructureDistances(structuresToAssign);
-        var castleTeamID = 0;
-        TileBase[] forbiddenTiles = {boundsTile, wallTile};
-        foreach (var kvp in structuresToAssign)
+        if (IsServer)
         {
-            if (!IsStructureAccessible(kvp.Key, forbiddenTiles))
-                errorMessages.Add("Cannot place structure out of map bounds");
-            if (NetworkManager.Singleton.IsServer)
+            CheckStructureDistances(structuresToAssign);
+            var castleTeamID = 0;
+            TileBase[] forbiddenTiles = { boundsTile, wallTile };
+            foreach (var kvp in structuresToAssign)
             {
+                if (!IsStructureAccessible(kvp.Key, forbiddenTiles))
+                    errorMessages.Add("Cannot place structure out of map bounds");
+                
                 var structure = Instantiate(kvp.Value, gridLayout.CellToWorld(kvp.Key), Quaternion.identity);
+                structure.GetComponent<NetworkObject>().Spawn();
+
+                var outpost = structure.GetComponent<Outpost>();
+                if (outpost == null) continue;
+
                 if (kvp.Value == castlePrefab)
                 {
-                    structure.GetComponent<Outpost>().SetCastle(castleTeamID);
+                    outpost.Team = castleTeamID;
+                    outpost.IsCastle = true;
                     castleTeamID++;
                 }
-                var networkObject = structure.GetComponent<NetworkObject>();
-                networkObject.Spawn();
+                else
+                {
+                    outpost.Team = -1;
+                }
             }
         }
     }
+    
     private void SetStructureTiles(Dictionary<Vector3Int, TileBase> structuresToAssign,List<string> errorMessages)
     {
         var structureRadius = 2;

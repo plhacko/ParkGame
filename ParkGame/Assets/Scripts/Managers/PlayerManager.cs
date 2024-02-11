@@ -24,7 +24,6 @@ namespace Managers
         private Announcer announcer;
         private PlayerController localPlayerController;
         
-        public event Action OnAllPlayersSceneLoaded = null;
         public event Action OnAllPlayersReady = null;
         
         // Only on the host
@@ -53,6 +52,7 @@ namespace Managers
             for (int i = 0; i < 4; i++) {
                 unitsInTeam[i] = new List<Transform>();
             }
+            unitsInTeam[-1] = new List<Transform>();
         }
 
         private void Update()
@@ -98,6 +98,13 @@ namespace Managers
                 controller.IsLocked = false;
             }
             
+            var outpostss = FindObjectsOfType<Outpost>();
+            foreach (var outpost in outpostss)
+            {
+                yield return new WaitForSeconds(0.5f);
+                outpost.SpawnInitialUnits();
+            }
+            
             invokeOnAllPlayersReadyClientRpc();
         }
 
@@ -136,7 +143,20 @@ namespace Managers
         {
             playerPointerPlacer = FindObjectOfType<PlayerPointerPlacer>();
             playerPointerPlacer.SetReadyColor(false);
-            isSceneLoaded = true;   
+            isSceneLoaded = true;
+            if (IsHost)
+            {
+                sendHostMapLoadedClientRpc();
+            }
+        }
+
+        [ClientRpc]
+        private void sendHostMapLoadedClientRpc()
+        {
+            if (!IsHost)
+            {
+                map.LoadMap();   
+            }
         }
 
         public override void OnNetworkDespawn()
@@ -161,9 +181,20 @@ namespace Managers
             {
                 announcer.AnnounceEventClientRpc("Walk to your castles!", Color.white);
                 Debug.Log("All players scene loaded");
-                OnAllPlayersSceneLoaded?.Invoke();
-                spawnPlayers();
+
+                StartCoroutine(aaa());
+                // wait here
+                // OnAllPlayersSceneLoaded?.Invoke();
+                // spawnPlayers();
             }
+        }
+        
+        IEnumerator aaa()
+        {
+            yield return new WaitForSeconds(10);
+            map.LoadMap();
+            yield return new WaitForSeconds(10);
+            spawnPlayers();
         }
 
         private void spawnPlayers()
@@ -250,7 +281,7 @@ namespace Managers
         }
 
         public bool CanAddSoldierToTeam(int team) {
-            if (team < 0 || team > 3) {
+            if (team < -1 || team > 3) {
                 return false; 
             }
             if (unitsInTeam[team].Count >= unitCapacity) {
@@ -260,13 +291,13 @@ namespace Managers
         }
 
         public void AddSoldierToTeam(int team, Transform unit) {
+            if (team < -1 || team > 3) { return; }
             unitsInTeam[team].Add(unit);
         }
 
         public void RemoveSoldierFromTeam(int team, Transform unit) {
-            if (team < 0 || team > 3) { return; }
+            if (team < -1 || team > 3) { return; }
             unitsInTeam[team]?.Remove(unit);
         }
-
     }
 }
