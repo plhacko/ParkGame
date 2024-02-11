@@ -93,6 +93,7 @@ public class Soldier : NetworkBehaviour, ISoldier {
     public SoldierCommand Command { get => _SoldierCommand.Value; set => _SoldierCommand.Value = value; }
 
     public UnityEvent CommandChangedEvent;
+    public UnityEvent SpeakEvent;
     private bool isDead;
     private float timeToDeath;
 
@@ -456,6 +457,7 @@ public class Soldier : NetworkBehaviour, ISoldier {
                 ReturningToOutpost = false;
                 SetCommanderToFollow(playerController.gameObject.transform);
                 NewCommand(SoldierCommand.Following);
+                SpeakEvent.Invoke();
                 FormationType = CommanderToFollow.GetComponent<ICommander>().GetFormation(); // get type of formation
                 FormationFromFollowedCommander = CommanderToFollow.GetComponent<Formation>();
 
@@ -469,6 +471,7 @@ public class Soldier : NetworkBehaviour, ISoldier {
                 var closestOutpost = ClosestOutpost();
                 SetCommanderToFollow(closestOutpost);
                 NewCommand(SoldierCommand.Following);
+                SpeakEvent.Invoke();
                 NavMeshFormationSwitch(false, FormationFromFollowedCommander, FormationType.Free);
             }
         }
