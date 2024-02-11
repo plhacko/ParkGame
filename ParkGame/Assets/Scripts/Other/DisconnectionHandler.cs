@@ -15,6 +15,12 @@ public class DisconnectionHandler : NetworkBehaviour
     {
         backToMenuButton.onClick.AddListener(DisconnectAndLeave);
     }
+
+    public void Leave()
+    {
+        NetworkManager.Singleton.Shutdown();
+        SceneManager.LoadScene("CleanUpScene");
+    }
     
     public void DisconnectAndLeave()
     {
@@ -38,8 +44,7 @@ public class DisconnectionHandler : NetworkBehaviour
     {
         disconnectingScreen.SetActive(true);
         yield return new WaitForSeconds(1);
-        NetworkManager.Singleton.Shutdown();
-        SceneManager.LoadScene("CleanUpScene");
+        Leave();
     }
     
     [ServerRpc(RequireOwnership = false)]

@@ -60,7 +60,7 @@ public class UIEndGameScreenController : UIPageController
     private void BackToMenu()
     {
         AudioManager.Instance.PlayClickSFX();
-        disconnectionHandler.DisconnectAndLeave();
+        disconnectionHandler.Leave();
     }
 
     public override void OnEnter()
