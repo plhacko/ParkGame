@@ -309,7 +309,6 @@ MonoBehaviour:
   - {fileID: 5345427510153531033}
   - {fileID: 5007737365405801524}
   - {fileID: 724770571687981084}
-  audioSourcesFree: []
 --- !u!1 &8470632620032945099
 GameObject:
   m_ObjectHideFlags: 0
@@ -398,7 +397,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 1
+      value: 0
       inSlope: 0
       outSlope: 0
       tangentMode: 0

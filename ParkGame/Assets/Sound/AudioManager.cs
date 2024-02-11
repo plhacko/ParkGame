@@ -21,7 +21,6 @@ public class AudioManager : MonoBehaviour
 
     public static AudioManager Instance;
 
-    [SerializeField] private AudioSource sfxSource;
     [SerializeField] private AudioSource clickSfxSource;
     public AudioSource commandsSource;
     public AudioSource notificationsSource;
@@ -45,7 +44,6 @@ public class AudioManager : MonoBehaviour
     private bool sfxMute;
     private bool notificationsMute;
 
-    private int frameCounter;
     private void Awake() {
         if (Instance == null) {
             Instance = this;
@@ -55,23 +53,31 @@ public class AudioManager : MonoBehaviour
         }
     }
 
-    private void Start() {
-        pool = gameObject.GetComponentInChildren<AudioPool>();
+    private void OnEnable() {
         // list to dictionary
         foreach (Sound s in notificationsList) {
             notificationsDict[s.name] = s.sound;
         }
-
-        frameCounter = 0;
+        pool = gameObject.GetComponentInChildren<AudioPool>();
+        ResetSoundSettings();
     }
 
-    public void MoveSource(AudioSource source, Vector3 position) {
-        source.transform.position = position;
+    // after leaving the game -> unmute everything
+    public void ResetSoundSettings() {
+        clickSfxSource.mute = false;
+        if (notificationsSource) { notificationsSource.mute = false; }
+        if (commandsSource) { commandsSource.mute = false; }
+        pool.ToggleSfx(false);
     }
 
-    public void PlaySFX(AudioClip sfx) {
-        sfxSource.PlayOneShot(sfx);
+    private void PoolSfxBasedOnCommander(AudioClip sfx, Vector3 position) {
+        position.z = notificationsSource.transform.position.z; // move to the same level as commander
+        float distance = Vector3.Distance(position, notificationsSource.transform.position);
+        if (distance <= 10) {
+            pool.PlayAtPoint(sfx, position);
+        }
     }
+
 
     public void PlayClickSFX() {
         // has its own audio source
@@ -123,47 +129,45 @@ public class AudioManager : MonoBehaviour
     }
 
     public void PlayPawnAttack(Vector3 position) {
-        MoveSource(sfxSource, position);
         AudioClip sfx = GetRandomItem(pawnAttackSfx_list);
-        pool.PlayAtPoint(sfx, position);
+        PoolSfxBasedOnCommander(sfx, position);
     }
 
     public void PlayArcherAttack(Vector3 position) {
-        MoveSource(sfxSource, position);
         AudioClip sfx = GetRandomItem(archerAttackSfx_list);
-        pool.PlayAtPoint(sfx, position);
+        PoolSfxBasedOnCommander(sfx, position);
     }
 
     public void PlayMolemanAttack(Vector3 position) {
-        MoveSource(sfxSource, position);
         AudioClip sfx = GetRandomItem(molemanAttackSfx_list);
-        pool.PlayAtPoint(sfx, position);
+        PoolSfxBasedOnCommander(sfx, position);
     }
 
     public void PlayDead(Vector3 position) {
-        MoveSource(sfxSource, position);
         AudioClip sfx = GetRandomItem(diedSfx_list);
-        pool.PlayAtPoint(sfx, position);
+        PoolSfxBasedOnCommander(sfx, position);
     }
 
     public void PlayClickOnDwarf(Vector3 position) {
-        MoveSource(sfxSource, position);
         AudioClip sfx = GetRandomItem(soldierClickSfx_list);
-        pool.PlayAtPoint(sfx, position);
+        PoolSfxBasedOnCommander(sfx, position);
     }
 
     public void ChangeSfxVolume(float volume) {
-        sfxSource.volume = volume;
+        clickSfxSource.volume = volume;
+        pool.ChangeSfxVolume(volume);
     }
 
     public void ChangeNotificationsVolume(float volume) {
         notificationsSource.volume = volume;
+        commandsSource.volume = volume;
     }
 
     public void ToggleSfx() {
         sfxMute = !sfxMute;
-        sfxSource.mute = sfxMute;
         clickSfxSource.mute = sfxMute;
+
+        pool.ToggleSfx(sfxMute);
     }
 
     public void ToggleNotificationSound() {

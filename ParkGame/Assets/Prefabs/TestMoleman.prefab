@@ -249,7 +249,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   NavMeshStatusNow: 0
   InitialHP: 8
-  MovementSpeed: 3.5
+  BaseMovementSpeed: 1
+  HorseManSpeed: 1.5
+  PathMovementSpeedMultiplier: 1.5
   InnerDistanceFromCommander: 1
   OuterDistanceFromCommander: 3
   DefendDistanceFromCommander: 4
@@ -259,7 +261,6 @@ MonoBehaviour:
   Attackcooldown: 2
   Damage: 3
   TypeOfUnit: 2
-  DeathFadeTime: 2
   revealer: {fileID: 1578417005418209535}
   colorSettings: {fileID: 11400000, guid: 540e0efb517eb1d4f8598ecd8326dff1, type: 2}
   ClosestEnemyDEBUG: 0
@@ -273,6 +274,9 @@ MonoBehaviour:
   _SoldierCommand:
     m_InternalValue: 0
   CommandChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  SpeakEvent:
     m_PersistentCalls:
       m_Calls: []
 --- !u!70 &3140456785125691185
@@ -727,10 +731,34 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4987884346027046658, guid: 577b5a6b0cefddb4a904b313f5a4c42e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5134203215357225472}
   m_SourcePrefab: {fileID: 100100000, guid: 577b5a6b0cefddb4a904b313f5a4c42e, type: 3}
 --- !u!4 &6209281167571267306 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8977763003683237097, guid: 577b5a6b0cefddb4a904b313f5a4c42e, type: 3}
   m_PrefabInstance: {fileID: 3079520621310591491}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &8035584823749326081 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4987884346027046658, guid: 577b5a6b0cefddb4a904b313f5a4c42e, type: 3}
+  m_PrefabInstance: {fileID: 3079520621310591491}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &5134203215357225472
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8035584823749326081}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d73749522688864cbb512996ef27c8f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  speakEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  SpeakIcon: {fileID: 21300000, guid: 7513d4fcf9cf83144be3aff655bf1b4a, type: 3}

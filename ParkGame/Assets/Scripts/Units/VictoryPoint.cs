@@ -43,14 +43,6 @@ public class VictoryPoint : NetworkBehaviour, IConquerable
     private void Awake()
     {
         teamScores = new NetworkList<int>();
-        if (IsServer)
-        {
-            teamScores.Add(0);
-            teamScores.Add(0);
-            teamScores.Add(0);
-            teamScores.Add(0);
-        }
-        
         conquerModuleObject = GetComponentInChildren<ConquerModule>().gameObject;
         spriteRenderer = GetComponent<SpriteRenderer>();
         lastConquestTime = float.MaxValue;
@@ -66,6 +58,12 @@ public class VictoryPoint : NetworkBehaviour, IConquerable
 
     private void Start()
     {
+        if (IsServer) {
+            teamScores.Add(0);
+            teamScores.Add(0);
+            teamScores.Add(0);
+            teamScores.Add(0);
+        }
         if (IsServer)
         {
             CloseVPClientRpc();
@@ -120,7 +118,7 @@ public class VictoryPoint : NetworkBehaviour, IConquerable
     {
         lastConquestTime = Time.time;
         CloseVPClientRpc();
-
+        
         int numPoints = teamScores[team] + 1;
         teamScores[team] = numPoints;
         

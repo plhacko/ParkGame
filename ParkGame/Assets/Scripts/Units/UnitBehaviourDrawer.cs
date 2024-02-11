@@ -4,8 +4,8 @@ using UnityEngine.Events;
 public class UnitBehaviourDrawer : MonoBehaviour
 {
     private Soldier TheSoldier;
-    public SpriteRenderer SpriteRenderer;
-    public UnityEvent BehaviourEvent;
+    private SpriteRenderer SpriteRenderer;
+    private UnityEvent BehaviourEvent;
     [SerializeField] Sprite EmptyIcon;
     [SerializeField] Sprite AttackIcon;
     [SerializeField] Sprite IdleIcon;
@@ -32,13 +32,14 @@ public class UnitBehaviourDrawer : MonoBehaviour
                 icon = IdleIcon;
                 break;
             case SoldierCommand.Following:
-                icon = MovementIcon;
-                break;
-                icon = FormationIcon;
+                //icon = MovementIcon;
+                icon = EmptyIcon;
                 break;
             case SoldierCommand.Die:
-            default:
                 icon = DeathIcon;
+                break;
+            default:
+                icon = EmptyIcon;
                 break;
         }
 
