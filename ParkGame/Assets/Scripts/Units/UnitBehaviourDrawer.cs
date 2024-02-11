@@ -4,8 +4,8 @@ using UnityEngine.Events;
 public class UnitBehaviourDrawer : MonoBehaviour
 {
     private Soldier TheSoldier;
-    public SpriteRenderer SpriteRenderer;
-    public UnityEvent BehaviourEvent;
+    private SpriteRenderer SpriteRenderer;
+    private UnityEvent BehaviourEvent;
     [SerializeField] Sprite EmptyIcon;
     [SerializeField] Sprite AttackIcon;
     [SerializeField] Sprite IdleIcon;

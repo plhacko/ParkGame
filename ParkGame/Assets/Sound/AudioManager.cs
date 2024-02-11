@@ -45,7 +45,6 @@ public class AudioManager : MonoBehaviour
     private bool sfxMute;
     private bool notificationsMute;
 
-    private int frameCounter;
     private void Awake() {
         if (Instance == null) {
             Instance = this;
@@ -61,8 +60,6 @@ public class AudioManager : MonoBehaviour
         foreach (Sound s in notificationsList) {
             notificationsDict[s.name] = s.sound;
         }
-
-        frameCounter = 0;
     }
 
     public void MoveSource(AudioSource source, Vector3 position) {
