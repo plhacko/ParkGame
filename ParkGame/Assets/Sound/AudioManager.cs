@@ -76,6 +76,12 @@ public class AudioManager : MonoBehaviour
         source.transform.position = position;
     }
 
+    private void PoolSfxBasedOnCommander(AudioClip sfx, Vector3 position) {
+        float distance = Vector3.Distance(position, notificationsSource.transform.position);
+        if (distance <= 10) {
+            pool.PlayAtPoint(sfx, position);
+        }
+    }
     public void PlaySFX(AudioClip sfx) {
         sfxSource.PlayOneShot(sfx);
     }
@@ -132,31 +138,36 @@ public class AudioManager : MonoBehaviour
     public void PlayPawnAttack(Vector3 position) {
         MoveSource(sfxSource, position);
         AudioClip sfx = GetRandomItem(pawnAttackSfx_list);
-        pool.PlayAtPoint(sfx, position);
+        PoolSfxBasedOnCommander(sfx, position);
+        //pool.PlayAtPoint(sfx, position);
     }
 
     public void PlayArcherAttack(Vector3 position) {
         MoveSource(sfxSource, position);
         AudioClip sfx = GetRandomItem(archerAttackSfx_list);
-        pool.PlayAtPoint(sfx, position);
+        PoolSfxBasedOnCommander(sfx, position);
+        //pool.PlayAtPoint(sfx, position);
     }
 
     public void PlayMolemanAttack(Vector3 position) {
         MoveSource(sfxSource, position);
         AudioClip sfx = GetRandomItem(molemanAttackSfx_list);
-        pool.PlayAtPoint(sfx, position);
+        PoolSfxBasedOnCommander(sfx, position);
+        //pool.PlayAtPoint(sfx, position);
     }
 
     public void PlayDead(Vector3 position) {
         MoveSource(sfxSource, position);
         AudioClip sfx = GetRandomItem(diedSfx_list);
-        pool.PlayAtPoint(sfx, position);
+        PoolSfxBasedOnCommander(sfx, position);
+        //pool.PlayAtPoint(sfx, position);
     }
 
     public void PlayClickOnDwarf(Vector3 position) {
         MoveSource(sfxSource, position);
         AudioClip sfx = GetRandomItem(soldierClickSfx_list);
-        pool.PlayAtPoint(sfx, position);
+        PoolSfxBasedOnCommander(sfx, position);
+        //pool.PlayAtPoint(sfx, position);
     }
 
     public void ChangeSfxVolume(float volume) {
