@@ -32,13 +32,14 @@ public class UnitBehaviourDrawer : MonoBehaviour
                 icon = IdleIcon;
                 break;
             case SoldierCommand.Following:
-                icon = MovementIcon;
-                break;
-                icon = FormationIcon;
+                //icon = MovementIcon;
+                icon = EmptyIcon;
                 break;
             case SoldierCommand.Die:
-            default:
                 icon = DeathIcon;
+                break;
+            default:
+                icon = EmptyIcon;
                 break;
         }
 
