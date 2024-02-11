@@ -155,12 +155,15 @@ public class AudioManager : MonoBehaviour
 
     public void ChangeNotificationsVolume(float volume) {
         notificationsSource.volume = volume;
+        pool.ChangeSfxVolume(volume);
     }
 
     public void ToggleSfx() {
         sfxMute = !sfxMute;
         sfxSource.mute = sfxMute;
         clickSfxSource.mute = sfxMute;
+
+        pool.ToggleSfx(sfxMute);
     }
 
     public void ToggleNotificationSound() {

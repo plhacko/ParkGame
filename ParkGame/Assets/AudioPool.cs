@@ -4,6 +4,7 @@ public class AudioPool : MonoBehaviour {
     [SerializeField] private List<AudioSource> audioSources = new List<AudioSource>(); // all sources: busy + free
     private List<AudioSource> audioSourcesFree = new List<AudioSource>(); // all free sources
     private int lastCheckFrame = -1;
+
     private void Start() {
         audioSourcesFree.Clear();
         foreach (var s in audioSources) {
@@ -35,6 +36,18 @@ public class AudioPool : MonoBehaviour {
 
         if (audioSourcesFree.Count > 0) {
             PlayOnFreeSource(sfx, position);
+        }
+    }
+
+    public void ToggleSfx(bool mute) {
+        foreach (AudioSource s in audioSources) {
+            s.mute = mute;
+        }
+    }
+
+    public void ChangeSfxVolume(float vol) {
+        foreach (AudioSource s in audioSources) {
+            s.volume = vol;
         }
     }
 }
