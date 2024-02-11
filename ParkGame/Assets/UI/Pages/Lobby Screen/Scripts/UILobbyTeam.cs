@@ -11,13 +11,18 @@ public class UILobbyTeam : MonoBehaviour
 {
     [SerializeField] private UILobbyPlayer lobbyPlayerPrefab;
     [SerializeField] private TextMeshProUGUI teamLabel;
+    [SerializeField] private Image teamImage;
     [SerializeField] private Button joinButton;
     [SerializeField] private RectTransform teamLayoutGroup;
-
+    [SerializeField] private ColorSettings colorSettings;
+    
     private string playerId;
 
     public void Initialize(int teamNumber, Action<int> onJoinTeam) {
-        teamLabel.text = $"Team {teamNumber + 1}";
+        
+        teamLabel.text = colorSettings.Colors[teamNumber].Name + " Team";
+        teamImage.color = colorSettings.Colors[teamNumber].Color;
+        
         joinButton.onClick.AddListener(() => {
             onJoinTeam?.Invoke(teamNumber);
             AudioManager.Instance.PlayClickSFX();
