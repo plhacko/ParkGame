@@ -164,7 +164,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   NavMeshStatusNow: 0
   InitialHP: 7
-  MovementSpeed: 1
+  BaseMovementSpeed: 1
+  HorseManSpeed: 1.5
+  PathMovementSpeedMultiplier: 1.5
   InnerDistanceFromCommander: 1
   OuterDistanceFromCommander: 2
   DefendDistanceFromCommander: 3
@@ -174,7 +176,6 @@ MonoBehaviour:
   Attackcooldown: 1
   Damage: 1
   TypeOfUnit: 0
-  DeathFadeTime: 2
   revealer: {fileID: 8791321709472324239}
   colorSettings: {fileID: 11400000, guid: 540e0efb517eb1d4f8598ecd8326dff1, type: 2}
   ClosestEnemyDEBUG: 0
