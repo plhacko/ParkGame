@@ -261,12 +261,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   NavMeshStatusNow: 0
   InitialHP: 4
-  BaseMovementSpeed: 1
-  HorseManSpeed: 1.5
+  BaseMovementSpeed: 0.1
+  HorseManSpeed: 0.3
   PathMovementSpeedMultiplier: 1.5
-  InnerDistanceFromCommander: 0.66
   OuterDistanceFromCommander: 2
-  DefendDistanceFromCommander: 3
+  DefendDistanceFromCommander: 1.5
   AttackDistanceFromCommander: 6
   MinAttackRange: 2
   MaxAttackRange: 7
@@ -398,7 +397,7 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.16
-  m_Speed: 1
+  m_Speed: 0.1
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120

@@ -129,7 +129,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8892233519408517762}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4.94, y: 1.48, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1.2, y: 1.2, z: 1.2}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -150,7 +150,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a6030245d92a7e42ab2c247dc0d696c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  InitialTeam: -1
   MaxUnits: 6
   InitialArchers: 2
   InitialHorsemans: 1
@@ -170,7 +169,7 @@ MonoBehaviour:
     m_InternalValue: -10
   _IsCastle:
     m_InternalValue: 0
-  arrowCooldownTime: 4
+  arrowCooldownTime: 6
   salveOfArrows: 6
   Damage: 1
 --- !u!114 &8892233519408517772
@@ -314,23 +313,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3153552412411743519, guid: d97eaf2398a72114690b69fe192ab5d7, type: 3}
       propertyPath: m_LocalScale.x
-      value: 1
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 3153552412411743519, guid: d97eaf2398a72114690b69fe192ab5d7, type: 3}
       propertyPath: m_LocalScale.y
-      value: 1
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 3153552412411743519, guid: d97eaf2398a72114690b69fe192ab5d7, type: 3}
       propertyPath: m_LocalScale.z
-      value: 1
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 3153552412411743519, guid: d97eaf2398a72114690b69fe192ab5d7, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.039
+      value: -0.02
       objectReference: {fileID: 0}
     - target: {fileID: 3153552412411743519, guid: d97eaf2398a72114690b69fe192ab5d7, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.603
+      value: -0.17
       objectReference: {fileID: 0}
     - target: {fileID: 3153552412411743519, guid: d97eaf2398a72114690b69fe192ab5d7, type: 3}
       propertyPath: m_LocalPosition.z
