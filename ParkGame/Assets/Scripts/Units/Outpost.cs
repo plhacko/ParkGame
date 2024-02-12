@@ -89,9 +89,6 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
         }
         //sr.sprite = ChangeSpawnType(counter);
         
-        if (!IsCastle) {
-            isSpawning = true;
-        }
         _Team.OnValueChanged += onTeamChanged;
     }
 
@@ -118,6 +115,12 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
         }
 
         isSpawning = true;
+    }
+
+    void Start() {
+        if (!IsCastle) {
+            isSpawning = true;
+        }
     }
 
     public void RegisterOnTeamChange(Action action)
