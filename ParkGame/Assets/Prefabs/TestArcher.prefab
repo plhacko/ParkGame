@@ -264,9 +264,8 @@ MonoBehaviour:
   BaseMovementSpeed: 1
   HorseManSpeed: 1.5
   PathMovementSpeedMultiplier: 1.5
-  InnerDistanceFromCommander: 0.66
   OuterDistanceFromCommander: 2
-  DefendDistanceFromCommander: 3
+  DefendDistanceFromCommander: 1.5
   AttackDistanceFromCommander: 6
   MinAttackRange: 2
   MaxAttackRange: 7

@@ -7,7 +7,6 @@ using System;
 using Player;
 using UnityEngine.AI;
 using static Formation;
-using DG.Tweening;
 
 
 public class Soldier : NetworkBehaviour, ISoldier {
@@ -28,9 +27,8 @@ public class Soldier : NetworkBehaviour, ISoldier {
     [SerializeField] float BaseMovementSpeed = 1f;
     [SerializeField] float HorseManSpeed = 1.5f;
     [SerializeField] float PathMovementSpeedMultiplier = 1.5f;
-    [SerializeField] float InnerDistanceFromCommander;
-    [SerializeField] float OuterDistanceFromCommander;
-    [SerializeField] float DefendDistanceFromCommander;
+    [SerializeField] float OuterDistanceFromCommander; // in outpost, was: sword 2, arch 2, mole 3
+    [SerializeField] float DefendDistanceFromCommander; 
     [SerializeField] float AttackDistanceFromCommander;
     //[SerializeField] float AttackRange = 0.4f; // old pawn
     [SerializeField] float MinAttackRange;
@@ -125,7 +123,7 @@ public class Soldier : NetworkBehaviour, ISoldier {
         isDead = false;
         timeToDeath = DeathFadeTime;
 
-        Radius = UnityEngine.Random.Range(0.06f, 1f);
+        Radius = UnityEngine.Random.Range(0.2f, 1.2f);
 
     }
     public override void OnNetworkSpawn() {
@@ -194,7 +192,8 @@ public class Soldier : NetworkBehaviour, ISoldier {
 
     void StationedInOutpost() {
         float distanceFromOutpost = Vector3.Distance(CommanderToFollow.position, transform.position);
-        if (distanceFromOutpost <= OuterDistanceFromCommander) { // have a value for every unit the same depending on the outpost's range???
+        //if (distanceFromOutpost <= OuterDistanceFromCommander) { // have a value for every unit the same depending on the outpost's range???
+        if (distanceFromOutpost <= DefendDistanceFromCommander) { // have a value for every unit the same depending on the outpost's range???
             Networkanimator.Animator.SetFloat(AnimatorMovementSpeedHash, 0.0f);
             Agent.SetDestination(transform.position);
         }
@@ -203,7 +202,7 @@ public class Soldier : NetworkBehaviour, ISoldier {
 
         if (enemyT != null && distanceFromOutpost < DefendDistanceFromCommander) {
             float distanceOfEnemyToOutpost = Vector3.Distance(enemyT.position, CommanderToFollow.position);
-            if (AttackEnemyIfInRange(enemyT)) { 
+            if (AttackEnemyIfInRange(enemyT, DefendDistanceFromCommander)) { 
                 return; 
             } else if (distanceOfEnemyToOutpost <= DefendDistanceFromCommander) {
                 MoveTowardsEntity(enemyT);
@@ -392,10 +391,13 @@ public class Soldier : NetworkBehaviour, ISoldier {
 
     /// <summary> attacks the closest enemy in range</summary>
     /// <returns> returns if enemy was in range </returns>
-    private bool AttackEnemyIfInRange(Transform enemyT) {
+    private bool AttackEnemyIfInRange(Transform enemyT, float maxAttackDistance = 0) {
         ClosestEnemyDEBUG = Vector3.Distance(enemyT.position, transform.position);
-
-        if (Vector3.Distance(enemyT.position, transform.position) <= MaxAttackRange
+        float maxRange = MaxAttackRange;
+        if (maxAttackDistance > 0) {
+            maxRange = maxAttackDistance;
+        }
+        if (Vector3.Distance(enemyT.position, transform.position) <= maxRange
             && Vector3.Distance(enemyT.position, transform.position) >= MinAttackRange) {
             if (AttackTimer >= Attackcooldown) {
                 AttackTimer = 0.0f;

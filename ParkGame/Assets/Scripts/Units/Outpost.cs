@@ -45,7 +45,7 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
     private ChangeMaterial changeMaterial;
     public Action<Soldier.UnitType> OnUnitTypeChange;
 
-    [SerializeField] int arrowCooldownTime;
+    [SerializeField] int arrowCooldownTime = 5; 
     [SerializeField] int salveOfArrows; // number of enemies targeted at once
     [SerializeField] int Damage; 
     private float arrowTimer; // castle shoots arrows
@@ -88,7 +88,10 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
             counter = 1;
         }
         //sr.sprite = ChangeSpawnType(counter);
-        
+        if (!IsCastle) {
+            isSpawning = true;
+        }
+
         _Team.OnValueChanged += onTeamChanged;
     }
 
@@ -235,7 +238,7 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
         bool canSpawn = playerManager.CanAddSoldierToTeam(Team);
         if (! canSpawn) { return; }
 
-        float r = 0.2f;
+        float r = 1f;
         Vector3 RndOffset = new Vector3(UnityEngine.Random.Range(-r, r), UnityEngine.Random.Range(-r, r), 0f);
         GameObject unit = Instantiate(SpawnWhichUnit(), position: transform.position + RndOffset, rotation: transform.rotation);
         unit.GetComponent<NetworkObject>().Spawn();
