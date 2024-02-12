@@ -25,7 +25,7 @@ public class Soldier : NetworkBehaviour, ISoldier {
     [SerializeField] int InitialHP = 3;
     [Header("game logic values")]
     [SerializeField] float BaseMovementSpeed = 1f;
-    [SerializeField] float HorseManSpeed = 1.5f;
+    [SerializeField] float HorseManSpeed = 0.3f;
     [SerializeField] float PathMovementSpeedMultiplier = 1.5f;
     [SerializeField] float OuterDistanceFromCommander; // in outpost, was: sword 2, arch 2, mole 3
     [SerializeField] float DefendDistanceFromCommander; 

@@ -87,10 +87,6 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
         {
             counter = 1;
         }
-        //sr.sprite = ChangeSpawnType(counter);
-        if (!IsCastle) {
-            isSpawning = true;
-        }
 
         _Team.OnValueChanged += onTeamChanged;
     }
