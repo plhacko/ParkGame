@@ -337,6 +337,10 @@ PrefabInstance:
       propertyPath: m_SortingOrder
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 4388496590651871187, guid: 48861cb72fa4179449fc8af1f8a0fc93, type: 3}
+      propertyPath: ConquerPointsRequired
+      value: 30
+      objectReference: {fileID: 0}
     - target: {fileID: 4388496590651871188, guid: 48861cb72fa4179449fc8af1f8a0fc93, type: 3}
       propertyPath: m_Name
       value: ConquerModule

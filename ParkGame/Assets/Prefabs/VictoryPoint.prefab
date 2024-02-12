@@ -189,7 +189,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b0e7804e57645e245b5515b7684d3c1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  openingTime: 20
+  openingTime: 60
   timeToNotifyPlayersBeforeOpening: 10
   colorSettings: {fileID: 11400000, guid: 540e0efb517eb1d4f8598ecd8326dff1, type: 2}
 --- !u!1 &9141332185099396012
@@ -313,7 +313,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4388496590651871187, guid: 48861cb72fa4179449fc8af1f8a0fc93, type: 3}
       propertyPath: ConquerPointsRequired
-      value: 10
+      value: 40
       objectReference: {fileID: 0}
     - target: {fileID: 4388496590651871188, guid: 48861cb72fa4179449fc8af1f8a0fc93, type: 3}
       propertyPath: m_Name

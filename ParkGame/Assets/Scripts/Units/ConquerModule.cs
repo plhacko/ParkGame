@@ -15,7 +15,7 @@ public class ConquerModule : NetworkBehaviour
     [SerializeField] float ConquerPointsRequired = 50.0f;
     [SerializeField] List<ITeamMember> VisibleConquerUnits = new();
     [SerializeField] List<ITeamMember> VisibleOtherUnits = new();
-    
+    [SerializeField] bool scaleWithNumberOfUnits = false;
     private GameSessionManager gameSessionManager;
 
     public float ConquerPoints { get => _ConquerPoints.Value; set => _ConquerPoints.Value = value; }
@@ -84,7 +84,7 @@ public class ConquerModule : NetworkBehaviour
             if (conquerable.GetTeam() != VisibleConquerUnits[0].Team)
             {
                 // score points
-                ConquerPoints += VisibleConquerUnits.Count * Time.deltaTime;   
+                ConquerPoints += scaleWithNumberOfUnits ? VisibleConquerUnits.Count * Time.deltaTime : Time.deltaTime;   
             }
         }
         else if (VisibleOtherUnits.Count == 0 && VisibleConquerUnits.Count == 0)
