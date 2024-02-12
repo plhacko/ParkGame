@@ -52,7 +52,7 @@ public class PanelCameraController : MonoBehaviour, IBeginDragHandler, IDragHand
                 float prevMagnitude = (touchZeroPrevPos - touchOnePrevPos).magnitude;
                 float currentMagnitude = (touchZeroPos - touchOnePos).magnitude;
 
-                delta = currentMagnitude - prevMagnitude;
+                delta = prevMagnitude - currentMagnitude;
             }
 
             GameManager.Instance.Zoom(delta * zoomSpeed);
