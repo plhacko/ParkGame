@@ -249,8 +249,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   NavMeshStatusNow: 0
   InitialHP: 8
-  BaseMovementSpeed: 0.1
-  HorseManSpeed: 0.3
+  BaseMovementSpeed: 0.5
+  HorseManSpeed: 0.8
   PathMovementSpeedMultiplier: 1.5
   OuterDistanceFromCommander: 3
   DefendDistanceFromCommander: 1.5
