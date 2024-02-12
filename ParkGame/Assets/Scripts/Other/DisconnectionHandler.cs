@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using Unity.Netcode;
+using Unity.Services.Lobbies.Models;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -61,5 +62,10 @@ public class DisconnectionHandler : NetworkBehaviour
         Debug.Log("Receive bye");
         hostDisconnectScreen.SetActive(true);
         NetworkManager.Singleton.Shutdown();
+    }
+
+    public void ShowHostDisconnectScreen()
+    {
+        hostDisconnectScreen.SetActive(true);
     }
 }
