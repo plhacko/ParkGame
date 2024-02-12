@@ -72,12 +72,12 @@ public class MapData
             addOneStructure(img,parentRect, structurePos, topLeft, bottomRight);
         }
 
-        var castleIdx = 1;
+        var castleIdx = 0;
         foreach (var structurePos in MetaData.Structures.Castles)
         {
             var img = UnityEngine.Object.Instantiate(castle, drawnTexture.transform);
             addOneStructure(img,parentRect, structurePos, topLeft, bottomRight);
-            img.GetComponentInChildren<TextMeshProUGUI>().text = $"TEAM {castleIdx}";
+            img.GetComponentInChildren<TextMeshProUGUI>().text = $"TEAM {castleIdx + 1}";
             img.GetComponent<Image>().color = colorSettings.Colors[castleIdx].Color;
             castleIdx++;
         }
