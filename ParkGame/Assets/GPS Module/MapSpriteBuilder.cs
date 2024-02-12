@@ -47,7 +47,8 @@ public class MapSpriteBuilder : MonoBehaviour
 
         var mapSpriteInstance = Instantiate(mapSprite);
         // Pass map sprite to next scene and load it
-        StartCoroutine(LoadAsyncSceneWithMapSprite(mapSpriteInstance));
+        // StartCoroutine(LoadAsyncSceneWithMapSprite(mapSpriteInstance));
+        LoadSceneWithMapSprite(mapSpriteInstance);
     }
 
 
@@ -67,5 +68,12 @@ public class MapSpriteBuilder : MonoBehaviour
         SceneManager.MoveGameObjectToScene(mapSprite, SceneManager.GetSceneByName(mapDrawingSceneName));
         // Unload previous scene
         SceneManager.UnloadSceneAsync(currentScene);
+    }
+
+    private void LoadSceneWithMapSprite(GameObject mapSprite)
+    {
+        Debug.Log($"Loading {mapDrawingSceneName}...");
+        DontDestroyOnLoad(mapSprite);
+        SceneManager.LoadScene(mapDrawingSceneName);
     }
 }
