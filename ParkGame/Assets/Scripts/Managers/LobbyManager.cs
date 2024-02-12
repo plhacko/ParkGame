@@ -240,7 +240,14 @@ namespace Managers
             Debug.Log("Lobby event connection state changed: " + state);
             switch (state)
             {
-                case LobbyEventConnectionState.Unsubscribed: /* Update the UI if necessary, as the subscription has been stopped. */ break;
+                case LobbyEventConnectionState.Unsubscribed: /* Update the UI if necessary, as the subscription has been stopped. */
+                    OnKickedFromLobby();
+                    var hostLeftDialog = FindObjectOfType<DisconnectionHandler>();
+                    if (hostLeftDialog != null)
+                    {
+                        hostLeftDialog.ShowHostDisconnectScreen();
+                    }
+                    break;
                 case LobbyEventConnectionState.Subscribing: /* Update the UI if necessary, while waiting to be subscribed. */ break;
                 case LobbyEventConnectionState.Subscribed: /* Update the UI if necessary, to show subscription is working. */ break;
                 case LobbyEventConnectionState.Unsynced: /* Update the UI to show connection problems. Lobby will attempt to reconnect automatically. */ break;
