@@ -528,11 +528,6 @@ public class CreateMapWithOverlay : NetworkBehaviour
                     return;
                 }
 
-                if (outposts.GetStructureCount() == 0)
-                {
-                    errorMessages.Add("Add at least 1 outpost to the map");
-                    return;
-                }
                 // Also for adjusting uploaded tilemap (Not used for now)
                 foreach (var tilePos in outposts.GetPlacedStructurePositions().Item2)
                     structuresToAssign.Add(tilePos, outpostPrefab);
