@@ -59,7 +59,7 @@ using UnityEngine.UI;
 public class DragAndDrop : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBeginDragHandler, IEndDragHandler, IDragHandler
 {
     [SerializeField] private Canvas canvas;
-    static public bool CanDrag = false;
+    static public bool CanDrag = true;
     public Drawable mapDrawable;
     public ItemSlot itemSlot;
     
