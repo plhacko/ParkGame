@@ -25,7 +25,7 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
     [SerializeField] private Collider2D switchCollider;
    
     List<NetworkObjectReference> Units = new List<NetworkObjectReference>();
-
+    private ShootSalvo shootSalvo;
     NetworkVariable<float> _Timer = new(0.0f);
     public float Timer { get => _Timer.Value; private set => _Timer.Value = value; }
 
@@ -44,13 +44,6 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
     private GameSessionManager gameSessionManager;
     private ChangeMaterial changeMaterial;
     public Action<Soldier.UnitType> OnUnitTypeChange;
-
-    [SerializeField] int arrowCooldownTime = 5; 
-    [SerializeField] int salveOfArrows; // number of enemies targeted at once
-    [SerializeField] int Damage; 
-    private float arrowTimer; // castle shoots arrows
-    private ShootScript shooting;
-    private EnemyObserver enemyObserver;
 
     // TODO Action and Dictionary should be reinitialized on outpost owner change
     public Action OnUnitTypeCountChange;
@@ -75,13 +68,7 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
         announcer = FindObjectOfType<Announcer>();
         changeMaterial = GetComponent<ChangeMaterial>();
         sr = GetComponent<SpriteRenderer>();
-        
-        if (IsServer)
-        {
-            arrowTimer = arrowCooldownTime;
-        }
-        shooting = GetComponent<ShootScript>();
-        enemyObserver = GetComponentInChildren<EnemyObserver>();
+        shootSalvo = GetComponent<ShootSalvo>(); // castle shoots salvo of arrows on enemies in its enemy detector
 
         if (InitOutpostUnitType == Soldier.UnitType.Archer)
         {
@@ -175,31 +162,17 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
         AudioManager.Instance.PlayArcherAttack(transform.position);
     }
 
-    void ShootSalve() {
-        var visibleEnemies = enemyObserver.GetAllEnemies();
-        int endCond = (visibleEnemies.Count >= salveOfArrows ? salveOfArrows : visibleEnemies.Count); 
-        for (int i = 0; i < endCond; i++) {
-            Transform enemyT = visibleEnemies[i];
-            Vector2 direction = enemyT.position - transform.position;
-            Direction directionE = Soldier.GetDirectionEnum(direction);
-            bool flip = directionE == Direction.Left;
-
-            PlayArcherAttackSFXClientRpc();
-            shooting.Shoot(enemyT.transform.position, Damage, flip, Team);
-        }
-    }
-
+  
     void Update()
     {
         // updating only on server
         if (!IsServer || !isSpawning) { return; }
         
         if (IsCastle) {
-            arrowTimer -= Time.deltaTime;
-            if (arrowTimer <= 0) {
-                ShootSalve();
-                arrowTimer = arrowCooldownTime;
+            if (shootSalvo.Shoot(Time.deltaTime, Team)) {
+                PlayArcherAttackSFXClientRpc();
             }
+            
         }
 
         if (Team == -1) {
