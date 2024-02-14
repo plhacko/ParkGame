@@ -115,6 +115,7 @@ GameObject:
   - component: {fileID: -5638008865318778227}
   - component: {fileID: 4934246142875084833}
   - component: {fileID: 5857862613527131611}
+  - component: {fileID: 1964011472715460869}
   m_Layer: 8
   m_Name: Castle
   m_TagString: Untagged
@@ -156,12 +157,6 @@ MonoBehaviour:
   InitialHorsemans: 1
   InitialPawns: 3
   SpawnTime: 2.5
-  UnitPrefab: {fileID: 2149011059489662585, guid: 767d4c3ee472ffe4ea667aae7025b849, type: 3}
-  ArcherPrefab: {fileID: 2149011059489662585, guid: d7dabec280dc4e54d93803fe26a0bb73, type: 3}
-  HorsemanPrefab: {fileID: 5515698993845621550, guid: 8cfe5a199b3c20445bc24ab6439cf170, type: 3}
-  PawnIcon: {fileID: 21300000, guid: ed6f231de5f144c48833cc832986b875, type: 3}
-  ArcherIcon: {fileID: 0}
-  HorsemanIcon: {fileID: 0}
   InitOutpostUnitType: 0
   revealer: {fileID: 3827981197028292139}
   colorSettings: {fileID: 11400000, guid: 540e0efb517eb1d4f8598ecd8326dff1, type: 2}
@@ -170,9 +165,6 @@ MonoBehaviour:
     m_InternalValue: -10
   _IsCastle:
     m_InternalValue: 0
-  arrowCooldownTime: 6
-  salveOfArrows: 6
-  Damage: 1
 --- !u!114 &8892233519408517772
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -308,6 +300,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 986c8b0a5584fa1408df92c1ee6a2116, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  arrowCooldownTime: 5
+  salveOfArrows: 6
+  Damage: 1
+--- !u!114 &1964011472715460869
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8892233519408517762}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b5d13a5c281d5741a966585567538a6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  UnitPrefab: {fileID: 2149011059489662585, guid: 767d4c3ee472ffe4ea667aae7025b849, type: 3}
+  ArcherPrefab: {fileID: 2149011059489662585, guid: d7dabec280dc4e54d93803fe26a0bb73, type: 3}
+  HorsemanPrefab: {fileID: 5515698993845621550, guid: 8cfe5a199b3c20445bc24ab6439cf170, type: 3}
+  PawnIcon: {fileID: 21300000, guid: 7c1c8fc1095e0c347b891b57f65df8d2, type: 3}
+  ArcherIcon: {fileID: 21300000, guid: 6c2c46ab69eac124687f68963aa9aa37, type: 3}
+  HorsemanIcon: {fileID: 21300000, guid: 7c1c8fc1095e0c347b891b57f65df8d2, type: 3}
 --- !u!1001 &6904529633569335100
 PrefabInstance:
   m_ObjectHideFlags: 0

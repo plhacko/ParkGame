@@ -185,7 +185,7 @@ public class Formation : MonoBehaviour {
     }
 
     void RotateHorseFormation() {
-        HorseRoot.transform.Rotate(0, 0, 0.5f);    
+        HorseRoot.transform.Rotate(0, 0, 0.1f);    
     }
 
     // rotate the box formation according to the commander's direction of movement

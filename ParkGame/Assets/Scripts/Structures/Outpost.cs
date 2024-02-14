@@ -12,13 +12,7 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
     [SerializeField] int InitialHorsemans = 3;
     [SerializeField] int InitialPawns = 3;
     [SerializeField] float SpawnTime = 4; // 4s
-    [SerializeField] GameObject UnitPrefab;
-    [SerializeField] GameObject ArcherPrefab;
-    [SerializeField] GameObject HorsemanPrefab;
 
-    [SerializeField] Sprite PawnIcon;
-    [SerializeField] Sprite ArcherIcon;
-    [SerializeField] Sprite HorsemanIcon;
     [SerializeField] private Soldier.UnitType InitOutpostUnitType;
     [SerializeField] private GameObject revealer;
     [SerializeField] ColorSettings colorSettings;
@@ -36,14 +30,11 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
     
     [SerializeField] NetworkVariable<bool> _IsCastle = new();
     
-    private Soldier.UnitType outpostUnitType;
-    public Soldier.UnitType OutpostUnitType { get => outpostUnitType; }
     private SpriteRenderer sr;
     private int counter;
     private PlayerManager playerManager;
     private GameSessionManager gameSessionManager;
     private ChangeMaterial changeMaterial;
-    public Action<Soldier.UnitType> OnUnitTypeChange;
 
     // TODO Action and Dictionary should be reinitialized on outpost owner change
     public Action OnUnitTypeCountChange;
@@ -54,6 +45,7 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
     };
     private Announcer announcer;
     private bool isSpawning = false;
+    private ToggleSpawner spawner;
 
     public override void OnNetworkSpawn()
     {
@@ -68,8 +60,8 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
         announcer = FindObjectOfType<Announcer>();
         changeMaterial = GetComponent<ChangeMaterial>();
         sr = GetComponent<SpriteRenderer>();
+        spawner = GetComponent<ToggleSpawner>();
         shootSalvo = GetComponent<ShootSalvo>(); // castle shoots salvo of arrows on enemies in its enemy detector
-
         if (InitOutpostUnitType == Soldier.UnitType.Archer)
         {
             counter = 1;
@@ -81,22 +73,19 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
     public void SpawnInitialUnits()
     {
         Debug.LogWarning("Spawning initial units in outpost + " + InitialHorsemans + " horsemen. " + InitialArchers + " archers. " + InitialPawns + " pawns.");
-        
-        outpostUnitType = Soldier.UnitType.Horseman;
-        for (int i = 0; i < InitialHorsemans; i++)
-        {
+
+        spawner.SetSpawnType(Soldier.UnitType.Horseman);
+        for (int i = 0; i < InitialHorsemans; i++) {
             SpawnUnit();
         }
-        
-        outpostUnitType = Soldier.UnitType.Archer;
-        for (int i = 0; i < InitialArchers; i++)
-        {
-            SpawnUnit();   
+
+        spawner.SetSpawnType(Soldier.UnitType.Archer);
+        for (int i = 0; i < InitialArchers; i++) {
+            SpawnUnit();
         }
-        
-        outpostUnitType = Soldier.UnitType.Pawn;
-        for (int i = 0; i < InitialPawns; i++)
-        {
+
+        spawner.SetSpawnType(Soldier.UnitType.Pawn);
+        for (int i = 0; i < InitialPawns; i++) {
             SpawnUnit();
         }
 
@@ -193,15 +182,17 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
         }
     }
 
-    GameObject SpawnWhichUnit() {
-        switch (outpostUnitType) {
-            case Soldier.UnitType.Archer:
-                return ArcherPrefab;
-            case Soldier.UnitType.Horseman:
-                return HorsemanPrefab;
-            default:
-                return UnitPrefab;
-        }
+    void Spawn() {
+        GameObject prefab = spawner.GetSpawnPrefab();
+
+        float r = 1f;
+        Vector3 RndOffset = new Vector3(UnityEngine.Random.Range(-r, r), UnityEngine.Random.Range(-r, r), 0f);
+        GameObject unit = Instantiate(prefab, position: transform.position + RndOffset, rotation: transform.rotation);
+        unit.GetComponent<NetworkObject>().Spawn();
+        unit.GetComponent<ISoldier>().Team = Team;
+        unit.GetComponent<ISoldier>().SetCommanderToFollow(transform);
+        unit.GetComponent<ISoldier>().NewCommand(SoldierCommand.InOutpost);
+        playerManager.AddSoldierToTeam(Team, unit.transform);
     }
 
     public void SpawnUnit()
@@ -213,14 +204,7 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
         bool canSpawn = playerManager.CanAddSoldierToTeam(Team);
         if (! canSpawn) { return; }
 
-        float r = 1f;
-        Vector3 RndOffset = new Vector3(UnityEngine.Random.Range(-r, r), UnityEngine.Random.Range(-r, r), 0f);
-        GameObject unit = Instantiate(SpawnWhichUnit(), position: transform.position + RndOffset, rotation: transform.rotation);
-        unit.GetComponent<NetworkObject>().Spawn();
-        unit.GetComponent<ISoldier>().Team = Team;
-        unit.GetComponent<ISoldier>().SetCommanderToFollow(transform);
-        unit.GetComponent<ISoldier>().NewCommand(SoldierCommand.InOutpost);
-        playerManager.AddSoldierToTeam(Team, unit.transform);
+        Spawn();
     }
 
 
@@ -295,31 +279,9 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
         return Formation.FormationType.Free;
     }
 
-    // change spawn type and icon
-    Sprite ChangeSpawnType(int n) {
-        Sprite icon = null;
-        switch (n) {
-            case 1:
-                outpostUnitType = Soldier.UnitType.Archer;
-                icon = ArcherIcon;
-                break;
-            case 2:
-                outpostUnitType = Soldier.UnitType.Horseman;
-                icon = HorsemanIcon;
-                break;
-            default:
-                outpostUnitType = Soldier.UnitType.Pawn;
-                icon = PawnIcon;
-                break;
-        }
-
-        OnUnitTypeChange?.Invoke(outpostUnitType);
-        return icon;
-    }
-
     [ClientRpc]
     void ChangeIconClientRpc(int si) {
-        sr.sprite = ChangeSpawnType(si);
+        sr.sprite = spawner.ChangeSpawnType(si);
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -347,7 +309,6 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
 
         ulong clientID = NetworkManager.Singleton.LocalClientId;
         RequestChangingSpawnTypeServerRpc(clientID);
-        
     }
 
     public void OnStartedConquering(int team)
@@ -414,7 +375,7 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
     [ClientRpc]
     private void onStoppedConqueringClientRpc(int team, ClientRpcParams clientRpcParams = default)
     {
-        if(Team == -1)
+        if (Team == -1)
         {
             sr.color = Color.white;
             return;

@@ -22,6 +22,7 @@ public class UIOutpost : Selectable, IPointerDownHandler, IPointerUpHandler
     [SerializeField] private Sprite castleIcon;
     
     private Outpost outpost;
+    private ToggleSpawner spawner;
     [SerializeField] private float holdTimerLimit = 1.0f;
     Stopwatch stopwatch = new Stopwatch();
     private Action removeAction;
@@ -29,9 +30,10 @@ public class UIOutpost : Selectable, IPointerDownHandler, IPointerUpHandler
     public void Initialize(Outpost outpost, Action removeAction)
     {
         this.outpost = outpost;
+        spawner = outpost.GetComponent<ToggleSpawner>();
         this.removeAction = removeAction;
-        OnUnitTypeChange(outpost.OutpostUnitType);
-        outpost.OnUnitTypeChange += OnUnitTypeChange;
+        OnUnitTypeChange(spawner.OutpostUnitType);
+        spawner.OnUnitTypeChange += OnUnitTypeChange;
         OnUnitTypeCountChange();
         outpost.OnUnitTypeCountChange += OnUnitTypeCountChange;
         this.outpost.RegisterOnTeamChange(OnTeamChange);
@@ -47,7 +49,7 @@ public class UIOutpost : Selectable, IPointerDownHandler, IPointerUpHandler
         if (outpost == null)
             return;
 
-        outpost.OnUnitTypeChange -= OnUnitTypeChange;
+        spawner.OnUnitTypeChange -= OnUnitTypeChange;
         outpost.OnUnitTypeCountChange -= OnUnitTypeCountChange;
         outpost.UnregisterOnTeamChange(OnTeamChange);
         base.OnDestroy();
@@ -70,12 +72,10 @@ public class UIOutpost : Selectable, IPointerDownHandler, IPointerUpHandler
             outpostIcon.sprite = castleIcon;
             return;
         }
-
         if (outpostIcons.Count != Enum.GetNames(typeof(Soldier.UnitType)).Length)
             return;
 
         var newTypeSprite = outpostIcons[(int)type];
-
         if (newTypeSprite == null)
             return;
 

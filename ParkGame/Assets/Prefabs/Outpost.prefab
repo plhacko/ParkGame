@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: -6080753142415193819}
   - component: {fileID: 598515007}
   - component: {fileID: 5313421381117267381}
+  - component: {fileID: 8299203047679039044}
   m_Layer: 8
   m_Name: Outpost
   m_TagString: Untagged
@@ -124,12 +125,6 @@ MonoBehaviour:
   InitialHorsemans: 1
   InitialPawns: 1
   SpawnTime: 4
-  UnitPrefab: {fileID: 2149011059489662585, guid: 767d4c3ee472ffe4ea667aae7025b849, type: 3}
-  ArcherPrefab: {fileID: 2149011059489662585, guid: d7dabec280dc4e54d93803fe26a0bb73, type: 3}
-  HorsemanPrefab: {fileID: 5515698993845621550, guid: 8cfe5a199b3c20445bc24ab6439cf170, type: 3}
-  PawnIcon: {fileID: 21300000, guid: 7c1c8fc1095e0c347b891b57f65df8d2, type: 3}
-  ArcherIcon: {fileID: 21300000, guid: 6c2c46ab69eac124687f68963aa9aa37, type: 3}
-  HorsemanIcon: {fileID: 21300000, guid: 8942c93d2dc69a54a9d32d7e7c8b3c03, type: 3}
   InitOutpostUnitType: 0
   revealer: {fileID: 7172483008333775361}
   colorSettings: {fileID: 11400000, guid: 540e0efb517eb1d4f8598ecd8326dff1, type: 2}
@@ -138,9 +133,6 @@ MonoBehaviour:
     m_InternalValue: 0
   _IsCastle:
     m_InternalValue: 0
-  arrowCooldownTime: 0
-  salveOfArrows: 0
-  Damage: 0
 --- !u!114 &-6080753142415193819
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -210,6 +202,24 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &8299203047679039044
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2776846833031490645}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b5d13a5c281d5741a966585567538a6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  UnitPrefab: {fileID: 2149011059489662585, guid: 767d4c3ee472ffe4ea667aae7025b849, type: 3}
+  ArcherPrefab: {fileID: 2149011059489662585, guid: d7dabec280dc4e54d93803fe26a0bb73, type: 3}
+  HorsemanPrefab: {fileID: 5515698993845621550, guid: 8cfe5a199b3c20445bc24ab6439cf170, type: 3}
+  PawnIcon: {fileID: 21300000, guid: 7c1c8fc1095e0c347b891b57f65df8d2, type: 3}
+  ArcherIcon: {fileID: 21300000, guid: 6c2c46ab69eac124687f68963aa9aa37, type: 3}
+  HorsemanIcon: {fileID: 21300000, guid: 8942c93d2dc69a54a9d32d7e7c8b3c03, type: 3}
 --- !u!1 &7172483008333775361
 GameObject:
   m_ObjectHideFlags: 0
