@@ -22,6 +22,10 @@ public class ItemSlot : MonoBehaviour, IDropHandler, IPointerDownHandler
     private Image image;
     private Camera mainCamera;
     private Sprite defaultSprite;
+
+    public RectTransform foreground;
+    public RectTransform background;
+
     private void Awake()
     {
         mainCamera = Camera.main;
@@ -73,6 +77,8 @@ public class ItemSlot : MonoBehaviour, IDropHandler, IPointerDownHandler
         
         counter.AddMapStructure(newStructure);
         var dragAndDrop = newStructure.GetComponent<DragAndDrop>();
+        dragAndDrop.foreground = foreground;
+        dragAndDrop.background = background;
         dragAndDrop.mapDrawable = mapDrawable;
         dragAndDrop.TilemapProperty = tilemap;
         dragAndDrop.itemSlot = this;

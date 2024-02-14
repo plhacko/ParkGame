@@ -386,3 +386,146 @@ public class MapDisplayer : MonoBehaviour
         return scale;
     }
 }
+
+public static class MapCameraExtensions
+{
+    public static IEnumerator PanToCoroutine(this Camera camera, Vector3 position, float duration)
+    {
+        var startPosition = camera.transform.position;
+        var endPosition = camera.ClampCameraToMap(position);
+        endPosition.z = camera.transform.position.z;
+
+        var elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            camera.transform.position = Vector3.Lerp(startPosition, endPosition, elapsed / duration);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        camera.transform.position = endPosition;
+    }
+
+    private static Vector3 ClampCameraToMap(this Camera camera, Vector3 position)
+    {
+        if (Map.GPSMap != null)
+        {
+            var mapBounds = Map.MapBounds;
+            var cameraBounds = camera.CalculateOrthographicBounds(position);
+
+            // dont allow camera to go outside of map bounds
+            if (cameraBounds.min.x < mapBounds.min.x)
+            {
+                position.x = mapBounds.min.x + cameraBounds.extents.x;
+            }
+            if (cameraBounds.max.x > mapBounds.max.x)
+            {
+                position.x = mapBounds.max.x - cameraBounds.extents.x;
+            }
+            if (cameraBounds.min.y < mapBounds.min.y)
+            {
+                position.y = mapBounds.min.y + cameraBounds.extents.y;
+            }
+            if (cameraBounds.max.y > mapBounds.max.y)
+            {
+                position.y = mapBounds.max.y - cameraBounds.extents.y;
+            }
+        }
+
+        return position;
+    }
+
+    public static void PointTo(this Camera camera, Vector3 position)
+    {
+        position.z = camera.transform.position.z;
+
+        camera.transform.position = camera.ClampCameraToMap(position);
+    }
+
+    public static void PointToInBounds(this Camera camera, Vector3 position, Bounds bounds)
+    {
+        position.z = camera.transform.position.z;
+
+        // Clamp position to bounds
+        if (position.x < bounds.min.x)
+        {
+            position.x = bounds.min.x;
+        }
+        if (position.x > bounds.max.x)
+        {
+            position.x = bounds.max.x;
+        }
+        if (position.y < bounds.min.y)
+        {
+            position.y = bounds.min.y;
+        }
+        if (position.y > bounds.max.y)
+        {
+            position.y = bounds.max.y;
+        }
+
+        camera.transform.position = position;
+    }
+
+    public static void InGameZoomTo(this Camera camera, float size)
+    {
+        var min = 0.5f;
+        var max = Map.GPSMap != null ? camera.MaxOrthographicSizeFor(Map.MapBounds) : float.MaxValue;
+
+         camera.orthographicSize = Mathf.Clamp(size, min, max);
+
+        // check if camera is within map bounds
+        if (Map.GPSMap != null)
+        {
+            var mapBounds = Map.MapBounds;
+            var cameraBounds = camera.CalculateOrthographicBounds();
+
+            // dont allow camera to go outside of map bounds
+            if (cameraBounds.min.x < mapBounds.min.x)
+            {
+                camera.transform.position = new Vector3(mapBounds.min.x + cameraBounds.extents.x, camera.transform.position.y, camera.transform.position.z);
+            }
+            if (cameraBounds.max.x > mapBounds.max.x)
+            {
+                camera.transform.position = new Vector3(mapBounds.max.x - cameraBounds.extents.x, camera.transform.position.y, camera.transform.position.z);
+            }
+            if (cameraBounds.min.y < mapBounds.min.y)
+            {
+                camera.transform.position = new Vector3(camera.transform.position.x, mapBounds.min.y + cameraBounds.extents.y, camera.transform.position.z);
+            }
+            if (cameraBounds.max.y > mapBounds.max.y)
+            {
+                camera.transform.position = new Vector3(camera.transform.position.x, mapBounds.max.y - cameraBounds.extents.y, camera.transform.position.z);
+            }
+        }
+    }
+
+    public static Bounds CalculateOrthographicBounds(this Camera camera, Vector3? position = null)
+    {
+        if (position == null)
+        {
+            position = camera.transform.position;
+        }
+
+        float cameraHeight = camera.orthographicSize * 2;
+        Bounds bounds = new Bounds(
+            position.Value,
+            new Vector3(cameraHeight * camera.aspect, cameraHeight, 0));
+        return bounds;
+    }
+
+    public static float MaxOrthographicSizeFor(this Camera camera, Bounds bounds, bool fill = true)
+    {
+        bool portrait = bounds.size.x < bounds.size.y;
+        portrait = !fill ? portrait : !portrait;
+        if (portrait)
+        {
+            return bounds.size.y / 2;
+        }
+        else
+        {
+            return bounds.size.x / 2 / camera.aspect;
+        }
+    }
+}

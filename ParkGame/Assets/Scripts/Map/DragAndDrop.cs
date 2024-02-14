@@ -79,6 +79,10 @@ public class DragAndDrop : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     private GameObject draggedItem;
     private CanvasGroup canvasGroup;
     private RectTransform rectTransform;
+
+    public RectTransform foreground;
+    public RectTransform background;
+
     private void Awake()
     {
         rectTransform = GetComponent<RectTransform>();
@@ -149,6 +153,8 @@ public class DragAndDrop : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                 mapDrawable.SetDrawableState(placingStructure: true);
             canvasGroup.blocksRaycasts = false;
             canvasGroup.alpha = 0.7f;
+            if (foreground != null && background != null)
+                transform.SetParent(foreground);
         }
         else
         {
@@ -157,6 +163,8 @@ public class DragAndDrop : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                 mapDrawable.SetDrawableState(placingStructure: false);
             canvasGroup.blocksRaycasts = true;
             canvasGroup.alpha = 1.0f;
+            if (foreground != null && background != null)
+                transform.SetParent(background);
         }
     }
 
