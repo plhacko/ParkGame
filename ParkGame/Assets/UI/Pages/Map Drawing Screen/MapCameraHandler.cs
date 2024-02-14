@@ -36,21 +36,21 @@ public class MapCameraHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, 
         panelImageRegister.raycastTarget = active;
     }
 
+    public void Activate()
+    {
+        active = true;
+        panelImageRegister.raycastTarget = true;
+    }
+
+    public void Deactivate()
+    {
+        active = false;
+        panelImageRegister.raycastTarget = false;
+    }
+
     // Update is called once per frame
     void Update()
     {
-
-        if (Input.GetKeyDown(KeyCode.T))
-        {
-            Debug.Log("Fitting map to screen");
-            Bounds mapBounds = mapDisplayer.GetComponent<SpriteRenderer>().bounds;
-            mainCamera.orthographicSize = mainCamera.MaxOrthographicSizeFor(mapBounds, false);
-        }
-
-        if (Input.GetKeyDown(KeyCode.D))
-        {
-            Toggle();
-        }
 
         if (!active)
         {
@@ -99,7 +99,6 @@ public class MapCameraHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, 
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        Debug.Log("Begin drag");
         // Check if the user began dragging on the panel
         if (eventData.pointerCurrentRaycast.gameObject != gameObject)
         {
@@ -149,7 +148,6 @@ public class MapCameraHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, 
 
     public void OnPointerUp(PointerEventData eventData)
     {
-        Debug.Log("Pointer up");
         if (isZooming)
         {
             isZooming = Input.touchCount >= 2;

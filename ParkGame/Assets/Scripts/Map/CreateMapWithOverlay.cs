@@ -317,6 +317,29 @@ public class CreateMapWithOverlay : NetworkBehaviour
         }
     }
 
+    public void Activate()
+    {
+        drawableSpriteRenderer.color = Color.white;
+        mapDrawable.SetDrawableState(drawingLocked: false);
+
+    }
+
+    public void Deactivate()
+    {
+        drawableSpriteRenderer.color = new Color(1, 1, 1, 0.2f);
+        mapDrawable.SetDrawableState(drawingLocked: true);
+    }
+
+    public void ActivateDragables()
+    {
+        DragAndDrop.CanDrag = true;
+    }
+
+    public void DeactivateDragables()
+    {
+        DragAndDrop.CanDrag = false;
+    }
+
     private void ToggleTilemap(bool visible)
     {
         blockingTilemap.GetComponent<TilemapRenderer>().enabled = visible;

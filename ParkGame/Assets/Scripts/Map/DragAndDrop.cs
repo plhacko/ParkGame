@@ -59,6 +59,7 @@ using UnityEngine.UI;
 public class DragAndDrop : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBeginDragHandler, IEndDragHandler, IDragHandler
 {
     [SerializeField] private Canvas canvas;
+    static public bool CanDrag = false;
     public Drawable mapDrawable;
     public ItemSlot itemSlot;
     
@@ -107,11 +108,17 @@ public class DragAndDrop : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     public void OnBeginDrag(PointerEventData eventData)
     {
+        if (!CanDrag)
+            return;
+
         InDragAction(true);
     }
 
     public void OnDrag(PointerEventData eventData)
     {
+        if (!CanDrag)
+            return;
+
         // Convert mouse position to world position
         RectTransformUtility.ScreenPointToWorldPointInRectangle(
             rectTransform, eventData.position, mainCamera,out var worldPosition
@@ -132,15 +139,24 @@ public class DragAndDrop : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     public void OnEndDrag(PointerEventData eventData)
     {
+        if (!CanDrag)
+            return;
+
         InDragAction(false);
     }
 
     public void OnPointerDown(PointerEventData eventData)
     {
+        if (!CanDrag)
+            return;
+
         InDragAction(true);
     }
     public void OnPointerUp(PointerEventData eventData)
     {
+        if (!CanDrag)
+            return;
+            
         InDragAction(false);
     }
 
