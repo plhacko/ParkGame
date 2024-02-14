@@ -203,6 +203,8 @@ GameObject:
   - component: {fileID: 5581282412466025598}
   - component: {fileID: 2618451931460631288}
   - component: {fileID: 815355168430835910}
+  - component: {fileID: 887063272399804861}
+  - component: {fileID: 1267932186955346935}
   m_Layer: 0
   m_Name: Commander
   m_TagString: Untagged
@@ -288,6 +290,7 @@ MonoBehaviour:
   initialName: 
   revealer: {fileID: 6065839690787669753}
   FormationType: 0
+  followPin: 0
 --- !u!212 &4847180919347885991
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -388,11 +391,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DEBUG: 1
   PositionPrefab: {fileID: 6223394261764091226, guid: e225b3896b59c98438cc2d5cf8fdb19c, type: 3}
+  formationCircle: {fileID: 0}
+  formationBox: {fileID: 0}
   soldiers: []
   soldiersSwordmen: []
   soldiersArchers: []
   soldiersMolemen: []
-  FormationCircle: []
   FormationCircleInner: []
   FormationCircleOuter: []
   FormationCircleForHorses: []
@@ -490,6 +494,30 @@ MonoBehaviour:
   shader2: {fileID: 10753, guid: 0000000000000000f000000000000000, type: 0}
   excludeObjects:
   - {fileID: 6065839690787669753}
+--- !u!114 &887063272399804861
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8693786845917539996}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 261024f647c626c4f9b269b8cafba94b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1267932186955346935
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8693786845917539996}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2210b33bdbda1fb4590bf1279fc9cd61, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &3841262987104045785
 PrefabInstance:
   m_ObjectHideFlags: 0

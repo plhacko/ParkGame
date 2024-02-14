@@ -30,7 +30,6 @@ public class Soldier : NetworkBehaviour, ISoldier {
     [SerializeField] float OuterDistanceFromCommander; // in outpost, was: sword 2, arch 2, mole 3
     [SerializeField] float DefendDistanceFromCommander; 
     [SerializeField] float AttackDistanceFromCommander;
-    //[SerializeField] float AttackRange = 0.4f; // old pawn
     [SerializeField] float MinAttackRange;
     [SerializeField] float MaxAttackRange;
     [SerializeField] float Attackcooldown = 1.0f;
@@ -41,8 +40,6 @@ public class Soldier : NetworkBehaviour, ISoldier {
     [SerializeField] ColorSettings colorSettings;
 
     public int MaxHP { get => InitialHP; }
-
-    public float ClosestEnemyDEBUG; // DEBUG // TODO: rm
 
     public UnitType Type { get => TypeOfUnit; }
 
@@ -392,7 +389,6 @@ public class Soldier : NetworkBehaviour, ISoldier {
     /// <summary> attacks the closest enemy in range</summary>
     /// <returns> returns if enemy was in range </returns>
     private bool AttackEnemyIfInRange(Transform enemyT, float maxAttackDistance = 0) {
-        ClosestEnemyDEBUG = Vector3.Distance(enemyT.position, transform.position);
         float maxRange = MaxAttackRange;
         if (maxAttackDistance > 0) {
             maxRange = maxAttackDistance;
@@ -509,10 +505,6 @@ public class Soldier : NetworkBehaviour, ISoldier {
     /// <summary> !call only on server! </summary>
     public void Die() {
         if (!IsServer) { return; }
-        //if (isDead) {
-        //    return;
-        //}
-        Debug.Log("DIEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
         isDead = true;
         HP = 0;
         NewCommand(SoldierCommand.Die);
@@ -538,7 +530,6 @@ public class Soldier : NetworkBehaviour, ISoldier {
     public void NewCommand(SoldierCommand command) {
         if (!IsServer) { return; }
 
-        Debug.Log("new command " + command);
         Command = command;
 
         if (command == SoldierCommand.Attack) {
