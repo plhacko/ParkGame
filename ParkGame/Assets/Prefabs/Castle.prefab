@@ -114,6 +114,7 @@ GameObject:
   - component: {fileID: 8892233519408517774}
   - component: {fileID: -5638008865318778227}
   - component: {fileID: 4934246142875084833}
+  - component: {fileID: 5857862613527131611}
   m_Layer: 8
   m_Name: Castle
   m_TagString: Untagged
@@ -295,6 +296,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ArrowPrefab: {fileID: 671494250457049604, guid: 8a338b87b7065194b9f0d7a082bcf539, type: 3}
+--- !u!114 &5857862613527131611
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8892233519408517762}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 986c8b0a5584fa1408df92c1ee6a2116, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &6904529633569335100
 PrefabInstance:
   m_ObjectHideFlags: 0
