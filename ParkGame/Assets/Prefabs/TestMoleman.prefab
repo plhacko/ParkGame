@@ -26,7 +26,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1578417005418209535}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 7.884796, y: 4.452366, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.6666667, y: 1.25, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -262,7 +262,6 @@ MonoBehaviour:
   TypeOfUnit: 2
   revealer: {fileID: 1578417005418209535}
   colorSettings: {fileID: 11400000, guid: 540e0efb517eb1d4f8598ecd8326dff1, type: 2}
-  ClosestEnemyDEBUG: 0
   FollowInNavMeshFormation: 0
   FormationFromFollowedCommander: {fileID: 0}
   ObjectToFollowInFormation: {fileID: 0}
