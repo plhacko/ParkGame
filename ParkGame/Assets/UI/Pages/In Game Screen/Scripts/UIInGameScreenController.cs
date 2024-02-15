@@ -51,10 +51,10 @@ public class UIInGameScreenController : UIPageController
         canvasGroup.interactable = true;
     }
 
+    // Gather
     private void Move()
     {
         gameManager.CommandMove();
-        //AudioManager.Instance.PlayNotificationSFX("Fallback");
         AudioManager.Instance.PlayCommandSFX("Fallback");
     }
 

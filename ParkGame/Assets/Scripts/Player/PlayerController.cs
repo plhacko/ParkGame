@@ -171,9 +171,13 @@ namespace Player
             }
 
             if (Input.GetKeyDown(KeyCode.T)) {
-                GatherWidget.CallGatherCommand(Team);
-                GatherSoldiersInRangeServerRpc(NetworkManager.Singleton.LocalClientId);
+                Gather();
             }
+        }
+
+        public void Gather() {
+            GatherWidget.CallGatherCommand(Team);
+            GatherSoldiersInRangeServerRpc(NetworkManager.Singleton.LocalClientId);
         }
 
         [ServerRpc(RequireOwnership = false)]
