@@ -25,6 +25,10 @@ public class EnemyObserver : MonoBehaviour
         => visibleFriends.Count > 0 ? visibleFriends.Min(e => (Vector3.Distance(e.position, t.position), e)).e : null;
     public List<Transform> GetAllEnemies() => visibleEnemies;
     public List<Transform> GetAllFriends() => visibleFriends;
+    public Transform GetClosestFriend() => GetClosestFriend(transform);
+    public Transform GetClosestFriend(Transform t) 
+        => visibleFriends.Count > 0 ? visibleFriends.Min(f => (Vector3.Distance(f.position, t.position), f)).f : null;  
+
     public void SetRadius(float radius) => CircleCollider2D.radius = radius;
 
     // for Molerider

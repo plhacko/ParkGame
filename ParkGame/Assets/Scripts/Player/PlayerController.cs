@@ -17,6 +17,8 @@ namespace Player
         [SerializeField] private int initialTeam;
         [SerializeField] private string initialName;
         [SerializeField] private GameObject revealer;
+        [SerializeField] private int MaxFollowingUnits;
+        [SerializeField] private GatherFriendsEffect GatherWidget;
         
         private PlayerManager playerManager;
         private GameSessionManager gameSessionManager;
@@ -52,6 +54,8 @@ namespace Player
         public Formation.FormationType GetFormation() {
             return FormationType;
         }
+
+        private EnemyObserver friendlyDetector;
         
         private static readonly int movementSpeedAnimationHash = Animator.StringToHash("MovementSpeed");
 
@@ -67,6 +71,7 @@ namespace Player
             gameSessionManager = FindObjectOfType<GameSessionManager>();
             uiInGameScreenController = UIController.Singleton.GetComponentInChildren<UIInGameScreenController>();
             pathTileChecker = FindObjectOfType<PathTileChecker>();
+            friendlyDetector = GetComponentInChildren<EnemyObserver>();
 
             if (IsServer) {
                 Team = initialTeam;
@@ -164,11 +169,34 @@ namespace Player
             { 
                 FormatSoldiersServerRpc(KeyCode.R); 
             }
+
+            if (Input.GetKeyDown(KeyCode.T)) {
+                GatherWidget.CallGatherCommand(Team);
+                GatherSoldiersInRangeServerRpc(NetworkManager.Singleton.LocalClientId);
+            }
         }
 
         [ServerRpc(RequireOwnership = false)]
         public void FormatSoldiersServerRpc(KeyCode key) {
             FormatSoldiers(key);
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        void GatherSoldiersInRangeServerRpc(ulong clientID) {
+            if (units.Count < MaxFollowingUnits) {
+                var friendsInRange = friendlyDetector.GetAllFriends();
+                int capacityForNew = MaxFollowingUnits - units.Count;
+                foreach (var f in friendsInRange) {
+                    if (capacityForNew <= 0) {
+                        return;
+                    }
+
+                    if (!f.GetComponent<Soldier>().IsFollowingCommander()) {
+                        f.GetComponent<Soldier>().RequestChangingCommanderToFollowServerRpc(clientID, true); 
+                        capacityForNew--;
+                    }
+                }           
+            }
         }
 
         public void FormatSoldiers(KeyCode key) {
