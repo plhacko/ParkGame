@@ -59,7 +59,7 @@ using UnityEngine.UI;
 public class DragAndDrop : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBeginDragHandler, IEndDragHandler, IDragHandler
 {
     [SerializeField] private Canvas canvas;
-    static public bool CanDrag = true;
+    static public bool CanDrag = false;
     public Drawable mapDrawable;
     public ItemSlot itemSlot;
     
@@ -84,6 +84,7 @@ public class DragAndDrop : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public RectTransform foreground;
     public RectTransform background;
 
+    private Vector3? worldPosition = null;
     private void Awake()
     {
         rectTransform = GetComponent<RectTransform>();
@@ -184,4 +185,27 @@ public class DragAndDrop : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         }
     }
 
+    public void SetWorldPosition(Vector3? position)
+    {
+        worldPosition = position;
+    }
+
+    void Update()
+    {
+
+        if (!CanDrag)
+        {
+            if (worldPosition == null)
+            {
+                worldPosition = mainCamera.ScreenToWorldPoint(rectTransform.position);
+            }
+            canvasGroup.alpha = 0.7f;
+            rectTransform.position = mainCamera.WorldToScreenPoint(worldPosition.Value);
+        }
+        else
+        {
+            canvasGroup.alpha = 1.0f;
+            worldPosition = null;
+        }
+    }
 }

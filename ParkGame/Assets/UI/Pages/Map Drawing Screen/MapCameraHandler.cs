@@ -16,11 +16,14 @@ public class MapCameraHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, 
     private bool isZooming = false; 
     private Vector3? startDragPosition;
     private const float zoomSpeed = 5f;
+    private List<StructureCounter> structureCounters;
     void Awake()
     {
         mainCamera = Camera.main;
         mapDisplayer = FindObjectOfType<MapDisplayer>();
         panelImageRegister = GetComponent<Image>();
+        structureCounters = new List<StructureCounter>(FindObjectsOfType<StructureCounter>());
+
     }
 
     // Start is called before the first frame update
@@ -62,8 +65,8 @@ public class MapCameraHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, 
         if (isDragging)
         {
             Vector3 input = Input.touchCount == 1 ? Input.GetTouch(0).position : Input.mousePosition;
-            Vector3 currentDragPosition = mainCamera.ScreenToWorldPoint(input);
-            Vector3 direction = startDragPosition.Value - currentDragPosition;
+            Vector3 currentWorldDragPosition = mainCamera.ScreenToWorldPoint(input);
+            Vector3 direction = startDragPosition.Value - currentWorldDragPosition;
 
             var cameraViewBounds = mainCamera.CalculateOrthographicBounds(Vector3.zero);
             mainCamera.PointToInBounds(mainCamera.transform.position + direction, cameraViewBounds);
@@ -152,5 +155,13 @@ public class MapCameraHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, 
         {
             isZooming = Input.touchCount >= 2;
         }
+    }
+
+    public void FitMapToScreen()
+    {
+        var mapBounds = mapDisplayer.GetComponent<SpriteRenderer>().bounds;
+        var maxOrthographicSize = mainCamera.MaxOrthographicSizeFor(mapBounds, false);
+        mainCamera.transform.position = new Vector3(mapBounds.center.x, mapBounds.center.y, mainCamera.transform.position.z);
+        mainCamera.orthographicSize = maxOrthographicSize;
     }
 }

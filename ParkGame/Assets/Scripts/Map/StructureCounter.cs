@@ -21,6 +21,7 @@ public class StructureCounter : MonoBehaviour
     public int maxStructures = 3;
     [SerializeField] private ColorSettings colorSettings;
     private List<GameObject> currentStructures;
+    public List<GameObject> CurrentStructures => currentStructures;
 
     public Tilemap tilemap;
 
