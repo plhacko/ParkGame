@@ -18,7 +18,6 @@ namespace Managers
     {
         [SerializeField] private PlayerController playerControllerPrefab;
         [SerializeField] private float MinInitialDistanceFromOutpost = 5f;
-        [SerializeField] private int unitCapacity = 12;
         
         private Map map;
         private Announcer announcer;
@@ -270,16 +269,6 @@ namespace Managers
             {
                 controller.IsLocked = true;
             }
-        }
-
-        public bool CanAddSoldierToTeam(int team) {
-            if (team < -1 || team > 3) {
-                return false; 
-            }
-            if (unitsInTeam[team].Count >= unitCapacity) {
-                return false;
-            }
-            return true;
         }
 
         public void AddSoldierToTeam(int team, Transform unit) {

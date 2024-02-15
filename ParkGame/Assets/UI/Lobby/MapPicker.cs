@@ -66,10 +66,14 @@ public class MapData
         var topLeft = MetaData.TopLeftTileIdx;
         var bottomRight = MetaData.BottomRightTileIdx;
         var parentRect = drawnTexture.rectTransform;
-        foreach (var structurePos in MetaData.Structures.Outposts)
+        
+        if (MetaData.Structures.Outposts != null)
         {
-            var img = UnityEngine.Object.Instantiate(outpost, drawnTexture.transform);
-            addOneStructure(img,parentRect, structurePos, topLeft, bottomRight);
+            foreach (var structurePos in MetaData.Structures.Outposts)
+            {
+                var img = UnityEngine.Object.Instantiate(outpost, drawnTexture.transform);
+                addOneStructure(img,parentRect, structurePos, topLeft, bottomRight);
+            }
         }
 
         var castleIdx = 0;

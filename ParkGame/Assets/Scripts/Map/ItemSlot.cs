@@ -67,7 +67,7 @@ public class ItemSlot : MonoBehaviour, IDropHandler, IPointerDownHandler
     public void InstantiateAndAddNewStructure(Vector3 position)
     {
         // Add new structure to center of screen
-        var newStructure = Instantiate(structureItem, counter.transform.parent);
+        var newStructure = Instantiate(structureItem, background != null ? background : counter.transform.parent);
         var origScale = newStructure.transform.localScale;
         newStructure.transform.localScale = Vector3.zero;
         newStructure.transform.DOScale(origScale, 0.4f).SetEase(Ease.OutElastic);

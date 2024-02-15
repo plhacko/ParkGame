@@ -189,7 +189,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b0e7804e57645e245b5515b7684d3c1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  openingTime: 60
+  openingTimeMin: 60
+  openingTimeMax: 100
   timeToNotifyPlayersBeforeOpening: 10
   colorSettings: {fileID: 11400000, guid: 540e0efb517eb1d4f8598ecd8326dff1, type: 2}
 --- !u!1 &9141332185099396012

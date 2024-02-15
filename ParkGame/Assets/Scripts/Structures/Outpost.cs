@@ -201,9 +201,6 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
         if (!IsServer)
         { throw new Exception("only server can spawn unit"); }
 
-        bool canSpawn = playerManager.CanAddSoldierToTeam(Team);
-        if (! canSpawn) { return; }
-
         Spawn();
     }
 

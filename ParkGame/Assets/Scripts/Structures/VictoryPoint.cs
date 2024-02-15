@@ -7,7 +7,8 @@ using UnityEngine;
 public class VictoryPoint : NetworkBehaviour, IConquerable
 {
     [Tooltip("Seconds since spawn to first opening of this Victory Point.")]
-    [SerializeField] float openingTime;
+    [SerializeField] float openingTimeMin;
+    [SerializeField] float openingTimeMax;
     [SerializeField] float timeToNotifyPlayersBeforeOpening;
     [SerializeField] ColorSettings colorSettings;
     
@@ -16,6 +17,7 @@ public class VictoryPoint : NetworkBehaviour, IConquerable
     private float lastConquestTime;
     private bool isOpen;
     private bool isNotified;
+    private float openingTime;
 
     private NetworkList<int> teamScores;
     
@@ -49,6 +51,7 @@ public class VictoryPoint : NetworkBehaviour, IConquerable
         playerManager = FindObjectOfType<PlayerManager>();
         announcer = FindObjectOfType<Announcer>();
         playerManager.OnAllPlayersReady += onAllPlayersReady;
+        openingTime = UnityEngine.Random.Range(openingTimeMin, openingTimeMax);
     }
 
     private void onAllPlayersReady()
@@ -92,6 +95,8 @@ public class VictoryPoint : NetworkBehaviour, IConquerable
 
         if (timeToOpen < 0 && !isOpen)
         {
+            openingTime = UnityEngine.Random.Range(openingTimeMin, openingTimeMax);
+
             OpenVPClientRpc();
             announcer.AnnounceEventClientRpc("Victory Point has opened!", Color.cyan, 5);
             announcer.PlayNotificationClientRpc("Notification");

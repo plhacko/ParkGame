@@ -167,6 +167,14 @@ public class Soldier : NetworkBehaviour, ISoldier {
         CommandChangedEvent.Invoke();
     }
 
+    public bool IsFollowingCommander() {
+        if (CommanderToFollow?.GetComponent<PlayerController>()) {
+            return true;
+        }
+        return false;
+        
+    }
+
     Transform ClosestOutpost() {
         GameObject selectedCommander = gameObject; // just to be sure that something is returned
         float shortestDist = float.PositiveInfinity;
@@ -212,7 +220,7 @@ public class Soldier : NetworkBehaviour, ISoldier {
     }
 
     void Follow() {
-        if (ObjectToFollowInFormation != null) { // attack vlastne znici jejich puvodni formaci
+        if (ObjectToFollowInFormation != null) { 
             FollowObjectWithAnimation(ObjectToFollowInFormation.transform, true); // follow precisely object in formation
         } else if (CommanderToFollow != null) {
             FollowObjectWithAnimation(CommanderToFollow); // follow till some distance (commander in free formation or outpost)
@@ -443,13 +451,15 @@ public class Soldier : NetworkBehaviour, ISoldier {
     }
 
     [ServerRpc(RequireOwnership = false)]
-    public void RequestChangingCommanderToFollowServerRpc(ulong clientID) {
+    public void RequestChangingCommanderToFollowServerRpc(ulong clientID, bool random=false) {
         PlayerController playerController = playerManager.GetPlayerController(clientID);
         if (playerController != null && playerController.Team == Team) {
             
             // play dwarf's 'mrouk'
             ClientRpcParams clientRpcParams = new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new[] { clientID } } };
-            PlaySelectedDwarfSFXClientRpc(clientRpcParams);
+            // random false: play sfx every click on unit
+            // random true: play only sometimes, on gathering call
+            if (!random || UnityEngine.Random.Range(0f, 20f) < 5f) { PlaySelectedDwarfSFXClientRpc(clientRpcParams); }
 
             if (playerController.gameObject.transform != CommanderToFollow) {
                 ReturningToOutpost = false;

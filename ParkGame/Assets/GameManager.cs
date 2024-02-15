@@ -66,7 +66,7 @@ public class GameManager : MonoBehaviour
         PlayerController playerController = playerManager.GetLocalPlayerController();
         
         if (playerController != null && !playerController.IsLocked) {
-            if (key == KeyCode.I) { playerController.CommandMovementServerRpc(); }
+            if (key == KeyCode.T) { playerController.Gather(); }
             if (key == KeyCode.O) { playerController.CommandIdleServerRpc(); }
             if (key == KeyCode.P) { playerController.CommandAttackServerRpc(); }
         }
@@ -92,7 +92,7 @@ public class GameManager : MonoBehaviour
 
     public void CommandMove()
     {
-        Movement(KeyCode.I);
+        Movement(KeyCode.T);
     }
 
     public void CommandIdle()
