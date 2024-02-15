@@ -14,14 +14,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Colors:
   - Name: Blue
-    Color: {r: 0.36258456, g: 0.55875325, b: 0.7924528, a: 1}
+    Color: {r: 0.15948732, g: 0.4300463, b: 0.754717, a: 1}
     TextColor: {r: 0, g: 0.005105671, b: 0.6509434, a: 1}
   - Name: Green
-    Color: {r: 0.3647059, g: 0.79607844, b: 0.39692813, a: 1}
+    Color: {r: 0.111018136, g: 0.764151, b: 0.15851866, a: 1}
     TextColor: {r: 0, g: 0.4528302, b: 0.07260067, a: 1}
   - Name: Yellow
-    Color: {r: 0.83713454, g: 0.8584906, b: 0.39279994, a: 1}
+    Color: {r: 1, g: 0.8780004, b: 0.15471691, a: 1}
     TextColor: {r: 0.990566, g: 0.8183847, b: 0, a: 1}
   - Name: Red
-    Color: {r: 0.8018868, g: 0.31543547, b: 0.26855645, a: 1}
+    Color: {r: 0.8113208, g: 0.07338581, b: 0, a: 1}
     TextColor: {r: 0.4811321, g: 0, b: 0, a: 1}
