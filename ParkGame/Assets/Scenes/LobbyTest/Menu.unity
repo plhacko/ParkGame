@@ -1936,7 +1936,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3167335048040697323, guid: 86bc216476a79ad40b20578ef1f2bf2a, type: 3}
       propertyPath: maxDistance
-      value: 500000
+      value: 30000
       objectReference: {fileID: 0}
     - target: {fileID: 3167335048040697323, guid: 86bc216476a79ad40b20578ef1f2bf2a, type: 3}
       propertyPath: colorSettings
