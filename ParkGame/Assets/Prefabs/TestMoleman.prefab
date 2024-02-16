@@ -121,6 +121,7 @@ GameObject:
   - component: {fileID: 8044945401517817214}
   - component: {fileID: 1500717351819628444}
   - component: {fileID: 7333030658235976814}
+  - component: {fileID: 4855198102711615278}
   m_Layer: 8
   m_Name: TestMoleman
   m_TagString: Untagged
@@ -247,6 +248,36 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 16e878c8ac6e19f46bc87fa57d8fe0a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  NavMeshStatusNow: 0
+  InitialHP: 8
+  BaseMovementSpeed: 0.4
+  HorseManSpeed: 0.5
+  PathMovementSpeedMultiplier: 1.5
+  OuterDistanceFromCommander: 3
+  DefendDistanceFromCommander: 1.5
+  AttackDistanceFromCommander: 8
+  MinAttackRange: 0.12
+  MaxAttackRange: 0.67
+  Attackcooldown: 2
+  Damage: 3
+  TypeOfUnit: 2
+  revealer: {fileID: 1578417005418209535}
+  colorSettings: {fileID: 11400000, guid: 540e0efb517eb1d4f8598ecd8326dff1, type: 2}
+  FollowInNavMeshFormation: 0
+  FormationFromFollowedCommander: {fileID: 0}
+  ObjectToFollowInFormation: {fileID: 0}
+  FormationType: 0
+  midPointPositionForHorseman: {x: 0, y: 0, z: 0}
+  midPointReached: 0
+  targetedEnemy: {fileID: 0}
+  _SoldierCommand:
+    m_InternalValue: 0
+  CommandChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  SpeakEvent:
+    m_PersistentCalls:
+      m_Calls: []
   NavMeshStatusNow: 0
   InitialHP: 8
   BaseMovementSpeed: 0.4
@@ -476,6 +507,48 @@ MonoBehaviour:
   shader2: {fileID: 10753, guid: 0000000000000000f000000000000000, type: 0}
   excludeObjects:
   - {fileID: 1578417005418209535}
+--- !u!114 &4855198102711615278
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5515698993845621550}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3c30a218825e8a42a7da96ef945624b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  NavMeshStatusNow: 0
+  InitialHP: 8
+  BaseMovementSpeed: 0.4
+  HorseManSpeed: 0.5
+  PathMovementSpeedMultiplier: 1.5
+  OuterDistanceFromCommander: 3
+  DefendDistanceFromCommander: 1.5
+  AttackDistanceFromCommander: 8
+  MinAttackRange: 0.12
+  MaxAttackRange: 0.67
+  Attackcooldown: 2
+  Damage: 3
+  TypeOfUnit: 0
+  revealer: {fileID: 1578417005418209535}
+  colorSettings: {fileID: 11400000, guid: 540e0efb517eb1d4f8598ecd8326dff1, type: 2}
+  FollowInNavMeshFormation: 0
+  FormationFromFollowedCommander: {fileID: 0}
+  ObjectToFollowInFormation: {fileID: 0}
+  FormationType: 0
+  midPointPositionForHorseman: {x: 0, y: 0, z: 0}
+  midPointReached: 0
+  targetedEnemy: {fileID: 0}
+  _SoldierCommand:
+    m_InternalValue: 0
+  CommandChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  SpeakEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &5861823242978903207
 GameObject:
   m_ObjectHideFlags: 0

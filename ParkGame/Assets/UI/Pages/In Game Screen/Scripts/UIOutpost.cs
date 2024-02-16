@@ -65,14 +65,14 @@ public class UIOutpost : Selectable, IPointerDownHandler, IPointerUpHandler
         stopwatch.Stop();
     }
 
-    private void OnUnitTypeChange(Soldier.UnitType type)
+    private void OnUnitTypeChange(ISoldier.UnitType type)
     {
         if (outpost.IsCastle)
         {
             outpostIcon.sprite = castleIcon;
             return;
         }
-        if (outpostIcons.Count != Enum.GetNames(typeof(Soldier.UnitType)).Length)
+        if (outpostIcons.Count != Enum.GetNames(typeof(ISoldier.UnitType)).Length)
             return;
 
         var newTypeSprite = outpostIcons[(int)type];
@@ -85,9 +85,9 @@ public class UIOutpost : Selectable, IPointerDownHandler, IPointerUpHandler
     private void OnUnitTypeCountChange()
     {
         var unitTypeCount = outpost.UnitTypeCount;
-        pawnCount.text = unitTypeCount[Soldier.UnitType.Pawn].ToString();
-        archerCount.text = unitTypeCount[Soldier.UnitType.Archer].ToString();
-        horsemanCount.text = unitTypeCount[Soldier.UnitType.Horseman].ToString();
+        pawnCount.text = unitTypeCount[ISoldier.UnitType.Pawn].ToString();
+        archerCount.text = unitTypeCount[ISoldier.UnitType.Archer].ToString();
+        horsemanCount.text = unitTypeCount[ISoldier.UnitType.Horseman].ToString();
     }
 
     void Update()

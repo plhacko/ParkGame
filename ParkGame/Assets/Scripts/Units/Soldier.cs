@@ -9,122 +9,21 @@ using UnityEngine.AI;
 using static Formation;
 
 
-public class Soldier : NetworkBehaviour, ISoldier {
-    public enum UnitType {
-        Pawn,
-        Archer,
-        Horseman
-    };
-
-    public NavMeshPathStatus NavMeshStatusNow;
-
-    // game logic
-    private Transform CommanderToFollow = null;
-    public Transform TransformToFollow { get => CommanderToFollow; }
-    [Header("initial values")]
-    [SerializeField] int InitialHP = 3;
-    [Header("game logic values")]
-    [SerializeField] float BaseMovementSpeed = 1f;
-    [SerializeField] float HorseManSpeed = 0.3f;
-    [SerializeField] float PathMovementSpeedMultiplier = 1.5f;
-    [SerializeField] float OuterDistanceFromCommander; // in outpost, was: sword 2, arch 2, mole 3
-    [SerializeField] float DefendDistanceFromCommander; 
-    [SerializeField] float AttackDistanceFromCommander;
-    [SerializeField] float MinAttackRange;
-    [SerializeField] float MaxAttackRange;
-    [SerializeField] float Attackcooldown = 1.0f;
-    [SerializeField] int Damage = 1;
-    [SerializeField] UnitType TypeOfUnit;
-    private float DeathFadeTime = 2f;
-    [SerializeField] private GameObject revealer;
-    [SerializeField] ColorSettings colorSettings;
-
-    public int MaxHP { get => InitialHP; }
-
-    public UnitType Type { get => TypeOfUnit; }
-
-    private NetworkVariable<int> _HP = new();
-    public int HP { get => _HP.Value; set => _HP.Value = value; }
-    private NetworkVariable<int> _Team = new(-1);
-    public int Team { get => _Team.Value; set => _Team.Value = value; }
-    private NetworkVariable<bool> _ReturningToOutpost = new(false);
-    public bool ReturningToOutpost { get => _ReturningToOutpost.Value; set => _ReturningToOutpost.Value = value; }
-    EnemyObserver EnemyObserver;
-    float AttackTimer = 0.0f;
-
-    // animation
-    private static readonly int AnimatorMovementSpeedHash = Animator.StringToHash("MovementSpeed");
-    private static readonly int AnimatorDirection = Animator.StringToHash("Direction");
-    private SpriteRenderer SpriteRenderer;
-    private NetworkAnimator Networkanimator;
-    private NetworkVariable<bool> XSpriteFlip = new(false,
-        NetworkVariableReadPermission.Everyone,
-        NetworkVariableWritePermission.Owner);
-
-    // formations
-    private NavMeshAgent Agent;
-    public bool FollowInNavMeshFormation;
-    public Formation FormationFromFollowedCommander;
-    public GameObject ObjectToFollowInFormation; // other formation
-    public FormationType FormationType;
-    private float Radius; // until what distance will follow some object - commander, outpost or castle
-
-    public Vector3 midPointPositionForHorseman;
-    public bool midPointReached;
-    public Transform targetedEnemy;
-
-    private ShootScript shooting;
-    private PlayerManager playerManager;
-    private ChangeMaterial changeMaterial;
-    private PathTileChecker pathTileChecker;
-    
-    private SpriteRenderer circleRenderer;
-    private GameSessionManager gameSessionManager;
-
-    public Action OnDeath;
-    private int EnemiesInAttackWaveCounter; // counter in attack wave - how many were targeted in a row during one attack command
-
-    public NetworkVariable<SoldierCommand> _SoldierCommand = new NetworkVariable<SoldierCommand>();
-    public SoldierCommand Command { get => _SoldierCommand.Value; set => _SoldierCommand.Value = value; }
-
-    public UnityEvent CommandChangedEvent;
-    public UnityEvent SpeakEvent;
-    private bool isDead;
-    private float timeToDeath;
-
-
-    private void Initialize() {
-        playerManager = FindObjectOfType<PlayerManager>();
-        gameSessionManager = FindObjectOfType<GameSessionManager>();
-        EnemyObserver = GetComponentInChildren<EnemyObserver>();
-        SpriteRenderer = GetComponent<SpriteRenderer>();
-        Agent = GetComponent<NavMeshAgent>();
-        Networkanimator = GetComponent<NetworkAnimator>();
-        shooting = GetComponent<ShootScript>();
-        changeMaterial = GetComponent<ChangeMaterial>();
-        circleRenderer = transform.Find("Circle")?.GetComponent<SpriteRenderer>();
-        pathTileChecker = FindObjectOfType<PathTileChecker>();
-
-
+public class Soldier : ISoldier {
+    protected override void Initialize() {
+//        shooting = GetComponent<ShootScript>(); // only for Archers
         _Team.OnValueChanged += OnTeamChanged;
-
         SpriteRenderer.flipX = XSpriteFlip.Value;
-
-        if (IsServer) HP = InitialHP;
-
         XSpriteFlip.OnValueChanged += OnXSpriteFlipChanged;
-
-        FormationType = FormationType.Free;
         _SoldierCommand.OnValueChanged += OnCommandChange;
         OnCommandChange(0, Command);
-        isDead = false;
-        timeToDeath = DeathFadeTime;
 
-        Radius = UnityEngine.Random.Range(0.2f, 1.2f);
+
 
     }
     public override void OnNetworkSpawn() {
         base.OnNetworkSpawn();
+        base.Initialize();
         Initialize();
     }
 
@@ -146,23 +45,6 @@ public class Soldier : NetworkBehaviour, ISoldier {
         }
     }
 
-    [ClientRpc]
-    void PlayDeathSFXClientRpc() {
-        AudioManager.Instance.PlayDead(transform.position);
-    }
-
-    [ClientRpc]
-    void PlaySwordAttackSFXClientRpc() {
-        AudioManager.Instance.PlayPawnAttack(transform.position);
-    }
-    [ClientRpc]
-    void PlayArcherAttackSFXClientRpc() {
-        AudioManager.Instance.PlayArcherAttack(transform.position);
-    }
-    [ClientRpc]
-    void PlaySelectedDwarfSFXClientRpc(ClientRpcParams clientRpcParams = default) {
-        AudioManager.Instance.PlayClickOnDwarf(transform.position);
-    }
     private void OnCommandChange(SoldierCommand previousValue, SoldierCommand newValue) {
         CommandChangedEvent.Invoke();
     }
@@ -300,30 +182,7 @@ public class Soldier : NetworkBehaviour, ISoldier {
      * Get position to follow in formation - based on formationType 
      * Called from PlayerController 
      */
-    public void NavMeshFormationSwitch(bool enable, Formation formation, FormationType formationType) {
-        // if in Circle or Box Formation or Free, it is following something
-        //Command = SoldierCommand.Following;
-        FollowInNavMeshFormation = enable;
-
-        if (!enable) { // disable, Unsubscribe from formation
-            formation.RemoveFromFormation(gameObject, ObjectToFollowInFormation, FormationType);
-            ObjectToFollowInFormation = null;
-
-        } else {
-            FormationFromFollowedCommander = formation;
-            FormationType = formationType;
-            switch (FormationType) {
-                case FormationType.Circle:
-                    ObjectToFollowInFormation = FormationFromFollowedCommander.GetPositionInFormation(gameObject, FormationType.Circle);
-                    break;
-                case FormationType.Box:
-                    ObjectToFollowInFormation = FormationFromFollowedCommander.GetPositionInFormation(gameObject, FormationType.Box);
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
+   
     public UnitType GetUnitType() {
         return TypeOfUnit;
     }
@@ -502,7 +361,7 @@ public class Soldier : NetworkBehaviour, ISoldier {
     }
 
     /// <summary> !call only on server! </summary>
-    public void TakeDamage(int damage) {
+    public override void TakeDamage(int damage) {
         if (!IsServer) { throw new Exception($"soldier ({gameObject.name}) can take damage only on server"); }
         if (isDead) { return; }
         Debug.Log("take damage");
@@ -538,7 +397,7 @@ public class Soldier : NetworkBehaviour, ISoldier {
         timeToDeath = time;
     }
 
-    public void NewCommand(SoldierCommand command) {
+    public override void NewCommand(SoldierCommand command) {
         if (!IsServer) { return; }
 
         Command = command;
