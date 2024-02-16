@@ -306,7 +306,7 @@ public class Soldier : NetworkBehaviour, ISoldier {
         FollowInNavMeshFormation = enable;
 
         if (!enable) { // disable, Unsubscribe from formation
-            formation.RemoveFromFormation(gameObject, ObjectToFollowInFormation, FormationType, true);
+            formation.RemoveFromFormation(gameObject, ObjectToFollowInFormation, FormationType);
             ObjectToFollowInFormation = null;
 
         } else {
@@ -478,7 +478,7 @@ public class Soldier : NetworkBehaviour, ISoldier {
             {
                 ReturningToOutpost = true;
                 var closestOutpost = ClosestOutpost();
-                FormationFromFollowedCommander?.RemoveFromFormation(gameObject, ObjectToFollowInFormation, FormationType, true);
+                FormationFromFollowedCommander?.RemoveFromFormation(gameObject, ObjectToFollowInFormation, FormationType);
                 CommanderToFollow?.GetComponent<ICommander>()?.ReportUnfollowing(gameObject);
                 SetCommanderToFollow(closestOutpost);
                 NewCommand(SoldierCommand.Following);
@@ -528,7 +528,7 @@ public class Soldier : NetworkBehaviour, ISoldier {
         PlayDeathSFXClientRpc();
         CommanderToFollow?.GetComponent<ICommander>()?.ReportUnfollowing(gameObject);
 
-        FormationFromFollowedCommander?.RemoveFromFormation(gameObject, ObjectToFollowInFormation, FormationType, true);
+        FormationFromFollowedCommander?.RemoveFromFormation(gameObject, ObjectToFollowInFormation, FormationType);
         OnDeath?.Invoke();
         playerManager.RemoveSoldierFromTeam(Team, transform);
         TimeToDestroy(DeathFadeTime);

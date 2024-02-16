@@ -14,20 +14,20 @@ public class Formation : MonoBehaviour {
     [Tooltip("Show positions for units")]
     [SerializeField] private bool DEBUG;
     [SerializeField] GameObject PositionPrefab;
-    [SerializeField] CircleFormation formationCircle;
-    [SerializeField] BoxFormation formationBox;
     [SerializeField] private ColorSettings colorSettings;
 
     public List<GameObject> soldiers = new List<GameObject>();
     public List<GameObject> soldiersSwordmen = new List<GameObject>();
     public List<GameObject> soldiersArchers = new List<GameObject>();
     public List<GameObject> soldiersMolemen = new List<GameObject>();
-    Color teamColor;
-
     public GameObject HorseRoot;
     // box formation
     public GameObject BoxRoot;
 
+    private IFormationType activeFormation;
+    private CircleFormation formationCircle;
+    private BoxFormation formationBox;
+    private Color teamColor;
     // disable renderer of object
     public void Hide(GameObject go) {
         var sr = go.GetComponent<SpriteRenderer>();
@@ -48,8 +48,8 @@ public class Formation : MonoBehaviour {
         UnparentFormation(BoxRoot, new Vector3(p.x - 2, p.y, p.z));
         formationCircle = GetComponent<CircleFormation>();
         formationBox = GetComponent<BoxFormation>();
-        formationCircle.SetRoots(HorseRoot, this);
-        formationBox.SetRoots(BoxRoot, HorseRoot, this);
+        formationCircle.SetRoots(this, HorseRoot, null);
+        formationBox.SetRoots(this, HorseRoot, BoxRoot);
         Hide(BoxRoot, false);
         Hide(HorseRoot, false);
     }
@@ -113,25 +113,32 @@ public class Formation : MonoBehaviour {
         return Soldier.UnitType.Pawn; // default
     }
 
-    public void RemoveFromFormation(GameObject soldier, GameObject position, FormationType shape = FormationType.Circle, bool destroy = true) {
+    private void SetActiveFormation(FormationType shape) {
+        if (shape == FormationType.Circle) { 
+            activeFormation = formationCircle; 
+        } else if (shape == FormationType.Box) {
+            activeFormation = formationBox;
+        }
+
+    }
+
+    public void RemoveFromFormation(GameObject soldier, GameObject position, FormationType shape) {
         if (soldiers.Contains(soldier)) {
             soldiers.Remove(soldier);
         }
-        
-        if (shape == FormationType.Circle) { formationCircle.RemoveFromFormation(soldier, position, destroy); }
-        if (shape == FormationType.Box) { formationBox.RemoveFromFormation(soldier, position, false); }
+        SetActiveFormation(shape);
+        if (shape == FormationType.Free) { return; }
+        activeFormation.RemoveFromFormation(soldier, position);
     }
 
     // starting point!
-    public GameObject GetPositionInFormation(GameObject soldier, FormationType shape = FormationType.Circle) {
+    public GameObject GetPositionInFormation(GameObject soldier, FormationType shape) {
         if (soldiers.Contains(soldier)) { return null; } // soldier already there?
         soldiers.Add(soldier);
         Soldier.UnitType unitType = AddSoldierByType(soldier);
-        if (shape == FormationType.Box) {
-            return formationBox.GetPosition(unitType);
-        }
-        // circular formation: archers in smaller circle, swordmen in bigger circle, molemen rotate around
-        return formationCircle.GetPosition(unitType);
+
+        SetActiveFormation(shape);
+        return activeFormation.GetPosition(unitType);
     }
 
     private void RemoveSpheres() {

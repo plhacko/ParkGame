@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BoxFormation : MonoBehaviour
+public class BoxFormation : MonoBehaviour, IFormationType
 {
     private GameObject BoxRoot;
     private GameObject HorseRoot;
@@ -20,10 +20,10 @@ public class BoxFormation : MonoBehaviour
         }
     }
 
-    public void SetRoots(GameObject br, GameObject hr, Formation f) {
-        BoxRoot = br;
-        HorseRoot = hr;
+    public void SetRoots(Formation f, GameObject hr, GameObject br) {
         formation = f;
+        HorseRoot = hr;
+        BoxRoot = br;
     }
 
     private void RotateHorseFormation() {
@@ -83,7 +83,7 @@ public class BoxFormation : MonoBehaviour
         formDescr.NumberOfHorsemenPositions++;
     }
 
-    public void RemoveFromFormation(GameObject soldier, GameObject position, bool destroy = true) {
+    public void RemoveFromFormation(GameObject soldier, GameObject position) {
         Soldier.UnitType unitType = soldier.GetComponent<Soldier>().GetUnitType();
         var positionList = FormationBox;
         var soldierList = formation.soldiersSwordmen; 
@@ -96,7 +96,7 @@ public class BoxFormation : MonoBehaviour
                 soldierList = formation.soldiersArchers;
             }
         }
-        formation.Remove(soldier, position, soldierList, positionList, destroy);
+        formation.Remove(soldier, position, soldierList, positionList, false);
     }
 
     private void Add1PositionToBoxFormation() {

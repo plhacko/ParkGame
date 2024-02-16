@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CircleFormation : MonoBehaviour {
+public class CircleFormation : MonoBehaviour, IFormationType {
     private GameObject HorseRoot;
     private Formation formation;
 
@@ -15,7 +15,7 @@ public class CircleFormation : MonoBehaviour {
         FormationCircleForHorses.Clear();
     }
 
-    public void RemoveFromFormation(GameObject soldier, GameObject position, bool destroy = true) {
+    public void RemoveFromFormation(GameObject soldier, GameObject position) {
         Soldier.UnitType unitType = soldier.GetComponent<Soldier>().GetUnitType();
         var positionList = FormationCircleOuter;
         var soldierList = formation.soldiersSwordmen; 
@@ -29,12 +29,12 @@ public class CircleFormation : MonoBehaviour {
             positionList = FormationCircleForHorses;
             soldierList = formation.soldiersMolemen;
         }
-        formation.Remove(soldier, position, soldierList, positionList, destroy);
+        formation.Remove(soldier, position, soldierList, positionList, true);
     }
 
-    public void SetRoots(GameObject hr, Formation f) {
-        HorseRoot = hr;
+    public void SetRoots(Formation f, GameObject hr, GameObject br) {
         formation = f;
+        HorseRoot = hr;
     }
 
     private void Add1PositionToCircularFormation(Vector3 pos, List<GameObject> lst, GameObject parent) {
