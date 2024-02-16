@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5446646868423074499}
-  - component: {fileID: 5446646868423074496}
   - component: {fileID: 5446646868423074498}
   m_Layer: 0
   m_Name: AudioManager
@@ -36,20 +35,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5446646868423074496
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5446646868423074501}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5c246197b5a82e94bb86c1928491399c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  notificationsSlider: {fileID: 0}
-  sfxSlider: {fileID: 0}
 --- !u!114 &5446646868423074498
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -62,7 +47,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1789ab7a9bb87b347afc871f394d0505, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sfxSource: {fileID: 5446646869533372605}
   clickSfxSource: {fileID: 2852450036666433336}
   commandsSource: {fileID: 0}
   notificationsSource: {fileID: 0}
