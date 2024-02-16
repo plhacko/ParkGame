@@ -1868,7 +1868,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerControllerPrefab: {fileID: -2561659011316829293, guid: 6792bdcabd42fb04987eb19d3912546f, type: 3}
   MinInitialDistanceFromOutpost: 5
-  unitCapacity: 40
 --- !u!4 &1184332470
 Transform:
   m_ObjectHideFlags: 0

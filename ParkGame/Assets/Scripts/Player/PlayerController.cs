@@ -50,6 +50,7 @@ namespace Player
 
         public Formation.FormationType FormationType;
         public bool followPin = false;
+        private SoldierCommand lastCommand;
 
         public Formation.FormationType GetFormation() {
             return FormationType;
@@ -177,6 +178,7 @@ namespace Player
 
         public void Gather() {
             GatherWidget.CallGatherCommand(Team);
+            // fallback also?
             GatherSoldiersInRangeServerRpc(NetworkManager.Singleton.LocalClientId);
         }
 
@@ -223,6 +225,7 @@ namespace Player
         private void notifySoldiers() {
             foreach (GameObject go in units) {
                 if (go.TryGetComponent<ISoldier>(out ISoldier soldier)) {
+                    lastCommand = SoldierCommand.Following;
                     soldier.NewCommand(SoldierCommand.Following);
 
                     switch (FormationType) {
@@ -243,6 +246,10 @@ namespace Player
                     }
                 }
             }
+        }
+
+        public SoldierCommand GetLastCommand() {
+            return lastCommand;
         }
 
         public void MoveTowards(Vector3 position)
@@ -367,6 +374,7 @@ namespace Player
             {
                 if (go.TryGetComponent<ISoldier>(out ISoldier soldier))
                 {
+                    lastCommand = SoldierCommand.Following;
                     soldier.NewCommand(SoldierCommand.Following);
                 }
             }
@@ -376,6 +384,7 @@ namespace Player
         public void CommandIdleServerRpc() {
             foreach (GameObject go in units) {
                 if (go.TryGetComponent<ISoldier>(out ISoldier soldier)) {
+                    lastCommand = SoldierCommand.Following;
                     soldier.NewCommand(SoldierCommand.Following);
                 }
             }
@@ -387,6 +396,7 @@ namespace Player
             //FormationType = Formation.FormationType.Free;
             foreach (GameObject go in units) {
                 if (go.TryGetComponent<ISoldier>(out ISoldier soldier)) {
+                    lastCommand = SoldierCommand.Attack;
                     soldier.NewCommand(SoldierCommand.Attack);
                 }
             }
