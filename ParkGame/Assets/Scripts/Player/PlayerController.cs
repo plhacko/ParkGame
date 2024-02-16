@@ -115,7 +115,7 @@ namespace Player
                 changeMaterial.Change(true);
             }
             
-            formationScript.InitializeFormation(); // build prefab, get position of the commander
+            formationScript.InitializeFormation(Team); // build prefab, get position of the commander
             FormationType = Formation.FormationType.Free; // movement without navmesh
 
             if (IsOwner)

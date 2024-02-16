@@ -16,10 +16,13 @@ public class Formation : MonoBehaviour {
     [SerializeField] GameObject PositionPrefab;
     [SerializeField] CircleFormation formationCircle;
     [SerializeField] BoxFormation formationBox;
+    [SerializeField] private ColorSettings colorSettings;
+
     public List<GameObject> soldiers = new List<GameObject>();
     public List<GameObject> soldiersSwordmen = new List<GameObject>();
     public List<GameObject> soldiersArchers = new List<GameObject>();
     public List<GameObject> soldiersMolemen = new List<GameObject>();
+    Color teamColor;
 
     public GameObject HorseRoot;
     // box formation
@@ -39,7 +42,8 @@ public class Formation : MonoBehaviour {
         go.transform.rotation = Quaternion.Euler(new Vector3(0, 0, 90));
     }
 
-    public void InitializeFormation() {
+    public void InitializeFormation(int colorIndex) {
+        teamColor = colorSettings.Colors[colorIndex].Color;
         Vector3 p = gameObject.transform.position;
         UnparentFormation(BoxRoot, new Vector3(p.x - 2, p.y, p.z));
         formationCircle = GetComponent<CircleFormation>();
@@ -54,6 +58,7 @@ public class Formation : MonoBehaviour {
     private void Hide(GameObject go, bool show) {
         var sr = go.GetComponent<SpriteRenderer>();
         var mr = go.GetComponent<MeshRenderer>();
+        sr.color = teamColor;
         if (sr) { sr.enabled = show; }
         if (mr) { mr.enabled = show; }
     }

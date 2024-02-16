@@ -492,9 +492,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DEBUG: 1
-  PositionPrefab: {fileID: 6223394261764091226, guid: e225b3896b59c98438cc2d5cf8fdb19c, type: 3}
+  PositionPrefab: {fileID: 8445700170667219416, guid: 8017038a20629f746abec45be20ba768, type: 3}
   formationCircle: {fileID: 0}
   formationBox: {fileID: 0}
+  colorSettings: {fileID: 11400000, guid: 540e0efb517eb1d4f8598ecd8326dff1, type: 2}
   soldiers: []
   soldiersSwordmen: []
   soldiersArchers: []
