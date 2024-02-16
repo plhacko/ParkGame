@@ -9,19 +9,13 @@ public class Soldier : ISoldier {
     }
    
     // volat na vsech typech override!!!
-    protected override void SetSoldierSpeed()
-    {
-        if (TypeOfUnit == UnitType.Horseman) {
+    protected override void SetSoldierSpeed() {
+        if (playerManager.GetLocalPlayerController().IsOnPath ||
+           (ReturningToOutpost && pathTileChecker.IsNearbyPath(Agent.transform.position)) // short-circuiting for efficiency
+           ) {
+            Agent.speed = BaseMovementSpeed * PathMovementSpeedMultiplier;
+        } else {
             Agent.speed = BaseMovementSpeed;
-        }
-        if (TypeOfUnit != UnitType.Horseman || (TypeOfUnit == UnitType.Horseman && FormationType == FormationType.Box)) {
-            if (
-                playerManager.GetLocalPlayerController().IsOnPath ||
-                (ReturningToOutpost && pathTileChecker.IsNearbyPath(Agent.transform.position)) // short-circuiting for efficiency
-            )
-                Agent.speed = BaseMovementSpeed * PathMovementSpeedMultiplier;
-            else
-                Agent.speed = BaseMovementSpeed;
         }
     }
 
@@ -30,18 +24,6 @@ public class Soldier : ISoldier {
             return targetedEnemy;
         }
         Transform enemyT = EnemyObserver.GetClosestEnemy();
-        // dat pak podle potreby do Archer a Moleridera!
-        if (TypeOfUnit == UnitType.Archer) {
-            enemyT = EnemyObserver.GetEnemyInRange(MinAttackRange, MaxAttackRange);
-        }
-        if (TypeOfUnit == UnitType.Horseman) {
-            if (EnemiesInAttackWaveCounter == 0) {
-                Debug.Log("WAVE == 0");
-
-                enemyT = EnemyObserver.GetFarthestEnemy(); // else attack the closest enemy
-            }
-        }
-        targetedEnemy = enemyT;
         return enemyT;
     }
 
@@ -62,7 +44,6 @@ public class Soldier : ISoldier {
                 {
                     PlaySwordAttackSFXClientRpc();
                     enemyT.GetComponent<ISoldier>()?.TakeDamage(Damage);
-
                 }
                 if (TypeOfUnit == UnitType.Archer) {
                     Vector2 direction = enemyT.position - transform.position;

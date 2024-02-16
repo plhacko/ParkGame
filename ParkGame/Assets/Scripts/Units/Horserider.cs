@@ -1,7 +1,6 @@
 using UnityEngine;
 using static Formation;
 
-
 public class Horserider : ISoldier {
     [SerializeField] protected float HorseManSpeed = 0.3f;
 
@@ -9,16 +8,26 @@ public class Horserider : ISoldier {
         base.Initialize();
     }
 
-    // basemovement speed ???
+    public override void NewCommand(SoldierCommand command) {
+        if (!IsServer) { return; }
+
+        Command = command;
+        if (command == SoldierCommand.Attack) {
+            EnemiesInAttackWaveCounter = 0; // reset counter of targeted enemies (because of moleman's modus operandi)
+        }
+    }
+
+// basemovement speed ???
     protected override void SetSoldierSpeed() {
         Agent.speed = HorseManSpeed;
         if (FormationType == FormationType.Box) {
             if (playerManager.GetLocalPlayerController().IsOnPath ||
                 (ReturningToOutpost && pathTileChecker.IsNearbyPath(Agent.transform.position)) // short-circuiting for efficiency
-            )
+            ) {
                 Agent.speed = BaseMovementSpeed * PathMovementSpeedMultiplier;
-            else
+            } else {
                 Agent.speed = BaseMovementSpeed;
+            }
         }
     }
 
@@ -28,9 +37,8 @@ public class Horserider : ISoldier {
         }
         Transform enemyT = EnemyObserver.GetClosestEnemy();
         if (EnemiesInAttackWaveCounter == 0) {
-            enemyT = EnemyObserver.GetFarthestEnemy(); // else attack the closest enemy
+            enemyT = EnemyObserver.GetFarthestEnemy(); 
         }
-        targetedEnemy = enemyT;
         return enemyT;
     }
 

@@ -448,13 +448,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   InitialHP: 8
   BaseMovementSpeed: 0.4
-  HorseManSpeed: 0.5
   PathMovementSpeedMultiplier: 1.5
   DefendDistanceFromCommander: 1.5
-  AttackDistanceFromCommander: 8
+  AttackDistanceFromCommander: 6
   MinAttackRange: 0.23
   MaxAttackRange: 0.67
-  Attackcooldown: 2
+  Attackcooldown: 1.5
   Damage: 3
   TypeOfUnit: 2
   revealer: {fileID: 1578417005418209535}
@@ -463,8 +462,6 @@ MonoBehaviour:
   FormationFromFollowedCommander: {fileID: 0}
   ObjectToFollowInFormation: {fileID: 0}
   FormationType: 0
-  midPointPositionForHorseman: {x: 0, y: 0, z: 0}
-  midPointReached: 0
   targetedEnemy: {fileID: 0}
   _SoldierCommand:
     m_InternalValue: 0
@@ -474,6 +471,7 @@ MonoBehaviour:
   SpeakEvent:
     m_PersistentCalls:
       m_Calls: []
+  HorseManSpeed: 0.5
 --- !u!1 &5861823242978903207
 GameObject:
   m_ObjectHideFlags: 0

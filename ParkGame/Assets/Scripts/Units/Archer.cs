@@ -1,19 +1,15 @@
 using UnityEngine;
-using static Formation;
-
 
 public class Archer : ISoldier {
 
     private ShootScript shooting;
     protected override void Initialize() {
-  //      shooting = GetComponent<ShootScript>(); 
+        shooting = GetComponent<ShootScript>(); 
     }
-    private void Start() {
-              shooting = GetComponent<ShootScript>(); 
-    }
+    
     public override void OnNetworkSpawn() {
         base.Initialize();
- //       Initialize();
+        Initialize();
     }
 
     protected override void SetSoldierSpeed() {
@@ -26,12 +22,21 @@ public class Archer : ISoldier {
         }
     }
 
+    protected override void MoveTowardsEntity(Transform entityT) {
+        // archers, don't go closer! you'd just die 
+        if (Vector3.Distance(entityT.position, transform.position) < MinAttackRange) {
+            return;
+        }
+
+        FollowObjectWithAnimation(entityT, true);
+    }
+
     protected override Transform GetEnemy() {
         if (targetedEnemy != null) {
             return targetedEnemy;
         }
-        targetedEnemy = EnemyObserver.GetEnemyInRange(MinAttackRange, MaxAttackRange);
-        return targetedEnemy;
+        Transform enemyT = EnemyObserver.GetEnemyInRange(MinAttackRange, MaxAttackRange);
+        return enemyT;
     }
 
     protected override bool AttackEnemyIfInRange(Transform enemyT, float maxAttackDistance = 0) {

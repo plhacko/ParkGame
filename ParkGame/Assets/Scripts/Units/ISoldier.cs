@@ -160,14 +160,10 @@ public class ISoldier : NetworkBehaviour, ITeamMember {
         return enemyT;
     }
 
-    public void NewCommand(SoldierCommand command) {
+    public virtual void NewCommand(SoldierCommand command) {
         if (!IsServer) { return; }
 
         Command = command;
-
-        if (command == SoldierCommand.Attack) {
-            EnemiesInAttackWaveCounter = 0; // reset counter of targeted enemies (because of moleman's modus operandi)
-        }
 }
 
     public void NavMeshFormationSwitch(bool enable, Formation formation, FormationType formationType) {
@@ -270,7 +266,7 @@ public class ISoldier : NetworkBehaviour, ITeamMember {
 
     void StationedInOutpost() {
         float distanceFromOutpost = Vector3.Distance(CommanderToFollow.position, transform.position);
-        if (distanceFromOutpost <= DefendDistanceFromCommander) { // have a value for every unit the same depending on the outpost's range???
+        if (distanceFromOutpost <= DefendDistanceFromCommander) { 
             Networkanimator.Animator.SetFloat(AnimatorMovementSpeedHash, 0.0f);
             Agent.SetDestination(transform.position);
         }
@@ -302,10 +298,12 @@ public class ISoldier : NetworkBehaviour, ITeamMember {
     void AttackOnCommand() {
         Transform enemyT = GetEnemy();
         if (enemyT != null) {
+            if (enemyT != targetedEnemy) {
+                EnemiesInAttackWaveCounter++;
+            }
             targetedEnemy = enemyT;
-            EnemiesInAttackWaveCounter++;
-        } else { // no enemy is close by, go to the commander
-            // not reset the formation positions upon calling Attack?
+        } else {
+            // or reset the formation positions upon calling Attack?
             Follow();
             return;
         }
@@ -368,12 +366,7 @@ public class ISoldier : NetworkBehaviour, ITeamMember {
         XSpriteFlip.Value = directionE == Direction.Left;
     }
 
-    protected void MoveTowardsEntity(Transform entityT) {
-        // archers, don't go closer! you'd just die 
-        if (Vector3.Distance(entityT.position, transform.position) < MinAttackRange && TypeOfUnit == UnitType.Archer) {
-            return;
-        }
-
+    protected virtual void MoveTowardsEntity(Transform entityT) {
         FollowObjectWithAnimation(entityT, true);
     }
 
