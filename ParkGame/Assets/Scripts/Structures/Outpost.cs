@@ -13,7 +13,7 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
     [SerializeField] int InitialPawns = 3;
     [SerializeField] float SpawnTime = 4; // 4s
 
-    [SerializeField] private Soldier.UnitType InitOutpostUnitType;
+    [SerializeField] private ISoldier.UnitType InitOutpostUnitType;
     [SerializeField] private GameObject revealer;
     [SerializeField] ColorSettings colorSettings;
     [SerializeField] private Collider2D switchCollider;
@@ -39,9 +39,9 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
     // TODO Action and Dictionary should be reinitialized on outpost owner change
     public Action OnUnitTypeCountChange;
     public Dictionary<Soldier.UnitType, int> UnitTypeCount = new() {
-        { Soldier.UnitType.Pawn, 0 },
-        { Soldier.UnitType.Archer, 0 },
-        { Soldier.UnitType.Horseman, 0 }
+        { ISoldier.UnitType.Pawn, 0 },
+        { ISoldier.UnitType.Archer, 0 },
+        { ISoldier.UnitType.Horseman, 0 }
     };
     private Announcer announcer;
     private bool isSpawning = false;
@@ -62,7 +62,7 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
         sr = GetComponent<SpriteRenderer>();
         spawner = GetComponent<ToggleSpawner>();
         shootSalvo = GetComponent<ShootSalvo>(); // castle shoots salvo of arrows on enemies in its enemy detector
-        if (InitOutpostUnitType == Soldier.UnitType.Archer)
+        if (InitOutpostUnitType == ISoldier.UnitType.Archer)
         {
             counter = 1;
         }
@@ -74,17 +74,17 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
     {
         Debug.LogWarning("Spawning initial units in outpost + " + InitialHorsemans + " horsemen. " + InitialArchers + " archers. " + InitialPawns + " pawns.");
 
-        spawner.SetSpawnType(Soldier.UnitType.Horseman);
+        spawner.SetSpawnType(ISoldier.UnitType.Horseman);
         for (int i = 0; i < InitialHorsemans; i++) {
             SpawnUnit();
         }
 
-        spawner.SetSpawnType(Soldier.UnitType.Archer);
+        spawner.SetSpawnType(ISoldier.UnitType.Archer);
         for (int i = 0; i < InitialArchers; i++) {
             SpawnUnit();
         }
 
-        spawner.SetSpawnType(Soldier.UnitType.Pawn);
+        spawner.SetSpawnType(ISoldier.UnitType.Pawn);
         for (int i = 0; i < InitialPawns; i++) {
             SpawnUnit();
         }
@@ -218,7 +218,7 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
             return;
         }
 
-        if (!networkObject.TryGetComponent<Soldier>(out var soldier))
+        if (!networkObject.TryGetComponent<ISoldier>(out var soldier))
         {
             Debug.LogError($"Could not find soldier {networkObjectReference}");
             return;
@@ -228,7 +228,7 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
     }
 
     [ClientRpc]
-    private void addToUnitsClientRpc(NetworkObjectReference networkObjectReference, int team, Soldier.UnitType unitType, ClientRpcParams clientRpcParams = default)
+    private void addToUnitsClientRpc(NetworkObjectReference networkObjectReference, int team, ISoldier.UnitType unitType, ClientRpcParams clientRpcParams = default)
     {
         var localPlayer = playerManager.GetLocalPlayerController();
         if (team == localPlayer.Team)
@@ -252,7 +252,7 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
             return;
         }
 
-        if (!networkObject.TryGetComponent<Soldier>(out var soldier))
+        if (!networkObject.TryGetComponent<ISoldier>(out var soldier))
         {
             Debug.LogError($"Could not find soldier {networkObjectReference}");
             return;
@@ -262,7 +262,7 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
     }
 
     [ClientRpc]
-    private void removeFromUnitsClientRpc(NetworkObjectReference networkObjectReference, int team, Soldier.UnitType unitType, ClientRpcParams clientRpcParams = default)
+    private void removeFromUnitsClientRpc(NetworkObjectReference networkObjectReference, int team, ISoldier.UnitType unitType, ClientRpcParams clientRpcParams = default)
     {
         var localPlayer = playerManager.GetLocalPlayerController();
         if (team == localPlayer.Team)
@@ -289,7 +289,7 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
             if (canBeToggled) {
                 Debug.Log("change spawning type");
                 counter++;
-                int numOfUnitTypes = Enum.GetNames(typeof(Soldier.UnitType)).Length;
+                int numOfUnitTypes = Enum.GetNames(typeof(ISoldier.UnitType)).Length;
                 ChangeIconClientRpc(counter % numOfUnitTypes);
 
                 // play sfx just for the changing player -- maybe for the whole team?

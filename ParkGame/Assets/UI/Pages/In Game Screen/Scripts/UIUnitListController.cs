@@ -6,16 +6,16 @@ using UnityEngine;
 public class UIUnitListController : MonoBehaviour
 {
     [SerializeField] private UIUnit unitPrefab;
-    private Dictionary<Soldier, UIUnit> units = new Dictionary<Soldier, UIUnit>();
+    private Dictionary<ISoldier, UIUnit> units = new Dictionary<ISoldier, UIUnit>();
     
-    public void AddUnit(Soldier soldier, Action removeAction)
+    public void AddUnit(ISoldier soldier, Action removeAction)
     {
         var unit = Instantiate(unitPrefab, transform);
         units.Add(soldier, unit);
         unit.Initialize(soldier, removeAction , () => RemoveUnit(soldier));
     }
 
-    public void RemoveUnit(Soldier soldier)
+    public void RemoveUnit(ISoldier soldier)
     {
         if (units.ContainsKey(soldier))
         {

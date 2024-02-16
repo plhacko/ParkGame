@@ -47,14 +47,14 @@ public class BoxFormation : MonoBehaviour, IFormationType
         }
     }
 
-    public GameObject GetPosition(Soldier.UnitType unitType) {
+    public GameObject GetPosition(ISoldier.UnitType unitType) {
         var positionList = FormationBox;
         int freeInBox = formation.GetNumberOfUnassignedPositions(FormationBox);
         int freeHorses = formation.GetNumberOfUnassignedPositions(FormationBoxForHorses);
-        if (unitType != Soldier.UnitType.Horseman && freeInBox < 1) {
+        if (unitType != ISoldier.UnitType.Horseman && freeInBox < 1) {
             Add1PositionToBoxFormation();
         }
-        if (unitType == Soldier.UnitType.Horseman) {
+        if (unitType == ISoldier.UnitType.Horseman) {
             if (freeHorses < 1) {
                 Add1PositionOnTheSide();
             }
@@ -84,15 +84,15 @@ public class BoxFormation : MonoBehaviour, IFormationType
     }
 
     public void RemoveFromFormation(GameObject soldier, GameObject position) {
-        Soldier.UnitType unitType = soldier.GetComponent<Soldier>().GetUnitType();
+        ISoldier.UnitType unitType = soldier.GetComponent<Soldier>().GetUnitType();
         var positionList = FormationBox;
         var soldierList = formation.soldiersSwordmen; 
-        if (unitType == Soldier.UnitType.Horseman) {
+        if (unitType == ISoldier.UnitType.Horseman) {
             positionList = FormationBoxForHorses;
             soldierList = formation.soldiersMolemen;
         } else {
             positionList = FormationBox;
-            if (unitType == Soldier.UnitType.Archer) {
+            if (unitType == ISoldier.UnitType.Archer) {
                 soldierList = formation.soldiersArchers;
             }
         }

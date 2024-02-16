@@ -29,7 +29,6 @@ public class ISoldier : NetworkBehaviour, ITeamMember {
     [SerializeField] protected int InitialHP = 3;
     [Header("game logic values")]
     [SerializeField] protected float BaseMovementSpeed = 1f;
-    [SerializeField] protected float HorseManSpeed = 0.3f;
     [SerializeField] protected float PathMovementSpeedMultiplier = 1.5f;
     [SerializeField] protected float DefendDistanceFromCommander;
     [SerializeField] protected float AttackDistanceFromCommander;
@@ -71,12 +70,9 @@ public class ISoldier : NetworkBehaviour, ITeamMember {
     public GameObject ObjectToFollowInFormation; // other formation
     public FormationType FormationType;
     protected float Radius; // until what distance will follow some object - commander, outpost or castle
-
-    public Vector3 midPointPositionForHorseman;
-    public bool midPointReached;
+    
     public Transform targetedEnemy;
 
-    protected ShootScript shooting;
     protected PlayerManager playerManager;
     protected ChangeMaterial changeMaterial;
     protected PathTileChecker pathTileChecker;
@@ -113,7 +109,7 @@ public class ISoldier : NetworkBehaviour, ITeamMember {
         }
     }
 
-    protected void OnCommandChange(SoldierCommand previousValue, SoldierCommand newValue) {
+    public void OnCommandChange(SoldierCommand previousValue, SoldierCommand newValue) {
         CommandChangedEvent.Invoke();
     }
 
@@ -164,14 +160,21 @@ public class ISoldier : NetworkBehaviour, ITeamMember {
         return enemyT;
     }
 
-    virtual public void NewCommand(SoldierCommand command) { }
+    public void NewCommand(SoldierCommand command) {
+        if (!IsServer) { return; }
+
+        Command = command;
+
+        if (command == SoldierCommand.Attack) {
+            EnemiesInAttackWaveCounter = 0; // reset counter of targeted enemies (because of moleman's modus operandi)
+        }
+}
 
     public void NavMeshFormationSwitch(bool enable, Formation formation, FormationType formationType) {
         // if in Circle or Box Formation or Free, it is following something
-        //Command = SoldierCommand.Following;
         FollowInNavMeshFormation = enable;
 
-        if (!enable) { // disable, Unsubscribe from formation
+        if (!enable) { // disable, unsubscribe from formation
             formation.RemoveFromFormation(gameObject, ObjectToFollowInFormation, FormationType);
             ObjectToFollowInFormation = null;
 
@@ -201,9 +204,8 @@ public class ISoldier : NetworkBehaviour, ITeamMember {
         gameSessionManager = FindObjectOfType<GameSessionManager>();
         EnemyObserver = GetComponentInChildren<EnemyObserver>();
         SpriteRenderer = GetComponent<SpriteRenderer>();
-        Agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
+        Agent = GetComponent<NavMeshAgent>();
         Networkanimator = GetComponent<NetworkAnimator>();
-        shooting = GetComponent<ShootScript>();
         changeMaterial = GetComponent<ChangeMaterial>();
         circleRenderer = transform.Find("Circle")?.GetComponent<SpriteRenderer>();
         pathTileChecker = FindObjectOfType<PathTileChecker>();

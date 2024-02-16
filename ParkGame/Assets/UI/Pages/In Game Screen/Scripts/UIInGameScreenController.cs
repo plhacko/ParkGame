@@ -27,7 +27,7 @@ public class UIInGameScreenController : UIPageController
     {
         optionsButton.onClick.AddListener(Options);
         action1.onClick.AddListener(Attack);
-        action2.onClick.AddListener(Move); // Fallback
+        action2.onClick.AddListener(Move); // Gather
         action3.onClick.AddListener(Formations);
         formationButton1.onClick.AddListener(Formation1);
         formationButton2.onClick.AddListener(Formation2);
@@ -78,7 +78,6 @@ public class UIInGameScreenController : UIPageController
     private void Formation3()
     {
         gameManager.CommandMove();
-        //AudioManager.Instance.PlayNotificationSFX("FormationFree");
         AudioManager.Instance.PlayCommandSFX("FormationFree");
 
     }
@@ -86,14 +85,12 @@ public class UIInGameScreenController : UIPageController
     private void Formation2() 
     {
         gameManager.FormationBox();
-        //AudioManager.Instance.PlayNotificationSFX("FormationBox");
         AudioManager.Instance.PlayCommandSFX("FormationBox");
     }
 
     private void Formation1() 
     {
         gameManager.FormationCircle();
-        //AudioManager.Instance.PlayNotificationSFX("FormationCircle");
         AudioManager.Instance.PlayCommandSFX("FormationCircle");
     }
     
@@ -109,7 +106,6 @@ public class UIInGameScreenController : UIPageController
     private void Attack()
     {
         gameManager.CommandAttack();
-        //AudioManager.Instance.PlayNotificationSFX("Attack");
         AudioManager.Instance.PlayCommandSFX("Attack");
     }
 
@@ -129,12 +125,12 @@ public class UIInGameScreenController : UIPageController
         UIController.Singleton.PushUIPage(optionsPage);
     }
 
-    public void AddUnit(Soldier unit, Action removeAction)
+    public void AddUnit(ISoldier unit, Action removeAction)
     {
         unitsList.AddUnit(unit, removeAction);
     }
 
-    public void RemoveUnit(Soldier unit)
+    public void RemoveUnit(ISoldier unit)
     {
         unitsList.RemoveUnit(unit);
     }   

@@ -224,7 +224,7 @@ namespace Player
 
         private void notifySoldiers() {
             foreach (GameObject go in units) {
-                if (go.TryGetComponent<ISoldier>(out ISoldier soldier)) {
+                if (go.TryGetComponent(out ISoldier soldier)) {
                     lastCommand = SoldierCommand.Following;
                     soldier.NewCommand(SoldierCommand.Following);
 
@@ -317,7 +317,7 @@ namespace Player
                 return;
             }
 
-            if (!networkObject.TryGetComponent<Soldier>(out var soldier))
+            if (!networkObject.TryGetComponent<ISoldier>(out var soldier))
             {
                 Debug.LogWarning($"could not get soldier from network object");
                 return;
@@ -353,7 +353,7 @@ namespace Player
                 return;
             }
 
-            if (!networkObject.TryGetComponent<Soldier>(out var soldier))
+            if (!networkObject.TryGetComponent<ISoldier>(out var soldier))
             {
                 Debug.LogWarning($"could not get soldier from network object");
                 return;

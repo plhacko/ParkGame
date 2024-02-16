@@ -11,7 +11,7 @@ public class UIUnit : Selectable, IPointerDownHandler, IPointerUpHandler
     [SerializeField] private Slider healthBarSlider;
     [SerializeField] private List<Sprite> unitIcons;
     [SerializeField] private Image unitIcon;
-    private Soldier unit;
+    private ISoldier unit;
     [SerializeField] private float pressHoldTimeSuccess = 1f;
     private Stopwatch pressHoldTimer = new Stopwatch();   
     private Action removeAction;
@@ -46,14 +46,14 @@ public class UIUnit : Selectable, IPointerDownHandler, IPointerUpHandler
         base.OnDestroy();
     }   
 
-    public void Initialize(Soldier unit, Action removeAction, Action onDeath)
+    public void Initialize(ISoldier unit, Action removeAction, Action onDeath)
     {
         this.unit = unit;
         this.removeAction = removeAction;
         this.onDeath = onDeath;
         unit.OnDeath += this.onDeath;
         
-        if (unitIcons.Count == Enum.GetNames(typeof(Soldier.UnitType)).Length)
+        if (unitIcons.Count == Enum.GetNames(typeof(ISoldier.UnitType)).Length)
         {
             var type = unit.Type;
             unitIcon.sprite = unitIcons[(int)type];

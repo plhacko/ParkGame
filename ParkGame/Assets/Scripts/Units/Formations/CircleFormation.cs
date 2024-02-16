@@ -16,13 +16,13 @@ public class CircleFormation : MonoBehaviour, IFormationType {
     }
 
     public void RemoveFromFormation(GameObject soldier, GameObject position) {
-        Soldier.UnitType unitType = soldier.GetComponent<Soldier>().GetUnitType();
+        ISoldier.UnitType unitType = soldier.GetComponent<ISoldier>().GetUnitType();
         var positionList = FormationCircleOuter;
         var soldierList = formation.soldiersSwordmen; 
 
-        if (unitType == Soldier.UnitType.Pawn) {
+        if (unitType == ISoldier.UnitType.Pawn) {
             positionList = FormationCircleOuter;
-        } else if (unitType == Soldier.UnitType.Archer) {
+        } else if (unitType == ISoldier.UnitType.Archer) {
             positionList = FormationCircleInner;
             soldierList = formation.soldiersArchers;
         } else {
@@ -44,13 +44,13 @@ public class CircleFormation : MonoBehaviour, IFormationType {
     }
 
     // add one position to circle formation: inner or outer circle
-    public GameObject GetPosition(Soldier.UnitType unitType) {
+    public GameObject GetPosition(ISoldier.UnitType unitType) {
         var positionList = FormationCircleOuter;
         GameObject parent = gameObject;
 
-        if (unitType == Soldier.UnitType.Archer) {
+        if (unitType == ISoldier.UnitType.Archer) {
             positionList = FormationCircleInner;
-        } else if (unitType == Soldier.UnitType.Horseman) {
+        } else if (unitType == ISoldier.UnitType.Horseman) {
             positionList = FormationCircleForHorses;
             parent = HorseRoot;
         }
@@ -73,15 +73,15 @@ public class CircleFormation : MonoBehaviour, IFormationType {
 
     }
 
-    private List<Vector3> ListCircularPositionsByUnitType(Soldier.UnitType unitType) {
+    private List<Vector3> ListCircularPositionsByUnitType(ISoldier.UnitType unitType) {
         var listOfSoldiers = formation.soldiersSwordmen;
         float radius = 1.6f;
         float j = 0;
-        if (unitType == Soldier.UnitType.Archer) {
+        if (unitType == ISoldier.UnitType.Archer) {
             listOfSoldiers = formation.soldiersArchers;
             radius = 0.8f;
             j = 0.5f;
-        } else if (unitType == Soldier.UnitType.Horseman) {
+        } else if (unitType == ISoldier.UnitType.Horseman) {
             listOfSoldiers = formation.soldiersMolemen;
             radius = 2.5f;
         }

@@ -3,7 +3,7 @@ using UnityEngine.Events;
 
 public class UnitBehaviourDrawer : MonoBehaviour
 {
-    private Soldier TheSoldier;
+    private ISoldier TheSoldier;
     private SpriteRenderer SpriteRenderer;
     private UnityEvent BehaviourEvent;
     [SerializeField] Sprite EmptyIcon;
@@ -16,7 +16,7 @@ public class UnitBehaviourDrawer : MonoBehaviour
     void Awake()
     {
         SpriteRenderer = GetComponent<SpriteRenderer>();
-        TheSoldier = GetComponentInParent<Soldier>();
+        TheSoldier = GetComponentInParent<ISoldier>();
         BehaviourEvent = TheSoldier.CommandChangedEvent;
         BehaviourEvent.AddListener(DrawCommandIcon);
     }

@@ -1,21 +1,18 @@
 using UnityEngine;
 using System.Collections;
-using UnityEngine.UI;
 using UnityEngine.Events;
 
 public class DwarfSpeakIcon : MonoBehaviour
 {
-    private UnitBehaviourDrawer statusDrawer;
     private SpriteRenderer sr;
-    private Soldier theSoldier;
+    private ISoldier theSoldier;
     public UnityEvent speakEvent;
     [SerializeField] Sprite SpeakIcon;
 
     void Start()
     {
-        statusDrawer = GetComponent<UnitBehaviourDrawer>();
         sr = GetComponent<SpriteRenderer>();
-        theSoldier = GetComponentInParent<Soldier>();
+        theSoldier = GetComponentInParent<ISoldier>();
         speakEvent = theSoldier.SpeakEvent;
         speakEvent.AddListener(DisplaySpeakIcon);
     }

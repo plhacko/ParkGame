@@ -94,23 +94,23 @@ public class Formation : MonoBehaviour {
         }
     }
 
-    private Soldier.UnitType AddSoldierByType(GameObject sol) {
-        Soldier.UnitType type = sol.GetComponent<Soldier>().GetUnitType();
+    private ISoldier.UnitType AddSoldierByType(GameObject sol) {
+        ISoldier.UnitType type = sol.GetComponent<ISoldier>().GetUnitType();
         switch (type) {
-            case Soldier.UnitType.Pawn:
+            case ISoldier.UnitType.Pawn:
                 soldiersSwordmen.Add(sol);
-                return Soldier.UnitType.Pawn;
-            case Soldier.UnitType.Archer:
+                return ISoldier.UnitType.Pawn;
+            case ISoldier.UnitType.Archer:
                 soldiersArchers.Add(sol);
-                return Soldier.UnitType.Archer;
-            case Soldier.UnitType.Horseman:
+                return ISoldier.UnitType.Archer;
+            case ISoldier.UnitType.Horseman:
                 soldiersMolemen.Add(sol);
-                return Soldier.UnitType.Horseman;
+                return ISoldier.UnitType.Horseman;
             default:
                 break;
 
         }
-        return Soldier.UnitType.Pawn; // default
+        return ISoldier.UnitType.Pawn; // default
     }
 
     private void SetActiveFormation(FormationType shape) {
@@ -135,7 +135,7 @@ public class Formation : MonoBehaviour {
     public GameObject GetPositionInFormation(GameObject soldier, FormationType shape) {
         if (soldiers.Contains(soldier)) { return null; } // soldier already there?
         soldiers.Add(soldier);
-        Soldier.UnitType unitType = AddSoldierByType(soldier);
+        ISoldier.UnitType unitType = AddSoldierByType(soldier);
 
         SetActiveFormation(shape);
         return activeFormation.GetPosition(unitType);

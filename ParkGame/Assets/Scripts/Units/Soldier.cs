@@ -1,26 +1,18 @@
-﻿using Managers;
-using Player;
-using UnityEngine;
+﻿using UnityEngine;
 using static Formation;
 
 
 public class Soldier : ISoldier {
 
-    private ShootScript shooting;
-    protected override void Initialize() {
-        shooting = GetComponent<ShootScript>(); // only for Archers
-    }
-
     public override void OnNetworkSpawn() {
         base.Initialize();
-        Initialize();
     }
    
     // volat na vsech typech override!!!
     protected override void SetSoldierSpeed()
     {
         if (TypeOfUnit == UnitType.Horseman) {
-            Agent.speed = HorseManSpeed;
+            Agent.speed = BaseMovementSpeed;
         }
         if (TypeOfUnit != UnitType.Horseman || (TypeOfUnit == UnitType.Horseman && FormationType == FormationType.Box)) {
             if (
@@ -33,7 +25,6 @@ public class Soldier : ISoldier {
         }
     }
 
-    // overload this !!!
     protected override Transform GetEnemy() {
         if (targetedEnemy != null) {
             return targetedEnemy;
@@ -45,18 +36,15 @@ public class Soldier : ISoldier {
         }
         if (TypeOfUnit == UnitType.Horseman) {
             if (EnemiesInAttackWaveCounter == 0) {
+                Debug.Log("WAVE == 0");
+
                 enemyT = EnemyObserver.GetFarthestEnemy(); // else attack the closest enemy
             }
         }
-        //
         targetedEnemy = enemyT;
         return enemyT;
     }
 
-    /// <summary> attacks the closest enemy in range</summary>
-    /// <returns> returns if enemy was in range </returns>
-    /// 
-    // override everywhere!!!
     protected override bool AttackEnemyIfInRange(Transform enemyT, float maxAttackDistance = 0) {
         float maxRange = MaxAttackRange;
         if (maxAttackDistance > 0) {
@@ -66,10 +54,9 @@ public class Soldier : ISoldier {
             && Vector3.Distance(enemyT.position, transform.position) >= MinAttackRange) {
             if (AttackTimer >= Attackcooldown) {
                 AttackTimer = 0.0f;
-                Networkanimator.Animator.SetFloat(AnimatorMovementSpeedHash, 0.0f); //("MovementSpeed", 0);
+                Networkanimator.Animator.SetFloat(AnimatorMovementSpeedHash, 0.0f); 
 
                 Networkanimator.SetTrigger("Attack");
-
 
                 if (TypeOfUnit == UnitType.Pawn || TypeOfUnit == UnitType.Horseman)
                 {
@@ -85,23 +72,10 @@ public class Soldier : ISoldier {
                     XSpriteFlip.Value = flip;
                     Debug.Log("shoot");
                     PlayArcherAttackSFXClientRpc();
-                    shooting.Shoot(enemyT.transform.position, Damage, flip, Team);
                 }
             }
             return true;
         }
         return false;
-    }
-
-    // override!!!
-    public override void NewCommand(SoldierCommand command) {
-        if (!IsServer) { return; }
-
-        Command = command;
-
-        if (command == SoldierCommand.Attack) {
-            EnemiesInAttackWaveCounter = 0; // reset counter of targeted enemies (because of moleman's modus operandi)
-        }
-
     }
 }
