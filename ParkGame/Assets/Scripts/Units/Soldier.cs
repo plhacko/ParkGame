@@ -468,7 +468,6 @@ public class Soldier : NetworkBehaviour, ISoldier {
                 SpeakEvent.Invoke();
                 FormationType = CommanderToFollow.GetComponent<ICommander>().GetFormation(); // get type of formation
                 FormationFromFollowedCommander = CommanderToFollow.GetComponent<Formation>();
-                NewCommand(playerController.GetLastCommand());
                 if (FormationType == FormationType.Box || FormationType == FormationType.Circle) {
                     NavMeshFormationSwitch(true, FormationFromFollowedCommander, FormationType);
                 }
