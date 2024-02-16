@@ -105,7 +105,7 @@ public class VictoryPoint : NetworkBehaviour, IConquerable
 
     public void OnStartedConquering(int team)
     {
-        onStartedConqueringClientRpc(team);
+        //onStartedConqueringClientRpc(team);
         NamedColor c = colorSettings.Colors[team];
         announcer.AnnounceEventClientRpc($"Victory Point is being captured by team {c.Name}!", Color.white, 5);
         announcer.PlayNotificationClientRpc("Foreboding");

@@ -310,7 +310,7 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
 
     public void OnStartedConquering(int team)
     {
-        onStartedConqueringClientRpc(team);
+        //onStartedConqueringClientRpc(team);
         
         NamedColor c = colorSettings.Colors[team];
         
@@ -356,6 +356,8 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
         int originalTeam = Team;
         Team = team;
         NamedColor c = colorSettings.Colors[team];
+        c.Color.a = 0.8f;
+        sr.color = c.Color;
         announcer.AnnounceEventClientRpc($"Outpost has been captured by team {c.Name}!", c.TextColor, 5);
         announcer.NotifyInvolvedTeamsServerRpc(Team, originalTeam, Announcer.Wonable.Outpost);
 
