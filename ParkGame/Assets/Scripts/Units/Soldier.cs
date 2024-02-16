@@ -447,7 +447,7 @@ public class Soldier : NetworkBehaviour, ISoldier {
         if (gameSessionManager.IsOver) return;
 
         ulong clientID = NetworkManager.Singleton.LocalClientId;
-        RequestChangingCommanderToFollowServerRpc(clientID: clientID);
+    //    RequestChangingCommanderToFollowServerRpc(clientID: clientID);
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -459,7 +459,7 @@ public class Soldier : NetworkBehaviour, ISoldier {
             ClientRpcParams clientRpcParams = new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new[] { clientID } } };
             // random false: play sfx every click on unit
             // random true: play only sometimes, on gathering call
-            if (!random || UnityEngine.Random.Range(0f, 20f) < 5f) { PlaySelectedDwarfSFXClientRpc(clientRpcParams); }
+            if (!random || UnityEngine.Random.Range(0f, 20f) < 8f) { PlaySelectedDwarfSFXClientRpc(clientRpcParams); }
 
             if (playerController.gameObject.transform != CommanderToFollow) {
                 ReturningToOutpost = false;
