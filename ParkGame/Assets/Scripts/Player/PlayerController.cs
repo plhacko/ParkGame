@@ -197,8 +197,8 @@ namespace Player
                         return;
                     }
 
-                    if (!f.GetComponent<Soldier>().IsFollowingCommander()) {
-                        f.GetComponent<Soldier>().RequestChangingCommanderToFollowServerRpc(clientID, true); 
+                    if (!f.GetComponent<ISoldier>().IsFollowingCommander()) {
+                        f.GetComponent<ISoldier>().RequestChangingCommanderToFollowServerRpc(clientID, true); 
                         capacityForNew--;
                     }
                 }           

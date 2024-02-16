@@ -22,8 +22,6 @@ public class ISoldier : NetworkBehaviour, ITeamMember {
         Horseman
     };
 
-    public UnityEngine.AI.NavMeshPathStatus NavMeshStatusNow;
-
     // game logic
     protected Transform CommanderToFollow = null;
     public Transform TransformToFollow { get => CommanderToFollow; }
@@ -33,7 +31,6 @@ public class ISoldier : NetworkBehaviour, ITeamMember {
     [SerializeField] protected float BaseMovementSpeed = 1f;
     [SerializeField] protected float HorseManSpeed = 0.3f;
     [SerializeField] protected float PathMovementSpeedMultiplier = 1.5f;
-    [SerializeField] protected float OuterDistanceFromCommander; // in outpost, was: sword 2, arch 2, mole 3
     [SerializeField] protected float DefendDistanceFromCommander;
     [SerializeField] protected float AttackDistanceFromCommander;
     [SerializeField] protected float MinAttackRange;
@@ -68,7 +65,7 @@ public class ISoldier : NetworkBehaviour, ITeamMember {
         NetworkVariableWritePermission.Owner);
 
     // formations
-    protected UnityEngine.AI.NavMeshAgent Agent;
+    protected NavMeshAgent Agent;
     public bool FollowInNavMeshFormation;
     public Formation FormationFromFollowedCommander;
     public GameObject ObjectToFollowInFormation; // other formation
@@ -98,9 +95,75 @@ public class ISoldier : NetworkBehaviour, ITeamMember {
     protected bool isDead;
     protected float timeToDeath;
 
-    public void SetCommanderToFollow(Transform go) { }
-    public virtual void TakeDamage(int damage) { }
-    //public virtual void NavMeshFormationSwitch(bool enable, Formation formation, Formation.FormationType type=Formation.FormationType.Free);
+    protected void OnXSpriteFlipChanged(bool previousValue, bool newValue) => SpriteRenderer.flipX = newValue;
+
+    protected void OnTeamChanged(int previousValue, int newValue) //DEBUG (just tem membership visualization) // TODO: rm
+    {
+        if (circleRenderer != null && newValue != -1) {
+            circleRenderer.color = colorSettings.Colors[newValue].Color;
+        }
+
+        var localPlayerData = LobbyManager.Singleton.GetLocalPlayerData();
+        if (localPlayerData.Team == newValue) {
+            revealer.SetActive(true);
+            changeMaterial.Change(false);
+        } else {
+            revealer.SetActive(false);
+            changeMaterial.Change(true);
+        }
+    }
+
+    protected void OnCommandChange(SoldierCommand previousValue, SoldierCommand newValue) {
+        CommandChangedEvent.Invoke();
+    }
+
+    public Transform GetCommanderWhomIFollow() {
+        return CommanderToFollow;
+    }
+
+    /// <summary> !call only on server! </summary>
+    public void TakeDamage(int damage) {
+        if (!IsServer) { throw new Exception($"soldier ({gameObject.name}) can take damage only on server"); }
+        if (isDead) { return; }
+        Debug.Log("take damage");
+        int hp = HP - damage;
+        if (hp <= 0) { Die(); } else { HP = hp; }
+    }
+
+    /// <summary> !call only on server! </summary>
+    public void SetCommanderToFollow(Transform commanderToFollow) {
+        if (!IsServer) { throw new Exception($"only server can set what the unit ({gameObject.name}) can follow ({CommanderToFollow?.name})"); }
+
+        if (CommanderToFollow != commanderToFollow) // change Commander to follow
+        {
+            CommanderToFollow?.GetComponent<ICommander>().ReportUnfollowing(gameObject);
+            CommanderToFollow = commanderToFollow;
+            CommanderToFollow?.GetComponent<ICommander>().ReportFollowing(gameObject);
+            NewCommand(SoldierCommand.Following);
+        }
+    }
+
+    public void OnMouseDown() {
+        Debug.Log("Sprite Clicked");
+        if (gameSessionManager.IsOver) return;
+
+        ulong clientID = NetworkManager.Singleton.LocalClientId;
+        //    RequestChangingCommanderToFollowServerRpc(clientID: clientID);
+    }
+
+    protected virtual bool AttackEnemyIfInRange(Transform enemyT, float maxAttackDistance = 0) {
+        return false;
+    }
+
+    protected virtual Transform GetEnemy() {
+        if (targetedEnemy != null) {
+            return targetedEnemy;
+        }
+        Transform enemyT = EnemyObserver.GetClosestEnemy();
+        targetedEnemy = enemyT;
+        return enemyT;
+    }
+
     virtual public void NewCommand(SoldierCommand command) { }
 
     public void NavMeshFormationSwitch(bool enable, Formation formation, FormationType formationType) {
@@ -128,6 +191,11 @@ public class ISoldier : NetworkBehaviour, ITeamMember {
         }
     }
 
+    public override void OnNetworkSpawn() {
+        base.OnNetworkSpawn();
+        Initialize();
+    }
+
     protected virtual void Initialize() {
         playerManager = FindObjectOfType<PlayerManager>();
         gameSessionManager = FindObjectOfType<GameSessionManager>();
@@ -140,17 +208,253 @@ public class ISoldier : NetworkBehaviour, ITeamMember {
         circleRenderer = transform.Find("Circle")?.GetComponent<SpriteRenderer>();
         pathTileChecker = FindObjectOfType<PathTileChecker>();
 
-        if (IsServer) HP = InitialHP;
+        _Team.OnValueChanged += OnTeamChanged;
+        SpriteRenderer.flipX = XSpriteFlip.Value;
+        XSpriteFlip.OnValueChanged += OnXSpriteFlipChanged;
+        _SoldierCommand.OnValueChanged += OnCommandChange;
+        OnCommandChange(0, Command);
+
+        if (IsServer) {
+            HP = InitialHP;
+        }
         FormationType = FormationType.Free;
         isDead = false;
         timeToDeath = DeathFadeTime;
         Radius = UnityEngine.Random.Range(0.2f, 1.2f);
     }
-    /*
-    private Initialize - bez shooting there
 
-     
-     */
+    void Update() {
+        // following is done only on server
+        if (!IsServer) { return; }
+
+        if (gameSessionManager.IsOver || !IsSpawned) return;
+
+        // check for a Commander
+        if (CommanderToFollow == null) {
+            return;
+        }
+
+        if (HP <= 0 && !isDead) {
+            Die();
+            return;
+        }
+        if (isDead && timeToDeath > 0) {
+            timeToDeath -= Time.deltaTime;
+            return;
+        }
+        if (isDead && timeToDeath <= 0) {
+            Destroy(this.gameObject);
+        }
+
+        // attack timer
+        if (AttackTimer <= Attackcooldown) { AttackTimer += Time.deltaTime; }
+
+        SetSoldierSpeed();
+
+        switch (Command) {
+            case SoldierCommand.InOutpost:
+                StationedInOutpost();
+                break;
+            case SoldierCommand.Following:
+                Follow();
+                break;
+            case SoldierCommand.Attack:
+                AttackOnCommand();
+                break;
+            default:
+                break;
+        }
+    }
+
+    void StationedInOutpost() {
+        float distanceFromOutpost = Vector3.Distance(CommanderToFollow.position, transform.position);
+        if (distanceFromOutpost <= DefendDistanceFromCommander) { // have a value for every unit the same depending on the outpost's range???
+            Networkanimator.Animator.SetFloat(AnimatorMovementSpeedHash, 0.0f);
+            Agent.SetDestination(transform.position);
+        }
+
+        Transform enemyT = EnemyObserver.GetClosestEnemy();
+
+        if (enemyT != null && distanceFromOutpost < DefendDistanceFromCommander) {
+            float distanceOfEnemyToOutpost = Vector3.Distance(enemyT.position, CommanderToFollow.position);
+            if (AttackEnemyIfInRange(enemyT, DefendDistanceFromCommander)) {
+                return;
+            } else if (distanceOfEnemyToOutpost <= DefendDistanceFromCommander) {
+                MoveTowardsEntity(enemyT);
+                return;
+            }
+        } else {
+            FollowObjectWithAnimation(CommanderToFollow);
+            return;
+        }
+    }
+
+    void Follow() {
+        if (ObjectToFollowInFormation != null) {
+            FollowObjectWithAnimation(ObjectToFollowInFormation.transform, true); // follow precisely object in formation
+        } else if (CommanderToFollow != null) {
+            FollowObjectWithAnimation(CommanderToFollow); // follow till some distance (commander in free formation or outpost)
+        }
+    }
+
+    void AttackOnCommand() {
+        Transform enemyT = GetEnemy();
+        if (enemyT != null) {
+            targetedEnemy = enemyT;
+            EnemiesInAttackWaveCounter++;
+        } else { // no enemy is close by, go to the commander
+            // not reset the formation positions upon calling Attack?
+            Follow();
+            return;
+        }
+
+        // attack the targeted enemy if in range
+        if (AttackEnemyIfInRange(targetedEnemy)) { return; }
+        // go closer to the enemy 
+        FollowObjectWithAnimation(targetedEnemy, true);
+
+        // if the commander is too far, the soldier will stop attacking and will return back to the commander
+        float distanceFromCommander = (CommanderToFollow.position - transform.position).magnitude;
+        if (distanceFromCommander > AttackDistanceFromCommander) {
+            Follow();
+        }
+    }
+
+    public bool IsFollowingCommander() {
+        if (CommanderToFollow?.GetComponent<PlayerController>()) {
+            return true;
+        }
+        return false;
+
+    }
+
+    public UnitType GetUnitType() {
+        return TypeOfUnit;
+    }
+    public static Direction GetDirectionEnum(Vector2 d) {
+        if (Mathf.Abs(d.x) > Mathf.Abs(d.y)) {
+            return d.x > 0 ? Direction.Right : Direction.Left;
+        } else {
+            return d.y > 0 ? Direction.Up : Direction.Down;
+        }
+    }
+
+    // precise: follow directly to the position
+    // ! precise: follow in free formation commander or within outposts
+    protected void FollowObjectWithAnimation(Transform toFollow, bool precise = false) {
+        Vector3 toFollowPosition = new Vector3(toFollow.position.x, toFollow.position.y, transform.position.z);
+        Agent.SetDestination(toFollowPosition);
+        Vector2 direction = toFollowPosition - gameObject.transform.position;
+
+        // get back to the outpost
+        Direction directionE = GetDirectionEnum(direction);
+        if (direction.magnitude < 1f && Command != SoldierCommand.InOutpost) {
+            if (toFollow == CommanderToFollow && CommanderToFollow.GetComponent<Outpost>()) {
+                NewCommand(SoldierCommand.InOutpost);
+            }
+        }
+
+        // got somewhere
+        if ((direction.magnitude < Radius && !precise) || (direction.magnitude < 0.1f && precise)) {
+            Networkanimator.Animator.SetFloat(AnimatorMovementSpeedHash, 0.0f);
+            Agent.SetDestination(transform.position);
+        } else {
+            Networkanimator.Animator.SetFloat(AnimatorMovementSpeedHash, 1.0f);
+            Networkanimator.Animator.SetInteger(AnimatorDirection, (int)directionE);
+        }
+
+        XSpriteFlip.Value = directionE == Direction.Left;
+    }
+
+    protected void MoveTowardsEntity(Transform entityT) {
+        // archers, don't go closer! you'd just die 
+        if (Vector3.Distance(entityT.position, transform.position) < MinAttackRange && TypeOfUnit == UnitType.Archer) {
+            return;
+        }
+
+        FollowObjectWithAnimation(entityT, true);
+    }
+
+    private Transform ClosestOutpost() {
+        GameObject selectedCommander = gameObject; // just to be sure that something is returned
+        float shortestDist = float.PositiveInfinity;
+
+        var outposts = FindObjectsOfType<Outpost>();
+
+        foreach (var iCom in outposts) {
+            if (iCom.Team == Team) {
+                float distCom = Vector3.Distance(transform.position, iCom.gameObject.transform.position);
+                if (distCom < shortestDist) {
+                    shortestDist = distCom;
+                    selectedCommander = iCom.gameObject;
+                }
+            }
+        }
+        return selectedCommander.transform;
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void RequestChangingCommanderToFollowServerRpc(ulong clientID, bool random = false) {
+        PlayerController playerController = playerManager.GetPlayerController(clientID);
+        if (playerController != null && playerController.Team == Team) {
+
+            // play dwarf's 'mrouk'
+            ClientRpcParams clientRpcParams = new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new[] { clientID } } };
+            // random false: play sfx every click on unit
+            // random true: play only sometimes, on gathering call
+            if (!random || UnityEngine.Random.Range(0f, 20f) < 8f) { PlaySelectedDwarfSFXClientRpc(clientRpcParams); }
+
+            // follow commander
+            if (playerController.gameObject.transform != CommanderToFollow) {
+                ReturningToOutpost = false;
+                SetCommanderToFollow(playerController.gameObject.transform);
+                NewCommand(SoldierCommand.Following);
+                SpeakEvent.Invoke();
+                FormationType = CommanderToFollow.GetComponent<ICommander>().GetFormation(); // get type of formation
+                FormationFromFollowedCommander = CommanderToFollow.GetComponent<Formation>();
+                if (FormationType == FormationType.Box || FormationType == FormationType.Circle) {
+                    NavMeshFormationSwitch(true, FormationFromFollowedCommander, FormationType);
+                }
+            }
+            // return to outpost
+            else {
+                ReturningToOutpost = true;
+                var closestOutpost = ClosestOutpost();
+                FormationFromFollowedCommander?.RemoveFromFormation(gameObject, ObjectToFollowInFormation, FormationType);
+                CommanderToFollow?.GetComponent<ICommander>()?.ReportUnfollowing(gameObject);
+                SetCommanderToFollow(closestOutpost);
+                NewCommand(SoldierCommand.Following);
+                SpeakEvent.Invoke();
+                NavMeshFormationSwitch(false, FormationFromFollowedCommander, FormationType.Free);
+            }
+        }
+    }
+
+    protected virtual void SetSoldierSpeed() { }
+
+    private void TimeToDestroy(float time) {
+        timeToDeath = time;
+    }
+
+    /// <summary> !call only on server! </summary>
+    public void Die() {
+        if (!IsServer) { return; }
+        isDead = true;
+        HP = 0;
+        NewCommand(SoldierCommand.Die);
+
+        Agent.SetDestination(transform.position);
+        gameObject.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;
+
+        Networkanimator.SetTrigger("Die");
+        PlayDeathSFXClientRpc();
+        CommanderToFollow?.GetComponent<ICommander>()?.ReportUnfollowing(gameObject);
+
+        FormationFromFollowedCommander?.RemoveFromFormation(gameObject, ObjectToFollowInFormation, FormationType);
+        OnDeath?.Invoke();
+        playerManager.RemoveSoldierFromTeam(Team, transform);
+        TimeToDestroy(DeathFadeTime);
+    }
 
     [ClientRpc]
     protected void PlayDeathSFXClientRpc() {
