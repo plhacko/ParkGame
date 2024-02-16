@@ -81,17 +81,11 @@ public class Formation : MonoBehaviour {
     }
 
     public void Remove(GameObject soldier, GameObject position, List<GameObject> soldierList, List<GameObject> positionList, bool destroy = true) {
-        foreach (var item in positionList) {
-            var pos = item?.GetComponent<PositionDescriptor>();
-            if (item == position) {
-                pos.isAssigned = false;
-                soldierList.Remove(soldier);
-                if (destroy) {
-                    positionList.Remove(item);
-                    Destroy(position);
-                }
-                return;
-            }
+        if (position) { position.GetComponent<PositionDescriptor>().isAssigned = false; }
+        soldierList.Remove(soldier);
+        if (destroy) {
+            positionList.Remove(position);
+            Destroy(position);
         }
     }
 
@@ -118,20 +112,20 @@ public class Formation : MonoBehaviour {
         if (soldiers.Contains(soldier)) {
             soldiers.Remove(soldier);
         }
+        
         if (shape == FormationType.Circle) { formationCircle.RemoveFromFormation(soldier, position, destroy); }
-        if (shape == FormationType.Box) { formationBox.RemoveFromFormation(soldier, position, destroy); }
+        if (shape == FormationType.Box) { formationBox.RemoveFromFormation(soldier, position, false); }
     }
 
     // starting point!
     public GameObject GetPositionInFormation(GameObject soldier, FormationType shape = FormationType.Circle) {
         if (soldiers.Contains(soldier)) { return null; } // soldier already there?
         soldiers.Add(soldier);
-
         Soldier.UnitType unitType = AddSoldierByType(soldier);
         if (shape == FormationType.Box) {
             return formationBox.GetPosition(unitType);
         }
-        // circular formation: archers in smaller circle, swordmen in bigger circle
+        // circular formation: archers in smaller circle, swordmen in bigger circle, molemen rotate around
         return formationCircle.GetPosition(unitType);
     }
 

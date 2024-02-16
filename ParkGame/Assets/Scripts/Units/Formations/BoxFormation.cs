@@ -54,8 +54,10 @@ public class BoxFormation : MonoBehaviour
         if (unitType != Soldier.UnitType.Horseman && freeInBox < 1) {
             Add1PositionToBoxFormation();
         }
-        if (unitType == Soldier.UnitType.Horseman && freeHorses < 1) {
-            Add1PositionOnTheSide();
+        if (unitType == Soldier.UnitType.Horseman) {
+            if (freeHorses < 1) {
+                Add1PositionOnTheSide();
+            }
             positionList = FormationBoxForHorses;
         }
 
@@ -74,7 +76,7 @@ public class BoxFormation : MonoBehaviour
         float horseinc = formDescr.HorseIncrement;
         var pos = formDescr.StartingPosition;
         float x = c % 2 == 1 ? -1 : 1;
-        Vector3 position = new Vector3(x * horseinc, -c / 2 * horseinc + pos.y, 0);
+        Vector3 position = new Vector3(x * horseinc, -c / 2 * horseinc / 2 + pos.y, 0);
 
         var sphere = formation.AddSphere(position, 0.2f, "BoxPosHorse", BoxRoot);
         FormationBoxForHorses.Add(sphere);
@@ -94,7 +96,7 @@ public class BoxFormation : MonoBehaviour
                 soldierList = formation.soldiersArchers;
             }
         }
-        formation.Remove(soldier, position, positionList, soldierList, destroy);
+        formation.Remove(soldier, position, soldierList, positionList, destroy);
     }
 
     private void Add1PositionToBoxFormation() {

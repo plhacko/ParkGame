@@ -29,7 +29,7 @@ public class CircleFormation : MonoBehaviour {
             positionList = FormationCircleForHorses;
             soldierList = formation.soldiersMolemen;
         }
-        formation.Remove(soldier, position, positionList, soldierList, destroy);
+        formation.Remove(soldier, position, soldierList, positionList, destroy);
     }
 
     public void SetRoots(GameObject hr, Formation f) {

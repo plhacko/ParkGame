@@ -306,7 +306,7 @@ public class Soldier : NetworkBehaviour, ISoldier {
         FollowInNavMeshFormation = enable;
 
         if (!enable) { // disable, Unsubscribe from formation
-            formation.RemoveFromFormation(gameObject, ObjectToFollowInFormation, FormationType);
+            formation.RemoveFromFormation(gameObject, ObjectToFollowInFormation, FormationType, true);
             ObjectToFollowInFormation = null;
 
         } else {
@@ -461,6 +461,7 @@ public class Soldier : NetworkBehaviour, ISoldier {
             // random true: play only sometimes, on gathering call
             if (!random || UnityEngine.Random.Range(0f, 20f) < 8f) { PlaySelectedDwarfSFXClientRpc(clientRpcParams); }
 
+            // follow commander
             if (playerController.gameObject.transform != CommanderToFollow) {
                 ReturningToOutpost = false;
                 SetCommanderToFollow(playerController.gameObject.transform);
@@ -472,10 +473,13 @@ public class Soldier : NetworkBehaviour, ISoldier {
                     NavMeshFormationSwitch(true, FormationFromFollowedCommander, FormationType);
                 }
             }
+            // return to outpost
             else
             {
                 ReturningToOutpost = true;
                 var closestOutpost = ClosestOutpost();
+                FormationFromFollowedCommander?.RemoveFromFormation(gameObject, ObjectToFollowInFormation, FormationType, true);
+                CommanderToFollow?.GetComponent<ICommander>()?.ReportUnfollowing(gameObject);
                 SetCommanderToFollow(closestOutpost);
                 NewCommand(SoldierCommand.Following);
                 SpeakEvent.Invoke();
@@ -491,7 +495,6 @@ public class Soldier : NetworkBehaviour, ISoldier {
         if (CommanderToFollow != commanderToFollow) // change Commander to follow
         {
             CommanderToFollow?.GetComponent<ICommander>().ReportUnfollowing(gameObject);
-            if (FormationFromFollowedCommander) { FormationFromFollowedCommander.RemoveFromFormation(gameObject, ObjectToFollowInFormation, FormationType, false); }
             CommanderToFollow = commanderToFollow;
             CommanderToFollow?.GetComponent<ICommander>().ReportFollowing(gameObject);
             NewCommand(SoldierCommand.Following);
@@ -525,8 +528,7 @@ public class Soldier : NetworkBehaviour, ISoldier {
         PlayDeathSFXClientRpc();
         CommanderToFollow?.GetComponent<ICommander>()?.ReportUnfollowing(gameObject);
 
-        FormationFromFollowedCommander?.RemoveFromFormation(gameObject, ObjectToFollowInFormation, FormationType, false);
-        if (ObjectToFollowInFormation) { ObjectToFollowInFormation.GetComponent<PositionDescriptor>().isAssigned = false; }
+        FormationFromFollowedCommander?.RemoveFromFormation(gameObject, ObjectToFollowInFormation, FormationType, true);
         OnDeath?.Invoke();
         playerManager.RemoveSoldierFromTeam(Team, transform);
         TimeToDestroy(DeathFadeTime);
