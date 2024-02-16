@@ -41,25 +41,4 @@ public class Horserider : ISoldier {
         }
         return enemyT;
     }
-
-    protected override bool AttackEnemyIfInRange(Transform enemyT, float maxAttackDistance = 0) {
-        float maxRange = MaxAttackRange;
-        if (maxAttackDistance > 0) {
-            maxRange = maxAttackDistance;
-        }
-        if (Vector3.Distance(enemyT.position, transform.position) <= maxRange
-            && Vector3.Distance(enemyT.position, transform.position) >= MinAttackRange) {
-            if (AttackTimer >= Attackcooldown) {
-                AttackTimer = 0.0f;
-                Networkanimator.Animator.SetFloat(AnimatorMovementSpeedHash, 0.0f); 
-
-                Networkanimator.SetTrigger("Attack");
-
-                PlaySwordAttackSFXClientRpc();
-                enemyT.GetComponent<ISoldier>()?.TakeDamage(Damage);
-            }
-            return true;
-        }
-        return false;
-    }
 }

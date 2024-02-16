@@ -7,5 +7,5 @@ public interface IFormationType {
 
     public void SetRoots(Formation f, GameObject hr, GameObject br = null);
 
-    public GameObject GetPosition(Soldier.UnitType unitType);
+    public GameObject GetPosition(ISoldier.UnitType unitType);
 }

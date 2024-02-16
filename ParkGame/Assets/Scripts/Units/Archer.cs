@@ -57,7 +57,6 @@ public class Archer : ISoldier {
                 bool flip = directionE == Direction.Left;
                 
                 XSpriteFlip.Value = flip;
-                Debug.Log("shoot");
                 PlayArcherAttackSFXClientRpc();
                 shooting.Shoot(enemyT.transform.position, Damage, flip, Team);
             }
