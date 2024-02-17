@@ -40,6 +40,12 @@ public class MapData
         GameObject imgObj, RectTransform parentRect, SerializedVector3Int structurePos, Vector3Int topLeft, Vector3Int bottomRight
     )
     {
+        var dragAndDrop = imgObj.GetComponentInChildren<DragAndDrop>();
+        if (dragAndDrop != null)
+        {
+            dragAndDrop.enabled = false;
+        }
+        
         var rect = imgObj.GetComponent<RectTransform>();
         // Set anchor to top left corner
         rect.anchorMin = new Vector2(0, 1.0f);
@@ -359,5 +365,6 @@ public class MapPicker : MonoBehaviour
         gpsTexture.color = Color.clear;
         nextMapButton.interactable = false;
         previousMapButton.interactable = false;
+        deleteStructuresFromMap();
     }
 }
