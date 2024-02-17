@@ -348,6 +348,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4388496590651871187, guid: 48861cb72fa4179449fc8af1f8a0fc93, type: 3}
+      propertyPath: colorSettings
+      value: 
+      objectReference: {fileID: 11400000, guid: 540e0efb517eb1d4f8598ecd8326dff1, type: 2}
+    - target: {fileID: 4388496590651871187, guid: 48861cb72fa4179449fc8af1f8a0fc93, type: 3}
       propertyPath: ConquerPointsRequired
       value: 30
       objectReference: {fileID: 0}

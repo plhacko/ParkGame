@@ -16,11 +16,13 @@ public class ConquerModule : NetworkBehaviour
     [SerializeField] List<ITeamMember> VisibleConquerUnits = new();
     [SerializeField] List<ITeamMember> VisibleOtherUnits = new();
     [SerializeField] bool scaleWithNumberOfUnits = false;
+    [SerializeField] ColorSettings colorSettings;
     private GameSessionManager gameSessionManager;
+    NetworkVariable<int> conquerTeam = new(-1);
 
     public float ConquerPoints { get => _ConquerPoints.Value; set => _ConquerPoints.Value = value; }
 
-    private IProgressBar ProgressBar = null;
+    private BubbleProgressBar ProgressBar = null;
     private int ConquererTeam => VisibleConquerUnits.Count > 0 ? VisibleConquerUnits[0].Team : -1;
 
     // public UnityAction<float> OnConquerPointsChanged;
@@ -35,22 +37,34 @@ public class ConquerModule : NetworkBehaviour
         // initialize the team member (the object we will be setting Team)
         conquerable = transform.parent.GetComponent<IConquerable>();
         // progress bar
-        ProgressBar = GetComponentInChildren<IProgressBar>();
+        ProgressBar = GetComponentInChildren<BubbleProgressBar>();
         gameSessionManager = FindObjectOfType<GameSessionManager>();
         
         if (ProgressBar != null)
         {
-            ProgressBar?.SetMaxValue(ConquerPointsRequired);
+            ProgressBar?.SetMaxValue(ConquerPointsRequired, ProgressBar.ColorOff);
             _ConquerPoints.OnValueChanged += UpdateProgressBarDelegate;
         }
     }
-    void UpdateProgressBarDelegate(float oldValue, float newValue) => ProgressBar?.SetValue(newValue);
+    void UpdateProgressBarDelegate(float oldValue, float newValue)
+    {
+        if(conquerTeam.Value != -1)
+        {
+            ProgressBar?.SetValue(newValue, colorSettings.Colors[conquerTeam.Value].Color);
+        }
+        else
+        {
+            ProgressBar?.SetValue(newValue, ProgressBar.ColorOff, true);
+        }
+    }
 
     private void Update()
     {
         // update should happen only on server
         if (NetworkManager == null || !NetworkManager.Singleton.IsServer || !IsSpawned)
         { return; }
+        
+        conquerTeam.Value = ConquererTeam;
         
         if(gameSessionManager.IsOver) return;
 
