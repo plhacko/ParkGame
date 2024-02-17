@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 8977763003683237097}
   - component: {fileID: 4349030486867519740}
   - component: {fileID: 2366310861051216526}
+  - component: {fileID: 1187312637791669850}
   m_Layer: 8
   m_Name: BehaviourIcon
   m_TagString: Untagged
@@ -97,13 +98,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6166c69e079629438c1d700931403bc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SpriteRenderer: {fileID: 0}
-  BehaviourEvent:
-    m_PersistentCalls:
-      m_Calls: []
   EmptyIcon: {fileID: 21300000, guid: dd5eee83f87fffa46923bd7864191c80, type: 3}
   AttackIcon: {fileID: 21300000, guid: 1c2aaab7ba5be67488b4641a46285d1f, type: 3}
   IdleIcon: {fileID: 21300000, guid: e3bb560e1131c7649a6a040ced46f09f, type: 3}
   FormationIcon: {fileID: 21300000, guid: 7193b5f66bd8e3c47b154a72f859662d, type: 3}
   MovementIcon: {fileID: 21300000, guid: 0758c2269edc8554ea2ab27eb797f839, type: 3}
   DeathIcon: {fileID: 21300000, guid: f50058e34aabd044a976bd719b969834, type: 3}
+--- !u!114 &1187312637791669850
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4987884346027046658}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d73749522688864cbb512996ef27c8f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  speakEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  SpeakIcon: {fileID: 21300000, guid: 7513d4fcf9cf83144be3aff655bf1b4a, type: 3}

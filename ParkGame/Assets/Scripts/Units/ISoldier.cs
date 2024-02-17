@@ -15,6 +15,8 @@ public enum SoldierCommand {
     Die // :/
 }
 
+public class CommandEvent : UnityEvent<SoldierCommand> { }
+
 public class ISoldier : NetworkBehaviour, ITeamMember {
     public enum UnitType {
         Pawn,
@@ -82,10 +84,11 @@ public class ISoldier : NetworkBehaviour, ITeamMember {
 
     public NetworkVariable<SoldierCommand> _SoldierCommand = new NetworkVariable<SoldierCommand>();
     public SoldierCommand Command { get => _SoldierCommand.Value; set => _SoldierCommand.Value = value; }
-
+    
     // events for icons
     public UnityEvent CommandChangedEvent;
     public UnityEvent SpeakEvent;
+    public CommandEvent NewCommandEvent = new CommandEvent();
 
     public Action OnDeath;
     protected bool isDead;
@@ -188,11 +191,20 @@ public class ISoldier : NetworkBehaviour, ITeamMember {
         return enemyT;
     }
 
-    public virtual void NewCommand(SoldierCommand command) {
-        if (!IsServer) { return; }
+    [ClientRpc]
+    private void NewCommandClientRpc(SoldierCommand command) {
+        NewCommandEvent.Invoke(command);
+    }
 
+    public void NewCommand(SoldierCommand command) {
+        if (!IsServer) { return; }
         Command = command;
-}
+        NewCommandClientRpc(command);
+
+        if (command == SoldierCommand.Attack) {
+            EnemiesInAttackWaveCounter = 0;
+        }
+    }
 
     public void NavMeshFormationSwitch(bool enable, Formation formation, FormationType formationType) {
         // if in Circle or Box Formation or Free, it is following something
@@ -414,6 +426,11 @@ public class ISoldier : NetworkBehaviour, ITeamMember {
         return selectedCommander.transform;
     }
 
+    [ClientRpc]
+    private void SpeakClientRpc() {
+        SpeakEvent.Invoke();
+    }
+
     [ServerRpc(RequireOwnership = false)]
     public void RequestChangingCommanderToFollowServerRpc(ulong clientID, bool random = false) {
         PlayerController playerController = playerManager.GetPlayerController(clientID);
@@ -430,7 +447,7 @@ public class ISoldier : NetworkBehaviour, ITeamMember {
                 ReturningToOutpost = false;
                 SetCommanderToFollow(playerController.gameObject.transform);
                 NewCommand(SoldierCommand.Following);
-                SpeakEvent.Invoke();
+                SpeakClientRpc();
                 FormationType = CommanderToFollow.GetComponent<ICommander>().GetFormation(); // get type of formation
                 FormationFromFollowedCommander = CommanderToFollow.GetComponent<Formation>();
                 if (FormationType == FormationType.Box || FormationType == FormationType.Circle) {
@@ -445,7 +462,7 @@ public class ISoldier : NetworkBehaviour, ITeamMember {
                 CommanderToFollow?.GetComponent<ICommander>()?.ReportUnfollowing(gameObject);
                 SetCommanderToFollow(closestOutpost);
                 NewCommand(SoldierCommand.Following);
-                SpeakEvent.Invoke();
+                SpeakClientRpc();
                 NavMeshFormationSwitch(false, FormationFromFollowedCommander, FormationType.Free);
             }
         }

@@ -1,11 +1,10 @@
 using UnityEngine;
-using UnityEngine.Events;
 
 public class UnitBehaviourDrawer : MonoBehaviour
 {
     private ISoldier TheSoldier;
     private SpriteRenderer SpriteRenderer;
-    private UnityEvent BehaviourEvent;
+    private CommandEvent CommandAction;
     [SerializeField] Sprite EmptyIcon;
     [SerializeField] Sprite AttackIcon;
     [SerializeField] Sprite IdleIcon;
@@ -17,12 +16,11 @@ public class UnitBehaviourDrawer : MonoBehaviour
     {
         SpriteRenderer = GetComponent<SpriteRenderer>();
         TheSoldier = GetComponentInParent<ISoldier>();
-        BehaviourEvent = TheSoldier.CommandChangedEvent;
-        BehaviourEvent.AddListener(DrawCommandIcon);
+        CommandAction = TheSoldier.NewCommandEvent;
+        CommandAction.AddListener(DrawCommandIcon);
     }
 
-    private void DrawCommandIcon() {
-        SoldierCommand command = TheSoldier.Command;
+    private void DrawCommandIcon(SoldierCommand command) {
         Sprite icon;
         switch (command) {
             case SoldierCommand.Attack:
