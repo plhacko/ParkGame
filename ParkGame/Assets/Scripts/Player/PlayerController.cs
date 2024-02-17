@@ -167,8 +167,8 @@ namespace Player
 
             // Box (Rectangular) formation
             if (Input.GetKeyDown(KeyCode.R)) 
-            { 
-                FormatSoldiersServerRpc(KeyCode.R); 
+            {
+                FormatSoldiersServerRpc(KeyCode.R);
             }
 
             if (Input.GetKeyDown(KeyCode.T)) {
@@ -180,11 +180,15 @@ namespace Player
             GatherWidget.CallGatherCommand(Team);
             // fallback also?
             GatherSoldiersInRangeServerRpc(NetworkManager.Singleton.LocalClientId);
+            if (lastCommand == SoldierCommand.Attack) {
+                CommandAttackServerRpc();
+            }
         }
 
         [ServerRpc(RequireOwnership = false)]
         public void FormatSoldiersServerRpc(KeyCode key) {
             FormatSoldiers(key);
+            lastCommand = SoldierCommand.Following;
         }
 
         [ServerRpc(RequireOwnership = false)]
@@ -206,7 +210,6 @@ namespace Player
         }
 
         public void FormatSoldiers(KeyCode key) {
-
             if (key == KeyCode.C) {
                 // circle (Circular) formation
                 FormationType = Formation.FormationType.Circle;
@@ -225,7 +228,6 @@ namespace Player
         private void notifySoldiers() {
             foreach (GameObject go in units) {
                 if (go.TryGetComponent(out ISoldier soldier)) {
-                    lastCommand = SoldierCommand.Following;
                     soldier.NewCommand(SoldierCommand.Following);
 
                     switch (FormationType) {
@@ -246,10 +248,6 @@ namespace Player
                     }
                 }
             }
-        }
-
-        public SoldierCommand GetLastCommand() {
-            return lastCommand;
         }
 
         public void MoveTowards(Vector3 position)
@@ -372,9 +370,8 @@ namespace Player
             FormationType = Formation.FormationType.Free;
             foreach (GameObject go in units)
             {
-                if (go.TryGetComponent<ISoldier>(out ISoldier soldier))
+                if (go.TryGetComponent(out ISoldier soldier))
                 {
-                    lastCommand = SoldierCommand.Following;
                     soldier.NewCommand(SoldierCommand.Following);
                 }
             }
@@ -382,9 +379,9 @@ namespace Player
 
         [ServerRpc]
         public void CommandIdleServerRpc() {
+            lastCommand = SoldierCommand.Following;
             foreach (GameObject go in units) {
-                if (go.TryGetComponent<ISoldier>(out ISoldier soldier)) {
-                    lastCommand = SoldierCommand.Following;
+                if (go.TryGetComponent(out ISoldier soldier)) {
                     soldier.NewCommand(SoldierCommand.Following);
                 }
             }
@@ -394,9 +391,9 @@ namespace Player
         public void CommandAttackServerRpc(ServerRpcParams serverRpcParams = default) {
             //formationScript.ResetFormation();
             //FormationType = Formation.FormationType.Free;
+            lastCommand = SoldierCommand.Attack;
             foreach (GameObject go in units) {
-                if (go.TryGetComponent<ISoldier>(out ISoldier soldier)) {
-                    lastCommand = SoldierCommand.Attack;
+                if (go.TryGetComponent(out ISoldier soldier)) {
                     soldier.NewCommand(SoldierCommand.Attack);
                 }
             }
