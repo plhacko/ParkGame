@@ -389,7 +389,7 @@ MonoBehaviour:
   initialTeam: 0
   initialName: 
   revealer: {fileID: 6065839690787669753}
-  MaxFollowingUnits: 15
+  MaxFollowingUnits: 20
   GatherWidget: {fileID: 4052147552757320488}
   FormationType: 0
   followPin: 0
@@ -493,8 +493,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DEBUG: 1
   PositionPrefab: {fileID: 8445700170667219416, guid: 8017038a20629f746abec45be20ba768, type: 3}
-  formationCircle: {fileID: 887063272399804861}
-  formationBox: {fileID: 1267932186955346935}
   colorSettings: {fileID: 11400000, guid: 540e0efb517eb1d4f8598ecd8326dff1, type: 2}
   soldiers: []
   soldiersSwordmen: []
