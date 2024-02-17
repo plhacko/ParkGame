@@ -26,10 +26,6 @@ public class BoxFormation : MonoBehaviour, IFormationType
         BoxRoot = br;
     }
 
-    private void RotateHorseFormation() {
-        HorseRoot.transform.Rotate(0, 0, 0.1f);
-    }
-
     // rotate the box formation according to the commander's direction of movement
     private void RotateBoxFormation() {
         if (!BoxRoot) { return; }
@@ -114,6 +110,5 @@ public class BoxFormation : MonoBehaviour, IFormationType
     private void Update()
     {
         RotateBoxFormation();
-        RotateHorseFormation();
     }
 }

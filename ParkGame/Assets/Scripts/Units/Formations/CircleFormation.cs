@@ -15,6 +15,14 @@ public class CircleFormation : MonoBehaviour, IFormationType {
         FormationCircleForHorses.Clear();
     }
 
+    void Update() {
+        RotateHorseFormation();
+    }
+
+    private void RotateHorseFormation() {
+        HorseRoot.transform.Rotate(0, 0, 0.07f);
+    }
+
     public void RemoveFromFormation(GameObject soldier, GameObject position) {
         ISoldier.UnitType unitType = soldier.GetComponent<ISoldier>().GetUnitType();
         var positionList = FormationCircleOuter;

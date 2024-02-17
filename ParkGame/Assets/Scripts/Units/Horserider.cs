@@ -10,15 +10,16 @@ public class Horserider : ISoldier {
     }
 
     protected override void SetSoldierSpeed() {
-        Agent.speed = HorseManSpeed;
-        if (FormationType == FormationType.Box) {
-            if (playerManager.GetLocalPlayerController().IsOnPath ||
-                (ReturningToOutpost && pathTileChecker.IsNearbyPath(Agent.transform.position)) // short-circuiting for efficiency
-            ) {
-                Agent.speed = BaseMovementSpeed * PathMovementSpeedMultiplier;
-            } else {
-                Agent.speed = BaseMovementSpeed;
-            }
+        if (FormationType == FormationType.Circle) {
+            Agent.speed = HorseManSpeed;
+            return;
+        }
+        if (playerManager.GetLocalPlayerController().IsOnPath ||
+            (ReturningToOutpost && pathTileChecker.IsNearbyPath(Agent.transform.position)) // short-circuiting for efficiency
+        ) {
+            Agent.speed = BaseMovementSpeed * PathMovementSpeedMultiplier;
+        } else {
+            Agent.speed = BaseMovementSpeed;
         }
     }
 
