@@ -84,7 +84,7 @@ public class BoxFormation : MonoBehaviour, IFormationType
     }
 
     public void RemoveFromFormation(GameObject soldier, GameObject position) {
-        ISoldier.UnitType unitType = soldier.GetComponent<Soldier>().GetUnitType();
+        ISoldier.UnitType unitType = soldier.GetComponent<ISoldier>().GetUnitType();
         var positionList = FormationBox;
         var soldierList = formation.soldiersSwordmen; 
         if (unitType == ISoldier.UnitType.Horseman) {
