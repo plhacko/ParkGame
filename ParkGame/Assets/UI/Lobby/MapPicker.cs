@@ -114,6 +114,7 @@ public class MapPicker : MonoBehaviour
     [SerializeField] private GameObject castle;
     [SerializeField] private GameObject victoryPoint;
     [SerializeField] private GameObject outpost;
+    [SerializeField] private LoadingUI loadingUI;
     private float maxImageSize;
 
     public List<MapData> MapDatas => mapDatas;
@@ -243,10 +244,16 @@ public class MapPicker : MonoBehaviour
         var requests = new List<Coroutine>(mapDatas.Count);
         requests.AddRange(mapDatas.Select(mapData => StartCoroutine(gpsTextureRequest(mapData))));
 
+        int childIndex = 0;
         foreach (var request in requests)
         {
             yield return request;
+            childIndex++;
+            float progress = childIndex / (float)mapDatas.Count;
+            loadingUI.SetProgress(0.25f + progress * 0.75f, $"Downloading near maps {childIndex} / {mapDatas.Count}" );
         }
+        
+        loadingUI.Show(false);
 
         gpsTexturesInit = true;
         if (drawTexturesInit)
@@ -269,7 +276,9 @@ public class MapPicker : MonoBehaviour
     public async Task DownloadMaps()
     {
         (double currentLongitude, double currentLatitude) = getCurrentGeoPosition();
-
+        
+        loadingUI.Show(true);
+        loadingUI.SetProgress(0, "Initializing...");
         await FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task =>
         {
             
@@ -282,12 +291,17 @@ public class MapPicker : MonoBehaviour
             databaseReference = FirebaseDatabase.DefaultInstance.RootReference;
             Debug.Log(task.Status);
         });
-
+        
         DataSnapshot dataSnapshot = await databaseReference.Child(FirebaseConstants.MAP_DATA_FOLDER).GetValueAsync();
+        int childIndex = 0;
         foreach (var mapDataDataSnapshot in dataSnapshot.Children)
         {
             MapMetaData mapMetaData = JsonUtility.FromJson<MapMetaData>(mapDataDataSnapshot.GetRawJsonValue());
             double distance = getGeoDistance(currentLongitude, currentLatitude, mapMetaData.Longitude, mapMetaData.Latitude);
+
+            childIndex++;
+            float progress = childIndex / (float)dataSnapshot.ChildrenCount; 
+            loadingUI.SetProgress(progress * 0.25f, $"Fetching map data {childIndex} / {dataSnapshot.ChildrenCount}" );
             
             if (distance < maxDistance)
             {
