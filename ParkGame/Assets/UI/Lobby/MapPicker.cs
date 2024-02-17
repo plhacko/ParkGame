@@ -127,6 +127,7 @@ public class MapPicker : MonoBehaviour
 
     private bool gpsTexturesInit;
     private bool drawTexturesInit;
+    private bool isInitialized;
     
     void Awake()
     {
@@ -177,7 +178,13 @@ public class MapPicker : MonoBehaviour
     
     private void showCurrentMap()
     {
-        if(currentMapIndex < 0 || currentMapIndex >= mapDatas.Count) return;
+        if (currentMapIndex < 0 || currentMapIndex >= mapDatas.Count)
+        {
+            mapNameText.text = "No maps found nearby";
+            mapDistanceText.text = "";
+            maxNumTeamsText.text = "";
+            return;
+        }
         
         MapData mapData = mapDatas[currentMapIndex];
         MapMetaData mapMetaData = mapData.MetaData;
@@ -243,14 +250,16 @@ public class MapPicker : MonoBehaviour
     {
         var requests = new List<Coroutine>(mapDatas.Count);
         requests.AddRange(mapDatas.Select(mapData => StartCoroutine(gpsTextureRequest(mapData))));
-
+        
+        loadingUI.SetProgress(0f, $"Downloading maps {0} / {mapDatas.Count}..." );
+        
         int childIndex = 0;
         foreach (var request in requests)
         {
             yield return request;
             childIndex++;
             float progress = childIndex / (float)mapDatas.Count;
-            loadingUI.SetProgress(0.25f + progress * 0.75f, $"Downloading near maps {childIndex} / {mapDatas.Count}" );
+            loadingUI.SetProgress(progress, $"Downloading maps {childIndex} / {mapDatas.Count}..." );
         }
         
         loadingUI.Show(false);
@@ -268,13 +277,18 @@ public class MapPicker : MonoBehaviour
         
         nextMapButton.interactable = mapDatas.Count >= 2;
         previousMapButton.interactable = mapDatas.Count >= 2;
-        currentMapIndex = mapDatas.Count > 1 ? 0 : -1;
-
+        currentMapIndex = mapDatas.Count >= 1 ? 0 : -1;
+        isInitialized = true;
+        
         showCurrentMap();
     }
 
     public async Task DownloadMaps()
     {
+        mapNameText.text = "";
+        mapDistanceText.text = "";
+        maxNumTeamsText.text = "";
+        
         (double currentLongitude, double currentLatitude) = getCurrentGeoPosition();
         
         loadingUI.Show(true);
@@ -301,7 +315,7 @@ public class MapPicker : MonoBehaviour
 
             childIndex++;
             float progress = childIndex / (float)dataSnapshot.ChildrenCount; 
-            loadingUI.SetProgress(progress * 0.25f, $"Fetching map data {childIndex} / {dataSnapshot.ChildrenCount}" );
+            loadingUI.SetProgress(progress, $"Fetching map data {childIndex} / {dataSnapshot.ChildrenCount}" );
             
             if (distance < maxDistance)
             {
@@ -364,7 +378,7 @@ public class MapPicker : MonoBehaviour
 
     public bool IsInitialized()
     {
-        return currentMapIndex != -1;
+        return isInitialized;
     }
 
     public void DeleteMaps()
@@ -379,6 +393,7 @@ public class MapPicker : MonoBehaviour
         gpsTexture.color = Color.clear;
         nextMapButton.interactable = false;
         previousMapButton.interactable = false;
+        isInitialized = false;
         deleteStructuresFromMap();
     }
 }
