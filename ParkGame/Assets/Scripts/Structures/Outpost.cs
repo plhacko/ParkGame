@@ -38,7 +38,7 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
 
     // TODO Action and Dictionary should be reinitialized on outpost owner change
     public Action OnUnitTypeCountChange;
-    public Dictionary<Soldier.UnitType, int> UnitTypeCount = new() {
+    public Dictionary<ISoldier.UnitType, int> UnitTypeCount = new() {
         { ISoldier.UnitType.Pawn, 0 },
         { ISoldier.UnitType.Archer, 0 },
         { ISoldier.UnitType.Horseman, 0 }
