@@ -562,12 +562,24 @@ public class CreateMapWithOverlay : NetworkBehaviour
             else
             {
                 // Structures from uploaded map 
-                foreach (var tilePos in structures.Outposts)
-                    structuresToAssign.Add(new Vector3Int(tilePos.x, tilePos.y, tilePos.z), outpostPrefab);
-                foreach (var tilePos in structures.Castles)
-                    structuresToAssign.Add(new Vector3Int(tilePos.x, tilePos.y, tilePos.z), castlePrefab);
-                foreach (var tilePos in structures.VictoryPoints)
-                    structuresToAssign.Add(new Vector3Int(tilePos.x, tilePos.y, tilePos.z), victoryPointPrefab);
+
+                if (structures.Outposts != null)
+                {
+                    foreach (var tilePos in structures.Outposts)
+                        structuresToAssign.Add(new Vector3Int(tilePos.x, tilePos.y, tilePos.z), outpostPrefab);    
+                }
+
+                if (structures.Castles != null)
+                {
+                    foreach (var tilePos in structures.Castles)
+                        structuresToAssign.Add(new Vector3Int(tilePos.x, tilePos.y, tilePos.z), castlePrefab);    
+                }
+
+                if (structures.VictoryPoints != null)
+                {
+                    foreach (var tilePos in structures.VictoryPoints) 
+                        structuresToAssign.Add(new Vector3Int(tilePos.x, tilePos.y, tilePos.z), victoryPointPrefab);
+                }
             }
         }
         catch(ArgumentException)
