@@ -15,6 +15,7 @@ public class UIMainMenuController : UIPageController
     [SerializeField] private Button joinButton;
     [SerializeField] private Button aboutButton;
     [SerializeField] private Button signOutButton;
+    [SerializeField] private Button exitButton;
     [SerializeField] private RectTransform headerPanel;
     private Vector2 finalHeaderPanelPos;
     [SerializeField] private RectTransform buttonsPanel;
@@ -33,7 +34,8 @@ public class UIMainMenuController : UIPageController
         joinButton.onClick.AddListener(Join);
         aboutButton.onClick.AddListener(About);
         signOutButton.onClick.AddListener(SignOut);
-
+        exitButton.onClick.AddListener(Exit);
+        
         // TODO remove this
         joinCodeInputField.text = PlayerPrefs.GetString("DebugRoomCode", "");
 
@@ -43,6 +45,11 @@ public class UIMainMenuController : UIPageController
         AudioManager.Instance.notificationsSource = Camera.main.GetComponent<AudioSource>();
 
         Prepare();
+    }
+
+    private void Exit()
+    {
+        Application.Quit();
     }
 
     private void OnDestroy()
