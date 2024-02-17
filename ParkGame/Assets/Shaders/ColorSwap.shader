@@ -7,7 +7,7 @@ Shader "Custom/ColorSwap"
         _IgnoreColor("Ignore Color", Color) = (1,1,1,1)
         _TargetColor("Target Color", Color) = (1,1,1,1)
         _Tolerance("Tolerance", Range(0, 100)) = 0.001  
-        _Darkness("Darkness", Range(0, 100)) = 0.001  
+        _Brightness("Brightness", Range(0, 100)) = 0.001  
     }
  
     SubShader
@@ -42,7 +42,7 @@ Shader "Custom/ColorSwap"
             float4 _IgnoreColor;
             float4 _TargetColor;
             float _Tolerance;
-            float _Darkness;
+            float _Brightness;
  
             v2f vert(appdata v)
             {
@@ -63,7 +63,7 @@ Shader "Custom/ColorSwap"
                 
                 if (length(col - _OriginalColor) < _Tolerance && length(col - _OriginalColor) < length(col - _IgnoreColor))
                 {
-                    return half4(_TargetColor.rgb * (col.r + col.g + col.b)/3 * _Darkness, col.a);
+                    return half4(_TargetColor.rgb * (col.r + col.g + col.b)/3 * _Brightness, col.a);
                 }
 
                 return col;

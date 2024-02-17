@@ -72,10 +72,11 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _Brightness: 2.8
     - _BumpScale: 1
     - _ColorMask: 15
     - _Cutoff: 0.5
-    - _Darkness: 1.73
+    - _Darkness: 2.8
     - _DetailNormalMapScale: 1
     - _DstBlend: 10
     - _GlossMapScale: 1
@@ -107,6 +108,6 @@ Material:
     - _OriginalColor: {r: 0.901, g: 0.015686275, b: 0, a: 1}
     - _OriginalColor2: {r: 1, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
-    - _TargetColor: {r: 0.28376496, g: 1, b: 0, a: 1}
+    - _TargetColor: {r: 0.3647059, g: 0.79607844, b: 0.39607844, a: 1}
     - _TeamColor: {r: 1, g: 0, b: 0, a: 1}
   m_BuildTextureStacks: []

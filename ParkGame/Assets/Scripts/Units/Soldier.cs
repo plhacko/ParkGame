@@ -135,8 +135,10 @@ public class Soldier : NetworkBehaviour, ISoldier {
 
     private void OnTeamChanged(int previousValue, int newValue) //DEBUG (just tem membership visualization) // TODO: rm
     {
-        if (circleRenderer != null && newValue != -1) {
+        if (circleRenderer != null && newValue != -1)
+        {
             circleRenderer.color = colorSettings.Colors[newValue].Color;
+            SpriteRenderer.material.SetColor("_TargetColor", colorSettings.Colors[newValue].Color);
         }
 
         var localPlayerData = LobbyManager.Singleton.GetLocalPlayerData();
