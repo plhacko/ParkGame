@@ -9,16 +9,6 @@ public class Horserider : ISoldier {
         TypeOfUnit = UnitType.Horseman;
     }
 
-    public override void NewCommand(SoldierCommand command) {
-        if (!IsServer) { return; }
-
-        Command = command;
-        if (command == SoldierCommand.Attack) {
-            EnemiesInAttackWaveCounter = 0; // reset counter of targeted enemies (because of moleman's modus operandi)
-        }
-    }
-
-// basemovement speed ???
     protected override void SetSoldierSpeed() {
         Agent.speed = HorseManSpeed;
         if (FormationType == FormationType.Box) {
