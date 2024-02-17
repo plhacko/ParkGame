@@ -24,7 +24,6 @@ public class ISoldier : NetworkBehaviour, ITeamMember {
 
     // game logic
     protected Transform CommanderToFollow = null;
-    public Transform TransformToFollow { get => CommanderToFollow; }
     [Header("initial values")]
     [SerializeField] protected int InitialHP = 3;
     [Header("game logic values")]
@@ -36,13 +35,13 @@ public class ISoldier : NetworkBehaviour, ITeamMember {
     [SerializeField] protected float MaxAttackRange;
     [SerializeField] protected float Attackcooldown = 1.0f;
     [SerializeField] protected int Damage = 1;
-    [SerializeField] protected UnitType TypeOfUnit;
     protected float DeathFadeTime = 2f;
     [SerializeField] protected GameObject revealer;
     [SerializeField] protected ColorSettings colorSettings;
 
     public int MaxHP { get => InitialHP; }
-
+    
+    protected UnitType TypeOfUnit;
     public UnitType Type { get => TypeOfUnit; }
 
     protected NetworkVariable<int> _HP = new();
@@ -50,7 +49,7 @@ public class ISoldier : NetworkBehaviour, ITeamMember {
     protected NetworkVariable<int> _Team = new(-1);
     public int Team { get => _Team.Value; set => _Team.Value = value; }
     protected NetworkVariable<bool> _ReturningToOutpost = new(false);
-    public bool ReturningToOutpost { get => _ReturningToOutpost.Value; set => _ReturningToOutpost.Value = value; }
+    protected bool ReturningToOutpost { get => _ReturningToOutpost.Value; set => _ReturningToOutpost.Value = value; }
     protected EnemyObserver EnemyObserver;
     protected float AttackTimer = 0.0f;
 
@@ -65,13 +64,11 @@ public class ISoldier : NetworkBehaviour, ITeamMember {
 
     // formations
     protected NavMeshAgent Agent;
-    public bool FollowInNavMeshFormation;
-    public Formation FormationFromFollowedCommander;
-    public GameObject ObjectToFollowInFormation; // other formation
-    public FormationType FormationType;
+    protected Formation FormationFromFollowedCommander;
+    private GameObject ObjectToFollowInFormation; // other formation
+    protected FormationType FormationType;
     protected float Radius; // until what distance will follow some object - commander, outpost or castle
     
-    public Transform targetedEnemy;
 
     protected PlayerManager playerManager;
     protected ChangeMaterial changeMaterial;
@@ -80,14 +77,17 @@ public class ISoldier : NetworkBehaviour, ITeamMember {
     protected SpriteRenderer circleRenderer;
     protected GameSessionManager gameSessionManager;
 
-    public Action OnDeath;
+    protected Transform targetedEnemy;
     protected int EnemiesInAttackWaveCounter; // counter in attack wave - how many were targeted in a row during one attack command
 
     public NetworkVariable<SoldierCommand> _SoldierCommand = new NetworkVariable<SoldierCommand>();
     public SoldierCommand Command { get => _SoldierCommand.Value; set => _SoldierCommand.Value = value; }
 
+    // events for icons
     public UnityEvent CommandChangedEvent;
     public UnityEvent SpeakEvent;
+
+    public Action OnDeath;
     protected bool isDead;
     protected float timeToDeath;
 
@@ -111,6 +111,16 @@ public class ISoldier : NetworkBehaviour, ITeamMember {
 
     public void OnCommandChange(SoldierCommand previousValue, SoldierCommand newValue) {
         CommandChangedEvent.Invoke();
+    }
+
+    protected virtual void SetSoldierSpeed() {
+        if (playerManager.GetLocalPlayerController().IsOnPath ||
+            (ReturningToOutpost && pathTileChecker.IsNearbyPath(Agent.transform.position)) // short-circuiting for efficiency
+        ) {
+            Agent.speed = BaseMovementSpeed * PathMovementSpeedMultiplier;
+        } else {
+            Agent.speed = BaseMovementSpeed;
+        }
     }
 
     public Transform GetCommanderWhomIFollow() {
@@ -186,8 +196,6 @@ public class ISoldier : NetworkBehaviour, ITeamMember {
 
     public void NavMeshFormationSwitch(bool enable, Formation formation, FormationType formationType) {
         // if in Circle or Box Formation or Free, it is following something
-        FollowInNavMeshFormation = enable;
-
         if (!enable) { // disable, unsubscribe from formation
             formation.RemoveFromFormation(gameObject, ObjectToFollowInFormation, FormationType);
             ObjectToFollowInFormation = null;
@@ -442,8 +450,6 @@ public class ISoldier : NetworkBehaviour, ITeamMember {
             }
         }
     }
-
-    protected virtual void SetSoldierSpeed() { }
 
     private void TimeToDestroy(float time) {
         timeToDeath = time;

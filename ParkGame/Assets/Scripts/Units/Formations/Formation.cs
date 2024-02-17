@@ -131,7 +131,7 @@ public class Formation : MonoBehaviour {
         activeFormation.RemoveFromFormation(soldier, position);
     }
 
-    // starting point!
+    // starting point:
     public GameObject GetPositionInFormation(GameObject soldier, FormationType shape) {
         if (soldiers.Contains(soldier)) { return null; } // soldier already there?
         soldiers.Add(soldier);

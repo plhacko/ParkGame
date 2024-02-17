@@ -6,6 +6,7 @@ public class Horserider : ISoldier {
 
     public override void OnNetworkSpawn() {
         base.Initialize();
+        TypeOfUnit = UnitType.Horseman;
     }
 
     public override void NewCommand(SoldierCommand command) {

@@ -4,22 +4,13 @@ public class Archer : ISoldier {
 
     private ShootScript shooting;
     protected override void Initialize() {
-        shooting = GetComponent<ShootScript>(); 
+        shooting = GetComponent<ShootScript>();
+        TypeOfUnit = UnitType.Archer;
     }
     
     public override void OnNetworkSpawn() {
         base.Initialize();
         Initialize();
-    }
-
-    protected override void SetSoldierSpeed() {
-        if (playerManager.GetLocalPlayerController().IsOnPath ||
-            (ReturningToOutpost && pathTileChecker.IsNearbyPath(Agent.transform.position)) // short-circuiting for efficiency
-        ) {
-            Agent.speed = BaseMovementSpeed * PathMovementSpeedMultiplier;
-        } else {
-            Agent.speed = BaseMovementSpeed;
-        }
     }
 
     protected override void MoveTowardsEntity(Transform entityT) {

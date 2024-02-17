@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class FormationDescriptor : MonoBehaviour {
@@ -24,7 +22,6 @@ public class FormationDescriptor : MonoBehaviour {
     */
 
     /* startPos + new Vector3(- (m.count % 2) * horseint, -m.count / 2 * horseinc, 0);
-     podle stejne logiky:
      m1  o o o  m2
      m3  o o o  m4
      m5  o o o  m6
