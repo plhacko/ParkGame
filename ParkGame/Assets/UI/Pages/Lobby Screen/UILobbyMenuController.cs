@@ -187,7 +187,7 @@ namespace UI.Lobby
             AudioManager.Instance.PlayClickSFX();
             LobbyManager.Singleton.StartGame();
         }
-
+        
         private void OnDisconnect()
         {
             UIController.Singleton.PushUIPage(mainMenuPage);

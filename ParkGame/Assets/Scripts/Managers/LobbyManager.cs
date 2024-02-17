@@ -232,7 +232,6 @@ namespace Managers
         {
             NetworkManager.Singleton.Shutdown();
             Reset();
-            OnDisconnect?.Invoke();
         }
 
         private void OnLobbyEventConnectionStateChanged(LobbyEventConnectionState state)
@@ -242,6 +241,7 @@ namespace Managers
             {
                 case LobbyEventConnectionState.Unsubscribed: /* Update the UI if necessary, as the subscription has been stopped. */
                     OnKickedFromLobby();
+                    OnDisconnect?.Invoke();
                     var hostLeftDialog = FindObjectOfType<DisconnectionHandler>();
                     if (hostLeftDialog != null)
                     {
