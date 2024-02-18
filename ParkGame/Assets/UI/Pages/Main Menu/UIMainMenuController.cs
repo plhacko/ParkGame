@@ -91,6 +91,14 @@ public class UIMainMenuController : UIPageController
         bool success = await LobbyManager.Singleton.JoinLobbyByCode(joinCodeInputField.text.ToUpper());
         if (success)
             UIController.Singleton.PushUIPage(lobbyPage);
+        else 
+            UIController.Singleton.ShowPopUp(
+                "Failed to join lobby",
+                "Please check the code and try again.", 
+                "Dismiss",
+                null,
+                "LobbyJoinFailed"
+            );
 
         enableButtons(true);
     }
