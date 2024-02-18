@@ -38,6 +38,8 @@ public class CircleFormation : MonoBehaviour, IFormationType {
             soldierList = formation.soldiersMolemen;
         }
         formation.Remove(soldier, position, soldierList, positionList, true);
+        var positions = ListCircularPositionsByUnitType(unitType);
+        AdjustFormation(positionList, positions);
     }
 
     public void SetRoots(Formation f, GameObject hr, GameObject br) {
