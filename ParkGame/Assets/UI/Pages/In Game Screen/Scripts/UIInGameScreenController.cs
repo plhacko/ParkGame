@@ -27,11 +27,11 @@ public class UIInGameScreenController : UIPageController
     {
         optionsButton.onClick.AddListener(Options);
         action1.onClick.AddListener(Attack);
-        action2.onClick.AddListener(Move); // Gather
+        action2.onClick.AddListener(Gather);
         action3.onClick.AddListener(Formations);
         formationButton1.onClick.AddListener(Formation1);
         formationButton2.onClick.AddListener(Formation2);
-        formationButton3.onClick.AddListener(Formation3);
+        formationButton3.onClick.AddListener(Formation3); // for toggle with Attack?
         formationButtonClose.onClick.AddListener(FormationClose);
     }
 
@@ -51,10 +51,9 @@ public class UIInGameScreenController : UIPageController
         canvasGroup.interactable = true;
     }
 
-    // Gather
-    private void Move()
+    private void Gather()
     {
-        gameManager.CommandMove();
+        gameManager.CommandGather();
         AudioManager.Instance.PlayCommandSFX("Fallback");
     }
 
@@ -77,7 +76,8 @@ public class UIInGameScreenController : UIPageController
 
     private void Formation3()
     {
-        gameManager.CommandMove();
+        // for toggle Attack/Fallback ?
+        gameManager.CommandFallback();
         AudioManager.Instance.PlayCommandSFX("FormationFree");
 
     }

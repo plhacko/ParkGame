@@ -67,7 +67,6 @@ public class GameManager : MonoBehaviour
         
         if (playerController != null && !playerController.IsLocked) {
             if (key == KeyCode.T) { playerController.Gather(); }
-            if (key == KeyCode.O) { playerController.CommandIdleServerRpc(); }
             if (key == KeyCode.P) { playerController.CommandAttackServerRpc(); }
         }
     }
@@ -90,14 +89,14 @@ public class GameManager : MonoBehaviour
         Formation(KeyCode.C);
     }
 
-    public void CommandMove()
+    public void CommandGather()
     {
         Movement(KeyCode.T);
     }
 
-    public void CommandIdle()
+    public void CommandFallback()
     {
-        Movement(KeyCode.O);
+        Formation(KeyCode.O);
     }
 
     public void CommandAttack()

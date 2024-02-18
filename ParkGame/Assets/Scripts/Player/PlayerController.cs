@@ -116,7 +116,7 @@ namespace Player
             }
             
             formationScript.InitializeFormation(Team); // build prefab, get position of the commander
-            FormationType = Formation.FormationType.Box; //Formation.FormationType.Free; 
+            FormationType = Formation.FormationType.Free; 
 
             if (IsOwner)
             {
@@ -174,6 +174,11 @@ namespace Player
             if (Input.GetKeyDown(KeyCode.T)) {
                 Gather();
             }
+
+            if (Input.GetKeyDown(KeyCode.O)) 
+            {
+                FormatSoldiersServerRpc(KeyCode.O);
+            }
         }
 
         public void Gather() {
@@ -210,17 +215,26 @@ namespace Player
         }
 
         public void FormatSoldiers(KeyCode key) {
-            if (key == KeyCode.C) {
-                // circle (Circular) formation
-                FormationType = Formation.FormationType.Circle;
-                formationScript.ResetFormation();
-                notifySoldiers();
-            }
-            if (key == KeyCode.R) {
-                // box (Rectangular) formation
-                FormationType = Formation.FormationType.Box;
-                formationScript.ResetFormation();
-                notifySoldiers();
+            switch (key) {
+                case KeyCode.C:
+                        // circle (Circular) formation
+                    FormationType = Formation.FormationType.Circle;
+                    formationScript.ResetFormation();
+                    notifySoldiers();
+                    break;
+                    break;
+                case KeyCode.R:
+                    // box (Rectangular) formation
+                    FormationType = Formation.FormationType.Box;
+                    formationScript.ResetFormation();
+                    notifySoldiers();
+                    break;
+                case KeyCode.O:
+                    FormationType = Formation.FormationType.Free;        
+                    formationScript.ResetFormation();
+                    notifySoldiers();
+                    break;
+                default: break;
             }
         }
 
