@@ -100,6 +100,7 @@ public class ISoldier : NetworkBehaviour, ITeamMember {
     {
         if (circleRenderer != null && newValue != -1) {
             circleRenderer.color = colorSettings.Colors[newValue].Color;
+            SpriteRenderer.material.SetColor("_TargetColor", colorSettings.Colors[newValue].Color);
         }
 
         var localPlayerData = LobbyManager.Singleton.GetLocalPlayerData();
