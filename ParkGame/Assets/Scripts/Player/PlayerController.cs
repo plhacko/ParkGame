@@ -116,7 +116,7 @@ namespace Player
             }
             
             formationScript.InitializeFormation(Team); // build prefab, get position of the commander
-            FormationType = Formation.FormationType.Free; 
+            FormationType = Formation.FormationType.Box; 
 
             if (IsOwner)
             {
