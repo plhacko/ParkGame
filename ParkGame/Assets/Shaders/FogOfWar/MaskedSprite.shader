@@ -8,6 +8,12 @@ Shader "Custom/MaskedSprite"
         _Color ("Tint", Color) = (1,1,1,1)
         _ColorMask ("Color Mask", Float) = 15
 
+        _OriginalColor("Original Color", Color) = (0.901,0.01568628,0,1)
+        _IgnoreColor("Ignore Color", Color) = (0.8705883,0.3019608,0.09803922,1)
+        _TargetColor("Target Color", Color) = (0.3647059,0.7960784,0.3960784,1)
+        _Tolerance("Tolerance", Range(0, 100)) = 0.62  
+        _Brightness("Brightness", Range(0, 100)) = 2.8  
+
         [Toggle(UNITY_UI_ALPHACLIP)] _UseUIAlphaClip ("Use Alpha Clip", Float) = 0
     }
 
@@ -75,6 +81,12 @@ Shader "Custom/MaskedSprite"
             float4 _ClipRect;
             float4 _MainTex_ST;
 
+            float4 _OriginalColor;
+            float4 _IgnoreColor;
+            float4 _TargetColor;
+            float _Tolerance;
+            float _Brightness;
+
             v2f vert(appdata_t v)
             {
                 v2f OUT;
@@ -100,6 +112,16 @@ Shader "Custom/MaskedSprite"
                 #ifdef UNITY_UI_ALPHACLIP
                 clip (color.a - 0.001);
                 #endif
+
+                if (color.a == 0)
+                {
+                    return half4(0, 0, 0, 0);
+                }
+                
+                if (length(color - _OriginalColor) < _Tolerance && length(color - _OriginalColor) < length(color - _IgnoreColor))
+                {
+                    return half4(_TargetColor.rgb * (color.r + color.g + color.b)/3 * _Brightness, color.a);
+                }
 
                 return color;
             }

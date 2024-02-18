@@ -3,11 +3,11 @@ Shader "Custom/ColorSwap"
     Properties
     {
         _MainTex("Texture", 2D) = "white" {}
-        _OriginalColor("Original Color", Color) = (1,1,1,1)
-        _IgnoreColor("Ignore Color", Color) = (1,1,1,1)
-        _TargetColor("Target Color", Color) = (1,1,1,1)
-        _Tolerance("Tolerance", Range(0, 100)) = 0.001  
-        _Brightness("Brightness", Range(0, 100)) = 0.001  
+        _OriginalColor("Original Color", Color) = (0.901,0.01568628,0,1)
+        _IgnoreColor("Ignore Color", Color) = (0.8705883,0.3019608,0.09803922,1)
+        _TargetColor("Target Color", Color) = (0.3647059,0.7960784,0.3960784,1)
+        _Tolerance("Tolerance", Range(0, 100)) = 0.62  
+        _Brightness("Brightness", Range(0, 100)) = 2.8  
     }
  
     SubShader
