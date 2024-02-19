@@ -103,7 +103,10 @@ public class UIController : MonoBehaviour
         if (pageStack.Count > 0)
         {        
             UIPage newPage = pageStack.Peek();
-            newPage.Enter(false);
+            if (currentPage.ExitOnNextPage)
+            {
+                newPage.Enter(false);
+            }
         }
     }
 
