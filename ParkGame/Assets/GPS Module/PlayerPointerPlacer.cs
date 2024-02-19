@@ -1,4 +1,5 @@
 using UnityEngine;
+using DG.Tweening;
 
 public class PlayerPointerPlacer : MonoBehaviour
 {
@@ -123,8 +124,8 @@ public class PlayerPointerPlacer : MonoBehaviour
 
         // Do something with the world position
         PinPosition = worldPosition;
-        Pin.transform.position = worldPosition;
-        accuracyCircle.transform.position = worldPosition;
+        Pin.transform.DOMove(worldPosition, 0.5f);
+        // accuracyCircle.transform.position = worldPosition;
         var scale = mapDisplayer.GetMapScale();
         float accuracyRadius = (float)(GPSLocator.instance.HorizontalAccuracy * scale * 2);
         accuracyCircle.transform.localScale = new Vector3(accuracyRadius, accuracyRadius, accuracyRadius);
