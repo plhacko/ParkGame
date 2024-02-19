@@ -5,7 +5,7 @@ public interface IFormationType {
 
     public void RemoveFromFormation(GameObject soldier, GameObject position);
 
-    public void SetRoots(Formation f, GameObject hr, GameObject br = null);
+    public void SetRoots(Formation f, GameObject r);
 
     public GameObject GetPosition(ISoldier.UnitType unitType);
 }

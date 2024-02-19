@@ -12,7 +12,7 @@ public class FormationDescriptor : MonoBehaviour {
     void Start() {
         StartingPosition = new Vector3(0.75f, 0.5f, 0);
         Increment = 0.75f;
-        HorseIncrement = 2f;
+        HorseIncrement = 1.5f;
     }
     /* in form: 3 * X + c
     o o o
