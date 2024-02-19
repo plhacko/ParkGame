@@ -517,16 +517,63 @@ public static class MapCameraExtensions
 
     public static float MaxOrthographicSizeFor(this Camera camera, Bounds bounds, bool fill = true)
     {
-        bool portrait = bounds.size.x < bounds.size.y;
-        portrait = fill ? !portrait : portrait;
-        portrait = camera.aspect < bounds.size.x / bounds.size.y ? !portrait : portrait;
-        if (portrait)
+        float mapAspect = bounds.size.x / bounds.size.y;
+        float cameraAspect = camera.aspect;
+
+        // Is the map in portrait or landscape mode?
+        if (mapAspect < 1)
         {
-            return bounds.size.y / 2;
+            // Camera view is taller than the map
+            if (cameraAspect < mapAspect)
+            {
+                // Restrict the camera size with the map's height
+                if (fill)
+                {
+                    return bounds.size.y / 2;
+                }
+                else
+                {
+                    return bounds.size.x / cameraAspect / 2;
+                }
+            }
+            else 
+            {
+                // Restrict the camera size with the map's width
+                if (fill)
+                {
+                    return bounds.size.x / cameraAspect / 2;
+                }
+                else
+                {
+                    return bounds.size.y / 2;
+                }
+            }
         }
         else
         {
-            return bounds.size.x / camera.aspect / 2;
+            // Camera view is wider than the map
+            if (cameraAspect > mapAspect)
+            {
+                if (fill)
+                {
+                    return bounds.size.x / cameraAspect / 2;
+                }
+                else
+                {
+                    return bounds.size.y / 2;
+                }
+            }
+            else 
+            {
+                if (fill)
+                {
+                    return bounds.size.y / 2;
+                }
+                else
+                {
+                    return bounds.size.x / cameraAspect / 2;
+                }
+            }
         }
     }
 }
