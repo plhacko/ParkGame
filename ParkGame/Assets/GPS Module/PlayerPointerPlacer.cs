@@ -1,4 +1,5 @@
 using UnityEngine;
+using DG.Tweening;
 
 public class PlayerPointerPlacer : MonoBehaviour
 {
@@ -11,6 +12,7 @@ public class PlayerPointerPlacer : MonoBehaviour
     [SerializeField] private Color farColor;
         
     private SpriteRenderer pinSpriteRenderer;
+    private float accuracyCircleScale;
     
     private Coordinate pinPosition = new Coordinate()
     {
@@ -40,6 +42,7 @@ public class PlayerPointerPlacer : MonoBehaviour
         br.lon = mapDisplayer.MinLongitude;
         br.lat = mapDisplayer.MaxLatitude;
         pinSpriteRenderer = Pin.GetComponent<SpriteRenderer>();
+        accuracyCircleScale = accuracyCircle.transform.localScale.x * Pin.transform.localScale.x;
     }
 
     // Update is called once per frame
@@ -123,10 +126,10 @@ public class PlayerPointerPlacer : MonoBehaviour
 
         // Do something with the world position
         PinPosition = worldPosition;
-        Pin.transform.position = worldPosition;
-        accuracyCircle.transform.position = worldPosition;
+        Pin.transform.DOMove(worldPosition, 0.5f);
+        // accuracyCircle.transform.position = worldPosition;
         var scale = mapDisplayer.GetMapScale();
-        float accuracyRadius = (float)(GPSLocator.instance.HorizontalAccuracy * scale * 2);
+        float accuracyRadius = (float)(GPSLocator.instance.HorizontalAccuracy * scale * 2 / accuracyCircleScale);
         accuracyCircle.transform.localScale = new Vector3(accuracyRadius, accuracyRadius, accuracyRadius);
     }
 
