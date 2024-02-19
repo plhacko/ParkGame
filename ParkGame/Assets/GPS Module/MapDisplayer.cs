@@ -518,14 +518,15 @@ public static class MapCameraExtensions
     public static float MaxOrthographicSizeFor(this Camera camera, Bounds bounds, bool fill = true)
     {
         bool portrait = bounds.size.x < bounds.size.y;
-        portrait = !fill ? portrait : !portrait;
+        portrait = fill ? !portrait : portrait;
+        portrait = camera.aspect < bounds.size.x / bounds.size.y ? !portrait : portrait;
         if (portrait)
         {
             return bounds.size.y / 2;
         }
         else
         {
-            return bounds.size.x / 2 / camera.aspect;
+            return bounds.size.x / camera.aspect / 2;
         }
     }
 }
