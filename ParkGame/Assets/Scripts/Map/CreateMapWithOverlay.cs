@@ -10,6 +10,7 @@ using UnityEngine.Tilemaps;
 using UnityEngine.Windows;
 using Input = UnityEngine.Input;
 using NavMeshSurface = NavMeshPlus.Components.NavMeshSurface;
+using Random = System.Random;
 
 [RequireComponent(typeof(Drawable))]
 public class CreateMapWithOverlay : NetworkBehaviour
@@ -20,6 +21,7 @@ public class CreateMapWithOverlay : NetworkBehaviour
     public Tilemap baseTilemap;
     public Tilemap actionTilemap;
     public Tilemap blockingTilemap;
+    public Tilemap propsTilemap;
     
     // Tile sprites
     [Header("Tile Sprites")]
@@ -27,6 +29,7 @@ public class CreateMapWithOverlay : NetworkBehaviour
     public TileBase boundsTile;
     public TileBase wallTile;
     public TileBase backgroundTile;
+    public TileBase foliageTile;
 
     // Structure tiles (currently unused, replaced by separate GameObject)
     [Header("Structure tiles (unused now, replaced by prefabs)")]
@@ -301,6 +304,7 @@ public class CreateMapWithOverlay : NetworkBehaviour
         baseTilemap.ClearAllTiles();
         actionTilemap.ClearAllTiles();
         blockingTilemap.ClearAllTiles();
+        propsTilemap.ClearAllTiles();
     }
     
     public void ToggleDrawable()
@@ -345,6 +349,7 @@ public class CreateMapWithOverlay : NetworkBehaviour
         blockingTilemap.GetComponent<TilemapRenderer>().enabled = visible;
         actionTilemap.GetComponent<TilemapRenderer>().enabled = visible;
         baseTilemap.GetComponent<TilemapRenderer>().enabled = visible;
+        propsTilemap.GetComponent<TilemapRenderer>().enabled = visible;
     }
 
     /**
@@ -505,7 +510,8 @@ public class CreateMapWithOverlay : NetworkBehaviour
             // SaveMap(resizedDrawableTexture);
         }
         var texturePixels = resizedDrawableTexture.GetPixels();
-
+        var randomGen = new Random(texturePixels.Length);  // seed the RNG so it has same output during creation and game
+        var foliagePercentage = 0.2;
         var tilesToAssign = new Dictionary<Vector3Int, TileBase>();
         for (var j = bottomRightCellPos.y; j < topLeftCellPos.y; j++)
         {
@@ -517,9 +523,17 @@ public class CreateMapWithOverlay : NetworkBehaviour
                 var pixelColor = texturePixels[pixelIdx];
                 var colorMatchingTile = ClosestColor(pixelColor);
                 if (colorMatchingTile == boundsTile || colorMatchingTile == wallTile)
+                {
                     blockingTilemap.SetTile(tilePos, colorMatchingTile);
+                    // Wall tiles are transparent (comment out if unused)
+                    if (colorMatchingTile == wallTile)
+                        baseTilemap.SetTile(tilePos, backgroundTile);
+                }
                 else
+                {
                     baseTilemap.SetTile(tilePos, colorMatchingTile);
+                }
+                    
                     // tilesToAssign.Add(tilePos, colorMatchingTile);
             }
             
@@ -528,11 +542,24 @@ public class CreateMapWithOverlay : NetworkBehaviour
         blockingTilemap.FloodFill(
             new Vector3Int(topLeftCellPos.x, topLeftCellPos.y), boundsTile
             );
-        // TODO check that whole map is not red
+        
         if (blockingTilemap.GetTilesBlock(blockingTilemap.cellBounds).All(tile => tile == boundsTile))
         {
             errorMessages.Add("Bounds (Red color) must be enclosed area");
             return;
+        }
+        // Add foliage tiles on certain bg tiles only, amount based on foliagePercentage
+        var foliageCnt = widthTilemap * heightTilemap * foliagePercentage;
+        for (int i = 0; i < foliageCnt; ++i)
+        {
+            var xPos = randomGen.Next(topLeftCellPos.x, bottomRightCellPos.x + 1);
+            var yPos = randomGen.Next(bottomRightCellPos.y, topLeftCellPos.y + 1);
+            var tilePos = new Vector3Int(xPos, yPos);
+            if (baseTilemap.GetTile(tilePos) == backgroundTile && blockingTilemap.GetTile(tilePos) == null)
+            {
+                propsTilemap.SetTile(tilePos, foliageTile);
+            }
+
         }
         var structuresToAssign = new Dictionary<Vector3Int, GameObject>();
         try

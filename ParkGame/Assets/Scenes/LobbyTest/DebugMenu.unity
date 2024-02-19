@@ -1306,7 +1306,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   GameSceneName: GameScene
-  mapId: 3814fb26-38a9-4c41-b7f3-9216520e6a0b
+  mapId: 454f23bb-eab9-4a42-8216-950b02e8f2a4
   startButton: {fileID: 444047100}
   hostButton: {fileID: 1236235280}
   clientButtonPrefab: {fileID: 4650210416855682124, guid: 3449cb50a2079d14ab07b032e1ec0b3f, type: 3}
