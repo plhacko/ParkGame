@@ -10,6 +10,7 @@ public class Horserider : ISoldier {
     }
 
     protected override void SetSoldierSpeed() {
+        float speed = HorseManSpeed;
         if (FormationType == FormationType.Circle) {
             Agent.speed = HorseManSpeed;
             return;
@@ -17,9 +18,9 @@ public class Horserider : ISoldier {
         if (playerManager.GetLocalPlayerController().IsOnPath ||
             (ReturningToOutpost && pathTileChecker.IsNearbyPath(Agent.transform.position)) // short-circuiting for efficiency
         ) {
-            Agent.speed = BaseMovementSpeed * PathMovementSpeedMultiplier;
+            Agent.speed = speed * PathMovementSpeedMultiplier;
         } else {
-            Agent.speed = BaseMovementSpeed;
+            Agent.speed = speed;
         }
     }
 

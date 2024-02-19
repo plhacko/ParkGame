@@ -20,7 +20,7 @@ public class CircleFormation : MonoBehaviour, IFormationType {
     }
 
     private void RotateHorseFormation() {
-        HorseRoot.transform.Rotate(0, 0, 0.07f);
+        HorseRoot.transform.Rotate(0, 0, 0.2f);
     }
 
     public void RemoveFromFormation(GameObject soldier, GameObject position) {
@@ -42,9 +42,9 @@ public class CircleFormation : MonoBehaviour, IFormationType {
         AdjustFormation(positionList, positions);
     }
 
-    public void SetRoots(Formation f, GameObject hr, GameObject br) {
+    public void SetRoots(Formation f, GameObject r) {
         formation = f;
-        HorseRoot = hr;
+        HorseRoot = r;
     }
 
     private void Add1PositionToCircularFormation(Vector3 pos, List<GameObject> lst, GameObject parent) {
@@ -93,9 +93,9 @@ public class CircleFormation : MonoBehaviour, IFormationType {
             j = 0.5f;
         } else if (unitType == ISoldier.UnitType.Horseman) {
             listOfSoldiers = formation.soldiersMolemen;
-            radius = 2.5f;
+            radius = 2.6f;
         }
-
+        radius = radius * 2 / 3;
         if (listOfSoldiers.Count < 1) { return null; }
 
         float alpha = 2 * Mathf.PI / listOfSoldiers.Count;

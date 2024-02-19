@@ -48,8 +48,8 @@ public class Formation : MonoBehaviour {
         UnparentFormation(BoxRoot, new Vector3(p.x - 2, p.y, p.z));
         formationCircle = GetComponent<CircleFormation>();
         formationBox = GetComponent<BoxFormation>();
-        formationCircle.SetRoots(this, HorseRoot, null);
-        formationBox.SetRoots(this, HorseRoot, BoxRoot);
+        formationCircle.SetRoots(this, HorseRoot);
+        formationBox.SetRoots(this, BoxRoot);
         Hide(BoxRoot, false);
         Hide(HorseRoot, false);
     }

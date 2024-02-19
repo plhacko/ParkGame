@@ -4,7 +4,6 @@ using UnityEngine;
 public class BoxFormation : MonoBehaviour, IFormationType
 {
     private GameObject BoxRoot;
-    private GameObject HorseRoot;
     private Formation formation;
 
     public List<GameObject> FormationBox = new List<GameObject>(); // are in hierarchy under BoxRoot
@@ -20,10 +19,9 @@ public class BoxFormation : MonoBehaviour, IFormationType
         }
     }
 
-    public void SetRoots(Formation f, GameObject hr, GameObject br) {
+    public void SetRoots(Formation f, GameObject r) {
         formation = f;
-        HorseRoot = hr;
-        BoxRoot = br;
+        BoxRoot = r;
     }
 
     // rotate the box formation according to the commander's direction of movement
