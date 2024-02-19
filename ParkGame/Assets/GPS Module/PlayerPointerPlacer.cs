@@ -127,7 +127,11 @@ public class PlayerPointerPlacer : MonoBehaviour
         Pin.transform.DOMove(worldPosition, 0.5f);
         // accuracyCircle.transform.position = worldPosition;
         var scale = mapDisplayer.GetMapScale();
-        float accuracyRadius = (float)(GPSLocator.instance.HorizontalAccuracy * scale * 2);
+        
+        var pinScale = Pin.transform.localScale.x;
+        var accuracyCircleScale = accuracyCircle.transform.localScale.x * pinScale;
+
+        float accuracyRadius = (float)(GPSLocator.instance.HorizontalAccuracy * scale * 2 / accuracyCircleScale);
         accuracyCircle.transform.localScale = new Vector3(accuracyRadius, accuracyRadius, accuracyRadius);
     }
 
