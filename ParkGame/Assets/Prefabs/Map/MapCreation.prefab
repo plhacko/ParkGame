@@ -168,8 +168,8 @@ Transform:
   m_Children:
   - {fileID: 2284287231515126843}
   - {fileID: 6476253433202332185}
-  - {fileID: 2377992987106317762}
   - {fileID: 2167176190187365717}
+  - {fileID: 2377992987106317762}
   m_Father: {fileID: 2284287230764064330}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -691,7 +691,7 @@ GameObject:
   - component: {fileID: 6413582324748213194}
   - component: {fileID: 3834357395403544054}
   m_Layer: 0
-  m_Name: Tilemap BlockingLayer 2
+  m_Name: Tilemap BlockingLayer 10
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -790,7 +790,7 @@ TilemapRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 2025221761
   m_SortingLayer: -1
-  m_SortingOrder: 2
+  m_SortingOrder: 10
   m_ChunkSize: {x: 32, y: 32, z: 32}
   m_ChunkCullingBounds: {x: 0, y: 0, z: 0}
   m_MaxChunkCount: 16

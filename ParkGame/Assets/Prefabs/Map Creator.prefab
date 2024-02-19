@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 7108999388589255759}
   - component: {fileID: 1053839976139596403}
   m_Layer: 0
-  m_Name: Tilemap BlockingLayer 2
+  m_Name: Tilemap BlockingLayer 10
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -113,7 +113,7 @@ TilemapRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 2025221761
   m_SortingLayer: -1
-  m_SortingOrder: 2
+  m_SortingOrder: 10
   m_ChunkSize: {x: 32, y: 32, z: 32}
   m_ChunkCullingBounds: {x: 0, y: 0, z: 0}
   m_MaxChunkCount: 16
@@ -390,8 +390,8 @@ Transform:
   m_Children:
   - {fileID: 2601613019165809598}
   - {fileID: 7082442908320556444}
-  - {fileID: 1921337635739279943}
   - {fileID: 3087689340148956467}
+  - {fileID: 1921337635739279943}
   m_Father: {fileID: 2601613018314090959}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
