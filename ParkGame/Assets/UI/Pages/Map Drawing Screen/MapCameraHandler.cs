@@ -15,7 +15,7 @@ public class MapCameraHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, 
     private bool isDragging = false;
     private bool isZooming = false; 
     private Vector3? startDragPosition;
-    private const float zoomSpeed = 5f;
+    private const float zoomSpeed = 30f;
     private List<StructureCounter> structureCounters;
     void Awake()
     {
