@@ -43,7 +43,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -129,7 +129,217 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
-    sprites: []
+    sprites:
+    - serializedVersion: 2
+      name: Wave_bottom_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 797
+        width: 266
+        height: 260
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1c1da8ddb2b1e654ba249cef992999a3
+      internalID: 1181674456
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wave_bottom_1
+      rect:
+        serializedVersion: 2
+        x: 266
+        y: 797
+        width: 266
+        height: 260
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a1424ea74edbe544ab058fe9ffefb69a
+      internalID: -1875285685
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wave_bottom_2
+      rect:
+        serializedVersion: 2
+        x: 532
+        y: 797
+        width: 266
+        height: 260
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 38fad15bae3787049bd86be797de2b0e
+      internalID: 657413737
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wave_bottom_3
+      rect:
+        serializedVersion: 2
+        x: 798
+        y: 797
+        width: 266
+        height: 260
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 640ee189f45c33e49ae5e1417c789b27
+      internalID: -1962524589
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wave_bottom_4
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 537
+        width: 266
+        height: 260
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8fdb74b27b0d20d4681085fe60b4804c
+      internalID: -188177497
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wave_bottom_5
+      rect:
+        serializedVersion: 2
+        x: 266
+        y: 537
+        width: 266
+        height: 260
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0f2ab4e4a39b7134eaf6d360659f0c53
+      internalID: -44798870
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wave_bottom_6
+      rect:
+        serializedVersion: 2
+        x: 532
+        y: 537
+        width: 266
+        height: 260
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c2ff0a4f97641a34bbcf1c427743a2cb
+      internalID: -544944123
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wave_bottom_7
+      rect:
+        serializedVersion: 2
+        x: 798
+        y: 537
+        width: 266
+        height: 260
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b6df457ef88685f4fbcc1f04ce128aac
+      internalID: 819878079
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wave_bottom_8
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 277
+        width: 266
+        height: 260
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1b502cf3fa251614d85fa77b30777757
+      internalID: 1886535800
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wave_bottom_9
+      rect:
+        serializedVersion: 2
+        x: 266
+        y: 277
+        width: 266
+        height: 260
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 361453ee439edb048b93002dde8624cf
+      internalID: -582722290
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -140,7 +350,17 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Wave_bottom_9: -582722290
+      Wave_bottom_0: 1181674456
+      Wave_bottom_5: -44798870
+      Wave_bottom_8: 1886535800
+      Wave_bottom_4: -188177497
+      Wave_bottom_1: -1875285685
+      Wave_bottom_7: 819878079
+      Wave_bottom_6: -544944123
+      Wave_bottom_3: -1962524589
+      Wave_bottom_2: 657413737
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

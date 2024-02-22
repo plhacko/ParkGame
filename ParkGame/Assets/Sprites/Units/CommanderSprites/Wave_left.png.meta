@@ -43,7 +43,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -129,7 +129,217 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
-    sprites: []
+    sprites:
+    - serializedVersion: 2
+      name: Wave_left_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 797
+        width: 266
+        height: 260
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1c2c7380a5581ec4e8758ab14717b45f
+      internalID: -485233643
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wave_left_1
+      rect:
+        serializedVersion: 2
+        x: 266
+        y: 797
+        width: 266
+        height: 260
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 86d3524e81ac6c447849afe721e2e851
+      internalID: -241046471
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wave_left_2
+      rect:
+        serializedVersion: 2
+        x: 532
+        y: 797
+        width: 266
+        height: 260
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a464f17b97211e849a1d23d1daad0e21
+      internalID: -1672851981
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wave_left_3
+      rect:
+        serializedVersion: 2
+        x: 798
+        y: 797
+        width: 266
+        height: 260
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 581a2902c49bdb34e85732ca58a7fbdb
+      internalID: 1105468286
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wave_left_4
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 537
+        width: 266
+        height: 260
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 07f141ed8d895f848ac6f02b60421e03
+      internalID: -270866330
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wave_left_5
+      rect:
+        serializedVersion: 2
+        x: 266
+        y: 537
+        width: 266
+        height: 260
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 85b6e15519e2cb04bad2c1d3833c2b81
+      internalID: -139021346
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wave_left_6
+      rect:
+        serializedVersion: 2
+        x: 532
+        y: 537
+        width: 266
+        height: 260
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d77aba4f93927674f88001f71999be34
+      internalID: 2002394930
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wave_left_7
+      rect:
+        serializedVersion: 2
+        x: 798
+        y: 537
+        width: 266
+        height: 260
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0562aa1dc5395f44192ebc3bacd46479
+      internalID: -1228815709
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wave_left_8
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 277
+        width: 266
+        height: 260
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 71b02718c01614945a76b30aeb8ca437
+      internalID: 183115640
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Wave_left_9
+      rect:
+        serializedVersion: 2
+        x: 266
+        y: 277
+        width: 266
+        height: 260
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 03b549a530065784398ce2caf4e122a3
+      internalID: 879447227
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -140,7 +350,17 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Wave_left_0: -485233643
+      Wave_left_2: -1672851981
+      Wave_left_6: 2002394930
+      Wave_left_8: 183115640
+      Wave_left_4: -270866330
+      Wave_left_5: -139021346
+      Wave_left_9: 879447227
+      Wave_left_1: -241046471
+      Wave_left_3: 1105468286
+      Wave_left_7: -1228815709
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

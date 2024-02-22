@@ -43,7 +43,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -129,7 +129,175 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
-    sprites: []
+    sprites:
+    - serializedVersion: 2
+      name: Idle_top_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 797
+        width: 266
+        height: 260
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0b4f6a590ad4a5847aa7e2fc3d321cc9
+      internalID: -134260456
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Idle_top_1
+      rect:
+        serializedVersion: 2
+        x: 266
+        y: 797
+        width: 266
+        height: 260
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9adfe127fa5e0114381f3e0075f7ff70
+      internalID: -1174764566
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Idle_top_2
+      rect:
+        serializedVersion: 2
+        x: 532
+        y: 797
+        width: 266
+        height: 260
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 58388d4e9f7f8314b9f32f38fd8ea3ff
+      internalID: -508526920
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Idle_top_3
+      rect:
+        serializedVersion: 2
+        x: 798
+        y: 797
+        width: 266
+        height: 260
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 89128b1d58dc91847b236cdefc14bb7e
+      internalID: -1596489319
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Idle_top_4
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 537
+        width: 266
+        height: 260
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2d48ba3b1c333924b9ed8c6f1f5bfd93
+      internalID: 990031125
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Idle_top_5
+      rect:
+        serializedVersion: 2
+        x: 266
+        y: 537
+        width: 266
+        height: 260
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ecee76d0df1679848bc5bd83ec255b44
+      internalID: -71204219
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Idle_top_6
+      rect:
+        serializedVersion: 2
+        x: 532
+        y: 537
+        width: 266
+        height: 260
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ded12a104af196b42b047970c9470e87
+      internalID: -1536525789
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Idle_top_7
+      rect:
+        serializedVersion: 2
+        x: 798
+        y: 537
+        width: 266
+        height: 260
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a96a1026e80d44747b656ef573d74c80
+      internalID: 330860776
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -140,7 +308,15 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Idle_top_2: -508526920
+      Idle_top_1: -1174764566
+      Idle_top_3: -1596489319
+      Idle_top_6: -1536525789
+      Idle_top_7: 330860776
+      Idle_top_5: -71204219
+      Idle_top_4: 990031125
+      Idle_top_0: -134260456
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
