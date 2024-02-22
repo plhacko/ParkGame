@@ -444,10 +444,10 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1514689905}
-  - {fileID: 5034220328284139533}
   - {fileID: 5034220328917699829}
   - {fileID: 5034220328677501600}
   - {fileID: 5034220327388002670}
+  - {fileID: 5034220328284139533}
   - {fileID: 473835382}
   m_Father: {fileID: 0}
   m_RootOrder: -1
@@ -612,6 +612,10 @@ MonoBehaviour:
   gpsTexture: {fileID: 5034220328010882078}
   teamsParent: {fileID: 5034220328917699829}
   mainMenuPage: {fileID: 0}
+  colorSettings: {fileID: 0}
+  castle: {fileID: 0}
+  victoryPoint: {fileID: 0}
+  outpost: {fileID: 0}
 --- !u!114 &1816979357
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1516,11 +1520,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7746866621816409208, guid: 352aec08d7712b24b8800eb3db6cee49, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 60
+      value: 150
       objectReference: {fileID: 0}
     - target: {fileID: 7746866621816409208, guid: 352aec08d7712b24b8800eb3db6cee49, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 60
+      value: 150
       objectReference: {fileID: 0}
     - target: {fileID: 7746866621816409208, guid: 352aec08d7712b24b8800eb3db6cee49, type: 3}
       propertyPath: m_LocalPosition.x

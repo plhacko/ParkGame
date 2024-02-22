@@ -701,6 +701,14 @@ PrefabInstance:
       propertyPath: m_Color.r
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 6924514959802501767, guid: 16dd6de0ad411d544ba523c2ff189fd2, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 150
+      objectReference: {fileID: 0}
+    - target: {fileID: 6924514959802501767, guid: 16dd6de0ad411d544ba523c2ff189fd2, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 150
+      objectReference: {fileID: 0}
     - target: {fileID: 8168517477153083002, guid: 16dd6de0ad411d544ba523c2ff189fd2, type: 3}
       propertyPath: loginButton
       value: 
@@ -1350,6 +1358,14 @@ PrefabInstance:
       propertyPath: mainMenuPage
       value: 
       objectReference: {fileID: 1552875232}
+    - target: {fileID: 3167335047569716538, guid: 86bc216476a79ad40b20578ef1f2bf2a, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 150
+      objectReference: {fileID: 0}
+    - target: {fileID: 3167335047569716538, guid: 86bc216476a79ad40b20578ef1f2bf2a, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 150
+      objectReference: {fileID: 0}
     - target: {fileID: 3167335048040697323, guid: 86bc216476a79ad40b20578ef1f2bf2a, type: 3}
       propertyPath: loadingUI
       value: 
