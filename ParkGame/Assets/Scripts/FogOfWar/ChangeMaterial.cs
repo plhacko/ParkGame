@@ -33,6 +33,11 @@ public class ChangeMaterial : MonoBehaviour
                 {
                     soldier.InitializeTeamColor();
                 }
+                else
+                {
+                    // effectively turnes off color swapping in the shader
+                    spriteRenderer.material.SetFloat("_Tolerance", 0.0f);
+                }
             }
         }
     }
