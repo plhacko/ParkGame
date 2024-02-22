@@ -73,6 +73,12 @@ namespace Managers
     }
     public class LobbyManager : MonoBehaviour
     {
+        public enum JoinLobbyResult
+        {
+            Success,
+            Failure,
+            AlreadyInLobby
+        }
         public static LobbyManager Singleton { get; private set; }
 
         private Lobby _lobby;
@@ -255,7 +261,7 @@ namespace Managers
             }
         }
 
-        public async Task<bool> JoinLobbyByCode(string code)
+        public async Task<JoinLobbyResult> JoinLobbyByCode(string code)
         {
             try
             {
@@ -266,6 +272,13 @@ namespace Managers
 
                 Lobby = await LobbyService.Instance.JoinLobbyByCodeAsync(code, joinLobbyByCodeOptions);
                 LobbyModel = GetLobbyModel();
+
+                if (IsAlreadyInLobby())
+                {
+                    Debug.LogError("Player is already in the lobby");
+                    await LeaveLobby();
+                    return JoinLobbyResult.AlreadyInLobby;
+                }
 
                 var callbacks = new LobbyEventCallbacks();
                 callbacks.LobbyChanged += OnLobbyChanged;
@@ -289,13 +302,28 @@ namespace Managers
                     AllocationId = joinAllocation.AllocationId.ToString(),
                 });
 
-                return true;
+                return JoinLobbyResult.Success;
             }
             catch (Exception e)
             {
                 Debug.LogError("Failed to join lobby: " + e.Message);
-                return false;
+                return JoinLobbyResult.Failure;
             }
+        }
+
+        private bool IsAlreadyInLobby()
+        {
+            var currentFirebaseUsername = FirebaseAuth.DefaultInstance.CurrentUser?.DisplayName;
+            int sameNameCount = 0;
+            foreach (var player in Lobby.Players)
+            {
+                if (currentFirebaseUsername == player.Data["PlayerName"].Value)
+                {
+                    sameNameCount++;
+                }
+            }
+
+            return sameNameCount > 1;
         }
 
         private Unity.Services.Lobbies.Models.Player CreateDefaultPlayerData()

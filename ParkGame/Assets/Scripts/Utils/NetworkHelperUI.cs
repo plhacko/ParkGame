@@ -139,8 +139,8 @@ namespace Utils
             string joinCode = PlayerPrefs.GetString("DebugRoomCode", "");
             LobbyManager.Singleton.DebugSetMapData(mapData);
 
-            bool joined = await LobbyManager.Singleton.JoinLobbyByCode(joinCode);
-            if (joined)
+            var joined = await LobbyManager.Singleton.JoinLobbyByCode(joinCode);
+            if (joined == LobbyManager.JoinLobbyResult.Success)
             {
                 Debug.Log($"Client initialized email: {client.Email}");
             }

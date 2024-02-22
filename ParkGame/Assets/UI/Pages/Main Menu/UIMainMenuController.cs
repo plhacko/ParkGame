@@ -87,18 +87,31 @@ public class UIMainMenuController : UIPageController
         enableButtons(false);
         AudioManager.Instance.PlayClickSFX();
 
-        // TODO notify when unsuccessful join
-        bool success = await LobbyManager.Singleton.JoinLobbyByCode(joinCodeInputField.text.ToUpper());
-        if (success)
-            UIController.Singleton.PushUIPage(lobbyPage);
-        else 
-            UIController.Singleton.ShowPopUp(
-                "Failed to join lobby",
-                "Please check the code and try again.", 
-                "Dismiss",
-                null,
-                "LobbyJoinFailed"
-            );
+        var result = await LobbyManager.Singleton.JoinLobbyByCode(joinCodeInputField.text.ToUpper());
+        switch (result)
+        {
+            case LobbyManager.JoinLobbyResult.Success:
+                UIController.Singleton.PushUIPage(lobbyPage);
+                break;
+            case LobbyManager.JoinLobbyResult.Failure:
+                UIController.Singleton.ShowPopUp(
+                    "Failed to join lobby",
+                    "Please check the code and try again.", 
+                    "Dismiss",
+                    null,
+                    "LobbyJoinFailed"
+                );
+                break;
+            case LobbyManager.JoinLobbyResult.AlreadyInLobby:
+                UIController.Singleton.ShowPopUp(
+                    "Player already in lobby",
+                    "Player is already in the lobby, please leave the lobby and try again.",
+                    "Dismiss",
+                    null,
+                    "AlreadyInLobby"
+                );
+                break;
+        }
 
         enableButtons(true);
     }
