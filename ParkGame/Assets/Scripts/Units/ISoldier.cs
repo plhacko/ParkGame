@@ -7,6 +7,7 @@ using System;
 using Player;
 using UnityEngine.AI;
 using static Formation;
+using Unity.Collections.LowLevel.Unsafe;
 
 public enum SoldierCommand {
     InOutpost, // defensive, wary
@@ -99,8 +100,7 @@ public class ISoldier : NetworkBehaviour, ITeamMember {
     protected void OnTeamChanged(int previousValue, int newValue) //DEBUG (just tem membership visualization) // TODO: rm
     {
         if (circleRenderer != null && newValue != -1) {
-            circleRenderer.color = colorSettings.Colors[newValue].Color;
-            SpriteRenderer.material.SetColor("_TargetColor", colorSettings.Colors[newValue].Color);
+            InitializeTeamColor();
         }
 
         var localPlayerData = LobbyManager.Singleton.GetLocalPlayerData();
@@ -111,6 +111,14 @@ public class ISoldier : NetworkBehaviour, ITeamMember {
             revealer.SetActive(false);
             changeMaterial.Change(true);
         }
+    }
+
+    /// <summary>Colors the unit with the color of its respective team</summary>
+    public void InitializeTeamColor()
+    {
+        Color teamColor = colorSettings.Colors[Team].Color;
+        circleRenderer.color = teamColor;
+        SpriteRenderer.material.SetColor("_TargetColor", teamColor);
     }
 
     public void OnCommandChange(SoldierCommand previousValue, SoldierCommand newValue) {
