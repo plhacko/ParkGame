@@ -19,7 +19,8 @@ namespace Player
         [SerializeField] private GameObject revealer;
         [SerializeField] private int MaxFollowingUnits;
         [SerializeField] private GatherFriendsEffect GatherWidget;
-        
+        [SerializeField] private ColorSettings colorSettings;
+
         private PlayerManager playerManager;
         private GameSessionManager gameSessionManager;
         private SpriteRenderer spriteRenderer;
@@ -59,6 +60,8 @@ namespace Player
         private EnemyObserver friendlyDetector;
         
         private static readonly int movementSpeedAnimationHash = Animator.StringToHash("MovementSpeed");
+        private static readonly int directionEnumAnimationHash = Animator.StringToHash("Direction");
+        private static readonly int WaveAnimationHash = Animator.StringToHash("Wave");
 
         private UIInGameScreenController uiInGameScreenController;
 
@@ -222,7 +225,6 @@ namespace Player
                     formationScript.ResetFormation();
                     notifySoldiers();
                     break;
-                    break;
                 case KeyCode.R:
                     // box (Rectangular) formation
                     FormationType = Formation.FormationType.Box;
@@ -262,21 +264,26 @@ namespace Player
                     }
                 }
             }
+
+            // set animation
+            networkAnimator.SetTrigger(WaveAnimationHash);
         }
 
         public void MoveTowards(Vector3 position)
         {
             followPin = true;
             Vector2 direction = position - transform.position;
-            transform.DOMove(position, Time.deltaTime * 0.8f);
+            transform.DOMove(endValue: position, duration: 0.8f);
 
             if (direction.magnitude > 0.03f)
             {
                 networkAnimator.Animator.SetFloat(movementSpeedAnimationHash, 1);
+                networkAnimator.Animator.SetInteger(directionEnumAnimationHash, (int)ISoldier.GetDirectionEnum(direction));
             }
             else
             {
                 networkAnimator.Animator.SetFloat(movementSpeedAnimationHash, 0);
+                networkAnimator.Animator.SetInteger(directionEnumAnimationHash, (int)ISoldier.GetDirectionEnum(direction));
             }
 
             spriteRenderer.flipX = direction.x < 0;
@@ -389,6 +396,9 @@ namespace Player
                     soldier.NewCommand(SoldierCommand.Following);
                 }
             }
+
+            // set animation
+            networkAnimator.SetTrigger(WaveAnimationHash);
         }
 
         [ServerRpc]
@@ -399,6 +409,9 @@ namespace Player
                     soldier.NewCommand(SoldierCommand.Following);
                 }
             }
+
+            // set animation
+            networkAnimator.SetTrigger(WaveAnimationHash);
         }
 
         [ServerRpc(RequireOwnership = false)]
@@ -411,6 +424,9 @@ namespace Player
                     soldier.NewCommand(SoldierCommand.Attack);
                 }
             }
+
+            // set animation
+            networkAnimator.SetTrigger(WaveAnimationHash);
         }
 
         public void AddOutpostUI(Outpost outpost) {
@@ -419,6 +435,13 @@ namespace Player
 
         public void RemoveOutpostUI(Outpost outpost) {
             uiInGameScreenController.RemoveOutpost(outpost);
+        }
+
+        /// <summary>Colors the unit with the color of its respective team</summary>
+        public void InitializeTeamColor()
+        {
+            Color teamColor = colorSettings.Colors[Team].Color;
+            GetComponent<SpriteRenderer>().material.SetColor("_TargetColor", teamColor);
         }
     }
 }
