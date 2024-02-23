@@ -17,7 +17,7 @@ namespace Managers
     public class PlayerManager : NetworkBehaviour
     {
         [SerializeField] private PlayerController playerControllerPrefab;
-        [SerializeField] private float MinInitialDistanceFromOutpost = 5f;
+        [SerializeField] private float MinInitialDistanceFromOutpost = 2f;
         
         private Map map;
         private Announcer announcer;
