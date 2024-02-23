@@ -134,12 +134,12 @@ TextureImporter:
       name: Wave_bottom_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 797
-        width: 266
+        x: 6
+        y: 801
+        width: 260
         height: 260
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -155,12 +155,12 @@ TextureImporter:
       name: Wave_bottom_1
       rect:
         serializedVersion: 2
-        x: 266
-        y: 797
-        width: 266
+        x: 273
+        y: 801
+        width: 260
         height: 260
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -176,12 +176,12 @@ TextureImporter:
       name: Wave_bottom_2
       rect:
         serializedVersion: 2
-        x: 532
-        y: 797
-        width: 266
+        x: 540
+        y: 801
+        width: 260
         height: 260
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -197,12 +197,12 @@ TextureImporter:
       name: Wave_bottom_3
       rect:
         serializedVersion: 2
-        x: 798
-        y: 797
-        width: 266
+        x: 807
+        y: 801
+        width: 260
         height: 260
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -218,12 +218,12 @@ TextureImporter:
       name: Wave_bottom_4
       rect:
         serializedVersion: 2
-        x: 0
-        y: 537
-        width: 266
+        x: 6
+        y: 534
+        width: 260
         height: 260
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -239,12 +239,12 @@ TextureImporter:
       name: Wave_bottom_5
       rect:
         serializedVersion: 2
-        x: 266
-        y: 537
-        width: 266
+        x: 273
+        y: 534
+        width: 260
         height: 260
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -260,12 +260,12 @@ TextureImporter:
       name: Wave_bottom_6
       rect:
         serializedVersion: 2
-        x: 532
-        y: 537
-        width: 266
+        x: 540
+        y: 534
+        width: 260
         height: 260
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -281,12 +281,12 @@ TextureImporter:
       name: Wave_bottom_7
       rect:
         serializedVersion: 2
-        x: 798
-        y: 537
-        width: 266
+        x: 807
+        y: 534
+        width: 260
         height: 260
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -302,12 +302,12 @@ TextureImporter:
       name: Wave_bottom_8
       rect:
         serializedVersion: 2
-        x: 0
-        y: 277
-        width: 266
+        x: 6
+        y: 267
+        width: 260
         height: 260
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -323,12 +323,12 @@ TextureImporter:
       name: Wave_bottom_9
       rect:
         serializedVersion: 2
-        x: 266
-        y: 277
-        width: 266
+        x: 273
+        y: 267
+        width: 260
         height: 260
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
