@@ -1,3 +1,4 @@
+using Player;
 using System.Collections.Generic;
 using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
@@ -32,6 +33,10 @@ public class ChangeMaterial : MonoBehaviour
                 if (spriteRenderer.TryGetComponent<ISoldier>(out ISoldier soldier))
                 {
                     soldier.InitializeTeamColor();
+                }
+                else if(spriteRenderer.TryGetComponent<PlayerController>(out PlayerController commander))
+                {
+                    commander.InitializeTeamColor();
                 }
                 else
                 {

@@ -391,6 +391,7 @@ MonoBehaviour:
   revealer: {fileID: 6065839690787669753}
   MaxFollowingUnits: 20
   GatherWidget: {fileID: 4052147552757320488}
+  colorSettings: {fileID: 11400000, guid: 540e0efb517eb1d4f8598ecd8326dff1, type: 2}
   FormationType: 0
   followPin: 0
 --- !u!212 &4847180919347885991
@@ -587,7 +588,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shader1: {fileID: 4800000, guid: 6a731f9a56e00be4b86162ee046e0493, type: 3}
-  shader2: {fileID: 10753, guid: 0000000000000000f000000000000000, type: 0}
+  shader2: {fileID: 4800000, guid: 56d0ea9920376a34da1fdf1d9b3f19c9, type: 3}
   excludeObjects:
   - {fileID: 6065839690787669753}
 --- !u!114 &887063272399804861

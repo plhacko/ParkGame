@@ -19,7 +19,8 @@ namespace Player
         [SerializeField] private GameObject revealer;
         [SerializeField] private int MaxFollowingUnits;
         [SerializeField] private GatherFriendsEffect GatherWidget;
-        
+        [SerializeField] private ColorSettings colorSettings;
+
         private PlayerManager playerManager;
         private GameSessionManager gameSessionManager;
         private SpriteRenderer spriteRenderer;
@@ -422,6 +423,13 @@ namespace Player
 
         public void RemoveOutpostUI(Outpost outpost) {
             uiInGameScreenController.RemoveOutpost(outpost);
+        }
+
+        /// <summary>Colors the unit with the color of its respective team</summary>
+        public void InitializeTeamColor()
+        {
+            Color teamColor = colorSettings.Colors[Team].Color;
+            GetComponent<SpriteRenderer>().material.SetColor("_TargetColor", teamColor);
         }
     }
 }
