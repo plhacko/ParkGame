@@ -59,6 +59,7 @@ namespace Player
         private EnemyObserver friendlyDetector;
         
         private static readonly int movementSpeedAnimationHash = Animator.StringToHash("MovementSpeed");
+        private static readonly int directionEnumAnimationHash = Animator.StringToHash("Direction");
 
         private UIInGameScreenController uiInGameScreenController;
 
@@ -268,15 +269,17 @@ namespace Player
         {
             followPin = true;
             Vector2 direction = position - transform.position;
-            transform.DOMove(position, Time.deltaTime * 0.8f);
+            transform.DOMove(endValue: position, duration: 0.8f);
 
             if (direction.magnitude > 0.03f)
             {
                 networkAnimator.Animator.SetFloat(movementSpeedAnimationHash, 1);
+                networkAnimator.Animator.SetInteger(directionEnumAnimationHash, (int)ISoldier.GetDirectionEnum(direction));
             }
             else
             {
                 networkAnimator.Animator.SetFloat(movementSpeedAnimationHash, 0);
+                networkAnimator.Animator.SetInteger(directionEnumAnimationHash, (int)ISoldier.GetDirectionEnum(direction));
             }
 
             spriteRenderer.flipX = direction.x < 0;
