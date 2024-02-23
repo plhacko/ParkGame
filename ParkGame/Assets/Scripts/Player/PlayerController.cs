@@ -61,6 +61,7 @@ namespace Player
         
         private static readonly int movementSpeedAnimationHash = Animator.StringToHash("MovementSpeed");
         private static readonly int directionEnumAnimationHash = Animator.StringToHash("Direction");
+        private static readonly int WaveAnimationHash = Animator.StringToHash("Wave");
 
         private UIInGameScreenController uiInGameScreenController;
 
@@ -224,7 +225,6 @@ namespace Player
                     formationScript.ResetFormation();
                     notifySoldiers();
                     break;
-                    break;
                 case KeyCode.R:
                     // box (Rectangular) formation
                     FormationType = Formation.FormationType.Box;
@@ -264,6 +264,9 @@ namespace Player
                     }
                 }
             }
+
+            // set animation
+            networkAnimator.SetTrigger(WaveAnimationHash);
         }
 
         public void MoveTowards(Vector3 position)
@@ -393,6 +396,9 @@ namespace Player
                     soldier.NewCommand(SoldierCommand.Following);
                 }
             }
+
+            // set animation
+            networkAnimator.SetTrigger(WaveAnimationHash);
         }
 
         [ServerRpc]
@@ -403,6 +409,9 @@ namespace Player
                     soldier.NewCommand(SoldierCommand.Following);
                 }
             }
+
+            // set animation
+            networkAnimator.SetTrigger(WaveAnimationHash);
         }
 
         [ServerRpc(RequireOwnership = false)]
@@ -415,6 +424,9 @@ namespace Player
                     soldier.NewCommand(SoldierCommand.Attack);
                 }
             }
+
+            // set animation
+            networkAnimator.SetTrigger(WaveAnimationHash);
         }
 
         public void AddOutpostUI(Outpost outpost) {
