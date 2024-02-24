@@ -167,7 +167,18 @@ namespace UI.Lobby
             lobbyTeam.Initialize(teamNumber,
                 async (teamNumber) => 
                 {
-                    await LobbyManager.Singleton.JoinTeam(teamNumber);
+                    bool success = await LobbyManager.Singleton.JoinTeam(teamNumber);
+
+                    if (!success)
+                    {
+                        UIController.Singleton.ShowPopUp(
+                            "Team Full",
+                            "The team is full. Please select another team.",
+                            "OK",
+                            null,
+                            "TeamFull"
+                        );
+                    }
                 }
             );
             return lobbyTeam;
