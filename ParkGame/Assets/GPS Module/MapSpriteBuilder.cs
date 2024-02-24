@@ -35,6 +35,13 @@ public class MapSpriteBuilder : MonoBehaviour
         {
             // TODO show error message
             Debug.LogError("Selected region is too small. Please select a larger region.");
+            UIController.Singleton.ShowPopUp(
+                "Region too small",
+                "Please select a larger region.",
+                "OK",
+                null,
+                "TooSmallRegion"
+                );
             return;
         }
 
@@ -42,6 +49,13 @@ public class MapSpriteBuilder : MonoBehaviour
         {
             // TODO show error message
             Debug.LogError("Selected region is too large. Please select a smaller region.");
+            UIController.Singleton.ShowPopUp(
+                "Region too large",
+                "Please select a smaller region.",
+                "OK",
+                null,
+                "TooLargeRegion"
+                );
             return;
         }
 
