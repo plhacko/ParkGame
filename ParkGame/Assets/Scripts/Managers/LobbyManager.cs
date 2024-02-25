@@ -400,13 +400,28 @@ namespace Managers
                 {
                     if (int.TryParse(teamNumberDataObject.Value, out int currentTeamNumber) && currentTeamNumber == teamNumber) return true;    
                 }
+
+                int teamCount = 0;
+                foreach (var player in Lobby.Players)
+                {
+                    if (player.Data.ContainsKey("TeamNumber") && player.Data["TeamNumber"].Value == teamNumber.ToString())
+                    {
+                        teamCount++;
+                    }
+
+                    if (teamCount >= 3)
+                    {
+                        Debug.LogWarning("Team is full");
+                        return false;
+                    }
+                }
                 
-                var player = CreateDefaultPlayerData();
-                player.Data["TeamNumber"].Value = teamNumber.ToString();
+                var thisPlayer = CreateDefaultPlayerData();
+                thisPlayer.Data["TeamNumber"].Value = teamNumber.ToString();
 
                 UpdatePlayerOptions updatePlayerOptions = new()
                 {
-                    Data = player.Data,
+                    Data = thisPlayer.Data,
                 };
 
                 Lobby = await Lobbies.Instance.UpdatePlayerAsync(Lobby.Id, AuthenticationService.Instance.PlayerId, updatePlayerOptions);
