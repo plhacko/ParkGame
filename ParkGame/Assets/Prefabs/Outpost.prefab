@@ -129,6 +129,7 @@ MonoBehaviour:
   revealer: {fileID: 7172483008333775361}
   colorSettings: {fileID: 11400000, guid: 540e0efb517eb1d4f8598ecd8326dff1, type: 2}
   switchCollider: {fileID: 0}
+  conquerModule: {fileID: 8538864165148386391}
   _Team:
     m_InternalValue: 0
   _IsCastle:
@@ -175,6 +176,7 @@ MonoBehaviour:
   shader2: {fileID: 10753, guid: 0000000000000000f000000000000000, type: 0}
   excludeObjects:
   - {fileID: 7172483008333775361}
+  - {fileID: 2776846833031490645}
 --- !u!50 &5313421381117267381
 Rigidbody2D:
   serializedVersion: 4
@@ -450,3 +452,14 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4388496590651871189, guid: 48861cb72fa4179449fc8af1f8a0fc93, type: 3}
   m_PrefabInstance: {fileID: 5361308661487119236}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &8538864165148386391 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4388496590651871187, guid: 48861cb72fa4179449fc8af1f8a0fc93, type: 3}
+  m_PrefabInstance: {fileID: 5361308661487119236}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0b7aaf6cd9da61418bc47c3e0ee3caa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

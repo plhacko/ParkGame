@@ -8,22 +8,31 @@ using UnityEngine;
 using Managers;
 using System.Collections.Generic;
 using Player;
+using UnityEngine.UI;
 
 public class Announcer : NetworkBehaviour
 {
     [SerializeField] private float fadeOutDuration = 1f;
     
+    private Image underlayImage;
     private TextMeshProUGUI text;
     private TweenerCore<Color, Color, ColorOptions> colorTween;
+    private TweenerCore<Color, Color, ColorOptions> imageColorTween;
     private PlayerManager playerManager;
+
+    private Color underlayStartColor;
+    
     public enum Wonable {
         Game, Outpost, VP
     }
 
     private void Awake()
     {
+        underlayImage = GetComponentInParent<Image>();
         text = GetComponent<TextMeshProUGUI>();
         playerManager = FindObjectOfType<PlayerManager>();
+        underlayStartColor = underlayImage.color;
+        underlayImage.color = Color.clear;
     }
 
     public void AnnounceEvent(string message, Color color, float duration = 45f)
@@ -31,10 +40,15 @@ public class Announcer : NetworkBehaviour
         if (colorTween != null && !colorTween.IsComplete())
         {
             colorTween.Complete();
+            imageColorTween.Complete();
         }
         
         text.text = message;
         text.color = color;
+        underlayImage.color = underlayStartColor;
+        Color targetUnderlayColor = new Color(underlayStartColor.r, underlayStartColor.g, underlayStartColor.b, 0);
+        
+        imageColorTween = underlayImage.DOColor(targetUnderlayColor, fadeOutDuration).SetDelay(duration);
         colorTween = text.DOColor(Color.clear, fadeOutDuration).SetDelay(duration);
     }
 

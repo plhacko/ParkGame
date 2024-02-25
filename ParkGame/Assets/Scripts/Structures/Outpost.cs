@@ -8,16 +8,14 @@ using Player;
 public class Outpost : NetworkBehaviour, ICommander, IConquerable
 {
     [SerializeField] int MaxUnits = 3; // in total
-    [SerializeField] int InitialArchers = 3;
-    [SerializeField] int InitialHorsemans = 3;
-    [SerializeField] int InitialPawns = 3;
     [SerializeField] float SpawnTime = 4; // 4s
 
     [SerializeField] private ISoldier.UnitType InitOutpostUnitType;
     [SerializeField] private GameObject revealer;
     [SerializeField] ColorSettings colorSettings;
     [SerializeField] private Collider2D switchCollider;
-   
+    [SerializeField] private ConquerModule conquerModule;
+    
     List<NetworkObjectReference> Units = new List<NetworkObjectReference>();
     private ShootSalvo shootSalvo;
     NetworkVariable<float> _Timer = new(0.0f);
@@ -52,6 +50,12 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
         base.OnNetworkSpawn();
         initialize();
     }
+    
+    public override void OnNetworkDespawn()
+    {
+        base.OnNetworkDespawn();
+        playerManager.OnAllPlayersReady -= onAllPlayersReady;
+    }
 
     public void initialize()
     {
@@ -62,6 +66,9 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
         sr = GetComponent<SpriteRenderer>();
         spawner = GetComponent<ToggleSpawner>();
         shootSalvo = GetComponent<ShootSalvo>(); // castle shoots salvo of arrows on enemies in its enemy detector
+        conquerModule = GetComponentInChildren<ConquerModule>();
+
+        playerManager.OnAllPlayersReady += onAllPlayersReady;
         if (InitOutpostUnitType == ISoldier.UnitType.Archer)
         {
             counter = 1;
@@ -70,26 +77,12 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
         _Team.OnValueChanged += onTeamChanged;
     }
 
-    public void SpawnInitialUnits()
+    private void onAllPlayersReady()
     {
-        Debug.LogWarning("Spawning initial units in outpost + " + InitialHorsemans + " horsemen. " + InitialArchers + " archers. " + InitialPawns + " pawns.");
-
-        spawner.SetSpawnType(ISoldier.UnitType.Horseman);
-        for (int i = 0; i < InitialHorsemans; i++) {
-            SpawnUnit();
-        }
-
-        spawner.SetSpawnType(ISoldier.UnitType.Archer);
-        for (int i = 0; i < InitialArchers; i++) {
-            SpawnUnit();
-        }
-
-        spawner.SetSpawnType(ISoldier.UnitType.Pawn);
-        for (int i = 0; i < InitialPawns; i++) {
-            SpawnUnit();
-        }
-
-        isSpawning = true;
+        if(IsServer && IsCastle)
+        {
+            isSpawning = true;
+        }   
     }
 
     void Start() {
@@ -168,7 +161,7 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
             return;
         }
 
-        if (gameSessionManager.IsOver) return;
+        if (gameSessionManager.IsOver || (!IsCastle && conquerModule.IsBeingConquered)) return;
 
         if (Units.Count >= MaxUnits)
         { Timer = 0f; return; }
@@ -189,9 +182,10 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
         Vector3 RndOffset = new Vector3(UnityEngine.Random.Range(-r, r), UnityEngine.Random.Range(-r, r), 0f);
         GameObject unit = Instantiate(prefab, position: transform.position + RndOffset, rotation: transform.rotation);
         unit.GetComponent<NetworkObject>().Spawn();
-        unit.GetComponent<ISoldier>().Team = Team;
-        unit.GetComponent<ISoldier>().SetCommanderToFollow(transform);
-        unit.GetComponent<ISoldier>().NewCommand(SoldierCommand.InOutpost);
+        ISoldier soldier = unit.GetComponent<ISoldier>();
+        soldier.Team = Team;
+        soldier.SetCommanderToFollow(transform);
+        soldier.NewCommand(SoldierCommand.InOutpost);
         playerManager.AddSoldierToTeam(Team, unit.transform);
     }
 
@@ -360,7 +354,7 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
         sr.color = c.Color;
         announcer.AnnounceEventClientRpc($"Outpost has been captured by team {c.Name}!", c.TextColor, 5);
         announcer.NotifyInvolvedTeamsServerRpc(Team, originalTeam, Announcer.Wonable.Outpost);
-
+        
         if (originalTeam == -1) {
             ChangeIconClientRpc(0);
         }

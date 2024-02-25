@@ -23,6 +23,9 @@ public class ConquerModule : NetworkBehaviour
     public float ConquerPoints { get => _ConquerPoints.Value; set => _ConquerPoints.Value = value; }
 
     private BubbleProgressBar ProgressBar = null;
+    private bool isBeingConquered;
+    public bool IsBeingConquered => isBeingConquered;
+    
     private int ConquererTeam => VisibleConquerUnits.Count > 0 ? VisibleConquerUnits[0].Team : -1;
 
     // public UnityAction<float> OnConquerPointsChanged;
@@ -78,6 +81,8 @@ public class ConquerModule : NetworkBehaviour
             {
                 if (conquerable.GetTeam() != ConquererTeam)
                 {
+                    isBeingConquered = true;
+                    ConquerPoints = 0;
                     conquerable.OnStartedConquering(ConquererTeam);   
                 }
             }
@@ -85,6 +90,8 @@ public class ConquerModule : NetworkBehaviour
             {
                 if (conquerable.GetTeam() != ConquererTeam)
                 {
+                    isBeingConquered = true;
+                    ConquerPoints = 0;
                     conquerable.OnStartedConquering(ConquererTeam);
                 }
                 
@@ -110,6 +117,7 @@ public class ConquerModule : NetworkBehaviour
         // check if site was conquered
         if (ConquerPoints > ConquerPointsRequired)
         {
+            isBeingConquered = false;
             conquerable.OnConquered(ConquererTeam);
             ConquerPoints = 0.0f;
             VisibleConquerUnits.Clear();
@@ -133,6 +141,8 @@ public class ConquerModule : NetworkBehaviour
                 if (!VisibleConquerUnits.Contains(tm))
                 { VisibleConquerUnits.Add(tm); }
                 
+                isBeingConquered = true;
+                ConquerPoints = 0;
                 conquerable.OnStartedConquering(tm.Team);
             }
             else if(tm.Team != ConquererTeam && ConquererTeam != -1)
@@ -156,6 +166,8 @@ public class ConquerModule : NetworkBehaviour
                 
                 if (VisibleConquerUnits.Count == 0)
                 {
+                    isBeingConquered = false;
+                    ConquerPoints = 0;
                     conquerable.OnStoppedConquering(conquererTeam);
                     if (VisibleOtherUnits.Count > 0)
                     {

@@ -18,6 +18,7 @@ namespace Managers
     {
         [SerializeField] private PlayerController playerControllerPrefab;
         [SerializeField] private float MinInitialDistanceFromOutpost = 2f;
+        [SerializeField] private GameObject pawnPrefab;
         
         private Map map;
         private Announcer announcer;
@@ -97,19 +98,37 @@ namespace Managers
                 controller.IsLocked = false;
             }
             
-            var outpostss = FindObjectsOfType<Outpost>();
-            foreach (var outpost in outpostss)
-            {
-                if (outpost.IsCastle)
-                {
-                    yield return new WaitForSeconds(0.5f);
-                    outpost.SpawnInitialUnits();
-                }
-            }
+            yield return new WaitForSeconds(0.5f);
+            
+            spawnInitialUnits();
+            
+            yield return new WaitForSeconds(0.5f);
             
             invokeOnAllPlayersReadyClientRpc();
         }
 
+        private void spawnInitialUnits()
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                var teamMembers = GetAllMembersOfTeam(i);
+                foreach (var member in teamMembers)
+                {
+                    for (int j = 0; j < 3; j++)
+                    {
+                        float r = 1f;
+                        Vector3 RndOffset = new Vector3(UnityEngine.Random.Range(-r, r), UnityEngine.Random.Range(-r, r), 0f);
+                        GameObject unit = Instantiate(pawnPrefab, position: member.transform.position + RndOffset, quaternion.identity);
+                        unit.GetComponent<NetworkObject>().Spawn();
+                        ISoldier soldier = unit.GetComponent<ISoldier>();
+                        soldier.Team = i;
+                        soldier.SetCommanderToFollow(member.transform);
+                        soldier.NewCommand(SoldierCommand.Following);
+                        AddSoldierToTeam(i, soldier.transform);   
+                    }
+                }
+            }
+        }
 
         [ClientRpc] 
         void PlaySFXNotificationClientRpc(string sfxName) 
