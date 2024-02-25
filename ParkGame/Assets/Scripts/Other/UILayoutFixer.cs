@@ -10,10 +10,15 @@ public class UILayoutFixer : MonoBehaviour
         StartCoroutine(fix());
     }
 
+    // peak engineering ahead
     IEnumerator fix()
     {
         uiToFix.SetActive(false);
-        yield return new WaitForSeconds(1);
+        yield return null;
+        uiToFix.SetActive(true);
+        yield return null;
+        uiToFix.SetActive(false);
+        yield return new WaitForSeconds(2);
         uiToFix.SetActive(true);
     }
 }
