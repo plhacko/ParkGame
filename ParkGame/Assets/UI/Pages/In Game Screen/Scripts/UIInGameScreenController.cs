@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
+using Managers;
 
 public class UIInGameScreenController : UIPageController
 {
@@ -23,11 +24,14 @@ public class UIInGameScreenController : UIPageController
     [SerializeField] private UIOutpostListController outpostsList;
     [SerializeField] private UIPage optionsPage;
     [SerializeField] private GameManager gameManager;
+    private PlayerManager playerManager;
     private bool attackToggleOn = false;
     private bool boxFormationOn = true;
 
     private void Awake()
     {
+        playerManager = FindObjectOfType<PlayerManager>();
+        playerManager.OnAllPlayersReady += ShowCommandButtons;
         optionsButton.onClick.AddListener(Options);
         action1.onClick.AddListener(Attack);
         action2.onClick.AddListener(Gather);
@@ -37,6 +41,7 @@ public class UIInGameScreenController : UIPageController
         formationButton2.onClick.AddListener(FormationBox);
         formationButton3.onClick.AddListener(Formation3);
         formationButtonClose.onClick.AddListener(FormationClose);
+        ShowCommandButtons(false);
     }
 
     private void Start()
@@ -53,6 +58,17 @@ public class UIInGameScreenController : UIPageController
     {
         var canvasGroup = GetComponent<CanvasGroup>();
         canvasGroup.interactable = true;
+    }
+    private void ShowCommandButtons(bool show) 
+    {
+        action1.gameObject.SetActive(show);
+        action2.gameObject.SetActive(show);
+        toggleFormationButton.gameObject.SetActive(show);
+    }
+
+    public void ShowCommandButtons() 
+    {
+        ShowCommandButtons(true);
     }
 
     private void Gather()
