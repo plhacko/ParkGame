@@ -153,14 +153,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MaxUnits: 6
-  InitialArchers: 2
-  InitialHorsemans: 1
-  InitialPawns: 3
-  SpawnTime: 2.5
+  SpawnTime: 10
   InitOutpostUnitType: 0
   revealer: {fileID: 3827981197028292139}
   colorSettings: {fileID: 11400000, guid: 540e0efb517eb1d4f8598ecd8326dff1, type: 2}
   switchCollider: {fileID: 0}
+  conquerModule: {fileID: 0}
   _Team:
     m_InternalValue: -10
   _IsCastle:

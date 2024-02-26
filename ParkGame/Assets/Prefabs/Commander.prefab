@@ -389,7 +389,7 @@ MonoBehaviour:
   initialTeam: 0
   initialName: 
   revealer: {fileID: 6065839690787669753}
-  MaxFollowingUnits: 20
+  MaxFollowingUnits: 15
   GatherWidget: {fileID: 4052147552757320488}
   colorSettings: {fileID: 11400000, guid: 540e0efb517eb1d4f8598ecd8326dff1, type: 2}
   FormationType: 0
