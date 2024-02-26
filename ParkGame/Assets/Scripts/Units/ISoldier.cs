@@ -158,6 +158,13 @@ public class ISoldier : NetworkBehaviour, ITeamMember {
             CommanderToFollow = commanderToFollow;
             CommanderToFollow?.GetComponent<ICommander>().ReportFollowing(gameObject);
             NewCommand(SoldierCommand.Following);
+
+            FormationType = CommanderToFollow.GetComponent<ICommander>().GetFormation(); // get type of formation
+            FormationFromFollowedCommander = CommanderToFollow.GetComponent<Formation>();
+            if (FormationType == FormationType.Box || FormationType == FormationType.Circle) {
+                NavMeshFormationSwitch(true, FormationFromFollowedCommander, FormationType);
+            }
+
         }
     }
 
@@ -262,7 +269,7 @@ public class ISoldier : NetworkBehaviour, ITeamMember {
         if (IsServer) {
             HP = InitialHP;
         }
-        FormationType = FormationType.Free;
+        FormationType = FormationType.Box;
         isDead = false;
         timeToDeath = DeathFadeTime;
         Radius = UnityEngine.Random.Range(0.2f, 1.2f);
