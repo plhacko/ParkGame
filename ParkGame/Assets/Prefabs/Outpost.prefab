@@ -121,10 +121,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MaxUnits: 3
-  InitialArchers: 1
-  InitialHorsemans: 1
-  InitialPawns: 1
-  SpawnTime: 4
+  SpawnTime: 10
   InitOutpostUnitType: 0
   revealer: {fileID: 7172483008333775361}
   colorSettings: {fileID: 11400000, guid: 540e0efb517eb1d4f8598ecd8326dff1, type: 2}
