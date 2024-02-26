@@ -273,33 +273,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 16e878c8ac6e19f46bc87fa57d8fe0a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  NavMeshStatusNow: 0
   InitialHP: 7
-  MovementSpeed: 1
-  InnerDistanceFromCommander: 1
-  OuterDistanceFromCommander: 2
+  BaseMovementSpeed: 1
+  PathMovementSpeedMultiplier: 1.5
   DefendDistanceFromCommander: 3
   AttackDistanceFromCommander: 6
   MinAttackRange: 0
   MaxAttackRange: 0.67
   Attackcooldown: 1
   Damage: 1
-  TypeOfUnit: 0
-  DeathFadeTime: 2
   revealer: {fileID: 8791321709472324239}
-  ClosestEnemyDEBUG: 0
-  Behaviour: 0
-  BehaviourChangedEvent:
+  colorSettings: {fileID: 0}
+  _SoldierCommand:
+    m_InternalValue: 0
+  CommandChangedEvent:
     m_PersistentCalls:
       m_Calls: []
-  AttackTimer: 0
-  FollowInNavMeshFormation: 0
-  FormationFromFollowedCommander: {fileID: 0}
-  ObjectToFollowInFormation: {fileID: 0}
-  FormationType: 0
-  midPointPositionForHorseman: {x: 0, y: 0, z: 0}
-  midPointReached: 0
-  targetedEnemy: {fileID: 0}
+  SpeakEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!70 &8848524197970868838
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -666,15 +658,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6166c69e079629438c1d700931403bc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SpriteRenderer: {fileID: 0}
-  BehaviourEvent:
-    m_PersistentCalls:
-      m_Calls: []
   EmptyIcon: {fileID: 21300000, guid: dd5eee83f87fffa46923bd7864191c80, type: 3}
   AttackIcon: {fileID: 21300000, guid: 3a3aabdd801ef0248bb008262f5c3bca, type: 3}
   IdleIcon: {fileID: 21300000, guid: 9cb8c28736cde784bb5d793c5ce6a91e, type: 3}
   FormationIcon: {fileID: 21300000, guid: 7193b5f66bd8e3c47b154a72f859662d, type: 3}
   MovementIcon: {fileID: 21300000, guid: 0758c2269edc8554ea2ab27eb797f839, type: 3}
+  DeathIcon: {fileID: 0}
 --- !u!1 &7518167911131455871
 GameObject:
   m_ObjectHideFlags: 0

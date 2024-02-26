@@ -215,7 +215,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 4
+  m_SortingOrder: 3
   m_Sprite: {fileID: -1055244776, guid: 3297282eb39fa9d4c9d9636a2aa84902, type: 3}
   m_Color: {r: 0.5051153, g: 0.9150943, b: 0.48776254, a: 1}
   m_FlipX: 0
@@ -681,6 +681,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 6578423205386703686}
     m_Modifications:
+    - target: {fileID: 4349030486867519740, guid: 577b5a6b0cefddb4a904b313f5a4c42e, type: 3}
+      propertyPath: m_SortingLayer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4349030486867519740, guid: 577b5a6b0cefddb4a904b313f5a4c42e, type: 3}
+      propertyPath: m_SortingOrder
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4349030486867519740, guid: 577b5a6b0cefddb4a904b313f5a4c42e, type: 3}
+      propertyPath: m_SortingLayerID
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4987884346027046658, guid: 577b5a6b0cefddb4a904b313f5a4c42e, type: 3}
       propertyPath: m_Name
       value: BehaviourIcon
