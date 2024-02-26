@@ -27,6 +27,7 @@ public class UIInGameScreenController : UIPageController
     private PlayerManager playerManager;
     private bool attackToggleOn = false;
     private bool boxFormationOn = true;
+    private ToggleButtonImage attackToggler;
 
     private void Awake()
     {
@@ -42,6 +43,7 @@ public class UIInGameScreenController : UIPageController
         formationButton3.onClick.AddListener(Formation3);
         formationButtonClose.onClick.AddListener(FormationClose);
         ShowCommandButtons(false);
+        attackToggler = action1.GetComponent<ToggleButtonImage>();
     }
 
     private void Start()
@@ -97,7 +99,10 @@ public class UIInGameScreenController : UIPageController
     private void ToggleFormation() 
     {
         boxFormationOn = !boxFormationOn;
-        attackToggleOn = false;
+        if (attackToggleOn) {
+            attackToggler.ChangeSprite();
+            attackToggleOn = false;
+        }
         if (boxFormationOn) {
             FormationBox();
         } else {

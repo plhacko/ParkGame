@@ -29,6 +29,10 @@ public class ToggleButtonImage : MonoBehaviour
     }
     
     void OnClick() {
+        ChangeSprite();
+    }
+
+    public void ChangeSprite() {
         CurrentState = (CurrentState + 1) % MaxStates;
         var nextState = (CurrentState + 1) % MaxStates;
         targetImage.sprite = states[(int)nextState].Sprite;
