@@ -14,6 +14,7 @@ public class UIInGameScreenController : UIPageController
     [SerializeField] private Button action3;
     [SerializeField] private RectTransform formationMask;
     [SerializeField] private RectTransform formationButtonParent;
+    [SerializeField] private Button toggleFormationButton;
     [SerializeField] private Button formationButton1;
     [SerializeField] private Button formationButton2;
     [SerializeField] private Button formationButton3;
@@ -22,6 +23,8 @@ public class UIInGameScreenController : UIPageController
     [SerializeField] private UIOutpostListController outpostsList;
     [SerializeField] private UIPage optionsPage;
     [SerializeField] private GameManager gameManager;
+    private bool attackToggleOn = false;
+    private bool boxFormationOn = true;
 
     private void Awake()
     {
@@ -29,9 +32,10 @@ public class UIInGameScreenController : UIPageController
         action1.onClick.AddListener(Attack);
         action2.onClick.AddListener(Gather);
         action3.onClick.AddListener(Formations);
-        formationButton1.onClick.AddListener(Formation1);
-        formationButton2.onClick.AddListener(Formation2);
-        formationButton3.onClick.AddListener(Formation3); // for toggle with Attack?
+        toggleFormationButton.onClick.AddListener(ToggleFormation);
+        formationButton1.onClick.AddListener(FormationCircle);
+        formationButton2.onClick.AddListener(FormationBox);
+        formationButton3.onClick.AddListener(Formation3);
         formationButtonClose.onClick.AddListener(FormationClose);
     }
 
@@ -74,21 +78,31 @@ public class UIInGameScreenController : UIPageController
         formationMask.DOSizeDelta(targetDelta, .25f).OnComplete(() => action3.interactable = true);
     }
 
+    private void ToggleFormation() 
+    {
+        boxFormationOn = !boxFormationOn;
+        attackToggleOn = false;
+        if (boxFormationOn) {
+            FormationBox();
+        } else {
+            FormationCircle();
+        }
+    }
+
     private void Formation3()
     {
-        // for toggle Attack/Fallback ?
         gameManager.CommandFallback();
         AudioManager.Instance.PlayCommandSFX("FormationFree");
 
     }
 
-    private void Formation2() 
+    private void FormationBox() 
     {
         gameManager.FormationBox();
         AudioManager.Instance.PlayCommandSFX("FormationBox");
     }
 
-    private void Formation1() 
+    private void FormationCircle() 
     {
         gameManager.FormationCircle();
         AudioManager.Instance.PlayCommandSFX("FormationCircle");
@@ -107,6 +121,18 @@ public class UIInGameScreenController : UIPageController
     {
         gameManager.CommandAttack();
         AudioManager.Instance.PlayCommandSFX("Attack");
+        attackToggleOn = !attackToggleOn;
+
+        if (attackToggleOn) {
+            gameManager.CommandAttack();
+            AudioManager.Instance.PlayCommandSFX("Attack");
+        } else {
+            if (boxFormationOn) {
+                FormationBox();
+            } else {
+                FormationCircle();
+            }
+        }
     }
 
     public void ZoomOut()
