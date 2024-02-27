@@ -77,7 +77,6 @@ public class ISoldier : NetworkBehaviour, ITeamMember {
     protected ChangeMaterial changeMaterial;
     protected PathTileChecker pathTileChecker;
     
-    protected SpriteRenderer circleRenderer;
     protected GameSessionManager gameSessionManager;
 
     protected Transform targetedEnemy;
@@ -99,7 +98,7 @@ public class ISoldier : NetworkBehaviour, ITeamMember {
 
     protected void OnTeamChanged(int previousValue, int newValue) //DEBUG (just tem membership visualization) // TODO: rm
     {
-        if (circleRenderer != null && newValue != -1) {
+        if (newValue != -1) {
             InitializeTeamColor();
         }
 
@@ -117,7 +116,6 @@ public class ISoldier : NetworkBehaviour, ITeamMember {
     public void InitializeTeamColor()
     {
         Color teamColor = colorSettings.Colors[Team].Color;
-        circleRenderer.color = teamColor;
         SpriteRenderer.material.SetColor("_TargetColor", teamColor);
     }
 
@@ -261,7 +259,6 @@ public class ISoldier : NetworkBehaviour, ITeamMember {
         Agent = GetComponent<NavMeshAgent>();
         Networkanimator = GetComponent<NetworkAnimator>();
         changeMaterial = GetComponent<ChangeMaterial>();
-        circleRenderer = transform.Find("Circle")?.GetComponent<SpriteRenderer>();
         pathTileChecker = FindObjectOfType<PathTileChecker>();
 
         _Team.OnValueChanged += OnTeamChanged;
