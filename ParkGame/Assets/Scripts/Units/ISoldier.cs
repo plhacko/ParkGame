@@ -231,15 +231,19 @@ public class ISoldier : NetworkBehaviour, ITeamMember {
         } else {
             FormationFromFollowedCommander = formation;
             FormationType = formationType;
+            GameObject pos = null;
             switch (FormationType) {
                 case FormationType.Circle:
-                    ObjectToFollowInFormation = FormationFromFollowedCommander.GetPositionInFormation(gameObject, FormationType.Circle);
+                    pos = FormationFromFollowedCommander.GetPositionInFormation(gameObject, FormationType.Circle);
                     break;
                 case FormationType.Box:
-                    ObjectToFollowInFormation = FormationFromFollowedCommander.GetPositionInFormation(gameObject, FormationType.Box);
+                    pos = FormationFromFollowedCommander.GetPositionInFormation(gameObject, FormationType.Box);
                     break;
                 default:
                     break;
+            }
+            if (pos) {
+                ObjectToFollowInFormation = pos;
             }
         }
     }
@@ -362,16 +366,16 @@ public class ISoldier : NetworkBehaviour, ITeamMember {
             return;
         }
 
-        // attack the targeted enemy if in range
-        if (AttackEnemyIfInRange(targetedEnemy)) { return; }
-        // go closer to the enemy 
-        FollowObjectWithAnimation(targetedEnemy, true);
-
         // if the commander is too far, the soldier will stop attacking and will return back to the commander
         float distanceFromCommander = (CommanderToFollow.position - transform.position).magnitude;
         if (distanceFromCommander > AttackDistanceFromCommander) {
             Follow();
         }
+
+        // attack the targeted enemy if in range
+        if (AttackEnemyIfInRange(targetedEnemy)) { return; }
+        // go closer to the enemy 
+        MoveTowardsEntity(targetedEnemy);
     }
 
     public bool IsFollowingCommander() {
@@ -399,14 +403,7 @@ public class ISoldier : NetworkBehaviour, ITeamMember {
         Vector3 toFollowPosition = new Vector3(toFollow.position.x, toFollow.position.y, transform.position.z);
         Agent.SetDestination(toFollowPosition);
         Vector2 direction = toFollowPosition - gameObject.transform.position;
-
-        // get back to the outpost
         Direction directionE = GetDirectionEnum(direction);
-        if (direction.magnitude < 1f && Command != SoldierCommand.InOutpost) {
-            if (toFollow == CommanderToFollow && CommanderToFollow.GetComponent<Outpost>()) {
-                NewCommand(SoldierCommand.InOutpost);
-            }
-        }
 
         // got somewhere
         if ((direction.magnitude < Radius && !precise) || (direction.magnitude < 0.1f && precise)) {
@@ -421,6 +418,13 @@ public class ISoldier : NetworkBehaviour, ITeamMember {
     }
 
     protected virtual void MoveTowardsEntity(Transform entityT) {
+        Vector3 entityPos = new Vector3(entityT.position.x, entityT.position.y, transform.position.z);
+        if (Vector3.Distance(entityPos, transform.position) <= MaxAttackRange) {
+            // stop
+            Networkanimator.Animator.SetFloat(AnimatorMovementSpeedHash, 0.0f);
+            Agent.SetDestination(transform.position);
+            return;
+        }
         FollowObjectWithAnimation(entityT, true);
     }
 
@@ -469,17 +473,6 @@ public class ISoldier : NetworkBehaviour, ITeamMember {
                 if (FormationType == FormationType.Box || FormationType == FormationType.Circle) {
                     NavMeshFormationSwitch(true, FormationFromFollowedCommander, FormationType);
                 }
-            }
-            // return to outpost
-            else {
-                ReturningToOutpost = true;
-                var closestOutpost = ClosestOutpost();
-                FormationFromFollowedCommander?.RemoveFromFormation(gameObject, ObjectToFollowInFormation, FormationType);
-                CommanderToFollow?.GetComponent<ICommander>()?.ReportUnfollowing(gameObject);
-                SetCommanderToFollow(closestOutpost);
-                NewCommand(SoldierCommand.Following);
-                SpeakClientRpc();
-                NavMeshFormationSwitch(false, FormationFromFollowedCommander, FormationType.Free);
             }
         }
     }

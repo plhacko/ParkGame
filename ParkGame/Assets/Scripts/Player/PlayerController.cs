@@ -185,7 +185,7 @@ namespace Player
         }
 
         public void Gather() {
-            GatherWidget.CallGatherCommand(Team);
+            GatherWidget.CallGatherCommand(Team); // visual effect
             // fallback also?
             GatherSoldiersInRangeServerRpc(NetworkManager.Singleton.LocalClientId);
             if (lastCommand == SoldierCommand.Attack) {

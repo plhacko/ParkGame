@@ -12,24 +12,7 @@ public class Archer : ISoldier {
         base.Initialize();
         Initialize();
     }
-
-    protected override void MoveTowardsEntity(Transform entityT) {
-        // archers, don't go closer! you'd just die 
-        if (Vector3.Distance(entityT.position, transform.position) < MinAttackRange) {
-            return;
-        }
-
-        FollowObjectWithAnimation(entityT, true);
-    }
-
-    protected override Transform GetEnemy() {
-        if (targetedEnemy != null) {
-            return targetedEnemy;
-        }
-        Transform enemyT = EnemyObserver.GetEnemyInRange(MinAttackRange, MaxAttackRange);
-        return enemyT;
-    }
-
+    
     protected override bool AttackEnemyIfInRange(Transform enemyT, float maxAttackDistance = 0) {
         float maxRange = MaxAttackRange;
         if (maxAttackDistance > 0) {
@@ -55,4 +38,6 @@ public class Archer : ISoldier {
         }
         return false;
     }
+    
+    
 }
