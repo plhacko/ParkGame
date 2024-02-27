@@ -4,10 +4,12 @@ using DG.Tweening;
 public class PlayerPointerPlacer : MonoBehaviour
 {
     public GameObject Pin;
+    public GameObject Pin2;
     public static Vector3 PinPosition = Vector3.zero;
     public GameObject accuracyCircle;
     public float debugMovementSpeed = 5.0f;
-
+    
+    [SerializeField] private float smoothTime = 0.3f;
     [SerializeField] private Color closeColor;
     [SerializeField] private Color farColor;
         
@@ -33,6 +35,7 @@ public class PlayerPointerPlacer : MonoBehaviour
     };
 
     private MapDisplayer mapDisplayer;
+    private Vector3 pinVelocity;
 
     private void Awake()
     {
@@ -43,6 +46,9 @@ public class PlayerPointerPlacer : MonoBehaviour
         br.lat = mapDisplayer.MaxLatitude;
         pinSpriteRenderer = Pin.GetComponent<SpriteRenderer>();
         accuracyCircleScale = accuracyCircle.transform.localScale.x * Pin.transform.localScale.x;
+#if !UNITY_EDITOR
+        Pin2.gameObject.SetActive(false);
+#endif
     }
 
     // Update is called once per frame
@@ -53,11 +59,12 @@ public class PlayerPointerPlacer : MonoBehaviour
         // Movement for debugging in Unity Editor
         // Using W, A, S, D or arrow keys
         var movement = new Vector3(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"), 0.0f);
-        if (movement != Vector3.zero)
-        {
-            Pin.transform.position += movement * debugMovementSpeed * Time.deltaTime;
-        }
-    #else
+
+        Pin2.transform.position += movement * debugMovementSpeed * Time.deltaTime;
+        Pin.transform.position = Vector3.SmoothDamp(Pin.transform.position, Pin2.transform.position, ref pinVelocity, smoothTime);
+        PinPosition = Pin.transform.position;
+#else
+
         // Check if GPS data is available
         if (!GPSLocator.instance.IsLocationServiceEnabled())
         {
@@ -73,9 +80,7 @@ public class PlayerPointerPlacer : MonoBehaviour
         pinPosition.lat = GPSLocator.instance.Lattitude;
 
         SetPin();
-    #endif
-
-        PinPosition = Pin.transform.position;
+#endif
     }
 
     void SetPin()
@@ -125,8 +130,9 @@ public class PlayerPointerPlacer : MonoBehaviour
         Vector3 worldPosition = new Vector3(worldX, worldY, transform.position.z);
 
         // Do something with the world position
-        PinPosition = worldPosition;
-        Pin.transform.DOMove(worldPosition, 0.5f);
+        PinPosition = Vector3.SmoothDamp(PinPosition, worldPosition, ref pinVelocity, smoothTime);
+        Pin.transform.position = PinPosition;
+        // Pin.transform.DOMove(worldPosition, 0.5f);
         // accuracyCircle.transform.position = worldPosition;
         var scale = mapDisplayer.GetMapScale();
         float accuracyRadius = (float)(GPSLocator.instance.HorizontalAccuracy * scale * 2 / accuracyCircleScale);
