@@ -119,6 +119,14 @@ public class ISoldier : NetworkBehaviour, ITeamMember {
         Color teamColor = colorSettings.Colors[Team].Color;
         circleRenderer.color = teamColor;
         SpriteRenderer.material.SetColor("_TargetColor", teamColor);
+        GetComponent<SpriteRenderer>().material.SetFloat("_Brightness", 2.0f);
+    }
+    /// <summary>Sets the color of the team </summary>
+    public void SetFollowCommanderColor()
+    {
+        Color teamColor = colorSettings.Colors[Team].Color;
+        GetComponent<SpriteRenderer>().material.SetColor("_TargetColor", teamColor);
+        GetComponent<SpriteRenderer>().material.SetFloat("_Brightness", 3.5f);
     }
 
     public void OnCommandChange(SoldierCommand previousValue, SoldierCommand newValue) {

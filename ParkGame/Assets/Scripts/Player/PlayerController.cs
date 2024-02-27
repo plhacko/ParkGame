@@ -31,7 +31,7 @@ namespace Player
         private List<NetworkObjectReference> units = new();
         private PathTileChecker pathTileChecker;
         private string firebaseId;
-        
+
         // Replicated variable for sprite orientation
         private readonly NetworkVariable<bool> xSpriteFlip = new(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         private readonly NetworkVariable<FixedString64Bytes> _Name = new(new FixedString64Bytes(""));
@@ -40,12 +40,12 @@ namespace Player
         private readonly NetworkVariable<bool> _IsLocked = new(true);
         private readonly NetworkVariable<Vector3> _PointerPosition = new(Vector3.zero, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
         private readonly NetworkVariable<bool> _IsOnPath = new(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-        
+
         public int Team { get => _Team.Value; set => _Team.Value = value; }
         public string Name { get => _Name.Value.Value; set => _Name.Value = value; }
         public string FirebaseId { get => _FirebaseId.Value.Value; set => _FirebaseId.Value = value; }
         public bool IsLocked { get => _IsLocked.Value; set => _IsLocked.Value = value; }
-        
+
         public Vector3 PointerPosition { get => _PointerPosition.Value; set => _PointerPosition.Value = value; }
         public bool IsOnPath { get => _IsOnPath.Value; set => _IsOnPath.Value = value; }
 
@@ -53,12 +53,13 @@ namespace Player
         public bool followPin = false;
         private SoldierCommand lastCommand;
 
-        public Formation.FormationType GetFormation() {
+        public Formation.FormationType GetFormation()
+        {
             return FormationType;
         }
 
         private EnemyObserver friendlyDetector;
-        
+
         private static readonly int movementSpeedAnimationHash = Animator.StringToHash("MovementSpeed");
         private static readonly int directionEnumAnimationHash = Animator.StringToHash("Direction");
         private static readonly int WaveAnimationHash = Animator.StringToHash("Wave");
@@ -77,12 +78,13 @@ namespace Player
             pathTileChecker = FindObjectOfType<PathTileChecker>();
             friendlyDetector = GetComponentInChildren<EnemyObserver>();
 
-            if (IsServer) {
+            if (IsServer)
+            {
                 Team = initialTeam;
                 Name = initialName;
                 FirebaseId = firebaseId;
             }
-            
+
             Debug.Log($"init player {Name} in {Team} with {FirebaseId}, is owner: {isActualOwner()}");
             if (isActualOwner())
             {
@@ -94,7 +96,7 @@ namespace Player
                 gameObject.AddComponent<AudioListener>();
                 gameObject.AddComponent<AudioSource>();
                 AudioManager.Instance.notificationsSource = gameObject.GetComponent<AudioSource>();
-                
+
                 // for trumpet sounds only
                 gameObject.AddComponent<AudioSource>();
                 AudioManager.Instance.commandsSource = gameObject.GetComponent<AudioSource>();
@@ -103,7 +105,7 @@ namespace Player
             {
                 xSpriteFlip.OnValueChanged += onXSpriteFlipChanged;
             }
-            
+
             _IsLocked.OnValueChanged += onIsLockedChanged;
 
             var localPlayerData = LobbyManager.Singleton.GetLocalPlayerData();
@@ -117,9 +119,9 @@ namespace Player
                 revealer.gameObject.SetActive(false);
                 changeMaterial.Change(true);
             }
-            
+
             formationScript.InitializeFormation(Team); // build prefab, get position of the commander
-            FormationType = Formation.FormationType.Box; 
+            FormationType = Formation.FormationType.Box;
 
             if (IsOwner)
             {
@@ -130,7 +132,7 @@ namespace Player
                     {
                         AddOutpostUI(castle);
                     }
-                }   
+                }
             }
         }
 
@@ -153,12 +155,14 @@ namespace Player
             if (gameSessionManager.IsOver) return;
 
             PointerPosition = PlayerPointerPlacer.PinPosition;
-            if (followPin) {
+            if (followPin)
+            {
                 MoveTowards(PointerPosition);
             }
-            
+
             // Attack
-            if (Input.GetKeyDown(KeyCode.P)) {
+            if (Input.GetKeyDown(KeyCode.P))
+            {
                 CommandAttackServerRpc();
             }
 
@@ -169,58 +173,69 @@ namespace Player
             }
 
             // Box (Rectangular) formation
-            if (Input.GetKeyDown(KeyCode.R)) 
+            if (Input.GetKeyDown(KeyCode.R))
             {
                 FormatSoldiersServerRpc(KeyCode.R);
             }
 
-            if (Input.GetKeyDown(KeyCode.T)) {
+            if (Input.GetKeyDown(KeyCode.T))
+            {
                 Gather();
             }
 
-            if (Input.GetKeyDown(KeyCode.O)) 
+            if (Input.GetKeyDown(KeyCode.O))
             {
                 FormatSoldiersServerRpc(KeyCode.O);
             }
         }
 
-        public void Gather() {
+        public void Gather()
+        {
             GatherWidget.CallGatherCommand(Team);
             // fallback also?
             GatherSoldiersInRangeServerRpc(NetworkManager.Singleton.LocalClientId);
-            if (lastCommand == SoldierCommand.Attack) {
+            if (lastCommand == SoldierCommand.Attack)
+            {
                 CommandAttackServerRpc();
             }
         }
 
         [ServerRpc(RequireOwnership = false)]
-        public void FormatSoldiersServerRpc(KeyCode key) {
+        public void FormatSoldiersServerRpc(KeyCode key)
+        {
             FormatSoldiers(key);
             lastCommand = SoldierCommand.Following;
         }
 
         [ServerRpc(RequireOwnership = false)]
-        void GatherSoldiersInRangeServerRpc(ulong clientID) {
-            if (units.Count < MaxFollowingUnits) {
+        void GatherSoldiersInRangeServerRpc(ulong clientID)
+        {
+            if (units.Count < MaxFollowingUnits)
+            {
                 var friendsInRange = friendlyDetector.GetAllFriends();
                 int capacityForNew = MaxFollowingUnits - units.Count;
-                foreach (var f in friendsInRange) {
-                    if (capacityForNew <= 0) {
+                foreach (var f in friendsInRange)
+                {
+                    if (capacityForNew <= 0)
+                    {
                         return;
                     }
 
-                    if (!f.GetComponent<ISoldier>().IsFollowingCommander()) {
-                        f.GetComponent<ISoldier>().RequestChangingCommanderToFollowServerRpc(clientID, true); 
+                    if (!f.GetComponent<ISoldier>().IsFollowingCommander())
+                    {
+                        f.GetComponent<ISoldier>().RequestChangingCommanderToFollowServerRpc(clientID, true);
                         capacityForNew--;
                     }
-                }           
+                }
             }
         }
 
-        public void FormatSoldiers(KeyCode key) {
-            switch (key) {
+        public void FormatSoldiers(KeyCode key)
+        {
+            switch (key)
+            {
                 case KeyCode.C:
-                        // circle (Circular) formation
+                    // circle (Circular) formation
                     FormationType = Formation.FormationType.Circle;
                     formationScript.ResetFormation();
                     notifySoldiers();
@@ -232,7 +247,7 @@ namespace Player
                     notifySoldiers();
                     break;
                 case KeyCode.O:
-                    FormationType = Formation.FormationType.Free;        
+                    FormationType = Formation.FormationType.Free;
                     formationScript.ResetFormation();
                     notifySoldiers();
                     break;
@@ -241,12 +256,16 @@ namespace Player
         }
 
 
-        private void notifySoldiers() {
-            foreach (GameObject go in units) {
-                if (go.TryGetComponent(out ISoldier soldier)) {
+        private void notifySoldiers()
+        {
+            foreach (GameObject go in units)
+            {
+                if (go.TryGetComponent(out ISoldier soldier))
+                {
                     soldier.NewCommand(SoldierCommand.Following);
 
-                    switch (FormationType) {
+                    switch (FormationType)
+                    {
                         case Formation.FormationType.Free:
                             soldier.NavMeshFormationSwitch(false, formationScript, FormationType);
                             formationScript.ResetFormation();
@@ -259,7 +278,7 @@ namespace Player
                             soldier.NavMeshFormationSwitch(false, formationScript, FormationType);
                             soldier.NavMeshFormationSwitch(true, formationScript, FormationType);
                             break;
-                        default: 
+                        default:
                             break;
                     }
                 }
@@ -314,18 +333,18 @@ namespace Player
         {
             if (!IsServer)
             { throw new Exception($"only on server can adding units to commander be done: {gameObject.name}"); }
-            
+
             ClientRpcParams clientRpcParams = new ClientRpcParams
             {
                 Send = new ClientRpcSendParams
                 {
-                    TargetClientIds = new []{ OwnerClientId, NetworkManager.Singleton.LocalClientId }
+                    TargetClientIds = new[] { OwnerClientId, NetworkManager.Singleton.LocalClientId }
                 }
             };
-            
+
             addToUnitsClientRpc(networkObjectReference, clientRpcParams);
         }
-        
+
         [ClientRpc]
         private void addToUnitsClientRpc(NetworkObjectReference networkObjectReference, ClientRpcParams clientRpcParams = default)
         {
@@ -344,24 +363,30 @@ namespace Player
 
             if (isActualOwner())
             {
-                uiInGameScreenController.AddUnit(soldier,
-                    () => soldier.RequestChangingCommanderToFollowServerRpc(NetworkManager.Singleton.LocalClientId)
-                );   
+                uiInGameScreenController.AddUnit(soldier, () =>
+                {
+                    soldier.RequestChangingCommanderToFollowServerRpc(NetworkManager.Singleton.LocalClientId);
+                    soldier.InitializeTeamColor();
+                });
+                soldier.SetFollowCommanderColor();
             }
         }
 
-        void ICommander.ReportUnfollowing(NetworkObjectReference networkObjectReference) {
+        void ICommander.ReportUnfollowing(NetworkObjectReference networkObjectReference)
+        {
             if (!IsServer) { throw new Exception($"only on server can removing units from commander be done: {gameObject.name}"); }
 
-            ClientRpcParams clientRpcParams = new ClientRpcParams {
-                Send = new ClientRpcSendParams {
+            ClientRpcParams clientRpcParams = new ClientRpcParams
+            {
+                Send = new ClientRpcSendParams
+                {
                     TargetClientIds = new[] { OwnerClientId, NetworkManager.Singleton.LocalClientId }
                 }
             };
 
             removeFromUnitsClientRpc(networkObjectReference, clientRpcParams);
         }
-        
+
         [ClientRpc]
         private void removeFromUnitsClientRpc(NetworkObjectReference networkObjectReference, ClientRpcParams clientRpcParams = default)
         {
@@ -383,7 +408,7 @@ namespace Player
                 uiInGameScreenController.RemoveUnit(soldier);
             }
         }
-        
+
         [ServerRpc]
         public void CommandMovementServerRpc()
         {
@@ -402,10 +427,13 @@ namespace Player
         }
 
         [ServerRpc]
-        public void CommandIdleServerRpc() {
+        public void CommandIdleServerRpc()
+        {
             lastCommand = SoldierCommand.Following;
-            foreach (GameObject go in units) {
-                if (go.TryGetComponent(out ISoldier soldier)) {
+            foreach (GameObject go in units)
+            {
+                if (go.TryGetComponent(out ISoldier soldier))
+                {
                     soldier.NewCommand(SoldierCommand.Following);
                 }
             }
@@ -415,12 +443,15 @@ namespace Player
         }
 
         [ServerRpc(RequireOwnership = false)]
-        public void CommandAttackServerRpc(ServerRpcParams serverRpcParams = default) {
+        public void CommandAttackServerRpc(ServerRpcParams serverRpcParams = default)
+        {
             //formationScript.ResetFormation();
             //FormationType = Formation.FormationType.Free;
             lastCommand = SoldierCommand.Attack;
-            foreach (GameObject go in units) {
-                if (go.TryGetComponent(out ISoldier soldier)) {
+            foreach (GameObject go in units)
+            {
+                if (go.TryGetComponent(out ISoldier soldier))
+                {
                     soldier.NewCommand(SoldierCommand.Attack);
                 }
             }
@@ -429,11 +460,13 @@ namespace Player
             networkAnimator.SetTrigger(WaveAnimationHash);
         }
 
-        public void AddOutpostUI(Outpost outpost) {
+        public void AddOutpostUI(Outpost outpost)
+        {
             uiInGameScreenController.AddOutpost(outpost);
         }
 
-        public void RemoveOutpostUI(Outpost outpost) {
+        public void RemoveOutpostUI(Outpost outpost)
+        {
             uiInGameScreenController.RemoveOutpost(outpost);
         }
 
@@ -442,6 +475,7 @@ namespace Player
         {
             Color teamColor = colorSettings.Colors[Team].Color;
             GetComponent<SpriteRenderer>().material.SetColor("_TargetColor", teamColor);
+            GetComponent<SpriteRenderer>().material.SetFloat("_Brightness", isActualOwner() ? 3.5f : 2.0f);
         }
     }
 }
