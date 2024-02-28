@@ -6,6 +6,7 @@ using TMPro;
 using System;
 using Managers;
 using Unity.Services.Lobbies.Models;
+using System.Threading.Tasks;
 
 public class UILobbyTeam : MonoBehaviour
 {
@@ -15,17 +16,18 @@ public class UILobbyTeam : MonoBehaviour
     [SerializeField] private Button joinButton;
     [SerializeField] private RectTransform teamLayoutGroup;
     [SerializeField] private ColorSettings colorSettings;
-    
-    private string playerId;
+    private int teamNumber;
 
-    public void Initialize(int teamNumber, Action<int> onJoinTeam) {
+    public void Initialize(int teamNumber) {
         
         teamLabel.text = colorSettings.Colors[teamNumber].Name + " Team";
         teamImage.color = colorSettings.Colors[teamNumber].Color;
         
+        this.teamNumber = teamNumber;
+
         joinButton.onClick.AddListener(() => {
-            onJoinTeam?.Invoke(teamNumber);
             AudioManager.Instance.PlayClickSFX();
+            JoinTeam();
         });
     
     }
@@ -43,6 +45,22 @@ public class UILobbyTeam : MonoBehaviour
         foreach (Transform child in teamLayoutGroup)
         {
             Destroy(child.gameObject);
+        }
+    }
+
+    private async void JoinTeam()
+    {
+        bool success = await LobbyManager.Singleton.JoinTeam(teamNumber);
+
+        if (!success)
+        {
+            UIController.Singleton.ShowPopUp(
+                "Team Full",
+                "The team is full. Please select another team.",
+                "OK",
+                null,
+                "TeamFull"
+            );
         }
     }
 }
