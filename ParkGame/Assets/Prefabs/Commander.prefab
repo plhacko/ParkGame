@@ -492,7 +492,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6bb49af851bf9364d8a061207283ed6e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DEBUG: 1
+  DEBUG: 0
   PositionPrefab: {fileID: 8445700170667219416, guid: 8017038a20629f746abec45be20ba768, type: 3}
   colorSettings: {fileID: 11400000, guid: 540e0efb517eb1d4f8598ecd8326dff1, type: 2}
   soldiers: []
