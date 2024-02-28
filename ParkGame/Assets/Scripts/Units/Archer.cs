@@ -22,7 +22,7 @@ public class Archer : ISoldier {
             && Vector3.Distance(enemyT.position, transform.position) >= MinAttackRange) {
             if (AttackTimer >= Attackcooldown) {
                 AttackTimer = 0.0f;
-                Networkanimator.Animator.SetFloat(AnimatorMovementSpeedHash, 0.0f);
+                StopMoving();
 
                 Networkanimator.SetTrigger("Attack");
 

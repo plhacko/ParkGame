@@ -412,8 +412,7 @@ public class ISoldier : NetworkBehaviour, ITeamMember {
 
         // got somewhere
         if ((direction.magnitude < Radius && !precise) || (direction.magnitude < 0.1f && precise)) {
-            Networkanimator.Animator.SetFloat(AnimatorMovementSpeedHash, 0.0f);
-            Agent.SetDestination(transform.position);
+            StopMoving();
         } else {
             Networkanimator.Animator.SetFloat(AnimatorMovementSpeedHash, 1.0f);
             Networkanimator.Animator.SetInteger(AnimatorDirection, (int)directionE);
@@ -426,11 +425,15 @@ public class ISoldier : NetworkBehaviour, ITeamMember {
         Vector3 entityPos = new Vector3(entityT.position.x, entityT.position.y, transform.position.z);
         if (Vector3.Distance(entityPos, transform.position) <= MinAttackRange) {
             // stop
-            Networkanimator.Animator.SetFloat(AnimatorMovementSpeedHash, 0.0f);
-            Agent.SetDestination(transform.position);
+            StopMoving();
             return;
         }
         FollowObjectWithAnimation(entityT, true);
+    }
+
+    protected void StopMoving() {
+        Networkanimator.Animator.SetFloat(AnimatorMovementSpeedHash, 0.0f);
+        Agent.SetDestination(transform.position);
     }
 
     private Transform ClosestOutpost() {

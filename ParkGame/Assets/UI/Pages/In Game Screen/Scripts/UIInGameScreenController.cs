@@ -26,8 +26,8 @@ public class UIInGameScreenController : UIPageController
     [SerializeField] private GameManager gameManager;
     private PlayerManager playerManager;
     private bool attackToggleOn = false;
-    private bool boxFormationOn = true;
     private ToggleButtonImage attackToggler;
+    private int formationType = 0; // 0 free, 1 box, 2 circle
 
     private void Awake()
     {
@@ -40,7 +40,7 @@ public class UIInGameScreenController : UIPageController
         toggleFormationButton.onClick.AddListener(ToggleFormation);
         formationButton1.onClick.AddListener(FormationCircle);
         formationButton2.onClick.AddListener(FormationBox);
-        formationButton3.onClick.AddListener(Formation3);
+        formationButton3.onClick.AddListener(FormationFree);
         formationButtonClose.onClick.AddListener(FormationClose);
         ShowCommandButtons(false);
         attackToggler = action1.GetComponent<ToggleButtonImage>();
@@ -98,19 +98,26 @@ public class UIInGameScreenController : UIPageController
 
     private void ToggleFormation() 
     {
-        boxFormationOn = !boxFormationOn;
+        formationType += 1;
         if (attackToggleOn) {
             attackToggler.ChangeSprite();
             attackToggleOn = false;
         }
-        if (boxFormationOn) {
+        IntoFormation();
+    }
+
+    private void IntoFormation() {
+        int num = 3;
+        if (formationType % num == 0) {
             FormationBox();
-        } else {
+        } else if (formationType % num == 1) {
             FormationCircle();
+        } else {
+            FormationFree();
         }
     }
 
-    private void Formation3()
+    private void FormationFree()
     {
         gameManager.CommandFallback();
         AudioManager.Instance.PlayCommandSFX("FormationFree");
@@ -148,11 +155,7 @@ public class UIInGameScreenController : UIPageController
             gameManager.CommandAttack();
             AudioManager.Instance.PlayCommandSFX("Attack");
         } else {
-            if (boxFormationOn) {
-                FormationBox();
-            } else {
-                FormationCircle();
-            }
+            IntoFormation();
         }
     }
 
