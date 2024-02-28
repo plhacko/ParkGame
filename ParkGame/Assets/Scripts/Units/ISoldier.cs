@@ -424,7 +424,7 @@ public class ISoldier : NetworkBehaviour, ITeamMember {
 
     protected virtual void MoveTowardsEntity(Transform entityT) {
         Vector3 entityPos = new Vector3(entityT.position.x, entityT.position.y, transform.position.z);
-        if (Vector3.Distance(entityPos, transform.position) <= MaxAttackRange) {
+        if (Vector3.Distance(entityPos, transform.position) <= MinAttackRange) {
             // stop
             Networkanimator.Animator.SetFloat(AnimatorMovementSpeedHash, 0.0f);
             Agent.SetDestination(transform.position);
