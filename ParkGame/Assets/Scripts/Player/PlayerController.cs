@@ -221,9 +221,9 @@ namespace Player
                         return;
                     }
 
-                    if (!f.GetComponent<ISoldier>().IsFollowingCommander())
-                    {
+                    if (!f.GetComponent<ISoldier>().IsFollowingCommander()) {
                         f.GetComponent<ISoldier>().RequestChangingCommanderToFollowServerRpc(clientID, true);
+                        f.GetComponent<ISoldier>().NewCommand(SoldierCommand.Following);
                         capacityForNew--;
                     }
                 }

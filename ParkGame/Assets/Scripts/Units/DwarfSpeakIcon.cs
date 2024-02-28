@@ -6,30 +6,31 @@ public class DwarfSpeakIcon : MonoBehaviour
 {
     private SpriteRenderer sr;
     private ISoldier theSoldier;
+    [SerializeField] private UnitBehaviourDrawer drawer;
     public UnityEvent speakEvent;
-    [SerializeField] Sprite SpeakIcon;
+    [SerializeField] private Sprite SpeakIcon;
 
     void Start()
     {
         sr = GetComponent<SpriteRenderer>();
         theSoldier = GetComponentInParent<ISoldier>();
+        drawer = GetComponent<UnitBehaviourDrawer>();
         speakEvent = theSoldier.SpeakEvent;
-        speakEvent.AddListener(DisplaySpeakIcon);
+        //speakEvent.AddListener(DisplaySpeakIcon);
     }
 
     void DisplaySpeakIcon() {
-        StartCoroutine(DisplaySpeakIcon(SpeakIcon, sr, 1f));
+        Debug.Log("SPEAK ICON!!!");
+        StartCoroutine(DisplaySpeakIcon(SpeakIcon, sr, 1f));//, () => { sr.sprite = drawer.GetIconForCommand(theSoldier.Command); }); );
     }
 
     public static IEnumerator DisplaySpeakIcon(Sprite iconToShow, SpriteRenderer sr, float t) {
         float timer = t;
-        Sprite prevIcon = sr.sprite;
         sr.sprite = iconToShow;
         while (timer > 0) {
             timer -= Time.deltaTime;
             yield return null;
         }
-        sr.sprite = prevIcon;
         yield break;
     }
 }

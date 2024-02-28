@@ -26,7 +26,7 @@ public class PathTileChecker : MonoBehaviour
         {
             if (tile == pathTile)
             {
-                Debug.Log("OnPath");
+                //Debug.Log("OnPath");
                 return true;
             }
         }
