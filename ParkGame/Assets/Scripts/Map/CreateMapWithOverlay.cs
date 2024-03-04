@@ -69,12 +69,14 @@ public class CreateMapWithOverlay : NetworkBehaviour
     public MapDisplayer BaseMap {get; private set;}
 
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         drawableSpriteRenderer = GetComponent<SpriteRenderer>();
         mapDrawable = GetComponent<Drawable>();
-        if (!doNotFetch) // Wait until map fetching from MapBox is completed
-            StartCoroutine(WaitForValue());
+        if (doNotFetch)
+            return;
+        fetchedMap = GameObject.FindWithTag("FetchedMapSprite");
+        fetchedMap.GetComponent<MapDisplayer>().OnMapLoaded += SetMapOverlay;
     }
 
     public void CreateTilemapFromFetchedMap(MapData mapData)
@@ -108,33 +110,6 @@ public class CreateMapWithOverlay : NetworkBehaviour
     public bool IsBaseMapLoaded()
     {
         return BaseMap.IsMapLoaded();
-    }
-    
-    private IEnumerator WaitForValue()
-    {
-        float timer = 0f;
-        float maxWaitTime = 5f; // Maximum wait time in seconds
-        fetchedMap = GameObject.FindWithTag("FetchedMapSprite");
-        var fetchedMapRenderer = fetchedMap.GetComponent<SpriteRenderer>();
-        
-
-        // Continuously check for the value until it becomes non-null or the time limit is reached
-        while (fetchedMapRenderer.sprite == null && timer < maxWaitTime)
-        {
-            timer += Time.deltaTime;
-            yield return null; // Wait for one frame
-        }
-
-        if (fetchedMapRenderer.sprite != null)
-        {
-            Debug.Log("Map was fetched is now available.");
-            fetchedMap.transform.SetParent(transform.parent);
-            SetMapOverlay(fetchedMapRenderer.sprite);
-        }
-        else
-        {
-            Debug.LogWarning("Map was not fetched within the specified time.");
-        }
     }
     
     public GameObject GetFetchedMap()
@@ -237,9 +212,17 @@ public class CreateMapWithOverlay : NetworkBehaviour
     /// Set map image as an overlay for drawing texture
     /// </summary>
     /// <param name="newMapOverlay"></param>
-    public void SetMapOverlay(Sprite newMapOverlay)
+    public void SetMapOverlay()
     {
-        mapOverlay = newMapOverlay;
+        var fetchedMapRenderer = fetchedMap.GetComponent<SpriteRenderer>();
+        if (fetchedMapRenderer.sprite == null)
+        {
+            Debug.LogError("Map was not fetched from the server.");
+            return;
+        }
+        Debug.Log("Map was fetched is now available.");
+        fetchedMap.transform.SetParent(transform.parent);
+        mapOverlay = fetchedMapRenderer.sprite;
         CreateNewTextureForDrawing();
         FitCamera();
     }
