@@ -128,7 +128,7 @@ public class GameManager : MonoBehaviour
 
     public void ShowFullMap()
     {
-        Map.MapCreator.FitCameraToMap();
+        Map.MapCreator.FitCameraToBaseMap();
     }
 
     public void Drag(Vector3 direction)

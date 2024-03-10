@@ -1,53 +1,3 @@
-// using System;
-// using System.Collections;
-// using System.Collections.Generic;
-// using FreeDraw;
-// using UnityEngine;
-//
-// using UnityEngine.EventSystems;
-//
-// public class DragAndDrop : MonoBehaviour
-// {
-//     private Vector3 mousePositionOffset;
-//     public Camera camera;
-//     public Drawable mapDrawable;
-//     private CanvasGroup canvasGroup;
-//
-//
-//     private void Awake()
-//     {
-//         canvasGroup = GetComponent<CanvasGroup>();
-//     }
-//
-//     private Vector3 GetMouseWorldPosition()
-//     {
-//         return camera.ScreenToWorldPoint(Input.mousePosition);
-//     }
-//
-//
-//     private void OnMouseDown()
-//     {
-//         Debug.Log("Mouse Down");
-//         canvasGroup.blocksRaycasts = false;
-//         canvasGroup.alpha = 0.7f;
-//         mousePositionOffset = gameObject.transform.position - GetMouseWorldPosition();
-//         mapDrawable.enabled = false;
-//     }
-//
-//     private void OnMouseDrag()
-//     {
-//         transform.position = GetMouseWorldPosition() + mousePositionOffset;
-//     }
-//
-//     private void OnMouseUp()
-//     {
-//         mapDrawable.enabled = true;
-//         canvasGroup.blocksRaycasts = true;
-//         canvasGroup.alpha = 1.0f;
-//
-//     }
-// }
-
 using System.Collections;
 using System.Collections.Generic;
 using FreeDraw;
@@ -59,7 +9,7 @@ using UnityEngine.UI;
 public class DragAndDrop : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBeginDragHandler, IEndDragHandler, IDragHandler
 {
     [SerializeField] private Canvas canvas;
-    static public bool CanDrag = false;
+    public static bool CanDrag = false;
     public Drawable mapDrawable;
     public ItemSlot itemSlot;
     

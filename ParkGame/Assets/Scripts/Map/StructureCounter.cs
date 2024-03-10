@@ -16,8 +16,6 @@ public class StructureCounter : MonoBehaviour
 		Outpost
 	}
     public StructureType structureType;
-    // Start is called before the first frame update
-    
     public int maxStructures = 3;
     [SerializeField] private ColorSettings colorSettings;
     private List<GameObject> currentStructures;

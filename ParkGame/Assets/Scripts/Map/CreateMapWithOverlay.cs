@@ -19,7 +19,6 @@ public class CreateMapWithOverlay : NetworkBehaviour
     // Tilemaps
     [Header("Tilemaps")]
     public Tilemap baseTilemap;
-    public Tilemap actionTilemap;
     public Tilemap blockingTilemap;
     public Tilemap propsTilemap;
     
@@ -79,6 +78,9 @@ public class CreateMapWithOverlay : NetworkBehaviour
         fetchedMap.GetComponent<MapDisplayer>().OnMapLoaded += SetMapOverlay;
     }
 
+    /**
+     * Create tilemap from uploaded map. Set correct scale and build nav mesh.
+     */
     public void CreateTilemapFromFetchedMap(MapData mapData)
     {
         SetLowResTextureForTilemapCreation(mapData.DrawnTexture);
@@ -116,42 +118,26 @@ public class CreateMapWithOverlay : NetworkBehaviour
     {
         return fetchedMap;
     }
-    
-    public void FitCameraToMap()
+    /**
+     * Fit orthographic camera to Base map based on map size 
+     */
+    public void FitCameraToBaseMap()
     {
-        // Calculate the size of the object based on its distance from the camera and its local scale
-        Vector3 mapBounds = BaseMap.GetComponent<SpriteRenderer>().bounds.size;
-        float objectWidth = mapBounds.x;
-        float objectHeight = mapBounds.y;
-
-        // Calculate the desired height and width of the object in the camera's view
-        float frustumHeight = 2.0f * mainCamera.orthographicSize;
-        float frustumWidth = frustumHeight * mainCamera.aspect;
-
-        // Calculate the scale factor to fit the object to the camera view
-        float scaleFactorHeight = frustumHeight / objectHeight;
-        float scaleFactorWidth = frustumWidth / objectWidth;
-
-        
-        
-        // Use the smaller scale factor to maintain aspect ratio and prevent stretching
-        var scaleFactor = Mathf.Min(scaleFactorWidth, scaleFactorHeight);
-
-        // gameObject.transform.localScale *= scaleFactor;
-        // fetchedMap.transform.localScale *= scaleFactor;
-        mainCamera.orthographicSize /= scaleFactor;
+        FitCamera(BaseMap.GetComponent<SpriteRenderer>().bounds.size);
     }   
     
-    private void FitCamera()
+    private void FitCamera(Vector3? mapBounds = null)
     {
         // Calculate the size of the object based on its distance from the camera and its local scale
-        Vector3 mapBounds;
-        if (fetchedMap)
-            mapBounds = fetchedMap.GetComponent<SpriteRenderer>().bounds.size;
-        else
-            mapBounds = mapOverlay.bounds.size;
-        float objectWidth = mapBounds.x;
-        float objectHeight = mapBounds.y;
+        if (mapBounds == null)
+        {
+            if (fetchedMap)
+                mapBounds = fetchedMap.GetComponent<SpriteRenderer>().bounds.size;
+            else
+                mapBounds = mapOverlay.bounds.size;
+        }
+        float objectWidth = mapBounds.Value.x;
+        float objectHeight = mapBounds.Value.y;
 
         // Calculate the desired height and width of the object in the camera's view
         float frustumHeight = 2.0f * mainCamera.orthographicSize;
@@ -160,8 +146,6 @@ public class CreateMapWithOverlay : NetworkBehaviour
         // Calculate the scale factor to fit the object to the camera view
         float scaleFactorHeight = frustumHeight / objectHeight;
         float scaleFactorWidth = frustumWidth / objectWidth;
-
-        
         
         // Use the smaller scale factor to maintain aspect ratio and prevent stretching
         var scaleFactor = Mathf.Min(scaleFactorWidth, scaleFactorHeight);
@@ -170,6 +154,10 @@ public class CreateMapWithOverlay : NetworkBehaviour
         // fetchedMap.transform.localScale *= scaleFactor;
         mainCamera.orthographicSize /= scaleFactor;
     }
+    
+    /**
+     * Create new drawing texture based on fetched map. Scale it accordingly based on the area
+     */
     private void CreateNewTextureForDrawing()
     {
         // create new texture and sprite where to draw based on resolution of map snippet
@@ -239,7 +227,7 @@ public class CreateMapWithOverlay : NetworkBehaviour
     }
 
     /// <summary>
-    /// Save drawn map into file into `path` set in class variable
+    /// Save drawn map into file into `path` set in class variable. Debug feature
     /// </summary>
     public void SaveMap(Texture2D texture = null)
     {
@@ -285,7 +273,6 @@ public class CreateMapWithOverlay : NetworkBehaviour
     public void ClearTilemap()
     {
         baseTilemap.ClearAllTiles();
-        actionTilemap.ClearAllTiles();
         blockingTilemap.ClearAllTiles();
         propsTilemap.ClearAllTiles();
     }
@@ -330,7 +317,6 @@ public class CreateMapWithOverlay : NetworkBehaviour
     private void ToggleTilemap(bool visible)
     {
         blockingTilemap.GetComponent<TilemapRenderer>().enabled = visible;
-        actionTilemap.GetComponent<TilemapRenderer>().enabled = visible;
         baseTilemap.GetComponent<TilemapRenderer>().enabled = visible;
         propsTilemap.GetComponent<TilemapRenderer>().enabled = visible;
     }
@@ -342,7 +328,7 @@ public class CreateMapWithOverlay : NetworkBehaviour
     {
         return resizedDrawableTexture;
     }
-    public void SetLowResTextureForTilemapCreation(Texture2D uploadedTexture)
+    private void SetLowResTextureForTilemapCreation(Texture2D uploadedTexture)
     {
         resizedDrawableTexture = uploadedTexture;
         // Debug feature
@@ -385,6 +371,7 @@ public class CreateMapWithOverlay : NetworkBehaviour
                pos.x >= topLeftCellPos.x && pos.x <= bottomRightCellPos.x &&
                pos.y >= bottomRightCellPos.y && pos.y <= topLeftCellPos.y;
     }
+    
     private void SetStructurePrefabs(Dictionary<Vector3Int, GameObject> structuresToAssign)
     {
         if (IsServer)
@@ -417,9 +404,13 @@ public class CreateMapWithOverlay : NetworkBehaviour
         }
     }
     
+    /**
+     * Set structure tiles into tilemap. Unused feature, currently prefabs are created instead
+     */
     private void SetStructureTiles(Dictionary<Vector3Int, TileBase> structuresToAssign,List<string> errorMessages)
     {
         var structureRadius = 2;
+        TileBase[] forbiddenTiles = { boundsTile, wallTile };
         foreach (var kvp in structuresToAssign)
         {
             for (int x = -structureRadius; x <= structureRadius; x++)
@@ -427,10 +418,8 @@ public class CreateMapWithOverlay : NetworkBehaviour
                 for (int y = -structureRadius; y <= structureRadius; y++)
                 {
                     var offsetPosition = kvp.Key + new Vector3Int(x, y, 0);
-                    if (actionTilemap.GetTile(offsetPosition) != boundsTile)
-                        actionTilemap.SetTile(offsetPosition, kvp.Value);
-                    else
-                        throw new ArgumentException("Cannot place structure out of map bounds");
+                    if (!IsStructureAccessible(kvp.Key, forbiddenTiles))
+                        errorMessages.Add("Cannot place structure out of map bounds");
                 }
             }
         }
@@ -444,10 +433,6 @@ public class CreateMapWithOverlay : NetworkBehaviour
         CreateTilemapFromTexture(false, null);
         if (errorMessages.Count != 0)
         {
-            // foreach (var errorMessage in errorMessages)
-            // {
-            //     Debug.LogError(errorMessage);
-            // }
             ToggleTilemap(false);  // Hide tilemap
             OnMapCreationErrors.Invoke(errorMessages);
             return;
@@ -455,6 +440,7 @@ public class CreateMapWithOverlay : NetworkBehaviour
         ToggleTilemap(true);
         OnMapValidated.Invoke(true); // Enable SaveMap button
     }
+    
     /**
      * Creates tilemap from drawn texture by scaling texture to low resolution and assigning tiles by according colors
      */
@@ -597,13 +583,8 @@ public class CreateMapWithOverlay : NetworkBehaviour
             errorMessages.Add("Structures are overlapping");
             return;
         }
-
-        // foreach (var kvp in tilesToAssign)
-        // {
-        //     if (tilemap.GetTile(kvp.Key) == null)
-        //         tilemap.SetTile(kvp.Key, kvp.Value);
-        // }
+        
         SetStructurePrefabs(structuresToAssign);
-        // SetStructureTiles(structuresToAssign);
+        // SetStructureTiles(structuresToAssign); unused now
     }
 }
