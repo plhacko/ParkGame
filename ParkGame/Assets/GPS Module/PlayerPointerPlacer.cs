@@ -4,7 +4,6 @@ using DG.Tweening;
 public class PlayerPointerPlacer : MonoBehaviour
 {
     public GameObject Pin;
-    public GameObject Pin2;
     public static Vector3 PinPosition = Vector3.zero;
     public GameObject accuracyCircle;
     public float debugMovementSpeed = 5.0f;
@@ -55,13 +54,12 @@ public class PlayerPointerPlacer : MonoBehaviour
     private void Update()
     {
 
-    #if UNITY_EDITOR
+#if UNITY_EDITOR
         // Movement for debugging in Unity Editor
         // Using W, A, S, D or arrow keys
         var movement = new Vector3(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"), 0.0f);
 
-        Pin2.transform.position += movement * debugMovementSpeed * Time.deltaTime;
-        Pin.transform.position = Vector3.SmoothDamp(Pin.transform.position, Pin2.transform.position, ref pinVelocity, smoothTime);
+        Pin.transform.position += movement * debugMovementSpeed * Time.deltaTime;
         PinPosition = Pin.transform.position;
 #else
 
@@ -130,8 +128,8 @@ public class PlayerPointerPlacer : MonoBehaviour
         Vector3 worldPosition = new Vector3(worldX, worldY, transform.position.z);
 
         // Do something with the world position
-        PinPosition = Vector3.SmoothDamp(PinPosition, worldPosition, ref pinVelocity, smoothTime);
-        Pin.transform.position = PinPosition;
+        Pin.transform.position = Vector3.SmoothDamp(Pin.transform.position, worldPosition, ref pinVelocity, smoothTime);
+        PinPosition = Pin.transform.position;
         // Pin.transform.DOMove(worldPosition, 0.5f);
         // accuracyCircle.transform.position = worldPosition;
         var scale = mapDisplayer.GetMapScale();
