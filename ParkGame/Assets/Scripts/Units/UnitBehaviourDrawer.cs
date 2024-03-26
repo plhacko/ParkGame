@@ -5,7 +5,7 @@ using UnityEngine.Events;
 
 public class UnitBehaviourDrawer : MonoBehaviour
 {
-    private ISoldier TheSoldier;
+    private SoldierBase TheSoldier;
     private SpriteRenderer SpriteRenderer;
     private CommandEvent CommandAction;
     private UnityEvent speakEvent;
@@ -22,7 +22,7 @@ public class UnitBehaviourDrawer : MonoBehaviour
     void Awake()
     {
         SpriteRenderer = GetComponent<SpriteRenderer>();
-        TheSoldier = GetComponentInParent<ISoldier>();
+        TheSoldier = GetComponentInParent<SoldierBase>();
         CommandAction = TheSoldier.NewCommandEvent;
         speakEvent = TheSoldier.SpeakEvent;
         speakEvent.AddListener(DisplaySpeakIcon);

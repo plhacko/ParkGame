@@ -30,7 +30,7 @@ public class ChangeMaterial : MonoBehaviour
                 }
 
                 // team color has been lost and we need to Initialize it again
-                if (spriteRenderer.TryGetComponent<ISoldier>(out ISoldier soldier))
+                if (spriteRenderer.TryGetComponent<SoldierBase>(out SoldierBase soldier))
                 {
                     soldier.InitializeTeamColor();
                 }

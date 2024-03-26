@@ -23,7 +23,7 @@ GameObject:
   - component: {fileID: 5944597004745786771}
   - component: {fileID: -4635222486533330687}
   m_Layer: 8
-  m_Name: TestUnit
+  m_Name: Pawn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

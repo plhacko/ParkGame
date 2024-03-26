@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class Soldier : ISoldier {
+public class Soldier : SoldierBase {
 
     public override void OnNetworkSpawn() {
         base.Initialize();

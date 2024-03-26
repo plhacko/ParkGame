@@ -18,11 +18,11 @@ public enum SoldierCommand {
 
 public class CommandEvent : UnityEvent<SoldierCommand> { }
 
-public class ISoldier : NetworkBehaviour, ITeamMember {
+public class SoldierBase : NetworkBehaviour, ITeamMember {
     public enum UnitType {
         Pawn,
         Archer,
-        Horseman
+        Molerider
     };
 
     // game logic
@@ -196,7 +196,7 @@ public class ISoldier : NetworkBehaviour, ITeamMember {
                 Networkanimator.SetTrigger("Attack");
 
                 PlaySwordAttackSFXClientRpc();
-                enemyT.GetComponent<ISoldier>()?.TakeDamage(Damage);
+                enemyT.GetComponent<SoldierBase>()?.TakeDamage(Damage);
 
             }
             return true;

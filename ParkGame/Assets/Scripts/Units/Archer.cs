@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Archer : ISoldier {
+public class Archer : SoldierBase {
 
     private ShootScript shooting;
     protected override void Initialize() {

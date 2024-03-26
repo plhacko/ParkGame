@@ -120,7 +120,7 @@ namespace Managers
                         Vector3 RndOffset = new Vector3(UnityEngine.Random.Range(-r, r), UnityEngine.Random.Range(-r, r), 0f);
                         GameObject unit = Instantiate(pawnPrefab, position: member.transform.position + RndOffset, quaternion.identity);
                         unit.GetComponent<NetworkObject>().Spawn();
-                        ISoldier soldier = unit.GetComponent<ISoldier>();
+                        SoldierBase soldier = unit.GetComponent<SoldierBase>();
                         soldier.Team = i;
                         soldier.SetCommanderToFollow(member.transform);
                         soldier.NewCommand(SoldierCommand.Following);

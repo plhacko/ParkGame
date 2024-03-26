@@ -221,9 +221,9 @@ namespace Player
                         return;
                     }
 
-                    if (!f.GetComponent<ISoldier>().IsFollowingCommander()) {
-                        f.GetComponent<ISoldier>().RequestChangingCommanderToFollowServerRpc(clientID, true);
-                        f.GetComponent<ISoldier>().NewCommand(SoldierCommand.Following);
+                    if (!f.GetComponent<SoldierBase>().IsFollowingCommander()) {
+                        f.GetComponent<SoldierBase>().RequestChangingCommanderToFollowServerRpc(clientID, true);
+                        f.GetComponent<SoldierBase>().NewCommand(SoldierCommand.Following);
                         capacityForNew--;
                     }
                 }
@@ -260,7 +260,7 @@ namespace Player
         {
             foreach (GameObject go in units)
             {
-                if (go.TryGetComponent(out ISoldier soldier))
+                if (go.TryGetComponent(out SoldierBase soldier))
                 {
                     soldier.NewCommand(SoldierCommand.Following);
 
@@ -297,12 +297,12 @@ namespace Player
             if (direction.magnitude > 0.03f)
             {
                 networkAnimator.Animator.SetFloat(movementSpeedAnimationHash, 1);
-                networkAnimator.Animator.SetInteger(directionEnumAnimationHash, (int)ISoldier.GetDirectionEnum(direction));
+                networkAnimator.Animator.SetInteger(directionEnumAnimationHash, (int)SoldierBase.GetDirectionEnum(direction));
             }
             else
             {
                 networkAnimator.Animator.SetFloat(movementSpeedAnimationHash, 0);
-                networkAnimator.Animator.SetInteger(directionEnumAnimationHash, (int)ISoldier.GetDirectionEnum(direction));
+                networkAnimator.Animator.SetInteger(directionEnumAnimationHash, (int)SoldierBase.GetDirectionEnum(direction));
             }
 
             spriteRenderer.flipX = direction.x < 0;
@@ -355,7 +355,7 @@ namespace Player
                 return;
             }
 
-            if (!networkObject.TryGetComponent<ISoldier>(out var soldier))
+            if (!networkObject.TryGetComponent<SoldierBase>(out var soldier))
             {
                 Debug.LogWarning($"could not get soldier from network object");
                 return;
@@ -397,7 +397,7 @@ namespace Player
                 return;
             }
 
-            if (!networkObject.TryGetComponent<ISoldier>(out var soldier))
+            if (!networkObject.TryGetComponent<SoldierBase>(out var soldier))
             {
                 Debug.LogWarning($"could not get soldier from network object");
                 return;
@@ -416,7 +416,7 @@ namespace Player
             FormationType = Formation.FormationType.Free;
             foreach (GameObject go in units)
             {
-                if (go.TryGetComponent(out ISoldier soldier))
+                if (go.TryGetComponent(out SoldierBase soldier))
                 {
                     soldier.NewCommand(SoldierCommand.Following);
                 }
@@ -432,7 +432,7 @@ namespace Player
             lastCommand = SoldierCommand.Following;
             foreach (GameObject go in units)
             {
-                if (go.TryGetComponent(out ISoldier soldier))
+                if (go.TryGetComponent(out SoldierBase soldier))
                 {
                     soldier.NewCommand(SoldierCommand.Following);
                 }
@@ -450,7 +450,7 @@ namespace Player
             lastCommand = SoldierCommand.Attack;
             foreach (GameObject go in units)
             {
-                if (go.TryGetComponent(out ISoldier soldier))
+                if (go.TryGetComponent(out SoldierBase soldier))
                 {
                     soldier.NewCommand(SoldierCommand.Attack);
                 }

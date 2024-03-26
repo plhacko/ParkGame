@@ -41,8 +41,8 @@ namespace Units.Archer {
 
             Collider2D[] collider2Ds = Physics2D.OverlapCircleAll(transform.position, 0.1f);
             foreach (var c in collider2Ds) {
-                if (c.gameObject.GetComponent<ISoldier>() != null) {
-                    ISoldier hitTarget = c.gameObject.GetComponent<ISoldier>();
+                if (c.gameObject.GetComponent<SoldierBase>() != null) {
+                    SoldierBase hitTarget = c.gameObject.GetComponent<SoldierBase>();
 
                     // find first hit enemy soldier, deal him damage, destruct arrow
                     if (hitTarget.Team != team) {

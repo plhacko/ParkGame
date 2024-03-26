@@ -175,12 +175,12 @@ public class UIInGameScreenController : UIPageController
         UIController.Singleton.PushUIPage(optionsPage);
     }
 
-    public void AddUnit(ISoldier unit, Action removeAction)
+    public void AddUnit(SoldierBase unit, Action removeAction)
     {
         unitsList.AddUnit(unit, removeAction);
     }
 
-    public void RemoveUnit(ISoldier unit)
+    public void RemoveUnit(SoldierBase unit)
     {
         unitsList.RemoveUnit(unit);
     }   

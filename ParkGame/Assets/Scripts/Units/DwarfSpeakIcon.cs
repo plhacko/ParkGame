@@ -5,7 +5,7 @@ using UnityEngine.Events;
 public class DwarfSpeakIcon : MonoBehaviour
 {
     private SpriteRenderer sr;
-    private ISoldier theSoldier;
+    private SoldierBase theSoldier;
     [SerializeField] private UnitBehaviourDrawer drawer;
     public UnityEvent speakEvent;
     [SerializeField] private Sprite SpeakIcon;
@@ -13,7 +13,7 @@ public class DwarfSpeakIcon : MonoBehaviour
     void Start()
     {
         sr = GetComponent<SpriteRenderer>();
-        theSoldier = GetComponentInParent<ISoldier>();
+        theSoldier = GetComponentInParent<SoldierBase>();
         drawer = GetComponent<UnitBehaviourDrawer>();
         speakEvent = theSoldier.SpeakEvent;
         //speakEvent.AddListener(DisplaySpeakIcon);

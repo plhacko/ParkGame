@@ -23,7 +23,7 @@ public class ToggleSpawner : MonoBehaviour
                 icon = ArcherIcon;
                 break;
             case 2:
-                outpostUnitType = Soldier.UnitType.Horseman;
+                outpostUnitType = Soldier.UnitType.Molerider;
                 icon = HorsemanIcon;
                 break;
             default:
@@ -44,7 +44,7 @@ public class ToggleSpawner : MonoBehaviour
         switch (outpostUnitType) {
             case Soldier.UnitType.Archer:
                 return ArcherPrefab;
-            case Soldier.UnitType.Horseman:
+            case Soldier.UnitType.Molerider:
                 return HorsemanPrefab;
             case Soldier.UnitType.Pawn:
             default:

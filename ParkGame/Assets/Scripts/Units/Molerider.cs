@@ -1,12 +1,12 @@
 using UnityEngine;
 using static Formation;
 
-public class Horserider : ISoldier {
+public class Molerider : SoldierBase {
     [SerializeField] protected float HorseManSpeed = 0.3f;
 
     public override void OnNetworkSpawn() {
         base.Initialize();
-        TypeOfUnit = UnitType.Horseman;
+        TypeOfUnit = UnitType.Molerider;
     }
 
     protected override void SetSoldierSpeed() {
