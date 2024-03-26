@@ -132,7 +132,8 @@ public class SoldierBase : NetworkBehaviour, ITeamMember {
     }
 
     protected virtual void SetSoldierSpeed() {
-        if (playerManager.GetLocalPlayerController().IsOnPath ||
+        var playerController = CommanderToFollow.GetComponent<PlayerController>();
+        if (playerController && playerController.IsOnPath ||
             (ReturningToOutpost && pathTileChecker.IsNearbyPath(Agent.transform.position)) // short-circuiting for efficiency
         ) {
             Agent.speed = BaseMovementSpeed * PathMovementSpeedMultiplier;
