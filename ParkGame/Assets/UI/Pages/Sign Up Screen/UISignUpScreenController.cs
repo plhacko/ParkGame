@@ -53,7 +53,7 @@ public class UISignUpScreenController : UIPageController
         
         if (result == ServicesManager.FirebaseAuthServiceError.FailedToCreateUser)
         {
-            // TODO: Show error message
+            UIController.Singleton.ShowPopUp("Sign Up failed", "Please check your email and password and try again.", "OK", null);
             var colors = defaultColors;
             colors.normalColor = new Color(1, 0.7f, 0.7f);
             nameInputField.colors = colors;
@@ -65,7 +65,6 @@ public class UISignUpScreenController : UIPageController
         }
         else if (result == ServicesManager.FirebaseAuthServiceError.FailedToLoginUser)
         {
-            // TODO: Show error message
             UIController.Singleton.PushUIPage(loginPage);
             processing = false;
             return;

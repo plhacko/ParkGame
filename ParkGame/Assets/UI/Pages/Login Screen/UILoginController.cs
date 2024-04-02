@@ -49,6 +49,7 @@ public class UILoginController : UIPageController
         else
         {
             Debug.LogError("Login failed");
+            UIController.Singleton.ShowPopUp("Login failed", "Please check your email and password and try again.", "OK", null);
             var colors = defaultColors;
             colors.normalColor = new Color(1, 0.7f, 0.7f);
             emailInputField.colors = colors;
