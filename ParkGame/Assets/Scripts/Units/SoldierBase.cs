@@ -82,7 +82,7 @@ public class SoldierBase : NetworkBehaviour, ITeamMember {
     protected Transform targetedEnemy;
     protected int EnemiesInAttackWaveCounter; // counter in attack wave - how many were targeted in a row during one attack command
 
-    public NetworkVariable<SoldierCommand> _SoldierCommand = new NetworkVariable<SoldierCommand>();
+    [HideInInspector] public NetworkVariable<SoldierCommand> _SoldierCommand = new NetworkVariable<SoldierCommand>();
     public SoldierCommand Command { get => _SoldierCommand.Value; set => _SoldierCommand.Value = value; }
     
     // events for icons
