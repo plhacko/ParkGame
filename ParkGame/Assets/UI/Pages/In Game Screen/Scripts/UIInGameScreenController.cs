@@ -147,8 +147,6 @@ public class UIInGameScreenController : UIPageController
 
     private void Attack()
     {
-        gameManager.CommandAttack();
-        AudioManager.Instance.PlayCommandSFX("Attack");
         attackToggleOn = !attackToggleOn;
 
         if (attackToggleOn) {

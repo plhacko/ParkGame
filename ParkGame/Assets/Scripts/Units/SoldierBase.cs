@@ -469,7 +469,8 @@ public class SoldierBase : NetworkBehaviour, ITeamMember {
             ClientRpcParams clientRpcParams = new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new[] { clientID } } };
             // random false: play sfx every click on unit
             // random true: play only sometimes, on gathering call
-            if (!random || UnityEngine.Random.Range(0f, 20f) < 8f) { 
+            if (!random || UnityEngine.Random.Range(0f, 20f) < 8f) { // with Easter Egg 
+            // if (random && UnityEngine.Random.Range(0f, 20f) < 8f) { // without the EEgg
                 PlaySelectedDwarfSFXClientRpc(clientRpcParams); 
             }
 
