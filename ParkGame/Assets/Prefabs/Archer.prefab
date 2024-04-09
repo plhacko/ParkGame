@@ -126,13 +126,13 @@ GameObject:
   - component: {fileID: 112822024680283683}
   - component: {fileID: 1858124458441567741}
   - component: {fileID: 2124107133495217878}
-  - component: {fileID: 7124321394914278606}
   - component: {fileID: 9103779003978253234}
   - component: {fileID: 5644872337915850710}
   - component: {fileID: 4538504831911856169}
   - component: {fileID: 5011098272519486155}
   - component: {fileID: 5849853689570586803}
   - component: {fileID: 4293539304113877487}
+  - component: {fileID: 3752663042078325954}
   m_Layer: 8
   m_Name: Archer
   m_TagString: Untagged
@@ -365,18 +365,6 @@ NavMeshAgent:
   m_BaseOffset: 0.7
   m_WalkableMask: 5
   m_ObstacleAvoidanceType: 4
---- !u!114 &7124321394914278606
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2149011059489662585}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0daf9da1e06be9746a47c0165d613f03, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &9103779003978253234
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -489,6 +477,18 @@ MonoBehaviour:
   SpeakEvent:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &3752663042078325954
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2149011059489662585}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e39f6090724e4a4a8aadeb042afa2bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7039114770966444783
 GameObject:
   m_ObjectHideFlags: 0

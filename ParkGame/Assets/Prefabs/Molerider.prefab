@@ -115,12 +115,12 @@ GameObject:
   - component: {fileID: 5821379871184071540}
   - component: {fileID: 5228682978736887978}
   - component: {fileID: 5486291451144485761}
-  - component: {fileID: 3713162510152829337}
   - component: {fileID: 2238284981904775809}
   - component: {fileID: 8044945401517817214}
   - component: {fileID: 1500717351819628444}
   - component: {fileID: 7333030658235976814}
   - component: {fileID: 1072320127597662737}
+  - component: {fileID: 1057378590120421692}
   m_Layer: 8
   m_Name: Molerider
   m_TagString: Untagged
@@ -353,18 +353,6 @@ NavMeshAgent:
   m_BaseOffset: 0.7
   m_WalkableMask: 5
   m_ObstacleAvoidanceType: 3
---- !u!114 &3713162510152829337
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5515698993845621550}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0daf9da1e06be9746a47c0165d613f03, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &2238284981904775809
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -465,6 +453,18 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   HorseManSpeed: 0.5
+--- !u!114 &1057378590120421692
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5515698993845621550}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e39f6090724e4a4a8aadeb042afa2bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &5861823242978903207
 GameObject:
   m_ObjectHideFlags: 0
