@@ -31,8 +31,8 @@ public class Archer : SoldierBase {
                 bool flip = directionE == Direction.Left;
                 
                 XSpriteFlip.Value = flip;
-                PlayArcherAttackSFXClientRpc();
-                shooting.Shoot(enemyT.transform.position, Damage, flip, Team);
+                //PlayArcherAttackSFXClientRpc();
+                shooting.Shoot(enemyT.transform.position, Damage, flip, Team, true);
             }
             return true;
         }
