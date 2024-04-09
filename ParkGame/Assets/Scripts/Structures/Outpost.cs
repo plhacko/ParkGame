@@ -140,8 +140,8 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
     }
 
     [ClientRpc]
-    void PlayArcherAttackSFXClientRpc() {
-        AudioManager.Instance.PlayArcherAttack(transform.position);
+    void PlayArrowAttackSFXClientRpc() {
+        AudioManager.Instance.PlayArrowAttack(transform.position);
     }
 
   
@@ -152,7 +152,7 @@ public class Outpost : NetworkBehaviour, ICommander, IConquerable
         
         if (IsCastle) {
             if (shootSalvo.Shoot(Time.deltaTime, Team)) {
-                PlayArcherAttackSFXClientRpc();
+                PlayArrowAttackSFXClientRpc();
             }
             
         }

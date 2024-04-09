@@ -336,6 +336,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 5446646868423074498, guid: 27c56a89bbf4d58408e9900a3166dd16, type: 3}
+      propertyPath: archerAttackSfx_list.Array.data[0]
+      value: 
+      objectReference: {fileID: 8300000, guid: 4299bbd5ba885ba40bf4f1e163f7c2b8, type: 3}
     - target: {fileID: 5446646868423074499, guid: 27c56a89bbf4d58408e9900a3166dd16, type: 3}
       propertyPath: m_RootOrder
       value: 5

@@ -89,10 +89,10 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 2da1941a0bc5b0845bf6c6ccf81a47b9, type: 3}
   - {fileID: 8300000, guid: 27208c258e7cf8844ad74939796729f6, type: 3}
   archerAttackSfx_list:
-  - {fileID: 8300000, guid: 859f23dce8d136744ba135e3fbd07dc8, type: 3}
-  - {fileID: 8300000, guid: 1a16e555bcc18694a92dd5889bff4293, type: 3}
-  - {fileID: 8300000, guid: 376c351524b11ee4093a44abc7342d93, type: 3}
-  - {fileID: 8300000, guid: 4a857d9f9ad96c543b927ae4e36dfb64, type: 3}
+  - {fileID: 8300000, guid: 4299bbd5ba885ba40bf4f1e163f7c2b8, type: 3}
+  - {fileID: 8300000, guid: 9f17f70ce62901a43894506bdb62b35e, type: 3}
+  - {fileID: 8300000, guid: 14d90b30257ac4e48ab8fa446ca4c2a5, type: 3}
+  - {fileID: 8300000, guid: 5db1b8090a0662a498d62ae53307c8d9, type: 3}
   molemanAttackSfx_list: []
   soldierClickSfx_list:
   - {fileID: 8300000, guid: 56fea83cd1edac8439a5ee71ce29a491, type: 3}
@@ -106,6 +106,11 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 328c981fec6c63d4f8247fd60f4a6132, type: 3}
   - {fileID: 8300000, guid: fbd08d7b80d59544da04b0853d99c7f8, type: 3}
   - {fileID: 8300000, guid: 17a4fdd2cb68d9b41b60a3875f6b9dc5, type: 3}
+  arrowAttackSfx_list:
+  - {fileID: 8300000, guid: 859f23dce8d136744ba135e3fbd07dc8, type: 3}
+  - {fileID: 8300000, guid: 1a16e555bcc18694a92dd5889bff4293, type: 3}
+  - {fileID: 8300000, guid: 376c351524b11ee4093a44abc7342d93, type: 3}
+  - {fileID: 8300000, guid: 4a857d9f9ad96c543b927ae4e36dfb64, type: 3}
   clickSfx_list:
   - {fileID: 8300000, guid: a9c18f1a24ddaec4986fe4802863ac29, type: 3}
 --- !u!1 &5446646869533372604

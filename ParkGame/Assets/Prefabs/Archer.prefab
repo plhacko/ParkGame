@@ -377,7 +377,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5773faa4e3c9fd247970b88346945c04, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ArrowPrefab: {fileID: 671494250457049604, guid: 8a338b87b7065194b9f0d7a082bcf539, type: 3}
+  ArrowPrefab: {fileID: 671494250457049604, guid: 81c3f4490b3f20d418c435f9c526912a, type: 3}
 --- !u!114 &5644872337915850710
 MonoBehaviour:
   m_ObjectHideFlags: 0
