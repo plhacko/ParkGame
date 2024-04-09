@@ -266,9 +266,9 @@ CapsuleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -0.05836451, y: -0.30197233}
-  m_Size: {x: 0.4933498, y: 1.0110162}
-  m_Direction: 0
+  m_Offset: {x: 0.03, y: -0.17}
+  m_Size: {x: 0.76, y: 0.67}
+  m_Direction: 1
 --- !u!50 &5821379871184071540
 Rigidbody2D:
   serializedVersion: 4
@@ -350,7 +350,7 @@ NavMeshAgent:
   m_AutoBraking: 0
   m_AutoRepath: 1
   m_Height: 0.35
-  m_BaseOffset: 0.7
+  m_BaseOffset: 0.46
   m_WalkableMask: 5
   m_ObstacleAvoidanceType: 3
 --- !u!114 &2238284981904775809
