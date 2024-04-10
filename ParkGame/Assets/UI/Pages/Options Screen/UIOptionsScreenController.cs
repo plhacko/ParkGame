@@ -8,7 +8,7 @@ public class UIOptionsScreenController : UIPageController
     [SerializeField] private Button quitButton;
     [SerializeField] private Button notificationSoundsToggleButton;
     [SerializeField] private Button soundEffectsToggleButton;
-    [SerializeField] private Button howToPlayButton;
+    // [SerializeField] private Button howToPlayButton;
     [SerializeField] private UIPage howToPlayPage;
     [SerializeField] private string mainMenuSceneName = "Menu";
     [SerializeField] private DisconnectionHandler disconnectionHandler;
@@ -19,7 +19,7 @@ public class UIOptionsScreenController : UIPageController
         quitButton.onClick.AddListener(Quit);
         notificationSoundsToggleButton.onClick.AddListener(ToggleNotifications);
         soundEffectsToggleButton.onClick.AddListener(ToggleSfx);
-        howToPlayButton.onClick.AddListener(HowToPlay);        
+        // howToPlayButton.onClick.AddListener(HowToPlay);        
 
     }
 
