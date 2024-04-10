@@ -37,7 +37,9 @@ public class Archer : SoldierBase {
                 // we need to delay the sooting by 0.5s to synch with the animation 
                 StartCoroutine(CallcackAfterDelayCoroutine(delay: 0.5f, callback: () =>
                 {
-                    shooting.Shoot(enemyT.transform.position, Damage, flip, Team, true);
+                    if (enemyT) {
+                        shooting.Shoot(enemyT.transform.position, Damage, flip, Team, true);
+                    }
                 }));
             }
             return true;
