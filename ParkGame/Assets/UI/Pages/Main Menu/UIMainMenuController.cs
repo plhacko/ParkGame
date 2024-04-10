@@ -13,7 +13,7 @@ public class UIMainMenuController : UIPageController
     [SerializeField] private Button hostButton;
     [SerializeField] private TMP_InputField joinCodeInputField;
     [SerializeField] private Button joinButton;
-    [SerializeField] private Button aboutButton;
+    // [SerializeField] private Button aboutButton;
     [SerializeField] private Button signOutButton;
     [SerializeField] private Button exitButton;
     [SerializeField] private RectTransform headerPanel;
@@ -32,7 +32,7 @@ public class UIMainMenuController : UIPageController
         createMapButton.onClick.AddListener(Create);
         hostButton.onClick.AddListener(Host);
         joinButton.onClick.AddListener(Join);
-        aboutButton.onClick.AddListener(About);
+        // aboutButton.onClick.AddListener(About);
         signOutButton.onClick.AddListener(SignOut);
         exitButton.onClick.AddListener(Exit);
         
@@ -138,7 +138,7 @@ public class UIMainMenuController : UIPageController
         joinCodeInputField.interactable = isInteractable;
         joinButton.interactable = isInteractable;
         signOutButton.interactable = isInteractable;
-        aboutButton.interactable = isInteractable;
+        // aboutButton.interactable = isInteractable;
         exitButton.interactable = isInteractable;
     }
 
