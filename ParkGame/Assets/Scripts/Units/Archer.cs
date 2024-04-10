@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class Archer : SoldierBase {
@@ -32,12 +33,21 @@ public class Archer : SoldierBase {
                 
                 XSpriteFlip.Value = flip;
                 //PlayArcherAttackSFXClientRpc();
-                shooting.Shoot(enemyT.transform.position, Damage, flip, Team, true);
+
+                // we need to delay the sooting by 0.5s to synch with the animation 
+                StartCoroutine(CallcackAfterDelayCoroutine(delay: 0.5f, callback: () =>
+                {
+                    shooting.Shoot(enemyT.transform.position, Damage, flip, Team, true);
+                }));
             }
             return true;
         }
         return false;
     }
-    
-    
+
+    System.Collections.IEnumerator CallcackAfterDelayCoroutine(float delay, Action callback)
+    {
+        yield return new WaitForSeconds(delay);
+        callback?.Invoke();
+    }
 }
