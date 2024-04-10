@@ -28,9 +28,9 @@ public class UIUnit : Selectable, IPointerDownHandler, IPointerUpHandler
 
         if (pressHoldTimer.ElapsedMilliseconds / 1000f > pressHoldTimeSuccess)
         {
-            UnityEngine.Debug.Log("Remove unit");
-            if (IsInteractable())
-                removeAction?.Invoke();
+            // UnityEngine.Debug.Log("Remove unit");
+            // if (IsInteractable())
+                // removeAction?.Invoke();
             pressHoldTimer.Reset();
             pressHoldTimer.Stop();
         }
