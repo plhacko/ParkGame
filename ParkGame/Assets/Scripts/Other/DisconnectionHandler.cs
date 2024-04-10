@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using Managers;
 using Unity.Netcode;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
@@ -17,8 +18,12 @@ public class DisconnectionHandler : NetworkBehaviour
         backToMenuButton.onClick.AddListener(DisconnectAndLeave);
     }
 
-    public void Leave()
+    public async void Leave()
     {
+        if (LobbyManager.Singleton != null)
+        {
+            await LobbyManager.Singleton.LeaveLobby();
+        }
         NetworkManager.Singleton.Shutdown();
         SceneManager.LoadScene("CleanUpScene");
     }
