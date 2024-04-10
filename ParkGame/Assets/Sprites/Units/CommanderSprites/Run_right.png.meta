@@ -48,7 +48,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 150
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -134,12 +134,12 @@ TextureImporter:
       name: Run_right_0
       rect:
         serializedVersion: 2
-        x: 6
-        y: 801
-        width: 260
-        height: 260
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+        x: 0
+        y: 800.25
+        width: 266.75
+        height: 266.75
+      alignment: 9
+      pivot: {x: 0.55, y: 0.15}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -155,12 +155,12 @@ TextureImporter:
       name: Run_right_1
       rect:
         serializedVersion: 2
-        x: 273
-        y: 801
-        width: 260
-        height: 260
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+        x: 266
+        y: 800.25
+        width: 266.75
+        height: 266.75
+      alignment: 9
+      pivot: {x: 0.55, y: 0.15}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -176,12 +176,12 @@ TextureImporter:
       name: Run_right_2
       rect:
         serializedVersion: 2
-        x: 540
-        y: 801
-        width: 260
-        height: 260
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+        x: 532
+        y: 800.25
+        width: 266.75
+        height: 266.75
+      alignment: 9
+      pivot: {x: 0.55, y: 0.15}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -197,12 +197,12 @@ TextureImporter:
       name: Run_right_3
       rect:
         serializedVersion: 2
-        x: 807
-        y: 801
-        width: 260
-        height: 260
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+        x: 798
+        y: 800.25
+        width: 266.75
+        height: 266.75
+      alignment: 9
+      pivot: {x: 0.55, y: 0.15}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -218,12 +218,12 @@ TextureImporter:
       name: Run_right_4
       rect:
         serializedVersion: 2
-        x: 6
-        y: 534
-        width: 260
-        height: 260
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+        x: 0
+        y: 534.25
+        width: 266.75
+        height: 266.75
+      alignment: 9
+      pivot: {x: 0.55, y: 0.15}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -239,12 +239,12 @@ TextureImporter:
       name: Run_right_5
       rect:
         serializedVersion: 2
-        x: 273
-        y: 534
-        width: 260
-        height: 260
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+        x: 266
+        y: 534.25
+        width: 266.75
+        height: 266.75
+      alignment: 9
+      pivot: {x: 0.55, y: 0.15}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -260,12 +260,12 @@ TextureImporter:
       name: Run_right_6
       rect:
         serializedVersion: 2
-        x: 540
-        y: 534
-        width: 260
-        height: 260
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+        x: 532
+        y: 534.25
+        width: 266.75
+        height: 266.75
+      alignment: 9
+      pivot: {x: 0.55, y: 0.15}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -281,12 +281,12 @@ TextureImporter:
       name: Run_right_7
       rect:
         serializedVersion: 2
-        x: 807
-        y: 534
-        width: 260
-        height: 260
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+        x: 798
+        y: 534.25
+        width: 266.75
+        height: 266.75
+      alignment: 9
+      pivot: {x: 0.55, y: 0.15}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -302,12 +302,12 @@ TextureImporter:
       name: Run_right_8
       rect:
         serializedVersion: 2
-        x: 6
-        y: 267
-        width: 260
-        height: 260
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+        x: 0
+        y: 268.25
+        width: 266.75
+        height: 266.75
+      alignment: 9
+      pivot: {x: 0.55, y: 0.15}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -323,12 +323,12 @@ TextureImporter:
       name: Run_right_9
       rect:
         serializedVersion: 2
-        x: 273
-        y: 267
-        width: 260
-        height: 260
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+        x: 266
+        y: 268.25
+        width: 266.75
+        height: 266.75
+      alignment: 9
+      pivot: {x: 0.55, y: 0.15}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
