@@ -45,9 +45,6 @@ public class PlayerPointerPlacer : MonoBehaviour
         br.lat = mapDisplayer.MaxLatitude;
         pinSpriteRenderer = Pin.GetComponent<SpriteRenderer>();
         accuracyCircleScale = accuracyCircle.transform.localScale.x * Pin.transform.localScale.x;
-#if !UNITY_EDITOR
-        Pin2.gameObject.SetActive(false);
-#endif
     }
 
     // Update is called once per frame

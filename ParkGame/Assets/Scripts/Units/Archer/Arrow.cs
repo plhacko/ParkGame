@@ -8,22 +8,24 @@ namespace Units.Archer {
         [SerializeField] private float moveSpeed;
         [SerializeField] private float delay;
         [SerializeField] private SpriteRenderer spriteRenderer;
-        [SerializeField] private SpriteRenderer feathersSpriteRenderer;
+        [SerializeField] private SpriteRenderer feathersSpriteRenderer = null;
         [SerializeField] private ColorSettings colorSettings;
 
         private int team;
         private int damage;
         private Vector3 positionOfTarget;
         private float spawnTime;
-        private bool dealtDamage;
+        private bool rock;
 
-        public void Initialize(Vector3 targetPosition, int damage, int team) {
+        public void Initialize(Vector3 targetPosition, int damage, int team, bool flyingRock = false) {
             this.damage = damage;
             this.team = team;
             this.positionOfTarget = targetPosition;
             this.spawnTime = Time.time;
-
-            initColorClientRPC();
+            rock = flyingRock;
+            if (feathersSpriteRenderer != null) {
+                initColorClientRPC();
+            }
         }
 
         [ClientRpc]
@@ -37,8 +39,6 @@ namespace Units.Archer {
         }
 
         void Hit() {
-            Debug.Log("Arrow hits");
-
             Collider2D[] collider2Ds = Physics2D.OverlapCircleAll(transform.position, 0.1f);
             foreach (var c in collider2Ds) {
                 if (c.gameObject.GetComponent<SoldierBase>() != null) {
@@ -46,14 +46,16 @@ namespace Units.Archer {
 
                     // find first hit enemy soldier, deal him damage, destruct arrow
                     if (hitTarget.Team != team) {
-                        Debug.Log(team + " hits " + hitTarget.Team);
                         hitTarget.TakeDamage(damage);
                         return;
                     }
                 }
             }
         }
-
+        [ClientRpc]
+        protected void PlayArcherAttackSFXClientRpc() {
+            AudioManager.Instance.PlayArcherAttack(transform.position);
+        }
         private void Update() {
             if (!IsServer) return;
             if (this.spawnTime + delay > Time.time) return;
@@ -61,6 +63,9 @@ namespace Units.Archer {
             // ARROW HITS
             if (Vector3.Distance(transform.position, positionOfTarget) < 0.1f) {
                 Hit();
+                if (rock) {
+                    PlayArcherAttackSFXClientRpc();
+                }
                 Destroy(gameObject);
                 return;
             

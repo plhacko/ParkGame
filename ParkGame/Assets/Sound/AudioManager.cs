@@ -37,6 +37,7 @@ public class AudioManager : MonoBehaviour
     [SerializeField] private List<AudioClip> molemanAttackSfx_list;
     [SerializeField] private List<AudioClip> soldierClickSfx_list;
     [SerializeField] private List<AudioClip> diedSfx_list;
+    [SerializeField] private List<AudioClip> arrowAttackSfx_list;
     [SerializeField] private List<AudioClip> clickSfx_list;
 
     private Dictionary<string, AudioClip> notificationsDict = new Dictionary<string, AudioClip>();
@@ -135,6 +136,11 @@ public class AudioManager : MonoBehaviour
 
     public void PlayArcherAttack(Vector3 position) {
         AudioClip sfx = GetRandomItem(archerAttackSfx_list);
+        PoolSfxBasedOnCommander(sfx, position);
+    }
+
+    public void PlayArrowAttack(Vector3 position) {
+        AudioClip sfx = GetRandomItem(arrowAttackSfx_list);
         PoolSfxBasedOnCommander(sfx, position);
     }
 

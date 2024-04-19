@@ -18,10 +18,10 @@ GameObject:
   - component: {fileID: 112822024680283683}
   - component: {fileID: 1858124458441567741}
   - component: {fileID: 2124107133495217878}
-  - component: {fileID: 7124321394914278606}
   - component: {fileID: -8023920900612525577}
   - component: {fileID: 5944597004745786771}
   - component: {fileID: -4635222486533330687}
+  - component: {fileID: 5389895377802796543}
   m_Layer: 8
   m_Name: Pawn
   m_TagString: Untagged
@@ -37,7 +37,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2149011059489662585}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -0.089, y: -0.073, z: 0}
   m_LocalScale: {x: 0.8, y: 0.8, z: 0.8}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -212,7 +212,7 @@ CapsuleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -0.05836451, y: -0.30197233}
+  m_Offset: {x: 0.03, y: 0}
   m_Size: {x: 0.4933498, y: 1.0110162}
   m_Direction: 0
 --- !u!50 &112822024680283683
@@ -296,21 +296,9 @@ NavMeshAgent:
   m_AutoBraking: 1
   m_AutoRepath: 1
   m_Height: 0.2
-  m_BaseOffset: 0.7
+  m_BaseOffset: 0.42
   m_WalkableMask: 5
   m_ObstacleAvoidanceType: 4
---- !u!114 &7124321394914278606
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2149011059489662585}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0daf9da1e06be9746a47c0165d613f03, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &-8023920900612525577
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -365,6 +353,18 @@ MonoBehaviour:
   shader2: {fileID: 4800000, guid: 56d0ea9920376a34da1fdf1d9b3f19c9, type: 3}
   excludeObjects:
   - {fileID: 8791321709472324239}
+--- !u!114 &5389895377802796543
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2149011059489662585}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e39f6090724e4a4a8aadeb042afa2bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8791321709472324239
 GameObject:
   m_ObjectHideFlags: 0
