@@ -507,6 +507,9 @@ public class SoldierBase : NetworkBehaviour, ITeamMember {
         CommanderToFollow?.GetComponent<ICommander>()?.ReportUnfollowing(gameObject);
 
         FormationFromFollowedCommander?.RemoveFromFormation(gameObject, ObjectToFollowInFormation, FormationType);
+        
+        FindObjectOfType<VictoryPoint>()?.TryRemoveUnit(this);
+        
         OnDeath?.Invoke();
         playerManager.RemoveSoldierFromTeam(Team, transform);
         TimeToDestroy(DeathFadeTime);

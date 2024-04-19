@@ -22,7 +22,7 @@ public class VictoryPoint : NetworkBehaviour, IConquerable
     private NetworkList<int> teamScores;
     
     private SpriteRenderer spriteRenderer;
-    private GameObject conquerModuleObject;
+    private ConquerModule conquerModuleObject;
     private PlayerManager playerManager;
     private GameSessionManager gameSessionManager;
     private Announcer announcer;
@@ -31,7 +31,7 @@ public class VictoryPoint : NetworkBehaviour, IConquerable
     void CloseVPClientRpc() {
         spriteRenderer.color = new Color(0.8f, 0.8f, 0.8f, 0.2f);
         isOpen = false;
-        conquerModuleObject.SetActive(false);
+        conquerModuleObject.gameObject.SetActive(false);
         isNotified = false;
     }
 
@@ -39,13 +39,13 @@ public class VictoryPoint : NetworkBehaviour, IConquerable
     void OpenVPClientRpc() {
         spriteRenderer.color = new Color(1, 1, 1, 1);
         isOpen = true;
-        conquerModuleObject.SetActive(true);
+        conquerModuleObject.gameObject.SetActive(true);
     }
 
     private void Awake()
     {
         teamScores = new NetworkList<int>();
-        conquerModuleObject = GetComponentInChildren<ConquerModule>().gameObject;
+        conquerModuleObject = GetComponentInChildren<ConquerModule>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         lastConquestTime = float.MaxValue;
         playerManager = FindObjectOfType<PlayerManager>();
@@ -158,5 +158,10 @@ public class VictoryPoint : NetworkBehaviour, IConquerable
     public int GetTeam()
     {
         return -1;
+    }
+
+    public void TryRemoveUnit(ITeamMember tm)
+    {
+        conquerModuleObject.TryRemoveUnit(tm);
     }
 }

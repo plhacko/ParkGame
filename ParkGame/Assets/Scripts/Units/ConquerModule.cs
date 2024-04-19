@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Managers;
 using Unity.Netcode;
@@ -153,32 +154,39 @@ public class ConquerModule : NetworkBehaviour
         }
     }
 
+    public void TryRemoveUnit(ITeamMember tm)
+    {
+        if (tm.Team == ConquererTeam && VisibleConquerUnits.Contains(tm))
+        {
+            int conquererTeam = ConquererTeam;
+            VisibleConquerUnits.Remove(tm);
+                
+            if (VisibleConquerUnits.Count == 0)
+            {
+                isBeingConquered = false;
+                ConquerPoints = 0;
+                conquerable.OnStoppedConquering(conquererTeam);
+                if (VisibleOtherUnits.Count > 0)
+                {
+                    VisibleConquerUnits.AddRange(VisibleOtherUnits);
+                    VisibleOtherUnits.Clear();
+                    conquerable.OnStartedConquering(ConquererTeam);
+                }
+            }
+        }
+        else if (VisibleOtherUnits.Contains(tm))
+        {
+            VisibleOtherUnits.Remove(tm);
+        }
+    }
+
     void OnCollisionExit2D(Collision2D collision)
     {
         if (!NetworkManager.Singleton.IsServer) { return; }
         
-        if (collision.gameObject.TryGetComponent<ITeamMember>(out ITeamMember tm))
+        if (collision.gameObject.TryGetComponent(out ITeamMember tm))
         {
-            if (tm.Team == ConquererTeam)
-            {
-                int conquererTeam = ConquererTeam;
-                VisibleConquerUnits.Remove(tm);
-                
-                if (VisibleConquerUnits.Count == 0)
-                {
-                    isBeingConquered = false;
-                    ConquerPoints = 0;
-                    conquerable.OnStoppedConquering(conquererTeam);
-                    if (VisibleOtherUnits.Count > 0)
-                    {
-                        VisibleConquerUnits.AddRange(VisibleOtherUnits);
-                        VisibleOtherUnits.Clear();
-                        conquerable.OnStartedConquering(ConquererTeam);
-                    }
-                }
-            }
-            else
-            { VisibleOtherUnits.Remove(tm); }
+            TryRemoveUnit(tm);
         }
     }
 }
