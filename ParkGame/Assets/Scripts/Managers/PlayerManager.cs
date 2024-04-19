@@ -122,12 +122,18 @@ namespace Managers
                         unit.GetComponent<NetworkObject>().Spawn();
                         SoldierBase soldier = unit.GetComponent<SoldierBase>();
                         soldier.Team = i;
-                        soldier.SetCommanderToFollow(member.transform);
-                        soldier.NewCommand(SoldierCommand.Following);
+                        StartCoroutine(initFollowing(soldier, member.transform));
                         AddSoldierToTeam(i, soldier.transform);   
                     }
                 }
             }
+        }
+        
+        IEnumerator initFollowing(SoldierBase soldier, Transform target)
+        {
+            yield return new WaitForSeconds(2); // give player some time before units start following him :)
+            soldier.SetCommanderToFollow(target);
+            soldier.NewCommand(SoldierCommand.Following);
         }
 
         [ClientRpc] 
