@@ -18,8 +18,8 @@ Many thanks to the project lead RNDr. Tomáš Holan, Ph.D., and also many thanks
 - built application can be downloaded in the repository's [Releases](https://github.com/plhacko/ParkGame/releases)
 
 ## Documentation
-- User documentation: [link]()
+- User documentation: [link](Docs/ParkGame%20project%20-%20user%20documentation.pdf)
   - This document contains information how to use the application.
-- Programmer documentation: [link]()
+- Programmer documentation: [link](Docs/ParkGame%20project%20-%20documentation.pdf)
   - This document contains information about the implementation of the application.
   - It is advised for the programmer to read the user documentation first.    
