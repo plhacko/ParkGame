@@ -14,6 +14,9 @@ The game was created by:
 
 Many thanks to the project lead RNDr. Tomáš Holan, Ph.D., and also many thanks to Vojtěch Pinc, the author of the sprite animations.
 
+## Trailer
+[![Game_Play](https://i.imgur.com/PdfsoSa.png)](https://www.youtube.com/watch?v=bzuVROxNfSw "Click to watch")
+
 ## Application
 - built application can be downloaded in the repository's [Releases](https://github.com/plhacko/ParkGame/releases)
 
@@ -23,3 +26,6 @@ Many thanks to the project lead RNDr. Tomáš Holan, Ph.D., and also many thanks
 - Programmer documentation: [link](Docs/ParkGame%20project%20-%20documentation.pdf)
   - This document contains information about the implementation of the application.
   - It is advised for the programmer to read the user documentation first.    
+
+## Game Play Footage
+[![Game_Play](https://i.imgur.com/grY0B4s.png)](https://www.youtube.com/watch?v=dOi9LRwLjRY "Click to watch")
