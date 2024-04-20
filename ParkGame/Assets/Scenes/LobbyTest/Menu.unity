@@ -1590,6 +1590,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 354576630}
     m_Modifications:
+    - target: {fileID: 1751956271828414734, guid: 9905b8689a11dcb408e0f79ff2a31bbc, type: 3}
+      propertyPath: m_text
+      value: "The game was created by:\r\nHong Son Ngo\r\nAl\u017Eb\u011Bta Mrkvov\xE1\r\nTom\xE1\u0161
+        Plh\xE1k\r\nFilip Ruta\r\nOnd\u0159ej Vaic\r\n"
+      objectReference: {fileID: 0}
     - target: {fileID: 3476490310529731351, guid: 9905b8689a11dcb408e0f79ff2a31bbc, type: 3}
       propertyPath: m_AnchorMax.x
       value: 1
@@ -1717,6 +1722,13 @@ PrefabInstance:
     - target: {fileID: 7530403938473826165, guid: 9905b8689a11dcb408e0f79ff2a31bbc, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8335277944764651697, guid: 9905b8689a11dcb408e0f79ff2a31bbc, type: 3}
+      propertyPath: m_text
+      value: "This game was created between 2023 and 2024 as a part of the software
+        project course at the faculty of mathematics and physics at Charles University.\r\n\r\n\n\r\nMany
+        thanks to the project lead RNDr. Tom\xE1\u0161 Holan, Ph.D., and also many
+        thanks to Vojt\u011Bch Pinc, the author of the sprite animations."
       objectReference: {fileID: 0}
     - target: {fileID: 9023345736965006603, guid: 9905b8689a11dcb408e0f79ff2a31bbc, type: 3}
       propertyPath: m_AnchorMax.x
