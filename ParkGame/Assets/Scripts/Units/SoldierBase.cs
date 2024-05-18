@@ -339,7 +339,7 @@ public class SoldierBase : NetworkBehaviour, ITeamMember {
 
         if (enemyT != null && distanceFromOutpost < DefendDistanceFromCommander) {
             float distanceOfEnemyToOutpost = Vector3.Distance(enemyT.position, CommanderToFollow.position);
-            if (AttackEnemyIfInRange(enemyT, DefendDistanceFromCommander)) {
+            if (AttackEnemyIfInRange(enemyT)) {
                 return;
             } else if (distanceOfEnemyToOutpost <= DefendDistanceFromCommander) {
                 MoveTowardsEntity(enemyT);
